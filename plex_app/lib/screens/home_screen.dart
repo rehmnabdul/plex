@@ -71,7 +71,7 @@ class _HomeScreenState extends PlexState<HomeScreen> {
 
     return Column(children: [
       PlexFormWidget(
-        form: myUser,
+        entity: myUser,
         onSubmit: () {
           print(myUser.toString());
         },

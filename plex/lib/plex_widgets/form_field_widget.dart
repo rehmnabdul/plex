@@ -11,7 +11,7 @@ class PlexInputWidget<T> extends StatefulWidget {
   static const typeDate = 2;
   static const typeButton = 3;
 
-  const PlexInputWidget({
+  PlexInputWidget({
     Key? key,
     this.title,
     required this.type,
@@ -48,17 +48,17 @@ class PlexInputWidget<T> extends StatefulWidget {
   final TextEditingController? inputController;
   final TextInputType inputKeyboardType;
   final bool isPassword;
-  final Function(String)? inputOnSubmit;
-  final Function(String)? inputOnChange;
+  final Function(String value)? inputOnSubmit;
+  final Function(String value)? inputOnChange;
 
   //Dropdown Field
   final List<T>? dropdownItems;
-  final Widget Function(dynamic)? dropDownLeadingIcon;
+  final Widget Function(dynamic item)? dropDownLeadingIcon;
   final Future<List<dynamic>>? dropdownAsyncItems;
-  final Widget Function(dynamic)? dropdownItemWidget;
-  final bool Function(String, dynamic)? dropdownOnSearch;
-  final String Function(dynamic)? dropdownItemAsString;
-  final Function(dynamic)? dropdownItemOnSelect;
+  final Widget Function(dynamic item)? dropdownItemWidget;
+  final bool Function(String query, dynamic item)? dropdownOnSearch;
+  String Function(dynamic item)? dropdownItemAsString = (item) => item.toString();
+  final Function(dynamic item)? dropdownItemOnSelect;
 
   //Button Field
   final Color? buttonColor;

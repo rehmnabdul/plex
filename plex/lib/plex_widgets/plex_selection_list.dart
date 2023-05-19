@@ -7,11 +7,11 @@ showSelectionList<T>(
   BuildContext context, {
   List<T>? items,
   Future<List<T>>? asyncItems,
-  required String Function(T) itemText,
-  required Function(T) onSelect,
-  Widget Function(dynamic)? itemWidget,
-  Widget Function(T)? leadingIcon,
-  bool Function(String, dynamic)? onSearch,
+  required String Function(T item) itemText,
+  required Function(T item) onSelect,
+  Widget Function(dynamic item)? itemWidget,
+  Widget Function(T item)? leadingIcon,
+  bool Function(String query, dynamic item)? onSearch,
 }) async {
   var originalListData = items;
   originalListData ??= await asyncItems;

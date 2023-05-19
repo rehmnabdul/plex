@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:plex_package/plex_screens/plex_screen.dart';
-import 'package:plex_package/plex_utils/plex_dimensions.dart';
-import 'package:plex_package/plex_widgets/plex_date_picker_widget.dart';
-import 'package:plex_package/plex_widgets/plex_form.dart';
+import 'package:plex/plex_screens/plex_screen.dart';
+import 'package:plex/plex_utils/plex_dimensions.dart';
+import 'package:plex/plex_widgets/plex_date_picker_widget.dart';
+import 'package:plex/plex_widgets/plex_form.dart';
 
 class MyUser extends PlexForm {
   String firstName;
@@ -69,13 +69,11 @@ class _HomeScreenState extends PlexState<HomeScreen> {
     var myUser = MyUser("Abdur", "Rahman", 5, DateTime.now(), true, "Pak");
     print(myUser.toString());
 
-    return Column(children: [
-      PlexFormWidget(
-        entity: myUser,
-        onSubmit: () {
-          print(myUser.toString());
-        },
-      ),
-    ]);
+    return PlexFormWidget(
+      entity: myUser,
+      onSubmit: () {
+        print(myUser.toString());
+      },
+    );
   }
 }

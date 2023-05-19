@@ -31,8 +31,8 @@ dependencies:
   flutter:
     sdk: flutter
 
-  plex_package:
-    path: ..\plex_package
+  plex:
+    path: ..\plex
 
 
   # The following adds the Cupertino Icons font to your application.

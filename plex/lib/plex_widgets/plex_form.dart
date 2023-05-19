@@ -15,7 +15,7 @@ class PlexField {
   late Type type;
   bool isPassword = false;
 
-  String Function(dynamic item) itemAsString = (item) => item.toString();
+  String Function(dynamic item)? itemAsString = (item) => item.toString();
   List<dynamic>? dropDownItems;
   Future<List<dynamic>>? dropDownItemsAsync;
   bool Function(String, dynamic)? onSearch;
@@ -37,7 +37,7 @@ class PlexField {
   PlexField.dropDown({
     required this.title,
     required this.onChange,
-    required this.itemAsString,
+    this.itemAsString,
     this.dropDownItems,
     this.dropDownItemsAsync,
     this.onSearch,
@@ -48,6 +48,7 @@ class PlexField {
     if (dropDownItems == null && dropDownItemsAsync == null) {
       throw Exception("Items must be initialized or async item function must be initialized");
     }
+    itemAsString ??= (item) => item.toString();
     thirdParty = true;
   }
 }
@@ -122,7 +123,7 @@ class _PlexFormWidgetState extends State<PlexFormWidget> {
             type: PlexInputWidget.typeDropdown,
             dropdownSelectionController: PlexWidgetController(data: value.initialVaue),
             dropdownItemOnSelect: (p) => value.onChange(p),
-            dropdownItemAsString: (p) => value.itemAsString(p),
+            dropdownItemAsString: (p) => value.itemAsString!(p),
             dropdownItems: value.dropDownItems,
             dropdownAsyncItems: value.dropDownItemsAsync,
             dropdownOnSearch: value.onSearch,

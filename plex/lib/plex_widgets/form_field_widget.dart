@@ -65,7 +65,7 @@ class PlexInputWidget<T> extends StatefulWidget {
   final Icon? buttonIcon;
   final Function()? buttonClick;
 
-  final PlexWidgetController<T>? dropdownSelectionController;
+  final PlexWidgetController<T?>? dropdownSelectionController;
 
   @override
   State<PlexInputWidget> createState() => _PlexInputWidgetState<T>();
@@ -73,10 +73,10 @@ class PlexInputWidget<T> extends StatefulWidget {
 
 class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
 
-  PlexWidgetController<T>? _dropdownSelectionController;
+  PlexWidgetController<T?>? _dropdownSelectionController;
 
   getDropDownController() {
-    _dropdownSelectionController ??= (widget.dropdownSelectionController ?? PlexWidgetController<T>()) as PlexWidgetController<T>?;
+    _dropdownSelectionController ??= (widget.dropdownSelectionController ?? PlexWidgetController<T?>()) as PlexWidgetController<T?>?;
     return _dropdownSelectionController;
   }
 
@@ -125,8 +125,8 @@ class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
           child: Row(
             children: [
               Expanded(
-                child: PlexWidget<T>(
-                  controller: getDropDownController() as PlexWidgetController<T>,
+                child: PlexWidget<T?>(
+                  controller: getDropDownController() as PlexWidgetController<T?>,
                   createWidget: (context, data) {
                     return Text(
                       data != null ? widget.dropdownItemAsString!(data) : "N/A",

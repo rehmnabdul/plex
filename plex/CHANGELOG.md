@@ -10,3 +10,7 @@
 ## 0.0.3
 
 * Fix `itemAsString` and mark it as not required
+
+## 0.0.4
+
+* Fix bug in `PlexDataPicker`, crashes app when clear date if it's not already selected

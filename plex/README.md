@@ -14,7 +14,7 @@ the resulting application meets the high standards of enterprise-level software.
 
 #### Note:
 
-`PLEX` also prvide a single click to move from `Material 2` to `Material 3` and `Light Mode` to `Dark Mode`.
+`PLEX` also provide a single click to move from `Material 2` to `Material 3` and `Light Mode` to `Dark Mode`.
 
 ## Screenshots
 

@@ -1,4 +1,4 @@
-## PLEX
+# <center>PLEX</center>
 
 `PLEX` is a UI framework for Flutter designed specifically for building enterprise applications. It provides a robust and customizable foundation for the entire application, including boilerplate code for main.dart file, routes, screens, and other essential components.
 
@@ -18,13 +18,21 @@ the resulting application meets the high standards of enterprise-level software.
 
 ### Material 2
 
-<img alt="Material 2 Light" src="plex/screenshots/img_1.png" title="Material 2 Light" width="200"/>
-<img alt="Material 2 Dark" src="plex/screenshots/img_3.png" width="200" title="Material 2 Dark">
+<div style="text-align: center;">
+<p align="center">
+<img alt="Material 2 Light" src="screenshots/img_1.png" width="49.7%" title="Material 2 Light"/>
+<img alt="Material 2 Dark" src="screenshots/img_3.png" width="49.7%" title="Material 2 Dark">
+</p>
+</div>
 
 ### Material 3
 
-<img alt="Material 3 Light" src="plex/screenshots/img_2.png" title="Material 2 Light" width="200"/>
-<img alt="Material 3 Dark" src="plex/screenshots/img_4.png" width="200" title="Material 3 Dark">
+<div style="text-align: center;">
+<p align="center">
+<img alt="Material 3 Light" src="screenshots/img_2.png"  width="49.7%" title="Material 2 Light"/>
+<img alt="Material 3 Dark" src="screenshots/img_4.png" width="49.7%" title="Material 3 Dark">
+</p>
+</div>
 
 ## Features
 

@@ -3,19 +3,29 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:plex/plex_db.dart';
+import 'package:plex/plex_package.dart';
 import 'package:plex/plex_screens/plex_screen.dart';
-import 'package:plex/plex_theme.dart';
 import 'package:plex/plex_user.dart';
 import 'package:plex/plex_utils/plex_dimensions.dart';
 import 'package:plex/plex_utils/plex_routing.dart';
-import 'package:plex/plex_widgets/form_field_widget.dart';
+import 'package:plex/plex_widgets/plex_input_widget.dart';
+
+class PlexLoginConfig {
+  PlexLoginConfig({
+    required this.onLogin,
+    this.additionalWidgets,
+  });
+
+  final Future<PlexUser?> Function(String email, String password) onLogin;
+  final Widget? additionalWidgets;
+}
 
 class PlexLoginScreen extends PlexScreen {
-  const PlexLoginScreen({Key? key, this.logo, required this.onLogin, required this.nextRoute}) : super(key: key);
+  const PlexLoginScreen({Key? key, this.logo, required this.loginConfig, required this.nextRoute}) : super(key: key);
 
   final Widget? logo;
   final String nextRoute;
-  final Future<PlexUser?> Function(String email, String password) onLogin;
+  final PlexLoginConfig loginConfig;
 
   @override
   PlexState<PlexLoginScreen> createState() => _PlexLoginScreenState();
@@ -30,7 +40,7 @@ class _PlexLoginScreenState extends PlexState<PlexLoginScreen> {
     super.initState();
 
     if (PlexDb.instance.getString(PlexDb.loggedInUser) != null) {
-      Future.delayed(const Duration(milliseconds: 100), () => Plex.offAndToNamed(widget.nextRoute));
+      Future.delayed(const Duration(milliseconds: 100), () => Plex.offAndToNamed(PlexRoutesPaths.homePath));
       return;
     }
 
@@ -48,11 +58,9 @@ class _PlexLoginScreenState extends PlexState<PlexLoginScreen> {
     return Center(
       child: Container(
         constraints: const BoxConstraints(
-          maxWidth: 300,
+          maxWidth: 350,
         ),
         child: Card(
-          color: customTheme.cardColor,
-          elevation: Dim.medium,
           child: Padding(
             padding: const EdgeInsets.all(Dim.medium),
             child: Column(
@@ -61,19 +69,22 @@ class _PlexLoginScreenState extends PlexState<PlexLoginScreen> {
                 if (widget.logo != null) ...{
                   widget.logo!,
                 },
+                spaceMedium(),
                 PlexInputWidget(
                   title: "Username / Email",
+                  inputHint: "Enter Your Email or Username",
                   type: PlexInputWidget.typeInput,
                   inputController: usernameController,
-                  fieldColor: customTheme.colorScheme.background,
                 ),
+                spaceMedium(),
                 PlexInputWidget(
                   title: "Password",
+                  inputHint: "Enter Your Password",
                   type: PlexInputWidget.typeInput,
                   inputController: passController,
-                  fieldColor: customTheme.colorScheme.background,
                   isPassword: true,
                 ),
+                spaceMedium(),
                 PlexInputWidget(
                   title: "Login",
                   buttonIcon: const Icon(Icons.login),
@@ -88,10 +99,10 @@ class _PlexLoginScreenState extends PlexState<PlexLoginScreen> {
                       return;
                     }
 
-                    var result = await widget.onLogin(usernameController.text.toString(), passController.text.toString());
+                    var result = await widget.loginConfig.onLogin(usernameController.text.toString(), passController.text.toString());
                     if (result != null) {
                       PlexDb.instance.setString(PlexDb.loggedInUser, jsonEncode(result.userData));
-                      Plex.offAndToNamed(widget.nextRoute);
+                      Plex.offAndToNamed(PlexRoutesPaths.homePath);
                     }
                   },
                 ),

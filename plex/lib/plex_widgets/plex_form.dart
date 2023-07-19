@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:plex/plex_utils/plex_dimensions.dart';
 import 'package:plex/plex_widget.dart';
-import 'package:plex/plex_widgets/form_field_widget.dart';
+import 'package:plex/plex_widgets/plex_input_widget.dart';
 
 abstract class PlexForm {
   List<PlexField> getFields();

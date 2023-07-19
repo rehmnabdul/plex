@@ -43,19 +43,6 @@ class _PlexDatePickerWidgetState extends State<PlexDatePickerWidget> {
                     firstDate: DateTime(2020, 1, 1),
                     lastDate: DateTime(2050, 12, 31),
                     useRootNavigator: true,
-                    builder: (context, child) {
-                      return Theme(
-                        data: Theme.of(context).copyWith(
-                          colorScheme: customTheme.colorScheme,
-                          textButtonTheme: TextButtonThemeData(
-                            style: TextButton.styleFrom(
-                              foregroundColor: customTheme.colorScheme.secondary, // button text color
-                            ),
-                          ),
-                        ),
-                        child: child!,
-                      );
-                    },
                   ).then((value) {
                     if (value != null) {
                       controller.text = value.getFormattedStringFromDate();
@@ -64,9 +51,8 @@ class _PlexDatePickerWidgetState extends State<PlexDatePickerWidget> {
                   });
                 },
                 controller: controller,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   border: InputBorder.none,
-                  fillColor: customTheme.colorScheme.primary,
                 ),
               ),
             ),

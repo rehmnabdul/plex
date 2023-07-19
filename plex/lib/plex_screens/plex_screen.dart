@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:plex/plex_theme.dart';
 import 'package:plex/plex_widget.dart';
 
 abstract class PlexScreen extends StatefulWidget {
@@ -45,7 +44,6 @@ abstract class PlexState<T extends PlexScreen> extends State<T> {
   Widget build(BuildContext context) {
     var body = Scaffold(
       key: key,
-      backgroundColor: customTheme.colorScheme.background,
       appBar: buildAppBar(),
       drawer: buildDrawer(),
       body: SafeArea(

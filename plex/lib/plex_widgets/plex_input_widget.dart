@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:plex/plex_theme.dart';
 import 'package:plex/plex_utils/plex_dimensions.dart';
 import 'package:plex/plex_widget.dart';
 import 'package:plex/plex_widgets/plex_date_picker_widget.dart';
@@ -22,6 +21,7 @@ class PlexInputWidget<T> extends StatefulWidget {
     this.inputController,
     this.inputKeyboardType = TextInputType.name,
     this.isPassword = false,
+    this.inputAction,
     this.inputOnChange,
     this.inputOnSubmit,
     this.dropdownItems,
@@ -48,6 +48,7 @@ class PlexInputWidget<T> extends StatefulWidget {
   final TextEditingController? inputController;
   final TextInputType inputKeyboardType;
   final bool isPassword;
+  final TextInputAction? inputAction;
   final Function(String value)? inputOnSubmit;
   final Function(String value)? inputOnChange;
 
@@ -89,7 +90,7 @@ class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
         enabled: widget.editable,
         controller: widget.inputController,
         keyboardType: widget.inputKeyboardType,
-        style: customTheme.textTheme.labelSmall!.copyWith(color: Colors.black),
+        textInputAction: widget.inputAction ?? TextInputAction.next,
         onSubmitted: (c) {
           widget.inputOnSubmit?.call(c.toString());
         },
@@ -98,10 +99,55 @@ class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
         },
         obscureText: widget.isPassword,
         decoration: InputDecoration(
-          border: InputBorder.none,
+          // border: InputBorder.none,
+          border: const OutlineInputBorder(),
           hintText: widget.inputHint,
+          //prefixIcon: const Icon(Icons.search),
+          //suffixIcon: _ClearButton(controller: _controllerFilled),
+          labelText: widget.title ?? "",
+          helperText: widget.helperText,
+          filled: true,
         ),
       );
+    } else if (widget.type == PlexInputWidget.typeButton) {
+      inputWidget = Container(
+        height: 45,
+        padding: const EdgeInsets.symmetric(horizontal: Dim.medium),
+        child: ElevatedButton(
+          onPressed: () {
+            widget.buttonClick?.call();
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: widget.buttonColor,
+            foregroundColor: Colors.grey,
+            textStyle: const TextStyle(fontSize: Dim.fontLarge),
+          ),
+          child: Wrap(crossAxisAlignment: WrapCrossAlignment.center, alignment: WrapAlignment.center, children: [
+            if (widget.buttonIcon != null) ...{
+              Icon(widget.buttonIcon!.icon),
+            },
+            if (widget.buttonIcon != null && widget.title != null) ...{
+              spaceSmall(),
+            },
+            if (widget.title != null) ...{
+              Text(
+                widget.title!,
+              )
+            },
+          ]),
+        ),
+      );
+
+      inputWidget = widget.buttonIcon == null
+          ? FilledButton(
+              onPressed: () => widget.buttonClick?.call(),
+              child: Text(widget.title ?? ""),
+            )
+          : FilledButton.tonalIcon(
+              onPressed: () => widget.buttonClick?.call(),
+              icon: widget.buttonIcon!,
+              label: Text(widget.title ?? ""),
+            );
     } else if (widget.type == PlexInputWidget.typeDropdown) {
       inputWidget = SizedBox(
         height: 45,
@@ -148,80 +194,17 @@ class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
           getDropDownController().setValue(dateTime);
         },
       );
-    } else if (widget.type == PlexInputWidget.typeButton) {
-      inputWidget = Container(
-        height: 45,
-        padding: const EdgeInsets.symmetric(horizontal: Dim.medium),
-        child: ElevatedButton(
-          onPressed: () {
-            widget.buttonClick?.call();
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: widget.buttonColor,
-            foregroundColor: Colors.grey,
-            textStyle: const TextStyle(fontSize: Dim.fontLarge),
-          ),
-          child: Wrap(crossAxisAlignment: WrapCrossAlignment.center, alignment: WrapAlignment.center, children: [
-            if (widget.buttonIcon != null) ...{
-              Icon(widget.buttonIcon!.icon, color: customTheme.colorScheme.onPrimary),
-            },
-            if (widget.buttonIcon != null && widget.title != null) ...{
-              spaceSmall(),
-            },
-            if (widget.title != null) ...{
-              Text(
-                widget.title!,
-                style: TextStyle(color: customTheme.colorScheme.onPrimary),
-              )
-            },
-          ]),
-        ),
-      );
     }
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        if (widget.type == PlexInputWidget.typeButton) ...{
-          Padding(
-            padding: const EdgeInsets.only(top: Dim.medium),
-            child: inputWidget,
-          ),
-        } else ...{
-          if (widget.title != null) ...{
-            Padding(
-              padding: const EdgeInsets.only(
-                left: Dim.medium,
-                right: Dim.medium,
-                top: Dim.medium,
-              ),
-              child: Text(
-                widget.title!,
-                style: TextStyle(color: customTheme.primaryColor),
-              ),
-            ),
-          },
-          Container(
-            decoration: BoxDecoration(color: widget.fieldColor, borderRadius: const BorderRadius.all(Radius.circular(Dim.small))),
-            margin: const EdgeInsets.symmetric(vertical: Dim.small, horizontal: Dim.medium),
-            padding: const EdgeInsets.symmetric(horizontal: Dim.small),
-            child: inputWidget,
-          ),
-          if (widget.helperText != null) ...{
-            Padding(
-              padding: const EdgeInsets.only(
-                left: Dim.medium,
-                right: Dim.medium,
-              ),
-              child: Text(
-                widget.helperText!,
-                style: const TextStyle(color: Colors.grey),
-              ),
-            ),
-          }
-        },
-      ],
+    if (widget.type == PlexInputWidget.typeInput || widget.type == PlexInputWidget.typeButton) {
+      return inputWidget;
+    }
+
+    return Container(
+      decoration: BoxDecoration(color: widget.fieldColor, borderRadius: const BorderRadius.all(Radius.circular(Dim.small))),
+      margin: const EdgeInsets.symmetric(vertical: Dim.small, horizontal: Dim.medium),
+      padding: const EdgeInsets.symmetric(horizontal: Dim.small),
+      child: inputWidget,
     );
   }
 }

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 
+///This [PlexWidget] will be use to uto update the widget by updating its contorller
 class PlexWidget<T> extends StatefulWidget {
   const PlexWidget({Key? key, required this.controller, required this.createWidget, this.tag}) : super(key: key);
 
   final String? tag;
-  final Widget Function(BuildContext, dynamic) createWidget;
+  final Widget Function(BuildContext context, dynamic data) createWidget;
   final PlexWidgetController<T> controller;
 
   @override

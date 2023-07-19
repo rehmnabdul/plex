@@ -20,8 +20,8 @@ the resulting application meets the high standards of enterprise-level software.
 
 <div style="text-align: center;">
 <p align="center">
-<img alt="Material 2 Light" src="screenshots/img_1.png" width="49.7%" title="Material 2 Light"/>
-<img alt="Material 2 Dark" src="screenshots/img_3.png" width="49.7%" title="Material 2 Dark">
+<img alt="Material 2 Light" src="plex/screenshots/img_1.png" width="49.7%" title="Material 2 Light"/>
+<img alt="Material 2 Dark" src="plex/screenshots/img_3.png" width="49.7%" title="Material 2 Dark">
 </p>
 </div>
 
@@ -29,8 +29,8 @@ the resulting application meets the high standards of enterprise-level software.
 
 <div style="text-align: center;">
 <p align="center">
-<img alt="Material 3 Light" src="screenshots/img_2.png"  width="49.7%" title="Material 2 Light"/>
-<img alt="Material 3 Dark" src="screenshots/img_4.png" width="49.7%" title="Material 3 Dark">
+<img alt="Material 3 Light" src="plex/screenshots/img_2.png"  width="49.7%" title="Material 2 Light"/>
+<img alt="Material 3 Dark" src="plex/screenshots/img_4.png" width="49.7%" title="Material 3 Dark">
 </p>
 </div>
 

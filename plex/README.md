@@ -1,5 +1,6 @@
-# <center>PLEX</center>
+# <div style="text-align: center;">PLEX</div>
 
+<p style="text-align: justify;">
 `PLEX` is a UI framework for Flutter designed specifically for building enterprise applications. It provides a robust and customizable foundation for the entire application, including boilerplate code for main.dart file, routes, screens, and other essential components.
 
 In addition to the basic application structure, `PLEX` comes with pre-built components for common UI elements such as tableviews and forms. The tableviews can be easily customized to display data in various formats like lists and grids, while the forms can collect data from users using different input
@@ -9,29 +10,26 @@ types like text fields, dropdowns, and checkboxes.
 
 The `PLEX` framework is an ideal choice for developers who want to build enterprise-level applications quickly and efficiently, without compromising on quality or customization. Its pre-built components and best practices can save developers a significant amount of time and effort, while also ensuring
 the resulting application meets the high standards of enterprise-level software.
+</p>
 
-#### Note: 
+#### Note:
 
 `PLEX` also prvide a single click to move from `Material 2` to `Material 3` and `Light Mode` to `Dark Mode`.
- 
+
 ## Screenshots
-
-### Material 2
-
-<div style="text-align: center;">
-<p align="center">
-<img alt="Material 2 Light" src="screenshots/img_1.png" width="49.7%" title="Material 2 Light"/>
-<img alt="Material 2 Dark" src="screenshots/img_3.png" width="49.7%" title="Material 2 Dark">
-</p>
-</div>
 
 ### Material 3
 
 <div style="text-align: center;">
-<p align="center">
-<img alt="Material 3 Light" src="screenshots/img_2.png"  width="49.7%" title="Material 2 Light"/>
-<img alt="Material 3 Dark" src="screenshots/img_4.png" width="49.7%" title="Material 3 Dark">
-</p>
+<img alt="Material 3 Light" src="screenshots/img_2.png"  width="25%" title="Material 3 Light"/>
+<img alt="Material 3 Dark" src="screenshots/img_4.png" width="25%" title="Material 3 Dark">
+</div>
+
+### Material 2
+
+<div style="text-align: center;">
+<img alt="Material 2 Light" src="screenshots/img_1.png" width="25%" title="Material 2 Light"/>
+<img alt="Material 2 Dark" src="screenshots/img_3.png" width="25%" title="Material 2 Dark">
 </div>
 
 ## Features

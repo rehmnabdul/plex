@@ -4,6 +4,7 @@ import 'package:plex/plex_widget.dart';
 import 'package:plex/plex_widgets/plex_date_picker_widget.dart';
 import 'package:plex/plex_widgets/plex_selection_list.dart';
 
+// ignore: must_be_immutable
 class PlexInputWidget<T> extends StatefulWidget {
   static const typeInput = 0;
   static const typeDropdown = 1;

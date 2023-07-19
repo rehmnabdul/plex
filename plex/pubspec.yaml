@@ -1,7 +1,7 @@
 name: plex
-description: PLEX is a Flutter UI framework for building enterprise apps, offering pre-built components and best practices for data management, architecture, and testing. It provides a customizable foundation with boilerplate code, while its tableviews and forms can be easily customized to display and collect data. PLEX is an efficient choice for developers who want to build high-quality enterprise apps quickly and maintainable.
+description: PLEX is Flutter UI framework for enterprise apps with pre-built components and best practices for efficient development in addition with many built in widgets
 
-version: 0.0.7
+version: 0.0.8
 homepage: https://github.com/rehmnabdul/plex
 
 environment:

@@ -16,6 +16,8 @@ class Dim {
   static const fontExtraLarge = 25.0;
 }
 
+space(double space) => SizedBox(height: space, width: space);
+
 spaceSmall() => const SizedBox(height: Dim.small, width: Dim.small);
 
 spaceMedium() => const SizedBox(height: Dim.medium, width: Dim.medium);

@@ -32,3 +32,13 @@
 * Update packages to latest versions
 * Add examples to the code
 * Add licence
+
+## 0.0.8
+
+* Add more documentations
+* Updates and minor bug fixes
+
+## 0.0.9
+
+* Update `PlexInputWidget` properties
+* Make `Plex` usable without using `PlexApp`

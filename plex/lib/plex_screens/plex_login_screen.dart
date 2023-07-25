@@ -76,7 +76,6 @@ class _PlexLoginScreenState extends PlexState<PlexLoginScreen> {
                   type: PlexInputWidget.typeInput,
                   inputController: usernameController,
                 ),
-                spaceMedium(),
                 PlexInputWidget(
                   title: "Password",
                   inputHint: "Enter Your Password",
@@ -84,7 +83,6 @@ class _PlexLoginScreenState extends PlexState<PlexLoginScreen> {
                   inputController: passController,
                   isPassword: true,
                 ),
-                spaceMedium(),
                 PlexInputWidget(
                   title: "Login",
                   buttonIcon: const Icon(Icons.login),

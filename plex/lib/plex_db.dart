@@ -6,7 +6,7 @@ class PlexDb {
 
   SharedPreferences? _prefs;
 
-  initialize() async {
+  Future initialize() async {
     _prefs ??= await SharedPreferences.getInstance();
   }
 

@@ -10,7 +10,7 @@ import 'package:syncfusion_flutter_xlsio/xlsio.dart';
 class PlexPrinter {
   PlexPrinter._();
 
-  static printExcel(String title, List<String> columns, List<PlexDataRow> rows) async {
+  static printExcel(String title, List<PlexDataCell> columns, List<List<PlexDataCell>> rows) async {
     var workbook = Workbook();
 
     final Worksheet productionSheet = workbook.worksheets[0];
@@ -28,14 +28,14 @@ class PlexPrinter {
 
     var currentColumn = 2;
     for (var column in columns) {
-      productionSheet.getRangeByIndex(productionRowNumber, currentColumn++).setText(column);
+      productionSheet.getRangeByIndex(productionRowNumber, currentColumn++).setText(column.value);
     }
 
     productionRowNumber++;
     for (var row in rows) {
       currentColumn = 2;
       for (var data in row) {
-        productionSheet.getRangeByIndex(productionRowNumber, currentColumn++).setText(data);
+        productionSheet.getRangeByIndex(productionRowNumber, currentColumn++).setText(data.value);
       }
       productionRowNumber++;
     }

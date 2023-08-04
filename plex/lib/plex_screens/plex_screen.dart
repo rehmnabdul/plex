@@ -43,7 +43,7 @@ abstract class PlexState<T extends PlexScreen> extends State<T> {
   @override
   Widget build(BuildContext context) {
     var body = Scaffold(
-      key: key,
+      key: widget.key ?? key,
       appBar: buildAppBar(),
       drawer: buildDrawer(),
       body: SafeArea(

@@ -12,25 +12,24 @@ The `PLEX` framework is an ideal choice for developers who want to build enterpr
 the resulting application meets the high standards of enterprise-level software.
 </p>
 
-#### Note: 
+#### Note:
 
 `PLEX` also provide a single click to move from `Material 2` to `Material 3` and `Light Mode` to `Dark Mode`.
- 
+
 ## Screenshots
 
 ### Material 3
 
 <div style="text-align: center;">
-<img alt="Material 3 Light" src="plex/screenshots/img_2.png"  width="25%" title="Material 3 Light"/>
-<img alt="Material 3 Dark" src="plex/screenshots/img_4.png" width="25%" title="Material 3 Dark">
+<img alt="Material 3 Light" src="screenshots/img_2.png"  width="25%" title="Material 3 Light"/>
+<img alt="Material 3 Dark" src="screenshots/img_4.png" width="25%" title="Material 3 Dark">
 </div>
-
 
 ### Material 2
 
 <div style="text-align: center;">
-<img alt="Material 2 Light" src="plex/screenshots/img_1.png" width="25%" title="Material 2 Light"/>
-<img alt="Material 2 Dark" src="plex/screenshots/img_3.png" width="25%" title="Material 2 Dark">
+<img alt="Material 2 Light" src="screenshots/img_1.png" width="25%" title="Material 2 Light"/>
+<img alt="Material 2 Dark" src="screenshots/img_3.png" width="25%" title="Material 2 Dark">
 </div>
 
 ## Features

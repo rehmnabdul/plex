@@ -11,11 +11,15 @@ class PlexDataCell {
   late final String? value;
   late final DataCell? cell;
 
-  PlexDataCell(String this.value) {
+  ///[value] is required as it is text only cell
+  PlexDataCell.text(String this.value) {
     cell = null;
   }
 
-  PlexDataCell.cell(this.value, this.cell) {
+  ///For custom design and handling of cell use this constructor.
+  ///[value] is optional
+  ///[cell] is required for custom cell
+  PlexDataCell.custom(this.value, this.cell) {
     if (value == null && cell == null) throw Exception("Either Value or DataCell must not be null");
   }
 }
@@ -30,7 +34,7 @@ class PlexDataTable extends StatefulWidget {
     this.onLoadMore,
     this.headerBackground,
     this.headerTextStyle,
-    this.alternateColor = true,
+    this.alternateColor = const Color(0xFFCECECE),
   }) : super(key: key);
 
   ///All Column titles
@@ -42,7 +46,7 @@ class PlexDataTable extends StatefulWidget {
   ///Styles
   final Color? headerBackground;
   final TextStyle? headerTextStyle;
-  final bool alternateColor;
+  final Color? alternateColor;
 
   ///OnRefresh Button Click Callback
   Function()? onRefresh;
@@ -107,15 +111,21 @@ class _PlexDataTableState extends State<PlexDataTable> {
               rows: [
                 ...widget.rows.map(
                   (row) => DataRow(
-                    color: isAlternate++ % 2 == 0 ? const Color(0xFF9B9B9B).getColorState() : null,
+                    color: isAlternate++ % 2 == 0 ? widget.alternateColor?.getColorState() : null,
                     cells: [
                       ...row.map(
-                        (data) => data.cell != null ? data.cell! : DataCell(
-                          Text(data.value ?? "N/A"),
-                          onTap: () {
+                        (data) => DataCell(
+                          data.cell?.child ?? Text(data.value ?? "N/A"),
+                          onTap: data.cell?.onTap ?? () {
                             Clipboard.setData(ClipboardData(text: data.value ?? "N/A"));
                             context.showSnackBar("Text copied on clipboard");
                           },
+                          showEditIcon: data.cell?.showEditIcon ?? false,
+                          onDoubleTap: data.cell?.onDoubleTap,
+                          onLongPress: data.cell?.onLongPress,
+                          onTapCancel: data.cell?.onTapCancel,
+                          onTapDown: data.cell?.onTapDown,
+                          placeholder: data.cell?.placeholder ?? false,
                         ),
                       )
                     ],

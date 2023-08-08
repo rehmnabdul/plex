@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:plex/plex_package.dart';
 import 'package:plex/plex_route.dart';
@@ -32,19 +31,47 @@ void main() async {
         category: "Tables",
         title: "Data Table",
         logo: const Icon(Icons.account_balance_outlined),
-        screen: (key, context) => Container(
-          child: PlexDataTable(
-            onRefresh: () {},
-            columns: const ["Id", "First Name", "Last Name", "Emp Code", "Designation", "Grade", "Company"],
-            rows: const [
-              ["1", "Abdur", "Rahman", "256720", "IT Specialist", "E3", "Interloop Pvt. Ltd"],
-              ["1", "Abdur", "Rahman", "256720", "IT Specialist", "E3", "Interloop Pvt. Ltd"],
-              ["1", "Abdur", "Rahman", "256720", "IT Specialist", "E3", "Interloop Pvt. Ltd"],
-              ["1", "Abdur", "Rahman", "256720", "IT Specialist", "E3", "Interloop Pvt. Ltd"],
-              ["1", "Abdur", "Rahman", "256720", "IT Specialist", "E3", "Interloop Pvt. Ltd"],
-              ["1", "Abdur", "Rahman", "256720", "IT Specialist", "E3", "Interloop Pvt. Ltd"],
+        screen: (key, context) => PlexDataTable(
+          onRefresh: () {},
+          columns: [
+            PlexDataCell.text("Id"),
+            PlexDataCell.text("First Name"),
+            PlexDataCell.text("Last Name"),
+            PlexDataCell.text("Emp Code"),
+            PlexDataCell.text("Designation"),
+            PlexDataCell.text("Grade"),
+            PlexDataCell.text("Company"),
+          ],
+          rows: [
+            [
+              PlexDataCell.text("1"),
+              PlexDataCell.text("Abdur"),
+              PlexDataCell.text("Rahman"),
+              PlexDataCell.text("EMP953346RT"),
+              PlexDataCell.text("Software Engineer"),
+              PlexDataCell.text("Grade / Scale"),
+              PlexDataCell.custom(
+                "Company Pvt. Ltd",
+                const DataCell(
+                  Text("Company Pvt. Ltd", style: TextStyle(color: Colors.lime)),
+                ),
+              ),
             ],
-          ),
+            [
+              PlexDataCell.text("1"),
+              PlexDataCell.text("Abdur"),
+              PlexDataCell.text("Rahman"),
+              PlexDataCell.text("EMP953346RT"),
+              PlexDataCell.text("Software Engineer"),
+              PlexDataCell.text("Grade / Scale"),
+              PlexDataCell.custom(
+                "Company Pvt. Ltd",
+                const DataCell(
+                  Text("Company Pvt. Ltd", style: TextStyle(color: Colors.lime)),
+                ),
+              )
+            ],
+          ],
         ),
       ),
     ],

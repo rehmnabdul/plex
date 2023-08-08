@@ -26,14 +26,14 @@ class PlexPrinter {
     productionRange6.cellStyle.bold = true;
     productionRange6.cellStyle.backColorRgb = Colors.grey;
 
-    var currentColumn = 2;
+    var currentColumn = 1;
     for (var column in columns) {
       productionSheet.getRangeByIndex(productionRowNumber, currentColumn++).setText(column.value);
     }
 
     productionRowNumber++;
     for (var row in rows) {
-      currentColumn = 2;
+      currentColumn = 1;
       for (var data in row) {
         productionSheet.getRangeByIndex(productionRowNumber, currentColumn++).setText(data.value);
       }

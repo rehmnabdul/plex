@@ -80,20 +80,52 @@ void main() {
         category: "Tables",
         title: "Data Table",
         logo: const Icon(Icons.account_balance_outlined),
-        //Return a widget that will be diaplayed when this page or route is called
+        //Return a widget that will be displayed when this page or route is called
         screen: (key, context) =>
             Container(
               //This PlexDataTable usage will show how you can show a data table using plex
               child: PlexDataTable(
-                onRefresh: () {},
-                columns: const ["Id", "First Name", "Last Name", "Emp Code", "Designation", "Grade", "Company"],
-                rows: const [
-                  ["1", "First Name", "Last Name", "0003001", "Designation", "Grade", "Company Pvt. Ltd"],
-                  ["1", "First Name", "Last Name", "0003001", "Designation", "Grade", "Company Pvt. Ltd"],
-                  ["1", "First Name", "Last Name", "0003001", "Designation", "Grade", "Company Pvt. Ltd"],
-                  ["1", "First Name", "Last Name", "0003001", "Designation", "Grade", "Company Pvt. Ltd"],
-                  ["1", "First Name", "Last Name", "0003001", "Designation", "Grade", "Company Pvt. Ltd"],
-                  ["1", "First Name", "Last Name", "0003001", "Designation", "Grade", "Company Pvt. Ltd"],
+                headerTextStyle: const TextStyle(fontWeight: FontWeight.bold),
+                headerBackground: Colors.red,
+                alternateColor: Colors.lightGreen,
+                columns: [
+                  PlexDataCell.text("Id"),
+                  PlexDataCell.text("First Name"),
+                  PlexDataCell.text("Last Name"),
+                  PlexDataCell.text("Emp Code"),
+                  PlexDataCell.text("Designation"),
+                  PlexDataCell.text("Grade"),
+                  PlexDataCell.text("Company"),
+                ],
+                rows: [
+                  [
+                    PlexDataCell.text("1"),
+                    PlexDataCell.text("Abdur"),
+                    PlexDataCell.text("Rahman"),
+                    PlexDataCell.text("EMP953346RT"),
+                    PlexDataCell.text("Software Engineer"),
+                    PlexDataCell.text("Grade / Scale"),
+                    PlexDataCell.custom(
+                      "Company Pvt. Ltd",
+                      const DataCell(
+                        Text("Company Pvt. Ltd", style: TextStyle(color: Colors.lime)),
+                      ),
+                    ),
+                  ],
+                  [
+                    PlexDataCell.text("1"),
+                    PlexDataCell.text("Abdur"),
+                    PlexDataCell.text("Rahman"),
+                    PlexDataCell.text("EMP953346RT"),
+                    PlexDataCell.text("Software Engineer"),
+                    PlexDataCell.text("Grade / Scale"),
+                    PlexDataCell.custom(
+                      "Company Pvt. Ltd",
+                      const DataCell(
+                        Text("Company Pvt. Ltd", style: TextStyle(color: Colors.lime)),
+                      ),
+                    )
+                  ],
                 ],
               ),
             ),

@@ -6,6 +6,7 @@ import 'package:plex/plex_utils/plex_dimensions.dart';
 import 'package:plex/plex_utils/plex_material.dart';
 import 'package:plex/plex_utils/plex_messages.dart';
 import 'package:plex/plex_utils/plex_printer.dart';
+import 'package:plex/plex_widgets/plex_input_widget.dart';
 
 class PlexDataCell {
   late final String? value;
@@ -35,7 +36,8 @@ class PlexDataTable extends StatefulWidget {
     this.headerBackground,
     this.headerTextStyle,
     this.alternateColor = const Color(0xFFCECECE),
-  }) : super(key: key);
+    this.border,
+  }) : super(key: key ?? GlobalKey());
 
   ///All Column titles
   final List<PlexDataCell> columns;
@@ -47,9 +49,10 @@ class PlexDataTable extends StatefulWidget {
   final Color? headerBackground;
   final TextStyle? headerTextStyle;
   final Color? alternateColor;
+  TableBorder? border;
 
   ///OnRefresh Button Click Callback
-  Function()? onRefresh;
+  List<List<PlexDataCell>> Function()? onRefresh;
 
   ///OnLoadMore Button Click Callback
   List<PlexDataCell> Function(int page)? onLoadMore;
@@ -59,24 +62,112 @@ class PlexDataTable extends StatefulWidget {
 }
 
 class _PlexDataTableState extends State<PlexDataTable> {
-  var scrollController = ScrollController(
-    keepScrollOffset: true,
-  );
+  var scrollController = ScrollController(keepScrollOffset: true);
+  var searchController = TextEditingController();
+  var updatedData = List<List<PlexDataCell>>.empty();
+  int? sortColumnIndex;
+  bool sortAscending = true;
+  Set<int> searchColumnIndexes = {};
+
+  @override
+  void initState() {
+    super.initState();
+    updatedData = widget.rows;
+  }
+
+  sortData(List<List<PlexDataCell>> data) {
+    if (sortColumnIndex == null) {
+      setState(() {
+        updatedData = data;
+      });
+      return;
+    };
+    data.sort((r1, r2) {
+      if (sortAscending) {
+        return (r1[sortColumnIndex!].value ?? "").compareTo(r2[sortColumnIndex!].value ?? "");
+      } else {
+        return (r2[sortColumnIndex!].value ?? "").compareTo(r1[sortColumnIndex!].value ?? "");
+      }
+    });
+    setState(() {
+      updatedData = data;
+    });
+  }
+
+  filterData() {
+    var data = widget.rows;
+    if (searchController.text.isNotEmpty) {
+      var searchIndexes = [];
+      if (searchColumnIndexes.isEmpty) {
+        searchIndexes = List.generate(widget.columns.length, (index) => index);
+      } else {
+        searchIndexes = searchColumnIndexes.toList();
+      }
+      data = data.where((r) {
+        var isOk = false;
+        for (var colIndex in searchIndexes) {
+          if ((r[colIndex].value ?? "").toLowerCase().contains(searchController.text.toLowerCase())) {
+            isOk = true;
+            break;
+          }
+        }
+        return isOk;
+      }).toList();
+    }
+    sortData(data);
+  }
 
   @override
   Widget build(BuildContext context) {
-    int isAlternate = 0;
+    int isAlternate = -1;
     return Column(
       children: [
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: Dim.medium, vertical: Dim.small),
+            child: Row(
+              children: [
+                SegmentedButton<int>(
+                  segments: [
+                    for (var i = 0; i < widget.columns.length; i++) ...{ButtonSegment(value: i, label: Text(widget.columns[i].value!), enabled: true)},
+                  ],
+                  selected: searchColumnIndexes,
+                  emptySelectionAllowed: true,
+                  multiSelectionEnabled: true,
+                  onSelectionChanged: (selection) {
+                    searchColumnIndexes = selection;
+                    filterData();
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: Dim.medium, vertical: Dim.small),
+          padding: const EdgeInsets.symmetric(vertical: Dim.small),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
             children: [
+              Expanded(
+                child: PlexInputWidget(
+                  type: PlexInputWidget.typeInput,
+                  inputController: searchController,
+                  title: "Search...",
+                  inputHint: "Type here to search whole data...",
+                  inputOnChange: (value) {
+                    filterData();
+                  },
+                ),
+              ),
               if (widget.onRefresh != null) ...{
                 FilledButton.tonal(
                   onPressed: () {
-                    widget.onRefresh?.call();
+                    var data = widget.onRefresh?.call() ?? List.empty();
+                    widget.rows.clear();
+                    widget.rows.addAll(data);
+                    setState(() {
+                      updatedData = widget.rows;
+                    });
                   },
                   child: const Icon(Icons.refresh),
                 ),
@@ -87,7 +178,7 @@ class _PlexDataTableState extends State<PlexDataTable> {
                   var path = await PlexPrinter.printExcel(
                     "Data",
                     widget.columns,
-                    widget.rows,
+                    updatedData,
                   );
                   if (path == null) {
                     context.showSnackBar(path);
@@ -96,6 +187,7 @@ class _PlexDataTableState extends State<PlexDataTable> {
                 },
                 child: const Icon(Icons.print),
               ),
+              spaceMedium(),
             ],
           ),
         ),
@@ -105,11 +197,26 @@ class _PlexDataTableState extends State<PlexDataTable> {
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: DataTable(
+              border: widget.border ?? TableBorder.all(color: Colors.black38),
               headingRowColor: widget.headerBackground?.getColorState(),
               headingTextStyle: widget.headerTextStyle,
-              columns: [...widget.columns.map((column) => DataColumn(label: Text(column.value ?? "N/A"), tooltip: column.value))],
+              sortColumnIndex: sortColumnIndex,
+              sortAscending: sortAscending,
+              columns: [
+                ...widget.columns.map(
+                  (column) => DataColumn(
+                    label: Text(column.value ?? "N/A"),
+                    tooltip: column.value,
+                    onSort: (columnIndex, ascending) {
+                      sortColumnIndex = columnIndex;
+                      sortAscending = ascending;
+                      sortData(updatedData);
+                    },
+                  ),
+                ),
+              ],
               rows: [
-                ...widget.rows.map(
+                ...updatedData.map(
                   (row) => DataRow(
                     color: isAlternate++ % 2 == 0 ? widget.alternateColor?.getColorState() : null,
                     cells: [

@@ -157,7 +157,7 @@ class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
               ),
               borderRadius: BorderRadius.circular(Dim.smallest)),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: Dim.small, vertical: Dim.small + Dim.smallest),
+            padding: const EdgeInsets.symmetric(horizontal: Dim.small, vertical: Dim.medium),
             child: Row(
               children: [
                 Expanded(

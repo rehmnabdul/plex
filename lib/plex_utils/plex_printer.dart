@@ -4,6 +4,7 @@ import 'package:file_saver/file_saver.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:plex/plex_widgets/plex_data_table.dart';
 import 'package:syncfusion_flutter_xlsio/xlsio.dart';
 
@@ -51,6 +52,7 @@ class PlexPrinter {
 
     String ext = "xlsx";
     Future<String?> fileSaveTask;
+    title = "$title-${DateFormat("dd-MMM-yyyy-HHmmss").format(DateTime.now())}";
     if (GetPlatform.isAndroid || GetPlatform.isIOS) {
       fileSaveTask = FileSaver.instance.saveAs(
         name: "$title.$ext",

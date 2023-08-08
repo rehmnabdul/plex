@@ -11,6 +11,38 @@ class Routes {
 }
 
 void main() async {
+  getTableData() =>
+      [
+        [
+          PlexDataCell.text("1"),
+          PlexDataCell.text("First"),
+          PlexDataCell.text("Person"),
+          PlexDataCell.text("EMP953312RT"),
+          PlexDataCell.text("Software Engineer"),
+          PlexDataCell.text("Grade"),
+          PlexDataCell.custom(
+            "First Company Pvt. Ltd",
+            const DataCell(
+              Text("First Company Pvt. Ltd", style: TextStyle(color: Colors.brown)),
+            ),
+          ),
+        ],
+        [
+          PlexDataCell.text("2"),
+          PlexDataCell.text("Second"),
+          PlexDataCell.text("Person"),
+          PlexDataCell.text("EMP95313RT"),
+          PlexDataCell.text("Software Engineer"),
+          PlexDataCell.text("Scale"),
+          PlexDataCell.custom(
+            "Second Company Pvt. Ltd",
+            const DataCell(
+              Text("Second Company Pvt. Ltd", style: TextStyle(color: Colors.green)),
+            ),
+          )
+        ],
+      ];
+
   runApp(PlexApp(
     themeFromColor: const Color(0xFF26A9E1),
     // themeFromImage: const AssetImage("/path/to/image"),
@@ -31,50 +63,25 @@ void main() async {
         category: "Tables",
         title: "Data Table",
         logo: const Icon(Icons.account_balance_outlined),
-        screen: (key, context) => PlexDataTable(
-          headerTextStyle: const TextStyle(fontWeight: FontWeight.bold),
-          headerBackground: Colors.red,
-          alternateColor: Colors.lightGreen,
-          columns: [
-            PlexDataCell.text("Id"),
-            PlexDataCell.text("First Name"),
-            PlexDataCell.text("Last Name"),
-            PlexDataCell.text("Emp Code"),
-            PlexDataCell.text("Designation"),
-            PlexDataCell.text("Grade"),
-            PlexDataCell.text("Company"),
-          ],
-          rows: [
-            [
-              PlexDataCell.text("1"),
-              PlexDataCell.text("Abdur"),
-              PlexDataCell.text("Rahman"),
-              PlexDataCell.text("EMP953346RT"),
-              PlexDataCell.text("Software Engineer"),
-              PlexDataCell.text("Grade / Scale"),
-              PlexDataCell.custom(
-                "Company Pvt. Ltd",
-                const DataCell(
-                  Text("Company Pvt. Ltd", style: TextStyle(color: Colors.lime)),
-                ),
-              ),
-            ],
-            [
-              PlexDataCell.text("1"),
-              PlexDataCell.text("Abdur"),
-              PlexDataCell.text("Rahman"),
-              PlexDataCell.text("EMP953346RT"),
-              PlexDataCell.text("Software Engineer"),
-              PlexDataCell.text("Grade / Scale"),
-              PlexDataCell.custom(
-                "Company Pvt. Ltd",
-                const DataCell(
-                  Text("Company Pvt. Ltd", style: TextStyle(color: Colors.lime)),
-                ),
-              )
-            ],
-          ],
-        ),
+        screen: (key, context) =>
+            PlexDataTable(
+              headerTextStyle: const TextStyle(fontWeight: FontWeight.bold),
+              headerBackground: Colors.redAccent,
+              border: TableBorder.all(color: Colors.black12),
+              onRefresh: () {
+                return getTableData();
+              },
+              columns: [
+                PlexDataCell.text("Id"),
+                PlexDataCell.text("First Name"),
+                PlexDataCell.text("Last Name"),
+                PlexDataCell.text("Emp Code"),
+                PlexDataCell.text("Designation"),
+                PlexDataCell.text("Grade"),
+                PlexDataCell.text("Company"),
+              ],
+              rows: getTableData(),
+            ),
       ),
     ],
   ));

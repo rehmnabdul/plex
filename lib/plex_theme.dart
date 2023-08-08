@@ -1,10 +1,7 @@
-
-
 import 'package:plex/plex_db.dart';
 
 ///This class will hold theme related information
 class PlexTheme {
-
   PlexTheme._();
 
   ///Check theme is Material 3 or not

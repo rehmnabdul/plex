@@ -11,8 +11,6 @@ import 'package:plex/plex_theme.dart';
 import 'package:plex/plex_utils/plex_dimensions.dart';
 import 'package:plex/plex_utils/plex_routing.dart';
 
-
-
 class PlexRoutesPaths {
   PlexRoutesPaths._();
 
@@ -108,7 +106,6 @@ class PlexApp extends StatefulWidget {
   isLogin() {
     return PlexDb.instance.hasKey(PlexDb.loggedInUser);
   }
-
 
   ///Logout the user and move user to the signin screen
   logout() {

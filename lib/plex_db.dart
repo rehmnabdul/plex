@@ -31,7 +31,7 @@ class PlexDb {
 
   ///Set the string value against a key
   setString(String key, String? value) {
-    if(value == null) {
+    if (value == null) {
       return _prefs!.remove(key);
     }
     return _prefs!.setString(key, value);
@@ -39,7 +39,7 @@ class PlexDb {
 
   ///Set the boolean value against a key
   setBool(String key, bool? value) {
-    if(value == null) {
+    if (value == null) {
       return _prefs!.remove(key);
     }
     return _prefs!.setBool(key, value);

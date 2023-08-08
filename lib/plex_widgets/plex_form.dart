@@ -65,7 +65,6 @@ class PlexFormWidget extends StatefulWidget {
 
 class _PlexFormWidgetState extends State<PlexFormWidget> {
   List<Widget> getFields() {
-
     var fields = [
       for (var value in widget.entity.getFields()) ...{
         if (!value.thirdParty && value.type == String) ...{

@@ -17,7 +17,6 @@ class PlexDashboardScreen extends PlexScreen {
 }
 
 class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
-
   var drawerSelectedIndex = 0;
 
   @override

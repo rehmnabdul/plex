@@ -80,7 +80,6 @@ class PlexInputWidget<T> extends StatefulWidget {
 }
 
 class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
-
   PlexWidgetController<T?>? _dropdownSelectionController;
 
   getDropDownController() {

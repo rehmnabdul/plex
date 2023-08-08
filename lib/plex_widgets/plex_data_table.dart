@@ -116,10 +116,11 @@ class _PlexDataTableState extends State<PlexDataTable> {
                       ...row.map(
                         (data) => DataCell(
                           data.cell?.child ?? Text(data.value ?? "N/A"),
-                          onTap: data.cell?.onTap ?? () {
-                            Clipboard.setData(ClipboardData(text: data.value ?? "N/A"));
-                            context.showSnackBar("Text copied on clipboard");
-                          },
+                          onTap: data.cell?.onTap ??
+                              () {
+                                Clipboard.setData(ClipboardData(text: data.value ?? "N/A"));
+                                context.showSnackBar("Text copied on clipboard");
+                              },
                           showEditIcon: data.cell?.showEditIcon ?? false,
                           onDoubleTap: data.cell?.onDoubleTap,
                           onLongPress: data.cell?.onLongPress,

@@ -52,10 +52,10 @@ class PlexDataTable extends StatefulWidget {
   TableBorder? border;
 
   ///OnRefresh Button Click Callback
-  List<List<PlexDataCell>> Function()? onRefresh;
+  Function()? onRefresh;
 
   ///OnLoadMore Button Click Callback
-  List<PlexDataCell> Function(int page)? onLoadMore;
+  Function(int page)? onLoadMore;
 
   @override
   State<PlexDataTable> createState() => _PlexDataTableState();
@@ -162,12 +162,7 @@ class _PlexDataTableState extends State<PlexDataTable> {
               if (widget.onRefresh != null) ...{
                 FilledButton.tonal(
                   onPressed: () {
-                    var data = widget.onRefresh?.call() ?? List.empty();
-                    widget.rows.clear();
-                    widget.rows.addAll(data);
-                    setState(() {
-                      updatedData = widget.rows;
-                    });
+                    widget.onRefresh?.call();
                   },
                   child: const Icon(Icons.refresh),
                 ),

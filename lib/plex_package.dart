@@ -20,17 +20,18 @@ class PlexRoutesPaths {
 
 ///PlexApp is the main app widget that will hold all your app
 class PlexApp extends StatefulWidget {
-  ///This is scaffold key to be used by widgets to access scaffold state
-  final scaffoldKey = GlobalKey<ScaffoldState>();
-
   ///This color will be used to generate app theme
   final Color themeFromColor;
+  var imageColorScheme = const ColorScheme.light();
 
   ///This image will be used to generate app theme
   final ImageProvider? themeFromImage;
 
-  ///This [appLogo] widget will be show ass Application Logo
+  ///This [appLogo] widget will be show as Application Logo
   final Widget appLogo;
+
+  ///This [appLogoDark] widget will be show as Application Logo in Dark mode
+  final Widget? appLogoDark;
 
   ///This [title] will be show ass Application title
   final String title;
@@ -38,8 +39,8 @@ class PlexApp extends StatefulWidget {
   ///This [initialRoute] will be treated as initial route for screen Application
   final String initialRoute;
 
-  ///This [routes] list will contains all the routes information for Application
-  final List<PlexRoute> routes;
+  ///This [pages] list will contains all the pages routes information for Application
+  final List<PlexRoute>? pages;
 
   ///This [unknownRoute] will contains [Error404] or [NotFound] screen for Application
   final PlexRoute? unknownRoute;
@@ -47,9 +48,11 @@ class PlexApp extends StatefulWidget {
   //Authorization
   ///Use this [trigger] to enable authorization in the applicaiton
   final bool useAuthorization;
+  final bool useDashboard;
 
   ///If [useAuthorization] is enable set the required inputs by initializing loginConfig
   final PlexLoginConfig? loginConfig;
+  final PlexDashboardConfig? dashboardConfig;
 
   //App Widgets
   ///Use this widget to create custom drawer header
@@ -67,9 +70,11 @@ class PlexApp extends StatefulWidget {
   PlexApp({
     super.key,
     required this.appLogo,
+    this.appLogoDark,
     required this.title,
     required this.initialRoute,
-    required this.routes,
+    this.dashboardConfig,
+    this.pages,
     this.themeFromColor = const Color(0xFF007AD7),
     this.themeFromImage,
     this.unknownRoute,
@@ -78,12 +83,24 @@ class PlexApp extends StatefulWidget {
     this.generateDrawerNavigationButton,
     this.loginConfig,
   }) {
-    if (routes.isEmpty) {
+    if (dashboardConfig == null && pages == null) {
+      throw Exception("Either \"DashboardConfig\" or \"Pages\" must not be null and empty");
+    }
+
+    if (dashboardConfig?.dashboardScreens?.isEmpty == true && pages == null) {
+      throw Exception("\"DashboardConfig.DashboardScreens\" can't be empty");
+    }
+
+    if (pages?.isEmpty == true && dashboardConfig == null) {
       throw Exception("\"Routes\" can't be empty");
     }
 
-    if (!routes.any((e) => e.route == initialRoute)) {
-      throw Exception("\"Routes\" doesn't contain \"initialRoute\"");
+    if (dashboardConfig!.dashboardScreens!.firstWhereOrNull((e) => e.route == initialRoute) == null && pages == null) {
+      throw Exception("\"DashboardConfig.DashboardScreens\" doesn't contain \"initialRoute\"");
+    }
+
+    if (pages!.firstWhereOrNull((e) => e.route == initialRoute) == null && dashboardConfig == null) {
+      throw Exception("\"Pages\" doesn't contain \"initialRoute\"");
     }
 
     if (useAuthorization && loginConfig == null) {
@@ -101,6 +118,10 @@ class PlexApp extends StatefulWidget {
   State<PlexApp> createState() => _PlexAppState();
 
   //Public Methods and Variables
+  ///Get AppLogo Based on Brightness Mode of Theme
+  Widget getLogo() {
+    return (PlexTheme.isDarkMode() ? appLogoDark : appLogo) ?? appLogo;
+  }
 
   ///Check the user is logged into the app or not
   isLogin() {
@@ -118,7 +139,6 @@ class _PlexAppState extends State<PlexApp> {
   bool _initialized = false;
   bool useMaterial3 = false;
   var themeMode = ThemeMode.light;
-  ColorScheme? imageColorScheme = const ColorScheme.light();
 
   ///This method will use bool to switch between light and dark mode
   void handleBrightnessChange(bool useDarkMode) {
@@ -136,35 +156,18 @@ class _PlexAppState extends State<PlexApp> {
     });
   }
 
-  ///Initial theme data for the app
-  ThemeData _getTheme(Brightness brightness) => ThemeData(
-        colorSchemeSeed: brightness == Brightness.dark
-            ? widget.themeFromColor
-            : widget.themeFromImage == null
-                ? widget.themeFromColor
-                : null,
-        colorScheme: brightness == Brightness.dark
-            ? null
-            : widget.themeFromImage == null
-                ? null
-                : imageColorScheme,
-        useMaterial3: useMaterial3,
-        brightness: brightness,
-      );
-
   @override
   void initState() {
     super.initState();
     Future(
-      () async {
+          () async {
         WidgetsFlutterBinding.ensureInitialized();
         await PlexDb.instance.initialize();
         if (widget.themeFromImage != null) {
-          imageColorScheme = await ColorScheme.fromImageProvider(provider: widget.themeFromImage!);
+          widget.imageColorScheme = await ColorScheme.fromImageProvider(provider: widget.themeFromImage!);
         }
         useMaterial3 = PlexTheme.isMaterial3();
         themeMode = PlexTheme.isDarkMode() ? ThemeMode.dark : ThemeMode.light;
-        await Future.delayed(const Duration(milliseconds: 500));
         setState(() {
           _initialized = true;
         });
@@ -177,11 +180,7 @@ class _PlexAppState extends State<PlexApp> {
     if (!_initialized) {
       return MaterialApp(
         title: widget.title,
-        theme: _getTheme(Brightness.light),
-        darkTheme: _getTheme(Brightness.dark),
-        themeMode: themeMode,
         debugShowCheckedModeBanner: false,
-        scrollBehavior: PlexScrollBehavior(),
         home: Scaffold(
           body: Padding(
             padding: const EdgeInsets.all(Dim.medium),
@@ -203,18 +202,28 @@ class _PlexAppState extends State<PlexApp> {
     }
     return GetMaterialApp(
       title: widget.title,
-      theme: _getTheme(Brightness.light),
-      darkTheme: _getTheme(Brightness.dark),
+      theme: PlexTheme.getThemeByBrightness(Brightness.light),
+      darkTheme: PlexTheme.getThemeByBrightness(Brightness.dark),
       themeMode: themeMode,
       debugShowCheckedModeBanner: false,
       scrollBehavior: PlexScrollBehavior(),
-      initialRoute: widget.useAuthorization ? PlexRoutesPaths.loginPath : widget.initialRoute,
-      unknownRoute: widget.unknownRoute != null ? GetPage(name: widget.unknownRoute!.route, page: () => widget.unknownRoute!.screen.call(widget.scaffoldKey, context)) : null,
+      initialRoute: widget.useAuthorization ? PlexRoutesPaths.loginPath : widget.dashboardConfig != null ? PlexRoutesPaths.homePath : widget.initialRoute,
+      unknownRoute: GetPage(
+        name: widget.unknownRoute?.route ?? "/NotFound",
+        page: () => widget.unknownRoute?.screen.call(context) ?? const Center(child: Text("Page not found: 404")),
+      ),
       routes: {
         if (widget.useAuthorization) ...{
-          PlexRoutesPaths.loginPath: (_) => PlexLoginScreen(loginConfig: widget.loginConfig!, logo: widget.appLogo, nextRoute: widget.initialRoute),
+          PlexRoutesPaths.loginPath: (_) => PlexLoginScreen(loginConfig: widget.loginConfig!, nextRoute: widget.initialRoute),
         },
-        PlexRoutesPaths.homePath: (_) => PlexDashboardScreen(handleBrightnessChange, handleMaterialVersionChange),
+        if (widget.dashboardConfig != null) ...{
+          PlexRoutesPaths.homePath: (_) => PlexDashboardScreen(handleBrightnessChange, handleMaterialVersionChange),
+        },
+        if (widget.pages?.isNotEmpty == true) ...{
+          for (var page in widget.pages!) ...{
+            page.route: (_) => page.screen.call(context),
+          },
+        },
       },
     );
   }

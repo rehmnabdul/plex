@@ -23,15 +23,15 @@ the resulting application meets the high standards of enterprise-level software.
 ### Material 3
 
 <div style="text-align: center;">
-<img alt="Material 3 Light" src="screenshots/img_2.png"  width="25%" title="Material 3 Light"/>
-<img alt="Material 3 Dark" src="screenshots/img_4.png" width="25%" title="Material 3 Dark">
+<img alt="Material 3 Light" src="https://raw.githubusercontent.com/rehmnabdul/plex/main/screenshots/img_2.png"  width="25%" title="Material 3 Light"/>
+<img alt="Material 3 Dark" src="https://raw.githubusercontent.com/rehmnabdul/plex/main/screenshots/img_4.png" width="25%" title="Material 3 Dark">
 </div>
 
 ### Material 2
 
 <div style="text-align: center;">
-<img alt="Material 2 Light" src="screenshots/img_1.png" width="25%" title="Material 2 Light"/>
-<img alt="Material 2 Dark" src="screenshots/img_3.png" width="25%" title="Material 2 Dark">
+<img alt="Material 2 Light" src="https://raw.githubusercontent.com/rehmnabdul/plex/main/screenshots/img_1.png" width="25%" title="Material 2 Light"/>
+<img alt="Material 2 Dark" src="https://raw.githubusercontent.com/rehmnabdul/plex/main/screenshots/img_3.png" width="25%" title="Material 2 Dark">
 </div>
 
 ## Features
@@ -49,6 +49,75 @@ the resulting application meets the high standards of enterprise-level software.
 Install the `plex` in your application.
 
 ## Usage
+
+### Widgets
+#### PlexWidget
+#### PlexDataTable
+#### PlexInputWidget
+#### PlexFormWidget
+
+###### Input Types
+```dart
+PlexInputWidget.typeInput 
+PlexInputWidget.typeDropdown
+PlexInputWidget.typeDate
+PlexInputWidget.typeButton
+```
+###### Input Field
+```dart
+PlexInputWidget(
+    title: "Username / Email",
+    
+    type: PlexInputWidget.typeInput,
+    inputHint: "Enter Your Email or Username",
+    inputController: usernameController,
+    inputOnChange: (value) {},
+    inputOnSubmit: (value) {},
+    inputAction: TextInputAction.go,
+    inputKeyboardType: TextInputType.name,
+    isPassword: false,
+    
+    dropdownItemOnSelect: (item) {},
+    dropdownItemAsString: (item) => item.toString(),
+    dropdownItems: const ["Data"],
+    dropdownAsyncItems: Future(() => ["Data"]),
+    dropdownSelectionController: PlexWidgetController(),
+    dropDownLeadingIcon: (item) => const Icon(Icons.add),
+    dropdownItemWidget: (item) => const Text("Data"),
+    dropdownOnSearch: (query, item) { return true; },
+    dropdownCustomOnTap: () {},
+    
+    buttonClick: ,
+    buttonIcon: ,
+    buttonColor: ,
+    
+    useMargin: ,
+    margin: ,
+    fieldColor: ,
+    editable: ,
+    helperText: ,
+)
+```
+
+#### Persistent Storage
+```dart
+//Only initialize if you are not using PlexApp 
+//and using PlexDb separately
+PlexDb.initialize();
+
+PlexDb.instance.setString("Key", "Value");
+PlexDb.instance.getString("Key");
+
+PlexDb.instance.setBool("Key", true);
+PlexDb.instance.getBool("Key");
+```
+
+### Messaging
+```dart
+BuildContext context;
+context.showSnackBar("Your Message...");
+```
+
 
 ```dart
 void main() {

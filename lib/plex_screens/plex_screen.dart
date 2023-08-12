@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:plex/plex_utils/plex_messages.dart';
 import 'package:plex/plex_widget.dart';
 
 abstract class PlexScreen extends StatefulWidget {
@@ -16,23 +16,15 @@ abstract class PlexState<T extends PlexScreen> extends State<T> {
     super.setState(fn);
   }
 
-  _toast(String message, {String title = 'Message'}) {
-    Get.closeAllSnackbars();
-    Get.snackbar(title, message);
-  }
-
-  toast(String message) {
-    if (!mounted) return null;
+  toast(String message, {String title = 'Message'}) {
     if (message.length > 1000) message = "${message.substring(0, 1000)}...";
-    _toast(message);
+    context.showSnackBar(message);
   }
 
   toastDelayed(String message) async {
-    if (!mounted) return Future(() => null);
     return Future.delayed(
       const Duration(milliseconds: 100),
       () {
-        if (!mounted) return Future(() => null);
         toast(message);
       },
     );
@@ -43,9 +35,10 @@ abstract class PlexState<T extends PlexScreen> extends State<T> {
   @override
   Widget build(BuildContext context) {
     var body = Scaffold(
-      key: widget.key ?? key,
+      key: key,
       appBar: buildAppBar(),
-      drawer: buildDrawer(),
+      drawer: buildSideNavigation(),
+      bottomNavigationBar: buildBottomNavigation(),
       body: SafeArea(
         child: Stack(
           children: [
@@ -66,7 +59,6 @@ abstract class PlexState<T extends PlexScreen> extends State<T> {
         ),
       ),
     );
-
     if (getNoOfTabs() > 0) {
       return DefaultTabController(
         length: getNoOfTabs(),
@@ -81,8 +73,31 @@ abstract class PlexState<T extends PlexScreen> extends State<T> {
     return null;
   }
 
-  Widget? buildDrawer() {
+  Widget? buildSideNavigation() {
     return null;
+  }
+
+  Widget? buildBottomNavigation() {
+    return null;
+  }
+
+  var smallScreen = false;
+  var mediumScreen = false;
+  var largeScreen = true;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    smallScreen = mediumScreen = largeScreen = false;
+    if (MediaQuery.of(context).size.width >= 900) {
+      largeScreen = true;
+      return;
+    }
+    if (MediaQuery.of(context).size.width >= 600) {
+      mediumScreen = true;
+      return;
+    }
+    smallScreen = true;
   }
 
   Widget buildBody();

@@ -8,22 +8,24 @@ import 'package:plex/plex_screens/plex_screen.dart';
 import 'package:plex/plex_user.dart';
 import 'package:plex/plex_utils/plex_dimensions.dart';
 import 'package:plex/plex_utils/plex_routing.dart';
+import 'package:plex/plex_widget.dart';
 import 'package:plex/plex_widgets/plex_input_widget.dart';
 
 class PlexLoginConfig {
   PlexLoginConfig({
     required this.onLogin,
-    this.additionalWidgets,
+    this.additionalWidgetsTop,
+    this.additionalWidgetsBottom,
   });
 
-  final Future<PlexUser?> Function(String email, String password) onLogin;
-  final Widget? additionalWidgets;
+  final Future<PlexUser?> Function(BuildContext context, String email, String password) onLogin;
+  final Widget Function(BuildContext context)? additionalWidgetsTop;
+  final Widget Function(BuildContext context)? additionalWidgetsBottom;
 }
 
 class PlexLoginScreen extends PlexScreen {
-  const PlexLoginScreen({Key? key, this.logo, required this.loginConfig, required this.nextRoute}) : super(key: key);
+  const PlexLoginScreen({Key? key, required this.loginConfig, required this.nextRoute}) : super(key: key);
 
-  final Widget? logo;
   final String nextRoute;
   final PlexLoginConfig loginConfig;
 
@@ -46,7 +48,7 @@ class _PlexLoginScreenState extends PlexState<PlexLoginScreen> {
 
     if (kDebugMode) {
       usernameController.text = "dev";
-      passController.text = "dev";
+      passController.text = ";';'";
     }
   }
 
@@ -66,9 +68,10 @@ class _PlexLoginScreenState extends PlexState<PlexLoginScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                if (widget.logo != null) ...{
-                  widget.logo!,
+                if (widget.loginConfig.additionalWidgetsTop != null) ...{
+                  widget.loginConfig.additionalWidgetsTop!.call(context),
                 },
+                PlexApp.app.getLogo(),
                 spaceMedium(),
                 PlexInputWidget(
                   title: "Username / Email",
@@ -97,13 +100,18 @@ class _PlexLoginScreenState extends PlexState<PlexLoginScreen> {
                       return;
                     }
 
-                    var result = await widget.loginConfig.onLogin(usernameController.text.toString(), passController.text.toString());
+                    showLoading();
+                    var result = await widget.loginConfig.onLogin(context, usernameController.text.toString(), passController.text.toString());
+                    hideLoading();
                     if (result != null) {
                       PlexDb.instance.setString(PlexDb.loggedInUser, jsonEncode(result.userData));
-                      Plex.offAndToNamed(PlexRoutesPaths.homePath);
+                      Plex.offAndToNamed(PlexApp.app.dashboardConfig != null ? PlexRoutesPaths.homePath : PlexApp.app.initialRoute);
                     }
                   },
                 ),
+                if (widget.loginConfig.additionalWidgetsBottom != null) ...{
+                  widget.loginConfig.additionalWidgetsBottom!.call(context),
+                },
               ],
             ),
           ),

@@ -9,14 +9,14 @@ class PlexRoute {
   String title;
 
   ///This is the build method to build the screen user defined UI
-  Widget Function(GlobalKey<ScaffoldState> key, BuildContext context) screen;
+  Widget Function(BuildContext context) screen;
 
   ///Optional [logo]
   Widget? logo;
 
   ///Use this [category] to group the screen in drawer menu
-  String? category;
+  String category;
 
   ///Default constructor
-  PlexRoute({required this.route, required this.title, required this.screen, this.logo, this.category});
+  PlexRoute({required this.route, required this.title, required this.screen, this.logo, this.category = "Menu"});
 }

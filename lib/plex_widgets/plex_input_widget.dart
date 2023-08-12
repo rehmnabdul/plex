@@ -164,11 +164,11 @@ class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
                   child: PlexWidget<T?>(
                     controller: getDropDownController() as PlexWidgetController<T?>,
                     createWidget: (context, data) {
-                      return Row(
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           if (widget.title != null) ...{
-                            Text("${widget.title}", style: const TextStyle(fontWeight: FontWeight.bold)),
-                            spaceSmall(),
+                            Text("${widget.title}", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: Dim.small)),
                           },
                           Text(data != null ? widget.dropdownItemAsString!(data) : "N/A"),
                         ],

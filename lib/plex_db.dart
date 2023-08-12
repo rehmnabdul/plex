@@ -2,7 +2,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 /// This class allow user to save and get persistent data
 class PlexDb {
-  static const loggedInUser = "LOGGED_IN_USER";
+  static const loggedInUser = "PLEX_LOGGED_IN_USER";
 
   SharedPreferences? _prefs;
 

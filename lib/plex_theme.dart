@@ -1,4 +1,6 @@
+import 'package:flutter/material.dart';
 import 'package:plex/plex_db.dart';
+import 'package:plex/plex_package.dart';
 
 ///This class will hold theme related information
 class PlexTheme {
@@ -23,4 +25,21 @@ class PlexTheme {
   static void setDarkMode(bool value) {
     PlexDb.instance.setBool("UseDarkMode", value);
   }
+
+  ///Initial theme data for the app
+  static ThemeData getActiveTheme() => getThemeByBrightness(isDarkMode() ? Brightness.dark : Brightness.light);
+
+  static ThemeData getThemeByBrightness(Brightness brightness) => ThemeData(
+      colorSchemeSeed: isDarkMode()
+          ? PlexApp.app.themeFromColor
+          : PlexApp.app.themeFromImage == null
+              ? PlexApp.app.themeFromColor
+              : null,
+      colorScheme: isDarkMode()
+          ? null
+          : PlexApp.app.themeFromImage == null
+              ? null
+              : PlexApp.app.imageColorScheme,
+      useMaterial3: isMaterial3(),
+      brightness: brightness);
 }

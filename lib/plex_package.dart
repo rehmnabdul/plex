@@ -73,6 +73,7 @@ class PlexApp extends StatefulWidget {
     this.appLogoDark,
     required this.title,
     required this.initialRoute,
+    this.useDashboard = false,
     this.dashboardConfig,
     this.pages,
     this.themeFromColor = const Color(0xFF007AD7),
@@ -87,7 +88,7 @@ class PlexApp extends StatefulWidget {
       throw Exception("Either \"DashboardConfig\" or \"Pages\" must not be null and empty");
     }
 
-    if (dashboardConfig?.dashboardScreens?.isEmpty == true && pages == null) {
+    if (dashboardConfig?.dashboardScreens.isEmpty == true && pages == null) {
       throw Exception("\"DashboardConfig.DashboardScreens\" can't be empty");
     }
 

@@ -1,3 +1,8 @@
+## 0.1.1
+
+* Update UI and Improvements
+* Update Documentations
+
 ## 0.1.0
 
 * Updates in `PlexDataTable`

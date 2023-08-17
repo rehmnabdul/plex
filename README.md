@@ -50,21 +50,23 @@ Install the `plex` in your application.
 
 ## Usage
 
-### Widgets
-#### PlexWidget
-#### PlexDataTable
-#### PlexInputWidget
-#### PlexFormWidget
+## Widgets
+1. PlexWidget
+2. PlexDataTable 
+3. PlexInputWidget 
+4. PlexFormWidget
+5. PlexInputWidget
 
-###### Input Types
+#### PlexInputWidget
+
+###### Usage
 ```dart
-PlexInputWidget.typeInput 
-PlexInputWidget.typeDropdown
-PlexInputWidget.typeDate
-PlexInputWidget.typeButton
-```
-###### Input Field
-```dart
+// Input Types
+// PlexInputWidget.typeInput
+// PlexInputWidget.typeDropdown
+// PlexInputWidget.typeDate
+// PlexInputWidget.typeButton
+
 PlexInputWidget(
     title: "Username / Email",
     

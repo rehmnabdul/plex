@@ -9,7 +9,8 @@ class PlexInputWidget<T> extends StatefulWidget {
   static const typeInput = 0;
   static const typeDropdown = 1;
   static const typeDate = 2;
-  static const typeButton = 3;
+  static const typeMultiSelect = 3;
+  static const typeButton = 4;
 
   PlexInputWidget({
     Key? key,
@@ -35,6 +36,8 @@ class PlexInputWidget<T> extends StatefulWidget {
     this.dropdownItemAsString,
     this.dropdownItemOnSelect,
     this.dropdownSelectionController,
+    this.multiSelectionController,
+    this.multiInitialSelection,
     this.dropdownCustomOnTap,
     this.buttonColor,
     this.buttonIcon,
@@ -68,12 +71,16 @@ class PlexInputWidget<T> extends StatefulWidget {
   final Function(dynamic item)? dropdownItemOnSelect;
   final Function? dropdownCustomOnTap;
 
+  ///Multiselect Fields
+  final List<T>? multiInitialSelection;
+
   ///Button Field
   final Color? buttonColor;
   final Icon? buttonIcon;
   final Function()? buttonClick;
 
   final PlexWidgetController<T?>? dropdownSelectionController;
+  final PlexWidgetController<List<T>?>? multiSelectionController;
 
   @override
   State<PlexInputWidget> createState() => _PlexInputWidgetState<T>();
@@ -81,10 +88,16 @@ class PlexInputWidget<T> extends StatefulWidget {
 
 class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
   PlexWidgetController<T?>? _dropdownSelectionController;
+  PlexWidgetController<List<T>?>? _multiSelectionController;
 
   getDropDownController() {
     _dropdownSelectionController ??= (widget.dropdownSelectionController ?? PlexWidgetController<T?>()) as PlexWidgetController<T?>?;
     return _dropdownSelectionController;
+  }
+
+  getMultiselectController() {
+    _multiSelectionController ??= (widget.multiSelectionController ?? PlexWidgetController<List<T>?>()) as PlexWidgetController<List<T>?>?;
+    return _multiSelectionController;
   }
 
   @override
@@ -228,6 +241,66 @@ class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
               ),
               const Icon(Icons.arrow_drop_down, color: Colors.grey),
             ],
+          ),
+        ),
+      );
+    } else if (widget.type == PlexInputWidget.typeMultiSelect) {
+      getMultiselectController().setValue(widget.multiInitialSelection);
+      inputWidget = InkWell(
+        onTap: () {
+          if (!widget.editable) return;
+
+          if (widget.dropdownCustomOnTap != null) {
+            widget.dropdownCustomOnTap?.call();
+            return;
+          }
+
+          showMultiSelection(
+            context,
+            items: widget.dropdownItems,
+            asyncItems: widget.dropdownAsyncItems,
+            leadingIcon: widget.dropDownLeadingIcon,
+            initialSelection: widget.multiInitialSelection,
+            itemText: (c) => widget.dropdownItemAsString!(c),
+            onSelect: (c) {
+              getMultiselectController().setValue(c);
+              widget.dropdownItemOnSelect?.call(c);
+            },
+            onSearch: widget.dropdownOnSearch,
+            itemWidget: widget.dropdownItemWidget,
+          );
+        },
+        child: Container(
+          decoration: BoxDecoration(
+              border: Border.all(
+                color: Theme.of(context).colorScheme.outline,
+                width: 1,
+              ),
+              borderRadius: BorderRadius.circular(Dim.smallest)),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: Dim.small, vertical: Dim.medium),
+            child: Row(
+              children: [
+                Expanded(
+                  child: PlexWidget<List<T>?>(
+                    controller: getMultiselectController() as PlexWidgetController<List<T>?>,
+                    createWidget: (context, data) {
+                      List<T> selectionData = data;
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (widget.title != null) ...{
+                            Text("${widget.title}", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: Dim.small)),
+                          },
+                          Text(data != null ? selectionData.map((e) => widget.dropdownItemAsString!(e)).join(", ") : "N/A"),
+                        ],
+                      );
+                    },
+                  ),
+                ),
+                const Icon(Icons.arrow_drop_down, color: Colors.grey),
+              ],
+            ),
           ),
         ),
       );

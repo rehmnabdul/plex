@@ -10,6 +10,11 @@ abstract class PlexState<T extends PlexScreen> extends State<T> {
   final GlobalKey<ScaffoldState> key = GlobalKey();
   final _loadingController = PlexWidgetController();
 
+  getArguments<T>() {
+    var args = ModalRoute.of(context)!.settings.arguments as T;
+    return args;
+  }
+
   @override
   setState(VoidCallback fn) {
     if (!mounted) return;

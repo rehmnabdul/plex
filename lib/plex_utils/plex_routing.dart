@@ -18,4 +18,8 @@ class Plex {
   }) {
     return Get.offAndToNamed<T>(path, arguments: arguments, parameters: parameters);
   }
+
+  static void back({dynamic result}) {
+    Get.back(result: result);
+  }
 }

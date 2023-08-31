@@ -1,7 +1,7 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// This class allow user to save and get persistent data
-class PlexDb {
+class PlexSp {
   static const loggedInUser = "PLEX_LOGGED_IN_USER";
 
   SharedPreferences? _prefs;
@@ -10,9 +10,9 @@ class PlexDb {
     _prefs ??= await SharedPreferences.getInstance();
   }
 
-  static PlexDb instance = PlexDb._();
+  static PlexSp instance = PlexSp._();
 
-  PlexDb._();
+  PlexSp._();
 
   ///Check weather the key exists or not
   bool hasKey(String key) {

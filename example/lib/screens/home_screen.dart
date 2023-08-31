@@ -19,29 +19,29 @@ class MyUser extends PlexForm {
   }
 
   @override
-  List<PlexField> getFields() {
+  List<PlexFormField> getFields() {
     return [
-      PlexField.input(title: "firstName", initialVaue: firstName, type: String, onChange: (value) => firstName = value ?? ""),
-      PlexField.input(title: "lastName", initialVaue: lastName, type: String, onChange: (value) => lastName = value ?? ""),
-      PlexField.input(title: "age", initialVaue: age, type: int, onChange: (value) => age = value ?? 0),
-      PlexField.input(title: "dob", initialVaue: dob, type: DateTime, onChange: (value) => dob = value ?? DateTime.now()),
-      PlexField.input(title: "male", initialVaue: male, type: bool, onChange: (value) => male = value),
-      PlexField.dropDown(
+      PlexFormField.input(title: "firstName", initialVaue: firstName, type: String, onChange: (value) => firstName = value ?? ""),
+      PlexFormField.input(title: "lastName", initialVaue: lastName, type: String, onChange: (value) => lastName = value ?? ""),
+      PlexFormField.input(title: "age", initialVaue: age, type: int, onChange: (value) => age = value ?? 0),
+      PlexFormField.input(title: "dob", initialVaue: dob, type: DateTime, onChange: (value) => dob = value ?? DateTime.now()),
+      PlexFormField.input(title: "male", initialVaue: male, type: bool, onChange: (value) => male = value),
+      PlexFormField.dropDown(
           title: "objects",
           initialVaue: object,
           onChange: (value) => object = value,
           itemAsString: (item) {
             return item.toString();
           },
-          dropDownItems: ["Pak", "Ind", "Eng"]),
-      PlexField.dropDown(
+          items: ["Pak", "Ind", "Eng"]),
+      PlexFormField.dropDown(
           title: "Data",
           initialVaue: "koko",
           onChange: (value) {},
           itemAsString: (item) {
             return item.toString();
           },
-          dropDownItems: ["Pak", "Ind", "Eng"]),
+          items: ["Pak", "Ind", "Eng"]),
     ];
   }
 }
@@ -68,9 +68,9 @@ class _FormUsageScreenState extends PlexState<FormUsageScreen> {
     var myUser = MyUser("Abdur", "Rahman", 5, DateTime.now(), true, "Pak");
     print(myUser.toString());
 
-    return PlexFormWidget(
+    return PlexFormWidget<MyUser>(
       entity: myUser,
-      onSubmit: () {
+      onSubmit: (MyUser myUser) {
         print(myUser.toString());
       },
     );

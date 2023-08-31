@@ -17,6 +17,9 @@ class PlexRoute {
   ///Use this [category] to group the screen in drawer menu
   String category;
 
+  ///Use this [rule] to group the screen in drawer menu
+  String? rule;
+
   ///Default constructor
-  PlexRoute({required this.route, required this.title, required this.screen, this.logo, this.category = "Menu"});
+  PlexRoute({required this.route, required this.title, required this.screen, this.logo, this.category = "Menu", this.rule});
 }

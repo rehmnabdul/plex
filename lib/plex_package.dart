@@ -1,13 +1,16 @@
 library plex;
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:plex/plex_db.dart';
+import 'package:plex/plex_sp.dart';
 import 'package:plex/plex_route.dart';
 import 'package:plex/plex_screens/plex_dashboard_screen.dart';
 import 'package:plex/plex_screens/plex_login_screen.dart';
 import 'package:plex/plex_scrollview.dart';
 import 'package:plex/plex_theme.dart';
+import 'package:plex/plex_user.dart';
 import 'package:plex/plex_utils/plex_dimensions.dart';
 import 'package:plex/plex_utils/plex_routing.dart';
 
@@ -48,7 +51,6 @@ class PlexApp extends StatefulWidget {
   //Authorization
   ///Use this [trigger] to enable authorization in the applicaiton
   final bool useAuthorization;
-  final bool useDashboard;
 
   ///If [useAuthorization] is enable set the required inputs by initializing loginConfig
   final PlexLoginConfig? loginConfig;
@@ -64,6 +66,9 @@ class PlexApp extends StatefulWidget {
   ///- To see the ripple effect [onTap] use Material Widgets like [Card] etc.
   final Widget Function(PlexRoute plexRoute)? generateDrawerNavigationButton;
 
+  ///When plex application is initialized this method will be called
+  final Function()? onInitializationComplete;
+
   ///This is a the app instance to access public variable of app anywhere in the applicaiton.
   static late PlexApp app;
 
@@ -73,7 +78,6 @@ class PlexApp extends StatefulWidget {
     this.appLogoDark,
     required this.title,
     required this.initialRoute,
-    this.useDashboard = false,
     this.dashboardConfig,
     this.pages,
     this.themeFromColor = const Color(0xFF007AD7),
@@ -83,25 +87,18 @@ class PlexApp extends StatefulWidget {
     this.customDrawerHeader,
     this.generateDrawerNavigationButton,
     this.loginConfig,
+    this.onInitializationComplete,
   }) {
     if (dashboardConfig == null && pages == null) {
       throw Exception("Either \"DashboardConfig\" or \"Pages\" must not be null and empty");
     }
 
-    if (dashboardConfig?.dashboardScreens.isEmpty == true && pages == null) {
-      throw Exception("\"DashboardConfig.DashboardScreens\" can't be empty");
+    if (pages == null && dashboardConfig!.dashboardScreens.firstWhereOrNull((e) => e.route == initialRoute) == null) {
+      throw Exception("\"DashboardConfig.DashboardScreens\" doesn't contain initial route");
     }
 
-    if (pages?.isEmpty == true && dashboardConfig == null) {
-      throw Exception("\"Routes\" can't be empty");
-    }
-
-    if (dashboardConfig!.dashboardScreens!.firstWhereOrNull((e) => e.route == initialRoute) == null && pages == null) {
-      throw Exception("\"DashboardConfig.DashboardScreens\" doesn't contain \"initialRoute\"");
-    }
-
-    if (pages!.firstWhereOrNull((e) => e.route == initialRoute) == null && dashboardConfig == null) {
-      throw Exception("\"Pages\" doesn't contain \"initialRoute\"");
+    if (dashboardConfig == null && pages!.firstWhereOrNull((e) => initialRoute == e.route) == null) {
+      throw Exception("\"Pages\" doesn't contain initial route");
     }
 
     if (useAuthorization && loginConfig == null) {
@@ -125,13 +122,28 @@ class PlexApp extends StatefulWidget {
   }
 
   ///Check the user is logged into the app or not
-  isLogin() {
-    return PlexDb.instance.hasKey(PlexDb.loggedInUser);
+  PlexUser? getUser() {
+    if (!PlexSp.instance.hasKey(PlexSp.loggedInUser)) return null;
+    try {
+      return loginConfig!.userFromJson(jsonDecode(PlexSp.instance.getString(PlexSp.loggedInUser)!));
+    } catch (e) {
+      logout();
+    }
+    return null;
+  }
+
+  void updateUser(PlexUser user) {
+    if (!PlexSp.instance.hasKey(PlexSp.loggedInUser)) return null;
+    try {
+      user.save();
+    } catch (e) {
+      logout();
+    }
   }
 
   ///Logout the user and move user to the signin screen
   logout() {
-    PlexDb.instance.setString(PlexDb.loggedInUser, null);
+    PlexSp.instance.setString(PlexSp.loggedInUser, null);
     Plex.offAndToNamed(PlexRoutesPaths.loginPath);
   }
 }
@@ -161,14 +173,15 @@ class _PlexAppState extends State<PlexApp> {
   void initState() {
     super.initState();
     Future(
-          () async {
+      () async {
         WidgetsFlutterBinding.ensureInitialized();
-        await PlexDb.instance.initialize();
+        await PlexSp.instance.initialize();
         if (widget.themeFromImage != null) {
           widget.imageColorScheme = await ColorScheme.fromImageProvider(provider: widget.themeFromImage!);
         }
         useMaterial3 = PlexTheme.isMaterial3();
         themeMode = PlexTheme.isDarkMode() ? ThemeMode.dark : ThemeMode.light;
+        widget.onInitializationComplete?.call();
         setState(() {
           _initialized = true;
         });
@@ -208,12 +221,17 @@ class _PlexAppState extends State<PlexApp> {
       themeMode: themeMode,
       debugShowCheckedModeBanner: false,
       scrollBehavior: PlexScrollBehavior(),
-      initialRoute: widget.useAuthorization ? PlexRoutesPaths.loginPath : widget.dashboardConfig != null ? PlexRoutesPaths.homePath : widget.initialRoute,
+      initialRoute: widget.useAuthorization
+          ? PlexRoutesPaths.loginPath
+          : widget.dashboardConfig != null
+              ? PlexRoutesPaths.homePath
+              : widget.initialRoute,
       unknownRoute: GetPage(
         name: widget.unknownRoute?.route ?? "/NotFound",
         page: () => widget.unknownRoute?.screen.call(context) ?? const Center(child: Text("Page not found: 404")),
       ),
       routes: {
+        "/": (_) => const Center(child: Text("Page not found: 404")),
         if (widget.useAuthorization) ...{
           PlexRoutesPaths.loginPath: (_) => PlexLoginScreen(loginConfig: widget.loginConfig!, nextRoute: widget.initialRoute),
         },

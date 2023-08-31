@@ -13,6 +13,44 @@ class Routes {
   static const secondScreen = "/second";
 }
 
+class AppUser extends PlexUser {
+  late String email;
+  late String userName;
+  List<String>? rules;
+
+  AppUser.init({required this.email, required this.userName, this.rules});
+
+  @override
+  String getLoggedInEmail() => email;
+
+  @override
+  List<String>? getLoggedInRules() => rules;
+
+  @override
+  String getLoggedInUsername() => userName;
+
+  @override
+  String getLoggedInFullName() => userName;
+
+
+
+  @override
+  Map<String, dynamic> toJson() {
+    final map = <String, dynamic>{};
+    map['userName'] = userName;
+    map['email'] = email;
+    map['rules'] = rules;
+    return map;
+  }
+
+  AppUser.fromJson(Map<String, dynamic> map) {
+    userName = map["userName"];
+    email = map["email"];
+    rules = map["rules"];
+  }
+
+}
+
 void main() async {
   getTableData() => [
         [
@@ -53,13 +91,15 @@ void main() async {
     initialRoute: Routes.dashboardScreen,
     useAuthorization: true,
     loginConfig: PlexLoginConfig(
-        additionalWidgetsTop: (context) => const Text("Login Screen"),
-        additionalWidgetsBottom: (context) => const Text("Login Screen End"),
-        onLogin: (context, email, password) async {
-          return PlexUser({
-            "Name": "Abdur Rahman",
-          });
-        }),
+      additionalWidgetsTop: (context) => const Text("Login Screen"),
+      additionalWidgetsBottom: (context) => const Text("Login Screen End"),
+      onLogin: (context, email, password) async {
+        return AppUser.init(userName: "Abdur Rahman", email: "ar@mail.com");
+      },
+      userFromJson: (userData) {
+        return AppUser.fromJson(userData);
+      },
+    ),
     dashboardConfig: PlexDashboardConfig(
       dashboardScreens: [
         PlexRoute(

@@ -35,7 +35,7 @@ class PlexDataTable extends StatefulWidget {
     this.onLoadMore,
     this.headerBackground,
     this.headerTextStyle,
-    this.alternateColor = const Color(0xFFCECECE),
+    this.alternateColor = const Color(0xFFA8A8A8),
     this.border,
   }) : super(key: key ?? GlobalKey());
 
@@ -81,7 +81,8 @@ class _PlexDataTableState extends State<PlexDataTable> {
         updatedData = data;
       });
       return;
-    };
+    }
+    ;
     data.sort((r1, r2) {
       if (sortAscending) {
         return (r1[sortColumnIndex!].value ?? "").compareTo(r2[sortColumnIndex!].value ?? "");

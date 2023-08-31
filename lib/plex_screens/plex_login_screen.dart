@@ -1,19 +1,17 @@
-import 'dart:convert';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:plex/plex_db.dart';
+import 'package:plex/plex_sp.dart';
 import 'package:plex/plex_package.dart';
 import 'package:plex/plex_screens/plex_screen.dart';
 import 'package:plex/plex_user.dart';
 import 'package:plex/plex_utils/plex_dimensions.dart';
 import 'package:plex/plex_utils/plex_routing.dart';
-import 'package:plex/plex_widget.dart';
 import 'package:plex/plex_widgets/plex_input_widget.dart';
 
 class PlexLoginConfig {
   PlexLoginConfig({
     required this.onLogin,
+    required this.userFromJson,
     this.additionalWidgetsTop,
     this.additionalWidgetsBottom,
   });
@@ -21,6 +19,7 @@ class PlexLoginConfig {
   final Future<PlexUser?> Function(BuildContext context, String email, String password) onLogin;
   final Widget Function(BuildContext context)? additionalWidgetsTop;
   final Widget Function(BuildContext context)? additionalWidgetsBottom;
+  final PlexUser Function(Map<String, dynamic> userData) userFromJson;
 }
 
 class PlexLoginScreen extends PlexScreen {
@@ -41,7 +40,7 @@ class _PlexLoginScreenState extends PlexState<PlexLoginScreen> {
   void initState() {
     super.initState();
 
-    if (PlexDb.instance.getString(PlexDb.loggedInUser) != null) {
+    if (PlexSp.instance.getString(PlexSp.loggedInUser) != null) {
       Future.delayed(const Duration(milliseconds: 100), () => Plex.offAndToNamed(PlexRoutesPaths.homePath));
       return;
     }
@@ -54,7 +53,7 @@ class _PlexLoginScreenState extends PlexState<PlexLoginScreen> {
 
   @override
   Widget buildBody() {
-    if (PlexDb.instance.getString(PlexDb.loggedInUser) != null) {
+    if (PlexSp.instance.getString(PlexSp.loggedInUser) != null) {
       return Container();
     }
     return Center(
@@ -103,8 +102,9 @@ class _PlexLoginScreenState extends PlexState<PlexLoginScreen> {
                     showLoading();
                     var result = await widget.loginConfig.onLogin(context, usernameController.text.toString(), passController.text.toString());
                     hideLoading();
+
                     if (result != null) {
-                      PlexDb.instance.setString(PlexDb.loggedInUser, jsonEncode(result.userData));
+                      result.save();
                       Plex.offAndToNamed(PlexApp.app.dashboardConfig != null ? PlexRoutesPaths.homePath : PlexApp.app.initialRoute);
                     }
                   },

@@ -28,6 +28,7 @@ class PlexTheme {
 
   ///Initial theme data for the app
   static ThemeData getActiveTheme() => getThemeByBrightness(isDarkMode() ? Brightness.dark : Brightness.light);
+  static TextTheme getTextTheme() => getActiveTheme().textTheme;
 
   static ThemeData getThemeByBrightness(Brightness brightness) => ThemeData(
       colorSchemeSeed: isDarkMode()

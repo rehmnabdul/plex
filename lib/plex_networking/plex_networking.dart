@@ -36,7 +36,8 @@ class PlexError<T> extends PlexApiResponse<T> {
 class AppHttpOverrides extends HttpOverrides {
   @override
   HttpClient createHttpClient(SecurityContext? context) {
-    return super.createHttpClient(context)..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
+    return super.createHttpClient(context)
+      ..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
   }
 }
 
@@ -114,7 +115,7 @@ class PlexNetworking {
     }
 
     headers ??= <String, String>{};
-    if(formData == null) {
+    if (formData == null) {
       headers["Content-Type"] = "application/json";
     }
     if (addHeaders != null) {
@@ -127,10 +128,10 @@ class PlexNetworking {
       if (kDebugMode) print("Started: ${uri.toString()}");
 
       late http.Response data;
-      if(formData != null) {
-        data = await _client.post(uri, headers: headers, body: formData);
+      if (formData != null) {
+        data = await http.post(uri, headers: headers, body: formData);
       } else if (body != null) {
-        data = await _client.post(uri, headers: headers, body: jsonEncode(body));
+        data = await http.post(uri, headers: headers, body: jsonEncode(body));
       }
 
       if (kDebugMode) print("Completed: ${data.statusCode}: ${uri.toString()}");

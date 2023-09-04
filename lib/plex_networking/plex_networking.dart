@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
-import 'package:plex/plex_sp.dart';
 
 class PlexApiResult {
   final bool success;
@@ -44,23 +43,18 @@ class AppHttpOverrides extends HttpOverrides {
 class PlexNetworking {
   static PlexNetworking instance = PlexNetworking._();
 
-  String baseUrl() {
-    return PlexSp.instance.getString("Url") ?? "https://10.0.62.89:8081/api/v1/";
-  }
-
-  setBaseUrl(String? url) {
-    PlexSp.instance.setString("Url", url ?? "https://10.0.62.89:8081/api/v1/");
-  }
-
   String _apiUrl() {
-    return baseUrl();
+    if (_basePath == null) throw Exception("Server Base Url is not provided");
+    return _basePath!;
   }
 
-  late http.Client _client;
-
-  PlexNetworking._(){
-    _client = http.Client();
+  void setUrl(String? basePath) {
+    _basePath = basePath;
   }
+
+  String? _basePath;
+
+  PlexNetworking._();
 
   ///Call this method to allow bad https certificate and manually verify them.
   ///If you trust your API server and it's certificate you can override the HTTPS system check
@@ -90,7 +84,7 @@ class PlexNetworking {
     try {
       var uri = Uri.parse(_apiUrl() + url);
       if (kDebugMode) print("Started: ${uri.toString()}");
-      var data = await _client.get(uri, headers: headers);
+      var data = await http.get(uri, headers: headers);
       if (kDebugMode) print("Completed: ${data.statusCode}: ${uri.toString()}");
       if (data.statusCode == 200) {
         return PlexSuccess(data.body);

@@ -1,3 +1,8 @@
+## 0.1.2
+
+* Updates in UI and Improvements
+* Add Networking in the Library
+
 ## 0.1.1
 
 * Update UI and Improvements

@@ -16,7 +16,7 @@ dependencies:
   get: ^4.6.5
 
   #Storage
-  shared_preferences: ^2.2.0
+  shared_preferences: ^2.2.1
 
   #Networking
   http: ^1.1.0

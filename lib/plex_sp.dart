@@ -29,6 +29,11 @@ class PlexSp {
     return _prefs!.getBool(key);
   }
 
+  ///Get the int value against a key
+  int? getInt(String key) {
+    return _prefs!.getInt(key);
+  }
+
   ///Set the string value against a key
   setString(String key, String? value) {
     if (value == null) {
@@ -43,5 +48,13 @@ class PlexSp {
       return _prefs!.remove(key);
     }
     return _prefs!.setBool(key, value);
+  }
+
+  ///Set the int value against a key
+  setInt(String key, int? value) {
+    if (value == null) {
+      return _prefs!.remove(key);
+    }
+    return _prefs!.setInt(key, value);
   }
 }

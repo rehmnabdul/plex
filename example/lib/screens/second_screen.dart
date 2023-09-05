@@ -19,9 +19,12 @@ class _UpdatableScreenState extends PlexState<UpdatableScreen> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          PlexWidget(controller: updateController, createWidget: (context, data) {
-            return Text("Counter: $data", style: const TextStyle(fontSize: 20));
-          },),
+          PlexWidget(
+            controller: updateController,
+            createWidget: (context, data) {
+              return Text("Counter: $data", style: const TextStyle(fontSize: 20));
+            },
+          ),
           spaceMedium(),
           ElevatedButton.icon(
             onPressed: () {

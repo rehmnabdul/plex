@@ -21,14 +21,14 @@ class MyUser extends PlexForm {
   @override
   List<PlexFormField> getFields() {
     return [
-      PlexFormField.input(title: "firstName", initialVaue: firstName, type: String, onChange: (value) => firstName = value ?? ""),
-      PlexFormField.input(title: "lastName", initialVaue: lastName, type: String, onChange: (value) => lastName = value ?? ""),
-      PlexFormField.input(title: "age", initialVaue: age, type: int, onChange: (value) => age = value ?? 0),
-      PlexFormField.input(title: "dob", initialVaue: dob, type: DateTime, onChange: (value) => dob = value ?? DateTime.now()),
-      PlexFormField.input(title: "male", initialVaue: male, type: bool, onChange: (value) => male = value),
+      PlexFormField.input(title: "firstName", initialValue: firstName, type: String, onChange: (value) => firstName = value ?? ""),
+      PlexFormField.input(title: "lastName", initialValue: lastName, type: String, onChange: (value) => lastName = value ?? ""),
+      PlexFormField.input(title: "age", initialValue: age, type: int, onChange: (value) => age = value ?? 0),
+      PlexFormField.input(title: "dob", initialValue: dob, type: DateTime, onChange: (value) => dob = value ?? DateTime.now()),
+      PlexFormField.input(title: "male", initialValue: male, type: bool, onChange: (value) => male = value),
       PlexFormField.dropDown(
           title: "objects",
-          initialVaue: object,
+          initialValue: object,
           onChange: (value) => object = value,
           itemAsString: (item) {
             return item.toString();
@@ -36,7 +36,7 @@ class MyUser extends PlexForm {
           items: ["Pak", "Ind", "Eng"]),
       PlexFormField.dropDown(
           title: "Data",
-          initialVaue: "koko",
+          initialValue: "koko",
           onChange: (value) {},
           itemAsString: (item) {
             return item.toString();

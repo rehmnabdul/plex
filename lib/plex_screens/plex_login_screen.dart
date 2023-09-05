@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:plex/plex_sp.dart';
 import 'package:plex/plex_package.dart';
 import 'package:plex/plex_screens/plex_screen.dart';
+import 'package:plex/plex_sp.dart';
 import 'package:plex/plex_user.dart';
 import 'package:plex/plex_utils/plex_dimensions.dart';
 import 'package:plex/plex_utils/plex_routing.dart';

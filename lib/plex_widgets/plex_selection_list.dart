@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:plex/plex_utils/plex_dimensions.dart';
 import 'package:plex/plex_widget.dart';
 import 'package:plex/plex_widgets/plex_input_widget.dart';
-import 'package:plex/utils.dart';
 
 showSelectionList<T>(
   BuildContext context, {
@@ -168,7 +167,7 @@ showMultiSelection<T>(
                           return InkWell(
                             onTap: () {
                               var prevItem = selectionList.firstWhereOrNull((element) => itemText(item) == itemText(element));
-                              if(prevItem == null){
+                              if (prevItem == null) {
                                 selectionList.add(item);
                               } else {
                                 selectionList.removeWhere((element) => itemText(item) == itemText(element));
@@ -181,17 +180,20 @@ showMultiSelection<T>(
                         return ListTile(
                           leading: leadingIcon?.call(item),
                           title: Text(itemText.call(item)),
-                          trailing: Checkbox(value: selectionList.firstWhereOrNull((element) => itemText(item) == itemText(element)) != null, onChanged: (value) {
-                            if(value == true){
-                              selectionList.add(item);
-                            } else {
-                              selectionList.removeWhere((element) => itemText(item) == itemText(element));
-                            }
-                            filteredListController.setValue(filteredListController.data);
-                          },),
+                          trailing: Checkbox(
+                            value: selectionList.firstWhereOrNull((element) => itemText(item) == itemText(element)) != null,
+                            onChanged: (value) {
+                              if (value == true) {
+                                selectionList.add(item);
+                              } else {
+                                selectionList.removeWhere((element) => itemText(item) == itemText(element));
+                              }
+                              filteredListController.setValue(filteredListController.data);
+                            },
+                          ),
                           onTap: () {
                             var prevItem = selectionList.firstWhereOrNull((element) => itemText(item) == itemText(element));
-                            if(prevItem == null){
+                            if (prevItem == null) {
                               selectionList.add(item);
                             } else {
                               selectionList.removeWhere((element) => itemText(item) == itemText(element));

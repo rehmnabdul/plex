@@ -51,15 +51,17 @@ Install the `plex` in your application.
 ## Usage
 
 ## Widgets
+
 1. PlexWidget
-2. PlexDataTable 
-3. PlexInputWidget 
+2. PlexDataTable
+3. PlexInputWidget
 4. PlexFormWidget
 5. PlexInputWidget
 
 #### PlexInputWidget
 
 ###### Usage
+
 ```dart
 // Input Types
 // PlexInputWidget.typeInput
@@ -102,6 +104,7 @@ PlexInputWidget(
 ```
 
 #### Persistent Storage
+
 ```dart
 //Only initialize if you are not using PlexApp 
 //and using PlexDb separately
@@ -115,11 +118,11 @@ PlexDb.instance.getBool("Key");
 ```
 
 ### Messaging
+
 ```dart
 BuildContext context;
 context.showSnackBar("Your Message...");
 ```
-
 
 ```dart
 void main() {

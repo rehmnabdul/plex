@@ -82,7 +82,7 @@ class _PlexDataTableState extends State<PlexDataTable> {
       });
       return;
     }
-    ;
+
     data.sort((r1, r2) {
       if (sortAscending) {
         return (r1[sortColumnIndex!].value ?? "").compareTo(r2[sortColumnIndex!].value ?? "");

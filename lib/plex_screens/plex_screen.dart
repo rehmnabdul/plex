@@ -10,8 +10,8 @@ abstract class PlexState<T extends PlexScreen> extends State<T> {
   final GlobalKey<ScaffoldState> key = GlobalKey();
   final _loadingController = PlexWidgetController();
 
-  getArguments<T>() {
-    var args = ModalRoute.of(context)!.settings.arguments as T;
+  getArguments<AT>() {
+    var args = ModalRoute.of(context)!.settings.arguments as AT;
     return args;
   }
 

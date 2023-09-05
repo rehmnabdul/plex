@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:plex/plex_networking/plex_networking.dart';
 import 'package:plex/plex_package.dart';
 import 'package:plex/plex_route.dart';
 import 'package:plex/plex_screens/plex_dashboard_screen.dart';
@@ -32,8 +33,6 @@ class AppUser extends PlexUser {
   @override
   String getLoggedInFullName() => userName;
 
-
-
   @override
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -48,7 +47,6 @@ class AppUser extends PlexUser {
     email = map["email"];
     rules = map["rules"];
   }
-
 }
 
 void main() async {
@@ -90,6 +88,9 @@ void main() async {
     title: "Auto Backup",
     initialRoute: Routes.dashboardScreen,
     useAuthorization: true,
+    onInitializationComplete: () {
+      PlexNetworking;
+    },
     loginConfig: PlexLoginConfig(
       additionalWidgetsTop: (context) => const Text("Login Screen"),
       additionalWidgetsBottom: (context) => const Text("Login Screen End"),

@@ -59,9 +59,12 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
       centerTitle: true,
       title: navigationSelectedIndex == -1 ? Container() : Text(routes[navigationSelectedIndex].title),
       leading: (routes.isNotEmpty)
-          ? IconButton(icon: const Icon(Icons.menu), onPressed: () {
-        key.currentState?.openDrawer();
-      }) : null,
+          ? IconButton(
+              icon: const Icon(Icons.menu),
+              onPressed: () {
+                key.currentState?.openDrawer();
+              })
+          : null,
       actions: [
         if (PlexApp.app.useAuthorization) ...[
           Center(child: Text(PlexApp.app.getUser()?.getLoggedInFullName().toUpperCase() ?? "N/A")),
@@ -138,10 +141,9 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
       children: [
         if (PlexApp.app.customDrawerHeader != null) ...{
           PlexApp.app.customDrawerHeader!,
-        } else
-          ...{
-            spaceMedium(),
-          },
+        } else ...{
+          spaceMedium(),
+        },
         ..._createSideNavigationButtons(),
       ],
     );
@@ -160,8 +162,7 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
         });
       },
       destinations: [
-        ...routes.map((destination) =>
-            NavigationDestination(
+        ...routes.map((destination) => NavigationDestination(
               label: destination.title,
               icon: destination.logo ?? const Icon(Icons.circle),
               selectedIcon: destination.logo,
@@ -180,10 +181,7 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
         menus.add(
           Padding(
             padding: const EdgeInsets.fromLTRB(28, 16, 16, 10),
-            child: Text(prevCategory ?? "", style: Theme
-                .of(context)
-                .textTheme
-                .titleSmall),
+            child: Text(prevCategory, style: Theme.of(context).textTheme.titleSmall),
           ),
         );
       }
@@ -215,9 +213,7 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
               child: NavigationRail(
                 extended: largeScreen,
                 elevation: Dim.smallest,
-                backgroundColor: PlexTheme
-                    .getActiveTheme()
-                    .secondaryHeaderColor,
+                backgroundColor: PlexTheme.getActiveTheme().secondaryHeaderColor,
                 leading: SizedBox(width: largeScreen ? 200 : 50, child: PlexApp.app.getLogo()),
                 selectedIndex: navigationSelectedIndex,
                 onDestinationSelected: (value) {
@@ -227,19 +223,18 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
                 },
                 destinations: [
                   ...routes.map(
-                        (destination) =>
-                        NavigationRailDestination(
-                          label: Text(destination.title),
-                          icon: destination.logo ?? const Icon(Icons.menu),
-                          selectedIcon: destination.logo ?? const Icon(Icons.circle),
-                        ),
+                    (destination) => NavigationRailDestination(
+                      label: Text(destination.title),
+                      icon: destination.logo ?? const Icon(Icons.menu),
+                      selectedIcon: destination.logo ?? const Icon(Icons.circle),
+                    ),
                   ),
                 ],
               ),
             ),
           ),
         },
-        if(navigationSelectedIndex != -1) ...{
+        if (navigationSelectedIndex != -1) ...{
           Expanded(child: routes[navigationSelectedIndex].screen.call(context)),
         }
       ],

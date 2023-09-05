@@ -1,3 +1,16 @@
+## 0.1.5
+
+* Formatting Code
+* Remove Redundant Imports
+
+## 0.1.4
+
+* Fix Bug
+
+## 0.1.3
+
+* Fix PlexNetworking Bugs
+
 ## 0.1.2
 
 * Updates in UI and Improvements

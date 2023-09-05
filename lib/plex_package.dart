@@ -1,14 +1,16 @@
+// ignore_for_file: must_be_immutable
+
 library plex;
 
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:plex/plex_sp.dart';
 import 'package:plex/plex_route.dart';
 import 'package:plex/plex_screens/plex_dashboard_screen.dart';
 import 'package:plex/plex_screens/plex_login_screen.dart';
 import 'package:plex/plex_scrollview.dart';
+import 'package:plex/plex_sp.dart';
 import 'package:plex/plex_theme.dart';
 import 'package:plex/plex_user.dart';
 import 'package:plex/plex_utils/plex_dimensions.dart';
@@ -133,7 +135,7 @@ class PlexApp extends StatefulWidget {
   }
 
   void updateUser(PlexUser user) {
-    if (!PlexSp.instance.hasKey(PlexSp.loggedInUser)) return null;
+    if (!PlexSp.instance.hasKey(PlexSp.loggedInUser)) return;
     try {
       user.save();
     } catch (e) {

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:plex/plex_sp.dart';
 import 'package:plex/plex_package.dart';
+import 'package:plex/plex_sp.dart';
 
 ///This class will hold theme related information
 class PlexTheme {
@@ -28,6 +28,7 @@ class PlexTheme {
 
   ///Initial theme data for the app
   static ThemeData getActiveTheme() => getThemeByBrightness(isDarkMode() ? Brightness.dark : Brightness.light);
+
   static TextTheme getTextTheme() => getActiveTheme().textTheme;
 
   static ThemeData getThemeByBrightness(Brightness brightness) => ThemeData(

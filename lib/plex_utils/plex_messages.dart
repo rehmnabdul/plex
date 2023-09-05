@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 extension SnackBarUtils on BuildContext {
   showSnackBar(String message) {
-    if(!mounted) return;
+    if (!mounted) return;
     final snackBar = SnackBar(
       behavior: SnackBarBehavior.floating,
       width: 400.0,

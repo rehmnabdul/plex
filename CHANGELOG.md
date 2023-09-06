@@ -1,3 +1,7 @@
+## 0.1.6
+
+* Fix Bug In PlexWidget
+ 
 ## 0.1.5
 
 * Formatting Code

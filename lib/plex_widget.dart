@@ -41,6 +41,7 @@ class PlexWidgetController<T> extends ChangeNotifier {
 
   void setValue(T? data) {
     this.data = data;
+    if(isDisposed) return;
     notifyListeners();
   }
 

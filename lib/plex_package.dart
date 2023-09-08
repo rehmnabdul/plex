@@ -71,6 +71,9 @@ class PlexApp extends StatefulWidget {
   ///When plex application is initialized this method will be called
   final Function()? onInitializationComplete;
 
+  ///When plex user is logout this method will be called
+  final Function()? onLogout;
+
   ///This is a the app instance to access public variable of app anywhere in the applicaiton.
   static late PlexApp app;
 
@@ -90,6 +93,7 @@ class PlexApp extends StatefulWidget {
     this.generateDrawerNavigationButton,
     this.loginConfig,
     this.onInitializationComplete,
+    this.onLogout,
   }) {
     if (dashboardConfig == null && pages == null) {
       throw Exception("Either \"DashboardConfig\" or \"Pages\" must not be null and empty");
@@ -147,6 +151,7 @@ class PlexApp extends StatefulWidget {
   logout() {
     PlexSp.instance.setString(PlexSp.loggedInUser, null);
     Plex.offAndToNamed(PlexRoutesPaths.loginPath);
+    this.onLogout?.call();
   }
 }
 

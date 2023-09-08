@@ -1,3 +1,7 @@
+## 0.1.8
+
+* Add `onLogout` Callback in `PlexApp` for post logout operations i.e. deleting some data etc
+
 ## 0.1.7
 
 * Add `columnSpacing` Style In `PlexDataTable`

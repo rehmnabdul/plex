@@ -11,7 +11,10 @@ abstract class PlexState<T extends PlexScreen> extends State<T> {
   final _loadingController = PlexWidgetController();
 
   getArguments<AT>() {
-    var args = ModalRoute.of(context)!.settings.arguments as AT;
+    var args = ModalRoute
+        .of(context)!
+        .settings
+        .arguments as AT;
     return args;
   }
 
@@ -29,7 +32,7 @@ abstract class PlexState<T extends PlexScreen> extends State<T> {
   toastDelayed(String message) async {
     return Future.delayed(
       const Duration(milliseconds: 100),
-      () {
+          () {
         toast(message);
       },
     );
@@ -39,7 +42,7 @@ abstract class PlexState<T extends PlexScreen> extends State<T> {
 
   @override
   Widget build(BuildContext context) {
-    var body = Scaffold(
+    var content = Scaffold(
       key: key,
       appBar: buildAppBar(),
       drawer: buildSideNavigation(),
@@ -64,14 +67,17 @@ abstract class PlexState<T extends PlexScreen> extends State<T> {
         ),
       ),
     );
+    Widget body;
     if (getNoOfTabs() > 0) {
-      return DefaultTabController(
+      body = DefaultTabController(
         length: getNoOfTabs(),
-        child: body,
+        child: content,
       );
     } else {
-      return body;
+      body = content;
     }
+
+    return body;
   }
 
   AppBar? buildAppBar() {
@@ -94,11 +100,17 @@ abstract class PlexState<T extends PlexScreen> extends State<T> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     smallScreen = mediumScreen = largeScreen = false;
-    if (MediaQuery.of(context).size.width >= 900) {
+    if (MediaQuery
+        .of(context)
+        .size
+        .width >= 900) {
       largeScreen = true;
       return;
     }
-    if (MediaQuery.of(context).size.width >= 600) {
+    if (MediaQuery
+        .of(context)
+        .size
+        .width >= 600) {
       mediumScreen = true;
       return;
     }

@@ -1,6 +1,10 @@
+## 0.1.7
+
+* Add `columnSpacing` Style In `PlexDataTable`
+
 ## 0.1.6
 
-* Fix Bug In PlexWidget
+* Fix Bug In `PlexWidget`
  
 ## 0.1.5
 

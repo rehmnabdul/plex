@@ -37,6 +37,7 @@ class PlexDataTable extends StatefulWidget {
     this.headerTextStyle,
     this.alternateColor = const Color(0xFFA8A8A8),
     this.border,
+    this.columnSpacing,
   }) : super(key: key ?? GlobalKey());
 
   ///All Column titles
@@ -50,6 +51,7 @@ class PlexDataTable extends StatefulWidget {
   final TextStyle? headerTextStyle;
   final Color? alternateColor;
   TableBorder? border;
+  double? columnSpacing;
 
   ///OnRefresh Button Click Callback
   Function()? onRefresh;
@@ -193,6 +195,7 @@ class _PlexDataTableState extends State<PlexDataTable> {
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: DataTable(
+              columnSpacing: widget.columnSpacing,
               border: widget.border ?? TableBorder.all(color: Colors.black38),
               headingRowColor: widget.headerBackground?.getColorState(),
               headingTextStyle: widget.headerTextStyle,

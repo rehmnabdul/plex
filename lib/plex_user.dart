@@ -10,6 +10,17 @@ abstract class PlexUser {
 
   String getLoggedInFullName();
 
+  String getInitials() {
+    List<String> names = getLoggedInFullName().split(' ');
+    String initials = '';
+    for (String name in names) {
+      if (name.isNotEmpty) {
+        initials += name[0];
+      }
+    }
+    return initials.toUpperCase();
+  }
+
   List<String>? getLoggedInRules();
 
   Map<String, dynamic> toJson();

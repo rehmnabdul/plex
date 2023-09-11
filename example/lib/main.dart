@@ -84,9 +84,14 @@ void main() async {
   runApp(PlexApp(
     themeFromColor: const Color(0xFF26A9E1),
     // themeFromImage: const AssetImage("/path/to/image"),
-    appLogo: const Icon(Icons.account_balance),
-    appInfo: PlexAppInfo(title: "Auto Backup", versionCode: 1, versionName: "v1.0.5"),
-    initialRoute: Routes.dashboardScreen,
+    appInfo: PlexAppInfo(
+      title: "Auto Backup",
+      appLogo: const Icon(Icons.account_balance),
+      appLogoDark: const Icon(Icons.account_balance, color: Colors.white),
+      initialRoute: Routes.dashboardScreen,
+      versionCode: 1,
+      versionName: "v1.0.0",
+    ),
     useAuthorization: true,
     onInitializationComplete: () {
       PlexNetworking;

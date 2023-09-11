@@ -1,3 +1,13 @@
+## 0.2.1
+
+* Move `appLogo`, `appLogoDar` and `initialRoute` to `PlexAppInfo`
+* Add `SideNavigation` header
+
+## 0.2.0
+
+* More than `5` menu items will be clubbed in `Mobile-View` and when user can navigate there by click `More` button
+* Add `UserIcons` on top right of dashboard screen with name. Name will be hidden on small screens.
+
 ## 0.1.9
 
 * Add `enableSerach` control in `PlexDataTable` to hide and show the search controls

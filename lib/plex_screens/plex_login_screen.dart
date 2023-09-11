@@ -109,7 +109,7 @@ class _PlexLoginScreenState extends PlexState<PlexLoginScreen> {
 
                     if (result != null) {
                       result.save();
-                      Plex.offAndToNamed(PlexApp.app.dashboardConfig != null ? PlexRoutesPaths.homePath : PlexApp.app.initialRoute);
+                      Plex.offAndToNamed(PlexApp.app.dashboardConfig != null ? PlexRoutesPaths.homePath : PlexApp.app.appInfo.initialRoute);
                     }
                   },
                 ),

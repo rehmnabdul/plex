@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:plex/plex_package.dart';
 import 'package:plex/plex_sp.dart';
@@ -44,4 +46,9 @@ class PlexTheme {
               : PlexApp.app.imageColorScheme,
       useMaterial3: isMaterial3(),
       brightness: brightness);
+
+  static Color randomColor() {
+    var colorLimit = 225;
+    return ColorScheme.fromSeed(seedColor: Color.fromARGB(255, Random().nextInt(colorLimit), Random().nextInt(colorLimit), Random().nextInt(colorLimit))).primary;
+  }
 }

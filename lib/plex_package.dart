@@ -17,11 +17,25 @@ import 'package:plex/plex_utils/plex_dimensions.dart';
 import 'package:plex/plex_utils/plex_routing.dart';
 
 class PlexAppInfo {
-  PlexAppInfo({required this.title, this.versionCode, this.versionName});
+  PlexAppInfo({required this.title, required this.appLogo, required this.initialRoute, this.appLogoDark, this.versionCode, this.versionName});
 
-  String title;
-  int? versionCode;
-  String? versionName;
+  ///This [title] will be appear as Application Name
+  final String title;
+
+  ///This [initialRoute] will be treated as initial route for screen Application
+  final String initialRoute;
+
+  ///This [versionCode] will be use to display Application version info
+  final int? versionCode;
+
+  ///This [versionName] will be use to display Application version info
+  final String? versionName;
+
+  ///This [appLogo] widget will be show as Application Logo
+  final Widget appLogo;
+
+  ///This [appLogoDark] widget will be show as Application Logo in Dark mode
+  final Widget? appLogoDark;
 }
 
 class PlexRoutesPaths {
@@ -40,17 +54,8 @@ class PlexApp extends StatefulWidget {
   ///This image will be used to generate app theme
   final ImageProvider? themeFromImage;
 
-  ///This [appLogo] widget will be show as Application Logo
-  final Widget appLogo;
-
-  ///This [appLogoDark] widget will be show as Application Logo in Dark mode
-  final Widget? appLogoDark;
-
   ///This [appInfo] will be show ass Application title
   final PlexAppInfo appInfo;
-
-  ///This [initialRoute] will be treated as initial route for screen Application
-  final String initialRoute;
 
   ///This [pages] list will contains all the pages routes information for Application
   final List<PlexRoute>? pages;
@@ -68,7 +73,7 @@ class PlexApp extends StatefulWidget {
 
   //App Widgets
   ///Use this widget to create custom drawer header
-  final Widget? customDrawerHeader;
+  final Widget Function()? customDrawerHeader;
 
   //Widget Callbacks
   ///Use this callback to create custom drawer navigation buttons
@@ -87,10 +92,7 @@ class PlexApp extends StatefulWidget {
 
   PlexApp({
     super.key,
-    required this.appLogo,
-    this.appLogoDark,
     required this.appInfo,
-    required this.initialRoute,
     this.dashboardConfig,
     this.pages,
     this.themeFromColor = const Color(0xFF007AD7),
@@ -107,11 +109,11 @@ class PlexApp extends StatefulWidget {
       throw Exception("Either \"DashboardConfig\" or \"Pages\" must not be null and empty");
     }
 
-    if (pages == null && dashboardConfig!.dashboardScreens.firstWhereOrNull((e) => e.route == initialRoute) == null) {
+    if (pages == null && dashboardConfig!.dashboardScreens.firstWhereOrNull((e) => e.route == appInfo.initialRoute) == null) {
       throw Exception("\"DashboardConfig.DashboardScreens\" doesn't contain initial route");
     }
 
-    if (dashboardConfig == null && pages!.firstWhereOrNull((e) => initialRoute == e.route) == null) {
+    if (dashboardConfig == null && pages!.firstWhereOrNull((e) => appInfo.initialRoute == e.route) == null) {
       throw Exception("\"Pages\" doesn't contain initial route");
     }
 
@@ -132,7 +134,7 @@ class PlexApp extends StatefulWidget {
   //Public Methods and Variables
   ///Get AppLogo Based on Brightness Mode of Theme
   Widget getLogo() {
-    return (PlexTheme.isDarkMode() ? appLogoDark : appLogo) ?? appLogo;
+    return (PlexTheme.isDarkMode() ? appInfo.appLogoDark : appInfo.appLogo) ?? appInfo.appLogo;
   }
 
   ///Check the user is logged into the app or not
@@ -159,7 +161,7 @@ class PlexApp extends StatefulWidget {
   logout() {
     PlexSp.instance.setString(PlexSp.loggedInUser, null);
     Plex.offAndToNamed(PlexRoutesPaths.loginPath);
-    this.onLogout?.call();
+    onLogout?.call();
   }
 }
 
@@ -217,7 +219,7 @@ class _PlexAppState extends State<PlexApp> {
               children: [
                 Align(
                   alignment: Alignment.center,
-                  child: widget.appLogo,
+                  child: widget.appInfo.appLogo,
                 ),
                 const Align(
                   alignment: Alignment.bottomCenter,
@@ -240,15 +242,15 @@ class _PlexAppState extends State<PlexApp> {
           ? PlexRoutesPaths.loginPath
           : widget.dashboardConfig != null
               ? PlexRoutesPaths.homePath
-              : widget.initialRoute,
+              : widget.appInfo.initialRoute,
       unknownRoute: GetPage(
         name: widget.unknownRoute?.route ?? "/NotFound",
-        page: () => widget.unknownRoute?.screen.call(context) ?? const Center(child: Text("Page not found: 404")),
+        page: () => widget.unknownRoute?.screen.call(context) ?? const Scaffold(body: Center(child: Text("Page not found: 404"))),
       ),
       routes: {
-        "/": (_) => const Center(child: Text("Page not found: 404")),
+        "/": (_) => const Scaffold(body: Center(child: Text("Page not found: 404"))),
         if (widget.useAuthorization) ...{
-          PlexRoutesPaths.loginPath: (_) => PlexLoginScreen(loginConfig: widget.loginConfig!, nextRoute: widget.initialRoute),
+          PlexRoutesPaths.loginPath: (_) => PlexLoginScreen(loginConfig: widget.loginConfig!, nextRoute: widget.appInfo.initialRoute),
         },
         if (widget.dashboardConfig != null) ...{
           PlexRoutesPaths.homePath: (_) => PlexDashboardScreen(handleBrightnessChange, handleMaterialVersionChange),

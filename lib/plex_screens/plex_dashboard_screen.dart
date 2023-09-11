@@ -25,6 +25,7 @@ class PlexDashboardScreen extends PlexScreen {
 }
 
 class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
+  final int maxBottomNavDestinations = 4;
   var navigationSelectedIndex = -1;
 
   PlexUser? user;
@@ -67,7 +68,26 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
           : null,
       actions: [
         if (PlexApp.app.useAuthorization) ...[
-          Center(child: Text(PlexApp.app.getUser()?.getLoggedInFullName().toUpperCase() ?? "N/A")),
+          if(largeScreen) ...{
+            Center(child: Text(PlexApp.app.getUser()?.getLoggedInFullName().toUpperCase() ?? "N/A")),
+            spaceSmall(),
+          },
+          Center(child: SizedBox(
+            width: 40,
+            height: 40,
+            child: Container(
+              decoration: BoxDecoration(
+                color: PlexTheme.getActiveTheme().colorScheme.secondary,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Center(
+                child: Text(
+                  PlexApp.app.getUser()?.getInitials().toString() ?? "N/A",
+                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                ),
+              ),
+            ),
+          )),
         ],
         MenuAnchor(
           menuChildren: [
@@ -110,10 +130,10 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
                 child: const Text("Logout"),
               )
             ],
-            if(PlexApp.app.appInfo.versionName != null) ...[
+            if (PlexApp.app.appInfo.versionName != null) ...[
               MenuItemButton(
                 leadingIcon: const Icon(Icons.code),
-                onPressed: (){},
+                onPressed: () {},
                 child: Text("Version: ${PlexApp.app.appInfo.versionName}"),
               )
             ]
@@ -147,10 +167,25 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
       },
       children: [
         if (PlexApp.app.customDrawerHeader != null) ...{
-          PlexApp.app.customDrawerHeader!,
+          PlexApp.app.customDrawerHeader!.call(),
         } else ...{
-          spaceMedium(),
+          Container(
+            color: PlexTheme.getActiveTheme().secondaryHeaderColor,
+            child: Padding(
+              padding: const EdgeInsets.all(Dim.large),
+              child: Column(
+                children: [
+                  SizedBox(
+                    height: 100,
+                    child: PlexApp.app.getLogo(),
+                  ),
+                  Text("Version: ${PlexApp.app.appInfo.versionName}"),
+                ],
+              ),
+            ),
+          )
         },
+        spaceMedium(),
         ..._createSideNavigationButtons(),
       ],
     );
@@ -160,7 +195,7 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
   Widget? buildBottomNavigation() {
     if (!smallScreen || (routes.length) <= 1) return null;
     return NavigationBar(
-      selectedIndex: navigationSelectedIndex,
+      selectedIndex: navigationSelectedIndex > maxBottomNavDestinations ? maxBottomNavDestinations : navigationSelectedIndex,
       labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
       animationDuration: const Duration(milliseconds: 500),
       onDestinationSelected: (int index) {
@@ -169,12 +204,48 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
         });
       },
       destinations: [
-        ...routes.map((destination) => NavigationDestination(
-              label: destination.title,
-              icon: destination.logo ?? const Icon(Icons.circle),
-              selectedIcon: destination.logo,
-              tooltip: destination.title,
-            )),
+        if (routes.length > maxBottomNavDestinations) ...{
+          ...routes.sublist(0, maxBottomNavDestinations).map((destination) => NavigationDestination(
+                label: destination.title,
+                icon: destination.logo ?? const Icon(Icons.circle),
+                selectedIcon: destination.logo,
+                tooltip: destination.title,
+              )),
+          MenuAnchor(
+            menuChildren: [
+              ...routes.sublist(maxBottomNavDestinations).map(
+                    (e) => MenuItemButton(
+                      onPressed: () {
+                        setState(() {
+                          navigationSelectedIndex = routes.indexWhere((i) => i.route == e.route);
+                        });
+                      },
+                      leadingIcon: e.logo ?? const Icon(Icons.logout),
+                      child: Text(e.title),
+                    ),
+                  ),
+            ],
+            builder: (context, controller, child) {
+              return IconButton(
+                onPressed: () {
+                  if (controller.isOpen) {
+                    controller.close();
+                  } else {
+                    controller.open();
+                  }
+                },
+                icon: const Icon(Icons.more),
+              );
+            },
+          ),
+        } else ...{
+          ...routes.map((destination) => NavigationDestination(
+                label: destination.title,
+                icon: destination.logo ?? const Icon(Icons.circle),
+                selectedIcon: destination.logo,
+                tooltip: destination.title,
+              )),
+        }
       ],
     );
   }
@@ -221,7 +292,13 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
                 extended: largeScreen,
                 elevation: Dim.smallest,
                 backgroundColor: PlexTheme.getActiveTheme().secondaryHeaderColor,
-                leading: SizedBox(width: largeScreen ? 200 : 50, child: PlexApp.app.getLogo()),
+                leading: SizedBox(width: largeScreen ? 200 : 50, child: Column(
+                  children: [
+                    PlexApp.app.getLogo(),
+                    Text("${PlexApp.app.appInfo.versionName}"),
+                    spaceSmall(),
+                  ],
+                )),
                 selectedIndex: navigationSelectedIndex,
                 onDestinationSelected: (value) {
                   setState(() {

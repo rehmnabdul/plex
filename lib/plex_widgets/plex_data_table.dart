@@ -33,6 +33,7 @@ class PlexDataTable extends StatefulWidget {
     required this.rows,
     this.onRefresh,
     this.onLoadMore,
+    this.enableSearch = true,
     this.headerBackground,
     this.headerTextStyle,
     this.alternateColor = const Color(0xFFA8A8A8),
@@ -52,6 +53,9 @@ class PlexDataTable extends StatefulWidget {
   final Color? alternateColor;
   TableBorder? border;
   double? columnSpacing;
+
+  ///OnRefresh Button Click Callback
+  final bool enableSearch;
 
   ///OnRefresh Button Click Callback
   Function()? onRefresh;
@@ -125,42 +129,46 @@ class _PlexDataTableState extends State<PlexDataTable> {
     int isAlternate = -1;
     return Column(
       children: [
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: Dim.medium, vertical: Dim.small),
-            child: Row(
-              children: [
-                SegmentedButton<int>(
-                  segments: [
-                    for (var i = 0; i < widget.columns.length; i++) ...{ButtonSegment(value: i, label: Text(widget.columns[i].value!), enabled: true)},
-                  ],
-                  selected: searchColumnIndexes,
-                  emptySelectionAllowed: true,
-                  multiSelectionEnabled: true,
-                  onSelectionChanged: (selection) {
-                    searchColumnIndexes = selection;
-                    filterData();
-                  },
-                ),
-              ],
+        if (widget.enableSearch) ...{
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: Dim.medium, vertical: Dim.small),
+              child: Row(
+                children: [
+                  SegmentedButton<int>(
+                    segments: [
+                      for (var i = 0; i < widget.columns.length; i++) ...{ButtonSegment(value: i, label: Text(widget.columns[i].value!), enabled: true)},
+                    ],
+                    selected: searchColumnIndexes,
+                    emptySelectionAllowed: true,
+                    multiSelectionEnabled: true,
+                    onSelectionChanged: (selection) {
+                      searchColumnIndexes = selection;
+                      filterData();
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
+        },
         Padding(
           padding: const EdgeInsets.symmetric(vertical: Dim.small),
           child: Row(
             children: [
               Expanded(
-                child: PlexInputWidget(
-                  type: PlexInputWidget.typeInput,
-                  inputController: searchController,
-                  title: "Search...",
-                  inputHint: "Type here to search whole data...",
-                  inputOnChange: (value) {
-                    filterData();
-                  },
-                ),
+                child: widget.enableSearch
+                    ? PlexInputWidget(
+                        type: PlexInputWidget.typeInput,
+                        inputController: searchController,
+                        title: "Search...",
+                        inputHint: "Type here to search whole data...",
+                        inputOnChange: (value) {
+                          filterData();
+                        },
+                      )
+                    : Container(),
               ),
               if (widget.onRefresh != null) ...{
                 FilledButton.tonal(

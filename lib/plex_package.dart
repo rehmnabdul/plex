@@ -16,6 +16,14 @@ import 'package:plex/plex_user.dart';
 import 'package:plex/plex_utils/plex_dimensions.dart';
 import 'package:plex/plex_utils/plex_routing.dart';
 
+class PlexAppInfo {
+  PlexAppInfo({required this.title, this.versionCode, this.versionName});
+
+  String title;
+  int? versionCode;
+  String? versionName;
+}
+
 class PlexRoutesPaths {
   PlexRoutesPaths._();
 
@@ -38,8 +46,8 @@ class PlexApp extends StatefulWidget {
   ///This [appLogoDark] widget will be show as Application Logo in Dark mode
   final Widget? appLogoDark;
 
-  ///This [title] will be show ass Application title
-  final String title;
+  ///This [appInfo] will be show ass Application title
+  final PlexAppInfo appInfo;
 
   ///This [initialRoute] will be treated as initial route for screen Application
   final String initialRoute;
@@ -81,7 +89,7 @@ class PlexApp extends StatefulWidget {
     super.key,
     required this.appLogo,
     this.appLogoDark,
-    required this.title,
+    required this.appInfo,
     required this.initialRoute,
     this.dashboardConfig,
     this.pages,
@@ -200,7 +208,7 @@ class _PlexAppState extends State<PlexApp> {
   Widget build(BuildContext context) {
     if (!_initialized) {
       return MaterialApp(
-        title: widget.title,
+        title: widget.appInfo.title,
         debugShowCheckedModeBanner: false,
         home: Scaffold(
           body: Padding(
@@ -222,7 +230,7 @@ class _PlexAppState extends State<PlexApp> {
       );
     }
     return GetMaterialApp(
-      title: widget.title,
+      title: widget.appInfo.title,
       theme: PlexTheme.getThemeByBrightness(Brightness.light),
       darkTheme: PlexTheme.getThemeByBrightness(Brightness.dark),
       themeMode: themeMode,

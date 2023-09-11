@@ -14,8 +14,12 @@ class PlexLoginConfig {
     required this.userFromJson,
     this.additionalWidgetsTop,
     this.additionalWidgetsBottom,
+    this.debugUsername,
+    this.debugPassword,
   });
 
+  final String? debugUsername;
+  final String? debugPassword;
   final Future<PlexUser?> Function(BuildContext context, String email, String password) onLogin;
   final Widget Function(BuildContext context)? additionalWidgetsTop;
   final Widget Function(BuildContext context)? additionalWidgetsBottom;
@@ -46,8 +50,8 @@ class _PlexLoginScreenState extends PlexState<PlexLoginScreen> {
     }
 
     if (kDebugMode) {
-      usernameController.text = "dev";
-      passController.text = ";';'";
+      usernameController.text = widget.loginConfig.debugUsername ?? "";
+      passController.text = widget.loginConfig.debugPassword ?? "";
     }
   }
 
@@ -112,6 +116,10 @@ class _PlexLoginScreenState extends PlexState<PlexLoginScreen> {
                 if (widget.loginConfig.additionalWidgetsBottom != null) ...{
                   widget.loginConfig.additionalWidgetsBottom!.call(context),
                 },
+                spaceSmall(),
+                if (PlexApp.app.appInfo.versionName != null) ...[
+                  Text("Version: ${PlexApp.app.appInfo.versionName}"),
+                ],
               ],
             ),
           ),

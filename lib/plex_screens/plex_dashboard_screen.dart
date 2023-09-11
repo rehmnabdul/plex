@@ -110,6 +110,13 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
                 child: const Text("Logout"),
               )
             ],
+            if(PlexApp.app.appInfo.versionName != null) ...[
+              MenuItemButton(
+                leadingIcon: const Icon(Icons.code),
+                onPressed: (){},
+                child: Text("Version: ${PlexApp.app.appInfo.versionName}"),
+              )
+            ]
           ],
           builder: (context, controller, child) {
             return IconButton(

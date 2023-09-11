@@ -1,3 +1,10 @@
+## 0.1.9
+
+* Add `enableSerach` control in `PlexDataTable` to hide and show the search controls
+* Add `PlexAppInfo` in the `PlexApp`. Use `appInfo` instead `title` in the `PlexApp`
+* Add version info in `PlexLoginScreen` and `PlexDashboardScreen` top right menu
+* Add `debugUsername` and `debugPassword` field in `PlexLoginConfig`, so `username` and `password` field appears pre-filled in debug mode for testing only
+
 ## 0.1.8
 
 * Add `onLogout` Callback in `PlexApp` for post logout operations i.e. deleting some data etc

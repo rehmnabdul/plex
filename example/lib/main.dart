@@ -85,7 +85,7 @@ void main() async {
     themeFromColor: const Color(0xFF26A9E1),
     // themeFromImage: const AssetImage("/path/to/image"),
     appLogo: const Icon(Icons.account_balance),
-    title: "Auto Backup",
+    appInfo: PlexAppInfo(title: "Auto Backup", versionCode: 1, versionName: "v1.0.5"),
     initialRoute: Routes.dashboardScreen,
     useAuthorization: true,
     onInitializationComplete: () {
@@ -109,6 +109,7 @@ void main() async {
           title: "Data Table Widget Usage",
           logo: const Icon(Icons.account_balance_outlined),
           screen: (context) => PlexDataTable(
+            enableSearch: true,
             headerTextStyle: const TextStyle(fontWeight: FontWeight.bold),
             headerBackground: Colors.redAccent,
             border: TableBorder.all(color: Colors.black12),

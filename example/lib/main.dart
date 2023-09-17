@@ -97,6 +97,8 @@ void main() async {
       PlexNetworking;
     },
     loginConfig: PlexLoginConfig(
+      debugUsername: 'test',
+      debugPassword: 'password',
       additionalWidgetsTop: (context) => const Text("Login Screen"),
       additionalWidgetsBottom: (context) => const Text("Login Screen End"),
       onLogin: (context, email, password) async {

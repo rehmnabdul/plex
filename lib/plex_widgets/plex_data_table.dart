@@ -34,6 +34,7 @@ class PlexDataTable extends StatefulWidget {
     this.onRefresh,
     this.onLoadMore,
     this.enableSearch = true,
+    this.enablePrint = true,
     this.headerBackground,
     this.headerTextStyle,
     this.alternateColor = const Color(0xFFA8A8A8),
@@ -54,8 +55,11 @@ class PlexDataTable extends StatefulWidget {
   TableBorder? border;
   double? columnSpacing;
 
-  ///OnRefresh Button Click Callback
+  ///Hide and show Search Field
   final bool enableSearch;
+
+  ///Hide and show Print Button
+  final bool enablePrint;
 
   ///OnRefresh Button Click Callback
   Function()? onRefresh;
@@ -153,50 +157,55 @@ class _PlexDataTableState extends State<PlexDataTable> {
             ),
           ),
         },
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: Dim.small),
-          child: Row(
-            children: [
-              Expanded(
-                child: widget.enableSearch
-                    ? PlexInputWidget(
-                        type: PlexInputWidget.typeInput,
-                        inputController: searchController,
-                        title: "Search...",
-                        inputHint: "Type here to search whole data...",
-                        inputOnChange: (value) {
-                          filterData();
-                        },
-                      )
-                    : Container(),
-              ),
-              if (widget.onRefresh != null) ...{
-                FilledButton.tonal(
-                  onPressed: () {
-                    widget.onRefresh?.call();
-                  },
-                  child: const Icon(Icons.refresh),
+        if(widget.enableSearch || widget.enablePrint || widget.onRefresh != null) ...{
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: Dim.small),
+            child: Row(
+              children: [
+                Expanded(
+                  child: widget.enableSearch
+                      ? PlexInputWidget(
+                    margin: EdgeInsets.zero,
+                    type: PlexInputWidget.typeInput,
+                    inputController: searchController,
+                    title: "Search...",
+                    inputHint: "Type here to search whole data...",
+                    inputOnChange: (value) {
+                      filterData();
+                    },
+                  )
+                      : Container(),
                 ),
-                spaceSmall(),
-              },
-              FilledButton.tonal(
-                onPressed: () async {
-                  var path = await PlexPrinter.printExcel(
-                    "Data",
-                    widget.columns,
-                    updatedData,
-                  );
-                  if (path == null) {
-                    context.showSnackBar(path);
-                  }
-                  context.showSnackBar("Report saved at \"$path\"");
+                if (widget.onRefresh != null) ...{
+                  spaceMedium(),
+                  FilledButton.tonal(
+                    onPressed: () {
+                      widget.onRefresh?.call();
+                    },
+                    child: const Icon(Icons.refresh),
+                  ),
                 },
-                child: const Icon(Icons.print),
-              ),
-              spaceMedium(),
-            ],
+                if(widget.enablePrint) ...{
+                  spaceMedium(),
+                  FilledButton.tonal(
+                    onPressed: () async {
+                      var path = await PlexPrinter.printExcel(
+                        "Data",
+                        widget.columns,
+                        updatedData,
+                      );
+                      if (path == null) {
+                        context.showSnackBar(path);
+                      }
+                      context.showSnackBar("Report saved at \"$path\"");
+                    },
+                    child: const Icon(Icons.print),
+                  ),
+                },
+              ],
+            ),
           ),
-        ),
+        },
         SingleChildScrollView(
           controller: scrollController,
           scrollDirection: Axis.vertical,

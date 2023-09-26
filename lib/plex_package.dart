@@ -17,7 +17,14 @@ import 'package:plex/plex_utils/plex_dimensions.dart';
 import 'package:plex/plex_utils/plex_routing.dart';
 
 class PlexAppInfo {
-  PlexAppInfo({required this.title, required this.appLogo, required this.initialRoute, this.appLogoDark, this.versionCode, this.versionName});
+  PlexAppInfo({
+    required this.title,
+    required this.appLogo,
+    required this.initialRoute,
+    this.appLogoDark,
+    this.versionCode,
+    this.versionName,
+  });
 
   ///This [title] will be appear as Application Name
   final String title;

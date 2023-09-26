@@ -153,6 +153,7 @@ class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
             items: widget.dropdownItems,
             asyncItems: widget.dropdownAsyncItems,
             leadingIcon: widget.dropDownLeadingIcon,
+            initialSelected: (getDropDownController() as PlexWidgetController<T?>).data,
             itemText: (c) => widget.dropdownItemAsString!(c),
             onSelect: (c) {
               getDropDownController().setValue(c);

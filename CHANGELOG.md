@@ -1,6 +1,11 @@
+## 0.2.2
+
+* Dropdown field show preselection highlighted
+* Print button can be hide in `PlexDataTable` by using `enablePrint` just like `enableSearch`
+
 ## 0.2.1
 
-* Move `appLogo`, `appLogoDar` and `initialRoute` to `PlexAppInfo`
+* Move `appLogo`, `appLogoDark` and `initialRoute` to `PlexAppInfo`
 * Add `SideNavigation` header
 
 ## 0.2.0

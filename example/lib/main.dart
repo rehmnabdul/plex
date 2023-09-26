@@ -109,6 +109,9 @@ void main() async {
       },
     ),
     dashboardConfig: PlexDashboardConfig(
+      disableExpandNavigationRail: true,
+      disableNavigationRail: false,
+      disableBottomNavigation: true,
       dashboardScreens: [
         PlexRoute(
           route: Routes.dashboardScreen,
@@ -117,12 +120,13 @@ void main() async {
           logo: const Icon(Icons.account_balance_outlined),
           screen: (context) => PlexDataTable(
             enableSearch: true,
-            headerTextStyle: const TextStyle(fontWeight: FontWeight.bold),
-            headerBackground: Colors.redAccent,
-            border: TableBorder.all(color: Colors.black12),
+            enablePrint: true,
             onRefresh: () {
               getTableData();
             },
+            headerTextStyle: const TextStyle(fontWeight: FontWeight.bold),
+            headerBackground: Colors.redAccent,
+            border: TableBorder.all(color: Colors.black12),
             columns: [
               PlexDataCell.text("Id"),
               PlexDataCell.text("First Name"),

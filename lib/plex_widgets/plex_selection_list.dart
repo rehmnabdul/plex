@@ -10,6 +10,7 @@ showSelectionList<T>(
   Future<List<T>>? asyncItems,
   required String Function(T item) itemText,
   required Function(T item) onSelect,
+  dynamic initialSelected,
   Widget Function(dynamic item)? itemWidget,
   Widget Function(T item)? leadingIcon,
   bool Function(String query, dynamic item)? onSearch,
@@ -51,35 +52,38 @@ showSelectionList<T>(
             spaceSmall(),
             Expanded(
               child: PlexWidget(
-                  controller: filteredListController,
-                  createWidget: (con, data) {
-                    var listData = data as List<T>;
-                    return ListView.builder(
-                      physics: const BouncingScrollPhysics(),
-                      itemCount: listData.length,
-                      itemBuilder: (context, index) {
-                        var item = listData[index];
-                        if (itemWidget != null) {
-                          return InkWell(
-                            onTap: () {
-                              onSelect.call(item);
-                              Get.back();
-                            },
-                            child: itemWidget.call(item),
-                          );
-                        }
-                        return ListTile(
-                          leading: leadingIcon?.call(item),
-                          // style: ListTileStyle.list,
-                          title: Text(itemText.call(item)),
+                controller: filteredListController,
+                createWidget: (con, data) {
+                  var listData = data as List<T>;
+                  return ListView.builder(
+                    physics: const BouncingScrollPhysics(),
+                    itemCount: listData.length,
+                    itemBuilder: (context, index) {
+                      var item = listData[index];
+                      if (itemWidget != null) {
+                        return InkWell(
                           onTap: () {
                             onSelect.call(item);
                             Get.back();
                           },
+                          child: itemWidget.call(item),
                         );
-                      },
-                    );
-                  }),
+                      }
+                      return ListTile(
+                        selectedTileColor: Colors.green.withOpacity(0.25),
+                        selected: initialSelected != null && itemText.call(item) == itemText.call(initialSelected),
+                        leading: leadingIcon?.call(item),
+                        title: Text(itemText.call(item)),
+                        trailing: initialSelected != null && itemText.call(item) == itemText.call(initialSelected) ? const Icon(Icons.check_circle, color: Colors.green) : null,
+                        onTap: () {
+                          onSelect.call(item);
+                          Get.back();
+                        },
+                      );
+                    },
+                  );
+                },
+              ),
             ),
           ],
         ),

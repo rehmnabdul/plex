@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:plex/plex_package.dart';
 import 'package:plex/plex_screens/plex_screen.dart';
 import 'package:plex/plex_utils/plex_dimensions.dart';
 import 'package:plex/plex_widget.dart';
@@ -33,6 +34,14 @@ class _UpdatableScreenState extends PlexState<UpdatableScreen> {
             },
             icon: const Icon(Icons.add),
             label: const Text("Add"),
+          ),
+          spaceMedium(),
+          ElevatedButton.icon(
+            onPressed: () {
+              PlexApp.app.dashboardConfig?.navigateOnDashboard(0);
+            },
+            icon: const Icon(Icons.home),
+            label: const Text("GoTo Home"),
           ),
         ],
       ),

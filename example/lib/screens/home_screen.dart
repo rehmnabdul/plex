@@ -30,10 +30,10 @@ class MyUser extends PlexForm {
           title: "objects",
           initialValue: object,
           onChange: (value) => object = value,
+          items: ["Pak", "Ind", "Eng"],
           itemAsString: (item) {
             return item.toString();
-          },
-          items: ["Pak", "Ind", "Eng"]),
+          }),
       PlexFormField.dropDown(
           title: "Data",
           initialValue: "koko",

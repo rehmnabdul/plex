@@ -28,6 +28,16 @@ class PlexDashboardConfig {
   ///This [disableBottomNavigation] will disable Bottom Navigation from Screen
   ///Left Drawer Still visible
   final bool disableBottomNavigation;
+
+  ///Navigate to other screen present in Dashboard Screen
+  void navigateOnDashboard(int index) {
+    if (index < 0 || index >= dashboardScreens.length) {
+      throw Exception("Invalid Screen Index");
+    }
+    onNavigation?.call(index);
+  }
+
+  Function(int index)? onNavigation;
 }
 
 class PlexDashboardScreen extends PlexScreen {
@@ -68,6 +78,12 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
     } else {
       navigationSelectedIndex = 0;
     }
+
+    PlexApp.app.dashboardConfig?.onNavigation = (index) {
+      setState(() {
+        navigationSelectedIndex = index;
+      });
+    };
   }
 
   @override
@@ -196,7 +212,9 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
                     height: 100,
                     child: PlexApp.app.getLogo(),
                   ),
-                  Text("Version: ${PlexApp.app.appInfo.versionName}"),
+                  if (PlexApp.app.appInfo.versionName != null) ...[
+                    Text("Version: ${PlexApp.app.appInfo.versionName}"),
+                  ],
                 ],
               ),
             ),
@@ -210,7 +228,7 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
 
   @override
   Widget? buildBottomNavigation() {
-    if(PlexApp.app.dashboardConfig!.disableBottomNavigation) return null;
+    if (PlexApp.app.dashboardConfig!.disableBottomNavigation) return null;
     if (!smallScreen || (routes.length) <= 1) return null;
     return NavigationBar(
       selectedIndex: navigationSelectedIndex > maxBottomNavDestinations ? maxBottomNavDestinations : navigationSelectedIndex,
@@ -310,15 +328,15 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
                 child: NavigationRail(
                   extended: !PlexApp.app.dashboardConfig!.disableExpandNavigationRail && largeScreen,
                   elevation: Dim.medium,
-                  backgroundColor: PlexTheme
-                      .getActiveTheme()
-                      .secondaryHeaderColor,
+                  backgroundColor: PlexTheme.getActiveTheme().secondaryHeaderColor,
                   leading: SizedBox(
                       width: !PlexApp.app.dashboardConfig!.disableExpandNavigationRail && largeScreen ? 200 : 50,
                       child: Column(
                         children: [
                           PlexApp.app.getLogo(),
-                          Text("${PlexApp.app.appInfo.versionName}"),
+                          if (PlexApp.app.appInfo.versionName != null) ...[
+                            Text("${PlexApp.app.appInfo.versionName}"),
+                          ],
                           spaceSmall(),
                         ],
                       )),
@@ -330,12 +348,11 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
                   },
                   destinations: [
                     ...routes.map(
-                          (destination) =>
-                          NavigationRailDestination(
-                            label: Text(destination.title),
-                            icon: destination.logo ?? const Icon(Icons.menu),
-                            selectedIcon: destination.logo ?? const Icon(Icons.circle),
-                          ),
+                      (destination) => NavigationRailDestination(
+                        label: Text(destination.title),
+                        icon: destination.logo ?? const Icon(Icons.menu),
+                        selectedIcon: destination.logo ?? const Icon(Icons.circle),
+                      ),
                     ),
                   ],
                 ),

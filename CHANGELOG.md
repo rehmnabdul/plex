@@ -1,3 +1,8 @@
+## 0.2.3
+
+* Navigate to other dashboard screen by using `PlexApp.app.dashboardConfig?.navigateOnDashboard(index: 0);`
+* Make version not visible if not given. Previously displaying `null`
+
 ## 0.2.2
 
 * Dropdown field show preselection highlighted

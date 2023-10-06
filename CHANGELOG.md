@@ -1,3 +1,7 @@
+## 0.2.4
+
+* Make Dashboard `NavigationRail` scrollable
+
 ## 0.2.3
 
 * Navigate to other dashboard screen by using `PlexApp.app.dashboardConfig?.navigateOnDashboard(index: 0);`

@@ -109,9 +109,9 @@ void main() async {
       },
     ),
     dashboardConfig: PlexDashboardConfig(
-      disableExpandNavigationRail: true,
+      disableExpandNavigationRail: false,
       disableNavigationRail: false,
-      disableBottomNavigation: true,
+      disableBottomNavigation: false,
       dashboardScreens: [
         PlexRoute(
           route: Routes.dashboardScreen,

@@ -325,36 +325,48 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
                   borderRadius: BorderRadius.circular(Dim.medium), // Adjust the radius as per your preference
                 ),
                 clipBehavior: Clip.hardEdge,
-                child: NavigationRail(
-                  extended: !PlexApp.app.dashboardConfig!.disableExpandNavigationRail && largeScreen,
-                  elevation: Dim.medium,
-                  backgroundColor: PlexTheme.getActiveTheme().secondaryHeaderColor,
-                  leading: SizedBox(
-                      width: !PlexApp.app.dashboardConfig!.disableExpandNavigationRail && largeScreen ? 200 : 50,
-                      child: Column(
-                        children: [
-                          PlexApp.app.getLogo(),
-                          if (PlexApp.app.appInfo.versionName != null) ...[
-                            Text("${PlexApp.app.appInfo.versionName}"),
-                          ],
-                          spaceSmall(),
-                        ],
-                      )),
-                  selectedIndex: navigationSelectedIndex,
-                  onDestinationSelected: (value) {
-                    setState(() {
-                      navigationSelectedIndex = value;
-                    });
-                  },
-                  destinations: [
-                    ...routes.map(
-                      (destination) => NavigationRailDestination(
-                        label: Text(destination.title),
-                        icon: destination.logo ?? const Icon(Icons.menu),
-                        selectedIcon: destination.logo ?? const Icon(Icons.circle),
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    return SingleChildScrollView(
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                        child: IntrinsicHeight(
+                          child: NavigationRail(
+                            useIndicator: true,
+                            extended: !PlexApp.app.dashboardConfig!.disableExpandNavigationRail && largeScreen,
+                            elevation: Dim.medium,
+                            backgroundColor: PlexTheme.getActiveTheme().secondaryHeaderColor,
+                            leading: SizedBox(
+                                width: !PlexApp.app.dashboardConfig!.disableExpandNavigationRail && largeScreen ? 200 : 50,
+                                child: Column(
+                                  children: [
+                                    PlexApp.app.getLogo(),
+                                    if (PlexApp.app.appInfo.versionName != null) ...[
+                                      Text("${PlexApp.app.appInfo.versionName}"),
+                                    ],
+                                    spaceSmall(),
+                                  ],
+                                )),
+                            selectedIndex: navigationSelectedIndex,
+                            onDestinationSelected: (value) {
+                              setState(() {
+                                navigationSelectedIndex = value;
+                              });
+                            },
+                            destinations: [
+                              ...routes.map(
+                                (destination) => NavigationRailDestination(
+                                  label: Text(destination.title),
+                                  icon: destination.logo ?? const Icon(Icons.menu),
+                                  selectedIcon: destination.logo ?? const Icon(Icons.circle),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
-                    ),
-                  ],
+                    );
+                  },
                 ),
               ),
             ),

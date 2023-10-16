@@ -1,3 +1,7 @@
+## 0.2.5
+
+* Add `PlexDataTableWithPages` widget. With this widget you can display large amount of data. Usage is same as `PlexDataTable`
+
 ## 0.2.4
 
 * Make Dashboard `NavigationRail` scrollable

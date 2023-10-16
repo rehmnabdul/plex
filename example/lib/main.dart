@@ -140,6 +140,24 @@ void main() async {
           ),
         ),
         PlexRoute(
+          route: "/paginated-table",
+          category: "Paginated Tables",
+          title: "Paginated Data Table",
+          logo: const Icon(Icons.account_balance_outlined),
+          screen: (context) => PlexDataTableWithPages(
+            columns: [
+              PlexDataCell.text("Id"),
+              PlexDataCell.text("First Name"),
+              PlexDataCell.text("Last Name"),
+              PlexDataCell.text("Emp Code"),
+              PlexDataCell.text("Designation"),
+              PlexDataCell.text("Grade"),
+              PlexDataCell.text("Company"),
+            ],
+            rows: getTableData(),
+          ),
+        ),
+        PlexRoute(
           route: "/update-widget",
           title: "Updatable Widget Usage",
           logo: const Icon(Icons.browser_updated),

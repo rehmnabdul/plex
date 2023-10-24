@@ -25,6 +25,7 @@ abstract class PlexState<T extends PlexScreen> extends State<T> {
   }
 
   toast(String message, {String title = 'Message'}) {
+    if (!mounted) return;
     if (message.length > 1000) message = "${message.substring(0, 1000)}...";
     context.showSnackBar(message);
   }

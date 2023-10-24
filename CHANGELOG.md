@@ -1,3 +1,7 @@
+## 0.2.7
+
+* Fix exception when show message and widget is expired or unmounted
+
 ## 0.2.6
 
 * Add `copyToClipboard('Your Text', showCopiedInfo = true)` function. Second argument is optional

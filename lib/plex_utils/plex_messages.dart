@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 extension SnackBarUtils on BuildContext {
   showSnackBar(String message) {
@@ -16,5 +17,10 @@ extension SnackBarUtils on BuildContext {
     );
     ScaffoldMessenger.of(this).hideCurrentSnackBar();
     ScaffoldMessenger.of(this).showSnackBar(snackBar);
+  }
+
+  copyToClipboard(String text, {bool showCopiedInfo = true}) {
+    Clipboard.setData(ClipboardData(text: text));
+    if (showCopiedInfo) showSnackBar("Text copied on clipboard");
   }
 }

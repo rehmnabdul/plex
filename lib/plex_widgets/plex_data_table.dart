@@ -240,8 +240,7 @@ class _PlexDataTableState extends State<PlexDataTable> {
                           data.cell?.child ?? Text(data.value ?? "N/A"),
                           onTap: data.cell?.onTap ??
                               () {
-                                Clipboard.setData(ClipboardData(text: data.value ?? "N/A"));
-                                context.showSnackBar("Text copied on clipboard");
+                                context.copyToClipboard(data.value ?? "N/A");
                               },
                           showEditIcon: data.cell?.showEditIcon ?? false,
                           onDoubleTap: data.cell?.onDoubleTap,
@@ -368,7 +367,6 @@ class PlexDataTableWithPagesState extends State<PlexDataTableWithPages> {
     }
     sortData(data);
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -511,8 +509,7 @@ class _PaginationDataTableSource extends DataTableSource {
             data.cell?.child ?? Text(data.value ?? "N/A"),
             onTap: data.cell?.onTap ??
                 () {
-                  Clipboard.setData(ClipboardData(text: data.value ?? "N/A"));
-                  context.showSnackBar("Text copied on clipboard");
+                  context.copyToClipboard(data.value ?? "N/A");
                 },
             showEditIcon: data.cell?.showEditIcon ?? false,
             onDoubleTap: data.cell?.onDoubleTap,

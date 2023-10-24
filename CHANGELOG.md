@@ -1,3 +1,7 @@
+## 0.2.6
+
+* Add `copyToClipboard('Your Text', showCopiedInfo = true)` function. Second argument is optional
+
 ## 0.2.5
 
 * Add `PlexDataTableWithPages` widget. With this widget you can display large amount of data. Usage is same as `PlexDataTable`

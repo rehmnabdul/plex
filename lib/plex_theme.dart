@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:plex/plex_package.dart';
 import 'package:plex/plex_sp.dart';
+import 'package:plex/plex_utils/plex_material.dart';
 
 ///This class will hold theme related information
 class PlexTheme {
@@ -45,6 +46,7 @@ class PlexTheme {
               ? null
               : PlexApp.app.imageColorScheme,
       useMaterial3: isMaterial3(),
+      navigationBarTheme: NavigationBarThemeData(labelTextStyle: const TextStyle(fontSize: 10).getState()),
       brightness: brightness);
 
   static Color randomColor() {

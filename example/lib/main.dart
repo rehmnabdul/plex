@@ -112,11 +112,32 @@ void main() async {
       disableExpandNavigationRail: false,
       disableNavigationRail: false,
       disableBottomNavigation: false,
+      showThemeSwitch: true,
+      showBrightnessSwitch: true,
+      showMaterialSwitch: true,
+      appbarActions: [
+        MenuItemButton(
+          leadingIcon: const Icon(Icons.abc_outlined),
+          child: const Text("ABC"),
+          onPressed: () {},
+        ),
+        MenuItemButton(
+          leadingIcon: const Icon(Icons.account_tree_outlined),
+          child: const Text("Tree"),
+          onPressed: () {},
+        ),
+        MenuItemButton(
+          leadingIcon: const Icon(Icons.account_balance_outlined),
+          child: const Text("Balance"),
+          onPressed: () {},
+        ),
+      ],
       dashboardScreens: [
         PlexRoute(
           route: Routes.dashboardScreen,
           category: "Tables",
           title: "Data Table Widget Usage",
+          shortTitle: 'Data Table',
           logo: const Icon(Icons.account_balance_outlined),
           screen: (context) => PlexDataTable(
             enableSearch: true,
@@ -143,6 +164,7 @@ void main() async {
           route: "/paginated-table",
           category: "Paginated Tables",
           title: "Paginated Data Table",
+          shortTitle: 'Paginated Table',
           logo: const Icon(Icons.account_balance_outlined),
           screen: (context) => PlexDataTableWithPages(
             columns: [
@@ -160,12 +182,14 @@ void main() async {
         PlexRoute(
           route: "/update-widget",
           title: "Updatable Widget Usage",
+          shortTitle: 'Updatable Widget',
           logo: const Icon(Icons.browser_updated),
           screen: (context) => const UpdatableScreen(),
         ),
         PlexRoute(
           route: "/form-usage",
           title: "Form Widget Usage",
+          shortTitle: 'Form Widget',
           logo: const Icon(Icons.format_align_center),
           screen: (context) => const FormUsageScreen(),
         ),

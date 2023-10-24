@@ -17,7 +17,7 @@ extension ColorUtils on Color {
 }
 
 extension TextStyleUtils on TextStyle {
-  getColorState() => MaterialStateProperty.resolveWith<TextStyle>(
+  MaterialStateProperty<TextStyle> getState() => MaterialStateProperty.resolveWith<TextStyle>(
         (Set<MaterialState> states) {
           if (states.contains(MaterialState.disabled)) {
             return copyWith(color: Colors.grey);

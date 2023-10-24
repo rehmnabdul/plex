@@ -7,6 +7,7 @@ class PlexRoute {
 
   ///[title] will be use to display title od the screen in the app
   String title;
+  String? shortTitle;
 
   ///This is the build method to build the screen user defined UI
   Widget Function(BuildContext context) screen;
@@ -21,5 +22,5 @@ class PlexRoute {
   String? rule;
 
   ///Default constructor
-  PlexRoute({required this.route, required this.title, required this.screen, this.logo, this.category = "Menu", this.rule});
+  PlexRoute({required this.route, required this.title, required this.screen, this.logo, this.category = "Menu", this.rule, this.shortTitle});
 }

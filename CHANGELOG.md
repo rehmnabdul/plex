@@ -1,3 +1,13 @@
+## 0.2.8
+
+* You can add more menu in the dashboard app bar by accessing and adding `MenuItemButton` in the `appbarActions` list in the `dashboardConfig` of application
+* You can `Hide` and `Show` theme controls by accessing dashboard `showThemeSwitch`, `showBrightnessSwitch` and `showMaterialSwitch` controls
+* Fix Bug: Stop Dashboard Screen `onBackPress` and show error `404`
+* Decrease font size of `BottomNavigationBar` on dashboard
+* Add `shortTile` in `PlexRoute`. So that `Plex` can use this text when there is shortage of space. If not available it will use `title` instead automatically
+* On LoggedIn user thumbnail hover, user full name will be shown as tooltip 
+* Add Platform OS function `getPlatformName()`
+
 ## 0.2.7
 
 * Fix exception when show message and widget is expired or unmounted

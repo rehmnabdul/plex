@@ -127,12 +127,42 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
                     color: PlexTheme.getActiveTheme().colorScheme.secondary,
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: Center(
-                    child: Text(
-                      PlexApp.app.getUser()?.getInitials().toString() ?? "N/A",
-                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
-                    ),
-                  ),
+                  clipBehavior: Clip.hardEdge,
+                  child: PlexApp.app.getUser()?.getPictureUrl() != null
+                      ? Image.network(
+                          PlexApp.app.getUser()!.getPictureUrl()!,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) => Center(
+                            child: Text(
+                              PlexApp.app.getUser()?.getInitials().toString() ?? "N/A",
+                              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                            ),
+                          ),
+                          loadingBuilder: (context, child, loadingProgress) => loadingProgress == null
+                              ? child
+                              : Stack(
+                                  children: [
+                                    Center(
+                                      child: Text(
+                                        PlexApp.app.getUser()?.getInitials().toString() ?? "N/A",
+                                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                                      ),
+                                    ),
+                                    Center(
+                                      child: CircularProgressIndicator(
+                                        color: Colors.deepOrange,
+                                        value: loadingProgress.expectedTotalBytes == null ? null : loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!,
+                                      ),
+                                    )
+                                  ],
+                                ),
+                        )
+                      : Center(
+                          child: Text(
+                            PlexApp.app.getUser()?.getInitials().toString() ?? "N/A",
+                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                          ),
+                        ),
                 ),
               ),
             ),
@@ -189,7 +219,9 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
             if (PlexApp.app.appInfo.versionName != null) ...[
               MenuItemButton(
                 leadingIcon: const Icon(Icons.code),
-                onPressed: () {},
+                onPressed: () {
+                  PlexApp.app.showAboutDialogue(context);
+                },
                 child: Text("Version: ${PlexApp.app.appInfo.versionName}"),
               )
             ]

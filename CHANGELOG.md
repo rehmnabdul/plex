@@ -1,3 +1,20 @@
+## 0.3.1
+
+* Add colorful loader in the `PlexScreen.showLoading()`
+* Make colorful loader available in public API. You can use it by `PlexLoader()` anywhere.
+
+
+## 0.3.0
+
+* Add `AboutDialog` when click on version name in dashboard screen `appbar` actions.
+* You can show `AboutDialog` anywhere by calling `PlexApp.app.showAboutDialogue(context);`. 
+* About dialog get information from `PlexAppInfo` which is initialized when we create `PlexApp`.
+* Add `PlexUser.getPictureUrl()`. You can override this functions to return image `URL` to be diaplayed on dashboard instead it will display user's name initials as user icon.
+
+## 0.2.9
+
+* Add Optional Input Action and KeyboardType in `PlexForm`. Can be accessed by `PlexFormField.input(this.inputType, this.inputAction)`
+
 ## 0.2.8
 
 * You can add more menu in the dashboard app bar by accessing and adding `MenuItemButton` in the `appbarActions` list in the `dashboardConfig` of application

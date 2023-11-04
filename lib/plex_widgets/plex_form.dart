@@ -20,6 +20,8 @@ class PlexFormField {
   List<dynamic>? initialSelection;
   late Type type;
   bool isPassword = false;
+  TextInputType? inputType;
+  TextInputAction? inputAction;
 
   String Function(dynamic item)? itemAsString = (item) => item.toString();
   List<dynamic>? items;
@@ -34,6 +36,8 @@ class PlexFormField {
     required this.title,
     required this.type,
     required this.onChange,
+    this.inputType,
+    this.inputAction,
     this.isPassword = false,
     this.initialValue,
   }) {
@@ -76,7 +80,7 @@ class PlexFormWidget<T> extends StatefulWidget {
   const PlexFormWidget({Key? key, required this.entity, required this.onSubmit}) : super(key: key);
 
   final PlexForm entity;
-  final Function(T entity) onSubmit;
+  final void Function(T entity) onSubmit;
 
   @override
   State<PlexFormWidget> createState() => _PlexFormWidgetState();
@@ -92,6 +96,8 @@ class _PlexFormWidgetState extends State<PlexFormWidget> {
               title: value.title.toUpperCase(),
               type: PlexInputWidget.typeInput,
               isPassword: value.isPassword,
+              inputKeyboardType: value.inputType ?? TextInputType.text,
+              inputAction: value.inputAction,
               inputController: TextEditingController(text: value.initialValue?.toString()),
               inputOnChange: (v) => value.onChange(v.toString()),
             ),
@@ -100,8 +106,9 @@ class _PlexFormWidgetState extends State<PlexFormWidget> {
             PlexInputWidget<int>(
               title: value.title.toUpperCase(),
               type: PlexInputWidget.typeInput,
-              inputKeyboardType: const TextInputType.numberWithOptions(decimal: false, signed: false),
+              inputKeyboardType: value.inputType ?? const TextInputType.numberWithOptions(decimal: false, signed: false),
               inputOnChange: (v) => value.onChange(int.tryParse(v)),
+              inputAction: value.inputAction,
               inputController: TextEditingController(text: value.initialValue?.toString()),
               isPassword: value.isPassword,
             ),
@@ -110,7 +117,8 @@ class _PlexFormWidgetState extends State<PlexFormWidget> {
             PlexInputWidget<double>(
               title: value.title.toUpperCase(),
               type: PlexInputWidget.typeInput,
-              inputKeyboardType: const TextInputType.numberWithOptions(decimal: true),
+              inputKeyboardType: value.inputType ?? const TextInputType.numberWithOptions(decimal: true, signed: false),
+              inputAction: value.inputAction,
               inputOnChange: (v) => value.onChange(v),
               inputController: TextEditingController(text: value.initialValue?.toString()),
               isPassword: value.isPassword,

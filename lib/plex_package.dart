@@ -21,13 +21,21 @@ class PlexAppInfo {
     required this.title,
     required this.appLogo,
     required this.initialRoute,
+    this.legalese,
     this.appLogoDark,
     this.versionCode,
     this.versionName,
+    this.aboutDialogWidgets,
   });
 
   ///This [title] will be appear as Application Name
   final String title;
+  final String? legalese;
+
+  ///These [aboutDialogWidgets] will be displayed on about dialog
+  ///Note: It will only work when [versionName] is available
+  ///You can view this on [PlexDashboardScreen] appbar actions list
+  final List<Widget>? aboutDialogWidgets;
 
   ///This [initialRoute] will be treated as initial route for screen Application
   final String initialRoute;
@@ -169,6 +177,18 @@ class PlexApp extends StatefulWidget {
     PlexSp.instance.setString(PlexSp.loggedInUser, null);
     Plex.offAndToNamed(PlexRoutesPaths.loginPath);
     onLogout?.call();
+  }
+
+  void showAboutDialogue(BuildContext context) {
+    showAboutDialog(
+      context: context,
+      applicationIcon: SizedBox(width: 50, height: 50, child: PlexApp.app.getLogo()),
+      applicationName: PlexApp.app.appInfo.title,
+      applicationVersion: PlexApp.app.appInfo.versionName,
+      routeSettings: const RouteSettings(name: "/about"),
+      applicationLegalese: PlexApp.app.appInfo.legalese,
+      children: PlexApp.app.appInfo.aboutDialogWidgets,
+    );
   }
 }
 

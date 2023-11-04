@@ -22,6 +22,12 @@ class AppUser extends PlexUser {
   AppUser.init({required this.email, required this.userName, this.rules});
 
   @override
+  String? getPictureUrl() {
+    // return "https://images.pexels.com/photos/631317/pexels-photo-631317.jpeg";
+    return "https://10.111.2.21/assets/images/super-admin.jpg";
+  }
+
+  @override
   String getLoggedInEmail() => email;
 
   @override
@@ -94,7 +100,7 @@ void main() async {
     ),
     useAuthorization: true,
     onInitializationComplete: () {
-      PlexNetworking;
+      PlexNetworking.instance.allowBadCertificateForHTTPS();
     },
     loginConfig: PlexLoginConfig(
       debugUsername: 'test',

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:plex/plex_utils/plex_messages.dart';
 import 'package:plex/plex_widget.dart';
+import 'package:plex/plex_widgets/plex_loader.dart';
 
 abstract class PlexScreen extends StatefulWidget {
   const PlexScreen({Key? key}) : super(key: key);
@@ -11,10 +12,7 @@ abstract class PlexState<T extends PlexScreen> extends State<T> {
   final _loadingController = PlexWidgetController();
 
   getArguments<AT>() {
-    var args = ModalRoute
-        .of(context)!
-        .settings
-        .arguments as AT;
+    var args = ModalRoute.of(context)!.settings.arguments as AT;
     return args;
   }
 
@@ -33,7 +31,7 @@ abstract class PlexState<T extends PlexScreen> extends State<T> {
   toastDelayed(String message) async {
     return Future.delayed(
       const Duration(milliseconds: 100),
-          () {
+      () {
         toast(message);
       },
     );
@@ -58,7 +56,9 @@ abstract class PlexState<T extends PlexScreen> extends State<T> {
                 if (data == true) {
                   return Container(
                     color: const Color(0x80000000),
-                    child: const Center(child: CircularProgressIndicator()),
+                    child: const Center(
+                      child: PlexLoader(),
+                    ),
                   );
                 }
                 return Container();
@@ -101,17 +101,11 @@ abstract class PlexState<T extends PlexScreen> extends State<T> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     smallScreen = mediumScreen = largeScreen = false;
-    if (MediaQuery
-        .of(context)
-        .size
-        .width >= 900) {
+    if (MediaQuery.of(context).size.width >= 900) {
       largeScreen = true;
       return;
     }
-    if (MediaQuery
-        .of(context)
-        .size
-        .width >= 600) {
+    if (MediaQuery.of(context).size.width >= 600) {
       mediumScreen = true;
       return;
     }

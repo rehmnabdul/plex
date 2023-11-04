@@ -22,8 +22,7 @@ class MyUser extends PlexForm {
   List<PlexFormField> getFields() {
     return [
       PlexFormField.input(title: "firstName", initialValue: firstName, type: String, onChange: (value) => firstName = value ?? ""),
-      PlexFormField.input(title: "lastName", initialValue: lastName, type: String, onChange: (value) => lastName = value ?? ""),
-      PlexFormField.input(title: "age", initialValue: age, type: int, onChange: (value) => age = value ?? 0),
+      PlexFormField.input(title: "lastName", initialValue: lastName, inputType: TextInputType.name, type: String, onChange: (value) => lastName = value ?? ""),
       PlexFormField.input(title: "dob", initialValue: dob, type: DateTime, onChange: (value) => dob = value ?? DateTime.now()),
       PlexFormField.input(title: "male", initialValue: male, type: bool, onChange: (value) => male = value),
       PlexFormField.dropDown(
@@ -42,6 +41,7 @@ class MyUser extends PlexForm {
             return item.toString();
           },
           items: ["Pak", "Ind", "Eng"]),
+      PlexFormField.input(title: "age", initialValue: age, type: int, onChange: (value) => age = value ?? 0),
     ];
   }
 }
@@ -70,7 +70,12 @@ class _FormUsageScreenState extends PlexState<FormUsageScreen> {
 
     return PlexFormWidget<MyUser>(
       entity: myUser,
-      onSubmit: (MyUser myUser) {
+      onSubmit: (dynamic myUser) {
+        Future(() async {
+          showLoading();
+          await Future.delayed(const Duration(milliseconds: 5000));
+          hideLoading();
+        },);
         print(myUser.toString());
       },
     );

@@ -23,7 +23,7 @@ class AppUser extends PlexUser {
 
   @override
   String? getPictureUrl() {
-    // return "https://images.pexels.com/photos/631317/pexels-photo-631317.jpeg";
+    return "https://images.pexels.com/photos/631317/pexels-photo-631317.jpeg";
     return "https://10.111.2.21/assets/images/super-admin.jpg";
   }
 
@@ -163,7 +163,7 @@ void main() async {
               PlexDataCell.text("Grade"),
               PlexDataCell.text("Company"),
             ],
-            rows: getTableData(),
+            rows: List.empty(),//getTableData(),
           ),
         ),
         PlexRoute(

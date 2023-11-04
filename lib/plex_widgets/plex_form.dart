@@ -22,6 +22,8 @@ class PlexFormField {
   bool isPassword = false;
   TextInputType? inputType;
   TextInputAction? inputAction;
+  bool editable = true;
+
 
   String Function(dynamic item)? itemAsString = (item) => item.toString();
   List<dynamic>? items;
@@ -36,6 +38,7 @@ class PlexFormField {
     required this.title,
     required this.type,
     required this.onChange,
+    this.editable = true,
     this.inputType,
     this.inputAction,
     this.isPassword = false,
@@ -47,6 +50,7 @@ class PlexFormField {
   PlexFormField.dropDown({
     required this.title,
     required this.onChange,
+    this.editable = true,
     this.itemAsString,
     this.items,
     this.itemsAsync,
@@ -65,6 +69,7 @@ class PlexFormField {
   PlexFormField.multiselect({
     required this.title,
     required this.onChange,
+    this.editable = true,
     this.initialSelection,
     this.items,
     this.itemsAsync,
@@ -100,6 +105,7 @@ class _PlexFormWidgetState extends State<PlexFormWidget> {
               inputAction: value.inputAction,
               inputController: TextEditingController(text: value.initialValue?.toString()),
               inputOnChange: (v) => value.onChange(v.toString()),
+              editable: value.editable,
             ),
           },
           if (value.type == int) ...{
@@ -111,6 +117,7 @@ class _PlexFormWidgetState extends State<PlexFormWidget> {
               inputAction: value.inputAction,
               inputController: TextEditingController(text: value.initialValue?.toString()),
               isPassword: value.isPassword,
+              editable: value.editable,
             ),
           },
           if (value.type == double) ...{
@@ -122,6 +129,7 @@ class _PlexFormWidgetState extends State<PlexFormWidget> {
               inputOnChange: (v) => value.onChange(v),
               inputController: TextEditingController(text: value.initialValue?.toString()),
               isPassword: value.isPassword,
+              editable: value.editable,
             ),
           },
           if (value.type == bool) ...{
@@ -132,6 +140,7 @@ class _PlexFormWidgetState extends State<PlexFormWidget> {
               dropdownItems: const [true, false],
               dropdownItemAsString: (v) => v ? "True" : "False",
               dropdownItemOnSelect: (v) => value.onChange(v),
+              editable: value.editable,
             ),
           },
           if (value.type == DateTime) ...{
@@ -140,6 +149,7 @@ class _PlexFormWidgetState extends State<PlexFormWidget> {
               type: PlexInputWidget.typeDate,
               dropdownSelectionController: PlexWidgetController(data: value.initialValue),
               dropdownItemOnSelect: (v) => value.onChange(v),
+              editable: value.editable,
             ),
           },
         } else if (value.fieldType == PlexFormField.TYPE_DROPDOWN) ...{
@@ -158,6 +168,7 @@ class _PlexFormWidgetState extends State<PlexFormWidget> {
             dropdownOnSearch: value.onSearch,
             dropdownItemWidget: value.dropdownWidget,
             dropDownLeadingIcon: value.dropdownLeadingWidget,
+            editable: value.editable,
           ),
         } else if (value.fieldType == PlexFormField.TYPE_MULTISELECT) ...{
           PlexInputWidget(
@@ -176,6 +187,7 @@ class _PlexFormWidgetState extends State<PlexFormWidget> {
             dropdownItemWidget: value.dropdownWidget,
             dropDownLeadingIcon: value.dropdownLeadingWidget,
             multiInitialSelection: value.initialSelection,
+            editable: value.editable,
           ),
         }
       }

@@ -1,12 +1,12 @@
 // ignore_for_file: use_build_context_synchronously, must_be_immutable
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:plex/plex_utils/plex_dimensions.dart';
 import 'package:plex/plex_utils/plex_material.dart';
 import 'package:plex/plex_utils/plex_messages.dart';
 import 'package:plex/plex_utils/plex_printer.dart';
 import 'package:plex/plex_widgets/plex_input_widget.dart';
+import 'package:plex/plex_widgets/plex_shimmer.dart';
 
 class PlexDataCell {
   late final String? value;
@@ -39,6 +39,7 @@ class PlexDataTable extends StatefulWidget {
     this.alternateColor = const Color(0xFFA8A8A8),
     this.border,
     this.columnSpacing,
+    this.showShimmer = true,
   }) : super(key: key ?? GlobalKey());
 
   ///All Column titles
@@ -53,6 +54,9 @@ class PlexDataTable extends StatefulWidget {
   final Color? alternateColor;
   TableBorder? border;
   double? columnSpacing;
+
+  ///Shimmer Controls
+  final bool showShimmer;
 
   ///Hide and show Search Field
   final bool enableSearch;
@@ -130,85 +134,85 @@ class _PlexDataTableState extends State<PlexDataTable> {
   @override
   Widget build(BuildContext context) {
     int isAlternate = -1;
-    return Column(
-      children: [
-        if (widget.enableSearch) ...{
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: Dim.medium, vertical: Dim.small),
+    return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
+      child: Column(
+        children: [
+          if (widget.enableSearch) ...{
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: Dim.medium, vertical: Dim.small),
+                child: Row(
+                  children: [
+                    SegmentedButton<int>(
+                      segments: [
+                        for (var i = 0; i < widget.columns.length; i++) ...{ButtonSegment(value: i, label: Text(widget.columns[i].value!), enabled: true)},
+                      ],
+                      selected: searchColumnIndexes,
+                      emptySelectionAllowed: true,
+                      multiSelectionEnabled: true,
+                      onSelectionChanged: (selection) {
+                        searchColumnIndexes = selection;
+                        filterData();
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          },
+          if (widget.enableSearch || widget.enablePrint || widget.onRefresh != null) ...{
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: Dim.small),
               child: Row(
                 children: [
-                  SegmentedButton<int>(
-                    segments: [
-                      for (var i = 0; i < widget.columns.length; i++) ...{ButtonSegment(value: i, label: Text(widget.columns[i].value!), enabled: true)},
-                    ],
-                    selected: searchColumnIndexes,
-                    emptySelectionAllowed: true,
-                    multiSelectionEnabled: true,
-                    onSelectionChanged: (selection) {
-                      searchColumnIndexes = selection;
-                      filterData();
-                    },
+                  Expanded(
+                    child: widget.enableSearch
+                        ? PlexInputWidget(
+                            margin: EdgeInsets.zero,
+                            type: PlexInputWidget.typeInput,
+                            inputController: searchController,
+                            title: "Search...",
+                            inputHint: "Type here to search whole data...",
+                            inputOnChange: (value) {
+                              filterData();
+                            },
+                          )
+                        : Container(),
                   ),
+                  if (widget.onRefresh != null) ...{
+                    spaceMedium(),
+                    FilledButton.tonal(
+                      onPressed: () {
+                        widget.onRefresh?.call();
+                      },
+                      child: const Icon(Icons.refresh),
+                    ),
+                  },
+                  if (widget.enablePrint) ...{
+                    spaceMedium(),
+                    FilledButton.tonal(
+                      onPressed: () async {
+                        var path = await PlexPrinter.printExcel(
+                          "Data",
+                          widget.columns,
+                          updatedData,
+                        );
+                        if (path == null) {
+                          context.showSnackBar(path);
+                        }
+                        context.showSnackBar("Report saved at \"$path\"");
+                      },
+                      child: const Icon(Icons.print),
+                    ),
+                  },
                 ],
               ),
             ),
-          ),
-        },
-        if (widget.enableSearch || widget.enablePrint || widget.onRefresh != null) ...{
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: Dim.small),
-            child: Row(
-              children: [
-                Expanded(
-                  child: widget.enableSearch
-                      ? PlexInputWidget(
-                          margin: EdgeInsets.zero,
-                          type: PlexInputWidget.typeInput,
-                          inputController: searchController,
-                          title: "Search...",
-                          inputHint: "Type here to search whole data...",
-                          inputOnChange: (value) {
-                            filterData();
-                          },
-                        )
-                      : Container(),
-                ),
-                if (widget.onRefresh != null) ...{
-                  spaceMedium(),
-                  FilledButton.tonal(
-                    onPressed: () {
-                      widget.onRefresh?.call();
-                    },
-                    child: const Icon(Icons.refresh),
-                  ),
-                },
-                if (widget.enablePrint) ...{
-                  spaceMedium(),
-                  FilledButton.tonal(
-                    onPressed: () async {
-                      var path = await PlexPrinter.printExcel(
-                        "Data",
-                        widget.columns,
-                        updatedData,
-                      );
-                      if (path == null) {
-                        context.showSnackBar(path);
-                      }
-                      context.showSnackBar("Report saved at \"$path\"");
-                    },
-                    child: const Icon(Icons.print),
-                  ),
-                },
-              ],
-            ),
-          ),
-        },
-        SingleChildScrollView(
-          controller: scrollController,
-          scrollDirection: Axis.vertical,
-          child: SingleChildScrollView(
+          },
+          SingleChildScrollView(
+            controller: scrollController,
             scrollDirection: Axis.horizontal,
             child: DataTable(
               columnSpacing: widget.columnSpacing,
@@ -231,33 +235,47 @@ class _PlexDataTableState extends State<PlexDataTable> {
                 ),
               ],
               rows: [
-                ...updatedData.map(
-                  (row) => DataRow(
-                    color: isAlternate++ % 2 == 0 ? widget.alternateColor?.getColorState() : null,
-                    cells: [
-                      ...row.map(
-                        (data) => DataCell(
-                          data.cell?.child ?? Text(data.value ?? "N/A"),
-                          onTap: data.cell?.onTap ??
-                              () {
-                                context.copyToClipboard(data.value ?? "N/A");
-                              },
-                          showEditIcon: data.cell?.showEditIcon ?? false,
-                          onDoubleTap: data.cell?.onDoubleTap,
-                          onLongPress: data.cell?.onLongPress,
-                          onTapCancel: data.cell?.onTapCancel,
-                          onTapDown: data.cell?.onTapDown,
-                          placeholder: data.cell?.placeholder ?? false,
-                        ),
-                      )
-                    ],
+                if (updatedData.isEmpty && widget.showShimmer) ...{
+                  ...(List.generate(10, (index) => index)).map(
+                    (e) => DataRow(cells: [
+                      ...widget.columns.map((e) => DataCell(GFShimmer(
+                            child: Container(
+                              color: Colors.green,
+                              height: 20,
+                              width: 50,
+                            ),
+                          )))
+                    ]),
                   ),
-                ),
+                } else ...{
+                  ...updatedData.map(
+                    (row) => DataRow(
+                      color: isAlternate++ % 2 == 0 ? widget.alternateColor?.getColorState() : null,
+                      cells: [
+                        ...row.map(
+                          (data) => DataCell(
+                            data.cell?.child ?? Text(data.value ?? "N/A"),
+                            onTap: data.cell?.onTap ??
+                                () {
+                                  context.copyToClipboard(data.value ?? "N/A");
+                                },
+                            showEditIcon: data.cell?.showEditIcon ?? false,
+                            onDoubleTap: data.cell?.onDoubleTap,
+                            onLongPress: data.cell?.onLongPress,
+                            onTapCancel: data.cell?.onTapCancel,
+                            onTapDown: data.cell?.onTapDown,
+                            placeholder: data.cell?.placeholder ?? false,
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                }
               ],
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

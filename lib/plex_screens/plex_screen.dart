@@ -114,17 +114,19 @@ abstract class PlexState<T extends PlexScreen> extends State<T> {
 
   Widget buildBody();
 
-  var loadingCount = 0;
+  var _loadingCount = 0;
+
+  isLoading() => _loadingCount > 0;
 
   showLoading() {
-    loadingCount++;
+    _loadingCount++;
     if (!mounted) return;
-    _loadingController.setValue(loadingCount > 0);
+    _loadingController.setValue(_loadingCount > 0);
   }
 
   hideLoading() {
-    loadingCount--;
+    _loadingCount--;
     if (!mounted) return;
-    _loadingController.setValue(loadingCount > 0);
+    _loadingController.setValue(_loadingCount > 0);
   }
 }

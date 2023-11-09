@@ -1,5 +1,4 @@
 // ignore_for_file: constant_identifier_names
-
 import 'package:flutter/material.dart';
 import 'package:plex/plex_utils/plex_dimensions.dart';
 import 'package:plex/plex_widget.dart';
@@ -23,7 +22,6 @@ class PlexFormField {
   TextInputType? inputType;
   TextInputAction? inputAction;
   bool editable = true;
-
 
   String Function(dynamic item)? itemAsString = (item) => item.toString();
   List<dynamic>? items;

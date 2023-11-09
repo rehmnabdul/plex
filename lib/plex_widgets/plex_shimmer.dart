@@ -1,54 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
-class GFColors {
-  // static const Color PRIMARY = Color(0xff3880FF);
-  // static const Color SECONDARY = Color(0xffAA66CC);
-  // static const Color SUCCESS = Color(0xff10DC60);
-  // static const Color INFO = Color(0xff33B5E5);
-  // static const Color WARNING = Color(0xffFFBB33);
-  // static const Color DANGER = Color(0xffF04141);
-  static const Color LIGHT = Color(0xffE0E0E0);
-  // static const Color DARK = Color(0xff222428);
-  // static const Color WHITE = Color(0xffffffff);
-  // static const Color FOCUS = Color(0xff434054);
-  // static const Color ALT = Color(0xff794c8a);
-  // static const Color TRANSPARENT = Colors.transparent;
-}
-
-/// [GFShimmerDirection] controls the direction of the shimmer effect
+/// [PlexShimmerDirection] controls the direction of the shimmer effect
 ///
-enum GFShimmerDirection {
-  /// Default direction is [GFShimmerDirection.leftToRight], which starts the
+enum PlexShimmerDirection {
+  /// Default direction is [PlexShimmerDirection.leftToRight], which starts the
   /// shimmer effect animation from left to right side of the child Widget.
   leftToRight,
 
-  /// Direction [GFShimmerDirection.rightToLeft], which starts the shimmer
+  /// Direction [PlexShimmerDirection.rightToLeft], which starts the shimmer
   /// effect animation from right to left side of the child Widget.
   rightToLeft,
 
-  /// Direction [GFShimmerDirection.topToBottom], which starts the shimmer
+  /// Direction [PlexShimmerDirection.topToBottom], which starts the shimmer
   /// effect animation from top to bottom side of the child Widget.
   topToBottom,
 
-  /// Direction [GFShimmerDirection.bottomToTop], which starts the shimmer
+  /// Direction [PlexShimmerDirection.bottomToTop], which starts the shimmer
   /// effect animation from bottom to top side of the child Widget.
   bottomToTop
 }
 
-class GFShimmer extends StatefulWidget {
-  /// [GFShimmer] shows shimmer effect.
-  const GFShimmer({
+class PlexShimmer extends StatefulWidget {
+  /// [PlexShimmer] shows shimmer effect.
+  const PlexShimmer({
     Key? key,
     required this.child,
     this.gradient,
-    this.direction = GFShimmerDirection.leftToRight,
+    this.direction = PlexShimmerDirection.leftToRight,
     this.duration = const Duration(milliseconds: 1500),
     this.shimmerEffectCount = 0,
     this.showShimmerEffect = true,
     this.showGradient = false,
     this.mainColor = Colors.grey,
-    this.secondaryColor = GFColors.LIGHT,
+    this.secondaryColor = const Color(0xffE0E0E0),
   }) : super(key: key);
 
   /// The child of type [Widget] to display shimmer effect.
@@ -60,7 +45,7 @@ class GFShimmer extends StatefulWidget {
 
   /// Controls the direction of the shimmer effect.
   /// The default direction is GFShimmerDirection.leftToRight.
-  final GFShimmerDirection direction;
+  final PlexShimmerDirection direction;
 
   /// Controls the [child]'s shades of color using Linear gradient.
   /// Child [Widget] only takes gradient color, If [showGradient] is true.
@@ -88,10 +73,10 @@ class GFShimmer extends StatefulWidget {
   final Color secondaryColor;
 
   @override
-  _GFShimmerState createState() => _GFShimmerState();
+  PlexShimmerState createState() => PlexShimmerState();
 }
 
-class _GFShimmerState extends State<GFShimmer> with SingleTickerProviderStateMixin {
+class PlexShimmerState extends State<PlexShimmer> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late int _count;
 
@@ -117,7 +102,7 @@ class _GFShimmerState extends State<GFShimmer> with SingleTickerProviderStateMix
   }
 
   @override
-  void didUpdateWidget(GFShimmer oldWidget) {
+  void didUpdateWidget(PlexShimmer oldWidget) {
     if (widget.showShimmerEffect) {
       _controller.forward();
     } else {
@@ -130,12 +115,12 @@ class _GFShimmerState extends State<GFShimmer> with SingleTickerProviderStateMix
   Widget build(BuildContext context) => AnimatedBuilder(
         animation: _controller,
         child: widget.child,
-        builder: (BuildContext context, Widget? child) => _GFShimmer(
-          child: child,
+        builder: (BuildContext context, Widget? child) => _PlexShimmer(
           direction: widget.direction,
           gradient: widget.showGradient ? widget.gradient : LinearGradient(begin: Alignment.topLeft, end: Alignment.centerRight, colors: <Color>[widget.mainColor, widget.mainColor, widget.secondaryColor, widget.mainColor, widget.mainColor], stops: const <double>[0, 0.3, 0.5, 0.7, 1]),
           controllerValue: _controller.value,
           showShimmerEffect: widget.showShimmerEffect,
+          child: child,
         ),
       );
 
@@ -147,8 +132,8 @@ class _GFShimmerState extends State<GFShimmer> with SingleTickerProviderStateMix
 }
 
 @immutable
-class _GFShimmer extends SingleChildRenderObjectWidget {
-  const _GFShimmer({
+class _PlexShimmer extends SingleChildRenderObjectWidget {
+  const _PlexShimmer({
     Widget? child,
     this.controllerValue,
     this.direction,
@@ -161,7 +146,7 @@ class _GFShimmer extends SingleChildRenderObjectWidget {
 
   /// Controls the direction of the shimmer effect.
   /// The default direction is GFShimmerDirection.leftToRight.
-  final GFShimmerDirection? direction;
+  final PlexShimmerDirection? direction;
 
   /// Controls the [child]'s shades of color.
   final Gradient? gradient;
@@ -170,17 +155,17 @@ class _GFShimmer extends SingleChildRenderObjectWidget {
   final bool? showShimmerEffect;
 
   @override
-  GFShimmerFilter createRenderObject(BuildContext context) => GFShimmerFilter(value: controllerValue, direction: direction, gradient: gradient, showShimmerEffect: showShimmerEffect);
+  PlexShimmerFilter createRenderObject(BuildContext context) => PlexShimmerFilter(value: controllerValue, direction: direction, gradient: gradient, showShimmerEffect: showShimmerEffect);
 
   @override
-  void updateRenderObject(BuildContext context, GFShimmerFilter shimmer) {
+  void updateRenderObject(BuildContext context, PlexShimmerFilter shimmer) {
     shimmer.controllerValue = controllerValue;
     shimmer.showShimmerEffect = showShimmerEffect;
   }
 }
 
-class GFShimmerFilter extends RenderProxyBox {
-  GFShimmerFilter({this.value, this.direction, this.gradient, this.showShimmerEffect}) : gradientPaint = Paint()..blendMode = BlendMode.srcIn;
+class PlexShimmerFilter extends RenderProxyBox {
+  PlexShimmerFilter({this.value, this.direction, this.gradient, this.showShimmerEffect}) : gradientPaint = Paint()..blendMode = BlendMode.srcIn;
 
   /// Constructs an empty [Paint] object with all fields initialized to their defaults.
   final Paint initialPaint = Paint();
@@ -193,7 +178,7 @@ class GFShimmerFilter extends RenderProxyBox {
 
   /// Controls the direction of the shimmer effect.
   /// The default direction is GFShimmerDirection.leftToRight.
-  final GFShimmerDirection? direction;
+  final PlexShimmerDirection? direction;
 
   /// Controls animation effect, defaults true state that makes animation active.
   bool? showShimmerEffect;
@@ -231,15 +216,15 @@ class GFShimmerFilter extends RenderProxyBox {
     final double width = child!.size.width;
     final double height = child!.size.height;
 
-    if (direction == GFShimmerDirection.leftToRight) {
+    if (direction == PlexShimmerDirection.leftToRight) {
       dx = _offset(-width, width, value!);
       dy = 0.0;
       rect = Rect.fromLTWH(offset.dx - width, offset.dy, 3 * width, height);
-    } else if (direction == GFShimmerDirection.bottomToTop) {
+    } else if (direction == PlexShimmerDirection.bottomToTop) {
       dx = 0.0;
       dy = _offset(height, -height, value!);
       rect = Rect.fromLTWH(offset.dx, offset.dy - height, width, 3 * height);
-    } else if (direction == GFShimmerDirection.topToBottom) {
+    } else if (direction == PlexShimmerDirection.topToBottom) {
       dx = 0.0;
       dy = _offset(-height, height, value!);
       rect = Rect.fromLTWH(offset.dx, offset.dy - height, width, 3 * height);

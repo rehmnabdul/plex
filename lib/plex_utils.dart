@@ -7,6 +7,10 @@ console(String message, {bool printInRelease = false}) {
   }
 }
 
+T createWidget<T>(T Function() callBack) {
+  return callBack.call();
+}
+
 dynamic delay(dynamic Function() callBack) async {
   return (await Future.delayed(const Duration(milliseconds: 500), callBack));
 }

@@ -71,11 +71,13 @@ class _FormUsageScreenState extends PlexState<FormUsageScreen> {
     return PlexFormWidget<MyUser>(
       entity: myUser,
       onSubmit: (dynamic myUser) {
-        Future(() async {
-          showLoading();
-          await Future.delayed(const Duration(milliseconds: 5000));
-          hideLoading();
-        },);
+        Future(
+          () async {
+            showLoading();
+            await Future.delayed(const Duration(milliseconds: 5000));
+            hideLoading();
+          },
+        );
         print(myUser.toString());
       },
     );

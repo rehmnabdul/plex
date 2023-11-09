@@ -125,6 +125,8 @@ class PlexNetworking {
         data = await http.post(uri, headers: headers, body: formData);
       } else if (body != null) {
         data = await http.post(uri, headers: headers, body: jsonEncode(body));
+      } else  {
+        data = await http.post(uri, headers: headers, body: null);
       }
 
       if (kDebugMode) print("Completed: ${data.statusCode}: ${uri.toString()}");

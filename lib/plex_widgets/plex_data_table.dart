@@ -237,15 +237,21 @@ class _PlexDataTableState extends State<PlexDataTable> {
               rows: [
                 if (updatedData.isEmpty && widget.showShimmer) ...{
                   ...(List.generate(10, (index) => index)).map(
-                    (e) => DataRow(cells: [
-                      ...widget.columns.map((e) => DataCell(GFShimmer(
-                            child: Container(
-                              color: Colors.green,
-                              height: 20,
-                              width: 50,
+                    (e) => DataRow(
+                      cells: [
+                        ...widget.columns.map(
+                          (e) => DataCell(
+                            PlexShimmer(
+                              child: Container(
+                                color: Colors.green,
+                                height: 25,
+                                width: 60,
+                              ),
                             ),
-                          )))
-                    ]),
+                          ),
+                        )
+                      ],
+                    ),
                   ),
                 } else ...{
                   ...updatedData.map(

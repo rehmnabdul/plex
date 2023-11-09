@@ -9,15 +9,14 @@ class Dim {
   static const medium = 16.0;
   static const large = 32.0;
   static const extraLarge = 64.0;
-
-  static const fontSmall = 12.0;
-  static const fontMedium = 14.0;
-  static const fontLarge = 16.0;
-  static const fontExtraLarge = 25.0;
 }
 
-space(double space) => SizedBox(height: space, width: space);
+Widget space(double value) => SizedBox(width: value, height: value);
 
-spaceSmall() => const SizedBox(height: Dim.small, width: Dim.small);
+Widget spaceMini() => const SizedBox(width: Dim.mini, height: Dim.mini);
 
-spaceMedium() => const SizedBox(height: Dim.medium, width: Dim.medium);
+Widget spaceSmallest() => const SizedBox(width: Dim.smallest, height: Dim.smallest);
+
+Widget spaceSmall() => const SizedBox(width: Dim.small, height: Dim.small);
+
+Widget spaceMedium() => const SizedBox(width: Dim.medium, height: Dim.medium);

@@ -52,22 +52,30 @@ Install the `plex` in your application.
 
 ## Widgets
 
-1. PlexWidget
-2. PlexDataTable
-3. PlexInputWidget
-4. PlexFormWidget
-5. PlexInputWidget
+1. `PlexWidget` 
+   - Updatable widget and controlled by a controller. Replaces the use of BLoC or provider pattern
+2. `PlexDataTable`
+   - View Data in a tabular form. Sort By Any Column, Search By Any Column, Export as Excel builtin functions
+3. `PlexInputWidget`
+   - Simple Widget to create a `TextInputField`, `DropdownField`, `DatePickerField` and `MultiSelectionFiel`
+   - There are lots of features available for each field
+4. `PlexFormWidget`
+   - Extend any model class with `PlexForm` and `override` method `getFields()` and configure UI fields. All the form layout will be created automatically.
+5. `PlexLoader`
+   - Show loading anywhere in application by displaying widget `PlexLoader`
+6. `PlexShimmer`
+   - Show shimmer widget when data is loading by displaying widget `PlexShimmer`
 
 #### PlexInputWidget
 
 ###### Usage
 
 ```dart
-// Input Types
-// PlexInputWidget.typeInput
-// PlexInputWidget.typeDropdown
-// PlexInputWidget.typeDate
-// PlexInputWidget.typeButton
+/// Input Types
+/// PlexInputWidget.typeInput
+/// PlexInputWidget.typeDropdown
+/// PlexInputWidget.typeDate
+/// PlexInputWidget.typeButton
 
 PlexInputWidget(
     title: "Username / Email",
@@ -124,6 +132,99 @@ BuildContext context;
 context.showSnackBar("Your Message...");
 ```
 
+### Utils
+
+#### Dimension Utilities
+```dart
+Dim.mini          //Dimension of 2
+Dim.smallest      //Dimension of 4
+Dim.small         //Dimension of 8
+Dim.medium        //Dimension of 16
+Dim.large         //Dimension of 32
+```
+
+#### Spacing Utilities
+```dart
+spaceMini()       //Widget with height width 2
+spaceSmallest()   //Widget with height width 4
+spaceSmall()      //Widget with height width 8
+spaceMedium()     //Widget with height width 16
+space(Any Double) //Widget with custom height anf width
+```
+
+#### Console Utilities
+```dart
+console("Your Message In Console", '(optional) enable print in release build')
+```
+
+#### Widget Utilities
+```dart
+createWidget((){
+  //Any Calculation or Custom Logic Here...
+  return Container();
+})
+```
+
+#### Async Utilities
+```dart
+//This will delay your code for 500 millis then do the work
+//Usefully when you want to execute a task after navigation or when UI is still building
+delay(() {
+  //Your Logic Here
+  return 'Any Object';
+})
+
+runAsync(() {
+  //Your Logic Here will be Asynchronously run
+  return "Any Object"
+})
+```
+
+#### List Utilities
+```dart
+//List.sort() doesn't return anything so we need a extra line to sort the list og type T
+//You can use this method to sort and use in one single line
+List<T> result = List<T>.sortAndReturn();
+
+//Will return a Map<Key, List<T>> by grouping the list on some condition
+Map<String, List<User>> usersByCities = List<User>.groupBy((user) {
+  return user.city;
+});
+```
+
+#### String Utils
+```dart
+/// "2012-02-27"
+/// "2012-02-27 13:27:00"
+/// "2012-02-27 13:27:00.123456789z"
+/// "2012-02-27 13:27:00,123456789z"
+/// "20120227 13:27:00"
+/// "20120227T132700"
+/// "20120227"
+/// "+20120227"
+/// "2012-02-27T14Z"
+/// "2012-02-27T14+00:00"
+/// "-123450101 00:00:00 Z": in the year -12345.
+/// "2002-02-27T14:00:00-0500"
+/// "2002-02-27T19:00:00Z"
+
+DateTime time = "2012-02-27 13:27:00".toDate();
+```
+
+#### DateTime Utilities
+```dart
+var dateInString = DateTime.now().toDDMMMHHmmss();
+var dateInString = DateTime.now().toMMMDDYYYY();
+
+//Convert DateTime to String in custom format
+var dateInString = DateTime.now().toFormattedString("hh:mm:ss a");
+
+// Will return the time difference in hours or minutes or in seconds 
+var timeDifference = "20120227 13:27:00".toDate().getDifferenceString();
+```
+
+
+
 ### Complete Example of Using PlexApp
 
 - You can also see example project to see the whole project usage in action.
@@ -151,6 +252,11 @@ class AppUser extends PlexUser {
   List<String>? rules;
 
   AppUser.init({required this.email, required this.userName, this.rules});
+ 
+  @override
+  String? getPictureUrl() {
+    return "https://images.pexels.com/photos/631317/pexels-photo-631317.jpeg";
+  }
 
   @override
   String getLoggedInEmail() => email;
@@ -225,7 +331,7 @@ void main() async {
     ),
     useAuthorization: true,
     onInitializationComplete: () {
-      PlexNetworking;
+      PlexNetworking.instance.allowBadCertificateForHTTPS();
     },
     loginConfig: PlexLoginConfig(
       debugUsername: 'test',
@@ -243,11 +349,32 @@ void main() async {
       disableExpandNavigationRail: false,
       disableNavigationRail: false,
       disableBottomNavigation: false,
+      showThemeSwitch: true,
+      showBrightnessSwitch: true,
+      showMaterialSwitch: true,
+      appbarActions: [
+        MenuItemButton(
+          leadingIcon: const Icon(Icons.abc_outlined),
+          child: const Text("ABC"),
+          onPressed: () {},
+        ),
+        MenuItemButton(
+          leadingIcon: const Icon(Icons.account_tree_outlined),
+          child: const Text("Tree"),
+          onPressed: () {},
+        ),
+        MenuItemButton(
+          leadingIcon: const Icon(Icons.account_balance_outlined),
+          child: const Text("Balance"),
+          onPressed: () {},
+        ),
+      ],
       dashboardScreens: [
         PlexRoute(
           route: Routes.dashboardScreen,
           category: "Tables",
           title: "Data Table Widget Usage",
+          shortTitle: 'Data Table',
           logo: const Icon(Icons.account_balance_outlined),
           screen: (context) => PlexDataTable(
             enableSearch: true,
@@ -267,13 +394,14 @@ void main() async {
               PlexDataCell.text("Grade"),
               PlexDataCell.text("Company"),
             ],
-            rows: getTableData(),
+            rows: List.empty(), //getTableData(),
           ),
         ),
         PlexRoute(
           route: "/paginated-table",
           category: "Paginated Tables",
           title: "Paginated Data Table",
+          shortTitle: 'Paginated Table',
           logo: const Icon(Icons.account_balance_outlined),
           screen: (context) => PlexDataTableWithPages(
             columns: [
@@ -291,12 +419,14 @@ void main() async {
         PlexRoute(
           route: "/update-widget",
           title: "Updatable Widget Usage",
+          shortTitle: 'Updatable Widget',
           logo: const Icon(Icons.browser_updated),
           screen: (context) => const UpdatableScreen(),
         ),
         PlexRoute(
           route: "/form-usage",
           title: "Form Widget Usage",
+          shortTitle: 'Form Widget',
           logo: const Icon(Icons.format_align_center),
           screen: (context) => const FormUsageScreen(),
         ),

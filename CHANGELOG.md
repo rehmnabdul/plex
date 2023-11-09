@@ -1,3 +1,9 @@
+## 0.3.2
+
+* Fix bug in `POST` call. If post body is empty the `API` didn't send the call to server
+* Add more extensions to List, String and DateTime.
+* Update Documentations
+
 ## 0.3.1
 
 * Add colorful loader in the `PlexScreen.showLoading()`

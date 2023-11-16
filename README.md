@@ -34,6 +34,38 @@ the resulting application meets the high standards of enterprise-level software.
 <img alt="Material 2 Dark" src="https://raw.githubusercontent.com/rehmnabdul/plex/main/screenshots/img_3.png" width="25%" title="Material 2 Dark">
 </div>
 
+### Application Screen Shots
+
+<div style="text-align: center;">
+<img alt="Dashboard - Large" src="https://raw.githubusercontent.com/rehmnabdul/plex/main/screenshots/app/1.png" width="38%" title="Dashboard - Large"/>
+<img alt="Dashboard - Medium" src="https://raw.githubusercontent.com/rehmnabdul/plex/main/screenshots/app/2.png" width="25%" title="Dashboard - Medium">
+</div>
+
+<div style="text-align: center;">
+<img alt="Dashboard - Mobile" src="https://raw.githubusercontent.com/rehmnabdul/plex/main/screenshots/app/3.png" width="25%" title="Dashboard - Mobile"/>
+<img alt="Dashboard Drawer - Mobile" src="https://raw.githubusercontent.com/rehmnabdul/plex/main/screenshots/app/4.png" width="25%" title="Dashboard Drawer - Mobile">
+</div>
+
+<div style="text-align: center;">
+<img alt="Paginated Table" src="https://raw.githubusercontent.com/rehmnabdul/plex/main/screenshots/app/5.png" width="25%" title="Paginated Table"/>
+<img alt="Updatable Widget" src="https://raw.githubusercontent.com/rehmnabdul/plex/main/screenshots/app/6.png" width="25%" title="Updatable Widget">
+</div>
+
+<div style="text-align: center;">
+<img alt="Plex Form" src="https://raw.githubusercontent.com/rehmnabdul/plex/main/screenshots/app/7.png" width="25%" title="Plex Form"/>
+<img alt="Drop Down Fields" src="https://raw.githubusercontent.com/rehmnabdul/plex/main/screenshots/app/8.png" width="25%" title="Drop Down Fields">
+</div>
+
+<div style="text-align: center;">
+<img alt="Drop Down Fields" src="https://raw.githubusercontent.com/rehmnabdul/plex/main/screenshots/app/9.png" width="45%" title="Drop Down Fields"/>
+<img alt="Navigation Menu - Theme Options" src="https://raw.githubusercontent.com/rehmnabdul/plex/main/screenshots/app/10.png" width="45%" title="Navigation Menu - Theme Options">
+</div>
+
+<div style="text-align: center;">
+<img alt="Auto Dark Mode" src="https://raw.githubusercontent.com/rehmnabdul/plex/main/screenshots/app/11.png" width="70%" title="Auto Dark Mode"/>
+<img alt="Auto Dark Mode" src="https://raw.githubusercontent.com/rehmnabdul/plex/main/screenshots/app/12.png" width="18%" title="Auto Dark Mode">
+</div>
+
 ## Features
 
 1. Create boilerplate code for an **Application**

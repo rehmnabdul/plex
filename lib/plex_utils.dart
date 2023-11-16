@@ -11,8 +11,8 @@ T createWidget<T>(T Function() callBack) {
   return callBack.call();
 }
 
-dynamic delay(dynamic Function() callBack) async {
-  return (await Future.delayed(const Duration(milliseconds: 500), callBack));
+dynamic delay(dynamic Function() callBack, {int delayMillis = 500}) async {
+  return (await Future.delayed(Duration(milliseconds: delayMillis), callBack));
 }
 
 dynamic runAsync(dynamic Function() callBack) async {

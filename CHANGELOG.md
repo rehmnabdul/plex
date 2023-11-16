@@ -1,3 +1,8 @@
+## 0.3.3
+
+* Add User Image Caching In the Dashboard
+* Add Download File in `PlexNetworking` You can download any file using function `downloadFile`
+
 ## 0.3.2
 
 * Fix bug in `POST` call. If post body is empty the `API` didn't send the call to server

@@ -2,24 +2,26 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 
-String getPlatform() {
-  var platformName = '';
+enum PlexPlatform { web, android, iOS, fuchsia, linux, macOS, windows, unknown }
+
+PlexPlatform getPlatform() {
   if (kIsWeb) {
-    platformName = "Web";
+    return PlexPlatform.web;
   } else {
     if (Platform.isAndroid) {
-      platformName = "Android";
+      return PlexPlatform.android;
     } else if (Platform.isIOS) {
-      platformName = "IOS";
+      return PlexPlatform.iOS;
     } else if (Platform.isFuchsia) {
-      platformName = "Fuchsia";
+      return PlexPlatform.fuchsia;
     } else if (Platform.isLinux) {
-      platformName = "Linux";
+      return PlexPlatform.linux;
     } else if (Platform.isMacOS) {
-      platformName = "MacOS";
+      return PlexPlatform.macOS;
     } else if (Platform.isWindows) {
-      platformName = "Windows";
+      return PlexPlatform.windows;
+    } else {
+      return PlexPlatform.unknown;
     }
   }
-  return platformName;
 }

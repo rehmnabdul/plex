@@ -3,9 +3,11 @@
 library plex;
 
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:plex/plex_networking/plex_networking.dart';
 import 'package:plex/plex_route.dart';
 import 'package:plex/plex_screens/plex_dashboard_screen.dart';
 import 'package:plex/plex_screens/plex_login_screen.dart';
@@ -15,6 +17,9 @@ import 'package:plex/plex_theme.dart';
 import 'package:plex/plex_user.dart';
 import 'package:plex/plex_utils/plex_dimensions.dart';
 import 'package:plex/plex_utils/plex_routing.dart';
+import 'package:plex/plex_utils/plex_utils.dart';
+import 'package:plex/plex_widget.dart';
+import 'package:plex/plex_widgets/plex_input_widget.dart';
 
 class PlexAppInfo {
   PlexAppInfo({
@@ -200,8 +205,8 @@ class _PlexAppState extends State<PlexApp> {
   ///This method will use bool to switch between light and dark mode
   void handleBrightnessChange(bool useDarkMode) {
     setState(() {
-      PlexTheme.setDarkMode(useDarkMode);
       themeMode = useDarkMode ? ThemeMode.dark : ThemeMode.light;
+      PlexTheme.setDarkMode(useDarkMode);
     });
   }
 
@@ -251,13 +256,14 @@ class _PlexAppState extends State<PlexApp> {
                 const Align(
                   alignment: Alignment.bottomCenter,
                   child: Text("Loading Components..."),
-                )
+                ),
               ],
             ),
           ),
         ),
       );
     }
+
     return GetMaterialApp(
       title: widget.appInfo.title,
       theme: PlexTheme.getThemeByBrightness(Brightness.light),

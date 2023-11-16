@@ -4,6 +4,7 @@ import 'package:plex/plex_package.dart';
 import 'package:plex/plex_route.dart';
 import 'package:plex/plex_screens/plex_dashboard_screen.dart';
 import 'package:plex/plex_screens/plex_login_screen.dart';
+import 'package:plex/plex_theme.dart';
 import 'package:plex/plex_user.dart';
 import 'package:plex/plex_widgets/plex_data_table.dart';
 import 'package:plex_app/screens/home_screen.dart';
@@ -88,12 +89,12 @@ void main() async {
       ];
 
   runApp(PlexApp(
-    themeFromColor: const Color(0xFF26A9E1),
-    // themeFromImage: const AssetImage("/path/to/image"),
+    // themeFromColor: const Color(0xFF26A9E1),
+    themeFromImage: const AssetImage("assets/img.png"),
     appInfo: PlexAppInfo(
       title: "Auto Backup",
-      appLogo: const Icon(Icons.account_balance),
-      appLogoDark: const Icon(Icons.account_balance, color: Colors.white),
+      appLogo: Image.asset("assets/app.png"),
+      appLogoDark: Image.asset("assets/app.png"),
       initialRoute: Routes.dashboardScreen,
       versionCode: 1,
       versionName: "v1.0.0",
@@ -152,7 +153,7 @@ void main() async {
               getTableData();
             },
             headerTextStyle: const TextStyle(fontWeight: FontWeight.bold),
-            headerBackground: Colors.redAccent,
+            headerBackground: PlexTheme.getActiveTheme().primaryColor,
             border: TableBorder.all(color: Colors.black12),
             columns: [
               PlexDataCell.text("Id"),

@@ -34,20 +34,41 @@ class PlexTheme {
 
   static TextTheme getTextTheme() => getActiveTheme().textTheme;
 
-  static ThemeData getThemeByBrightness(Brightness brightness) => ThemeData(
-      colorSchemeSeed: isDarkMode()
-          ? PlexApp.app.themeFromColor
-          : PlexApp.app.themeFromImage == null
-              ? PlexApp.app.themeFromColor
-              : null,
-      colorScheme: isDarkMode()
-          ? null
-          : PlexApp.app.themeFromImage == null
-              ? null
-              : PlexApp.app.imageColorScheme,
-      useMaterial3: isMaterial3(),
-      navigationBarTheme: NavigationBarThemeData(labelTextStyle: const TextStyle(fontSize: 10).getState()),
-      brightness: brightness);
+  static ThemeData getThemeByBrightness(Brightness brightness) {
+    debugPrint("Brightness: ${brightness.name}, DarkMode: ${isDarkMode()}");
+
+    var colorSchemeSeed = brightness == Brightness.dark
+        ? PlexApp.app.themeFromColor
+        : PlexApp.app.themeFromImage == null
+            ? PlexApp.app.themeFromColor
+            : null;
+    var colorScheme = brightness == Brightness.dark
+        ? null
+        : PlexApp.app.themeFromImage == null
+            ? null
+            : PlexApp.app.imageColorScheme;
+    return ThemeData(
+        colorSchemeSeed: colorSchemeSeed,
+        colorScheme: colorScheme,
+        useMaterial3: isMaterial3(),
+        navigationBarTheme: NavigationBarThemeData(labelTextStyle: const TextStyle(fontSize: 10).getState()),
+        brightness: brightness);
+
+    return ThemeData(
+        colorSchemeSeed: isDarkMode()
+            ? PlexApp.app.themeFromColor
+            : PlexApp.app.themeFromImage == null
+                ? PlexApp.app.themeFromColor
+                : null,
+        colorScheme: isDarkMode()
+            ? null
+            : PlexApp.app.themeFromImage == null
+                ? null
+                : PlexApp.app.imageColorScheme,
+        useMaterial3: isMaterial3(),
+        navigationBarTheme: NavigationBarThemeData(labelTextStyle: const TextStyle(fontSize: 10).getState()),
+        brightness: brightness);
+  }
 
   static Color randomColor() {
     var colorLimit = 225;

@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
 
 class PlexApiResult {
   final bool success;
@@ -125,7 +126,7 @@ class PlexNetworking {
         data = await http.post(uri, headers: headers, body: formData);
       } else if (body != null) {
         data = await http.post(uri, headers: headers, body: jsonEncode(body));
-      } else  {
+      } else {
         data = await http.post(uri, headers: headers, body: null);
       }
 
@@ -142,5 +143,54 @@ class PlexNetworking {
       if (kDebugMode) print("Error: ${e.toString()}");
       return PlexError(400, e.toString());
     }
+  }
+
+  ///[url] will be used as download url for the file
+  ///
+  ///[filename] will be used as file name for saving the file in app documents directory
+  ///
+  ///[onProgressUpdate] will be used as callback function
+  ///
+  ///[onProgressUpdate.downloaded] will return downloaded bytes
+  ///
+  ///[onProgressUpdate.downloaded] will return -1 bytes if there is an error while downloading
+  ///
+  ///[onProgressUpdate.percentage] will return download percentage if available else it will return null
+  ///
+  ///[onProgressUpdate.file] will return download file
+  Future downloadFile(String url, {required String filename, required Function(int downloaded, double? percentage, File? file) onProgressUpdate}) async {
+    var httpClient = http.Client();
+    var request = http.Request('GET', Uri.parse(url));
+    var response = httpClient.send(request);
+    String dir = (await getApplicationDocumentsDirectory()).path;
+
+    List<List<int>> chunks = List.empty(growable: true);
+    int downloaded = 0;
+
+    response.asStream().listen((http.StreamedResponse r) {
+      r.stream.listen(cancelOnError: true, (List<int> chunk) {
+        debugPrint('downloadPercentage: ${r.contentLength != null ? (downloaded / r.contentLength! * 100) : downloaded}');
+        onProgressUpdate(downloaded, r.contentLength != null ? (downloaded / r.contentLength! * 100) : null, null);
+        chunks.add(chunk);
+        downloaded += chunk.length;
+      }, onDone: () async {
+        debugPrint('downloadPercentage: ${r.contentLength != null ? (downloaded / r.contentLength! * 100) : downloaded}');
+        onProgressUpdate(downloaded, r.contentLength != null ? (downloaded / r.contentLength! * 100) : null, null);
+
+        // Save the file
+        File file = File('$dir/$filename');
+        final Uint8List bytes = Uint8List(downloaded);
+        int offset = 0;
+        for (List<int> chunk in chunks) {
+          bytes.setRange(offset, offset + chunk.length, chunk);
+          offset += chunk.length;
+        }
+        await file.writeAsBytes(bytes);
+
+        onProgressUpdate(downloaded, r.contentLength != null ? (downloaded / r.contentLength! * 100) : null, file);
+      }, onError: (error) {
+        onProgressUpdate(-1, null, null);
+      });
+    });
   }
 }

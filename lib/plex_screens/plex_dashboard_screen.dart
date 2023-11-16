@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:plex/plex_package.dart';
 import 'package:plex/plex_route.dart';
@@ -129,33 +130,33 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
                   ),
                   clipBehavior: Clip.hardEdge,
                   child: PlexApp.app.getUser()?.getPictureUrl() != null
-                      ? Image.network(
-                          PlexApp.app.getUser()!.getPictureUrl()!,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) => Center(
+                      ? CachedNetworkImage(
+                          imageUrl: PlexApp.app.getUser()!.getPictureUrl()!,
+                          progressIndicatorBuilder: (context, url, downloadProgress) {
+                            debugPrint(downloadProgress.progress.toString());
+                            return Stack(
+                              children: [
+                                Center(
+                                  child: Text(
+                                    PlexApp.app.getUser()?.getInitials().toString() ?? "N/A",
+                                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                                  ),
+                                ),
+                                Center(
+                                  child: CircularProgressIndicator(
+                                    color: Colors.yellowAccent,
+                                    value: downloadProgress.totalSize == null ? null : downloadProgress.downloaded / downloadProgress.totalSize!,
+                                  ),
+                                )
+                              ],
+                            );
+                          },
+                          errorWidget: (context, url, error) => Center(
                             child: Text(
                               PlexApp.app.getUser()?.getInitials().toString() ?? "N/A",
                               style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
                             ),
                           ),
-                          loadingBuilder: (context, child, loadingProgress) => loadingProgress == null
-                              ? child
-                              : Stack(
-                                  children: [
-                                    Center(
-                                      child: Text(
-                                        PlexApp.app.getUser()?.getInitials().toString() ?? "N/A",
-                                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
-                                      ),
-                                    ),
-                                    Center(
-                                      child: CircularProgressIndicator(
-                                        color: Colors.deepOrange,
-                                        value: loadingProgress.expectedTotalBytes == null ? null : loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!,
-                                      ),
-                                    )
-                                  ],
-                                ),
                         )
                       : Center(
                           child: Text(
@@ -374,22 +375,23 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
           if (!smallScreen && (routes.length) > 1) ...{
             Padding(
               padding: const EdgeInsets.all(Dim.small),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.grey[200],
-                  borderRadius: BorderRadius.circular(Dim.medium), // Adjust the radius as per your preference
-                ),
+              child: Card(
+                // decoration: BoxDecoration(
+                //   color: Colors.grey[200],
+                //   borderRadius: BorderRadius.circular(Dim.medium), // Adjust the radius as per your preference
+                // ),
                 clipBehavior: Clip.hardEdge,
+                elevation: Dim.small,
                 child: LayoutBuilder(
                   builder: (context, constraints) {
                     return SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
                       child: ConstrainedBox(
                         constraints: BoxConstraints(minHeight: constraints.maxHeight),
                         child: IntrinsicHeight(
                           child: NavigationRail(
                             useIndicator: true,
                             extended: !PlexApp.app.dashboardConfig!.disableExpandNavigationRail && largeScreen,
-                            elevation: Dim.medium,
                             backgroundColor: PlexTheme.getActiveTheme().secondaryHeaderColor,
                             leading: SizedBox(
                                 width: !PlexApp.app.dashboardConfig!.disableExpandNavigationRail && largeScreen ? 200 : 50,

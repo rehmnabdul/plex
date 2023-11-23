@@ -48,7 +48,9 @@ class PlexNetworking {
     return _basePath!;
   }
 
-  void setUrl(String? basePath) {
+  ///Optional [basePath]
+  ///If you not set base path it will suppose you enter complete [url] in [get][post] & [download] function parameter
+  void setBasePath(String? basePath) {
     _basePath = basePath;
   }
 
@@ -64,6 +66,14 @@ class PlexNetworking {
 
   ///Override this callback to always attach headers in the request i.e. UserId, AuthToken etc.
   Future<Map<String, String>> Function()? addHeaders;
+
+  _isValidUrl(String url) {
+    try{
+      return Uri.parse(url).scheme.length > 0;
+    } catch(e){
+      return false;
+    }
+  }
 
   Future<PlexApiResponse> get(String url, {Map<String, dynamic>? query, Map<String, String>? headers}) async {
     if (query != null && query.isNotEmpty) {
@@ -82,7 +92,7 @@ class PlexNetworking {
     }
 
     try {
-      var uri = Uri.parse(_apiUrl() + url);
+      var uri = Uri.parse(_isValidUrl(url) ? url : _apiUrl() + url);
       if (kDebugMode) print("Started: ${uri.toString()}");
       var data = await http.get(uri, headers: headers);
       if (kDebugMode) print("Completed: ${data.statusCode}: ${uri.toString()}");
@@ -118,7 +128,7 @@ class PlexNetworking {
     }
 
     try {
-      var uri = Uri.parse(_apiUrl() + url);
+      var uri = Uri.parse(_isValidUrl(url) ? url : _apiUrl() + url);
       if (kDebugMode) print("Started: ${uri.toString()}");
 
       late http.Response data;
@@ -160,7 +170,7 @@ class PlexNetworking {
   ///[onProgressUpdate.file] will return download file
   Future downloadFile(String url, {required String filename, required Function(int downloaded, double? percentage, File? file) onProgressUpdate}) async {
     var httpClient = http.Client();
-    var request = http.Request('GET', Uri.parse(url));
+    var request = http.Request('GET', Uri.parse(_isValidUrl(url) ? url : _apiUrl() + url));
     var response = httpClient.send(request);
     String dir = (await getApplicationDocumentsDirectory()).path;
 

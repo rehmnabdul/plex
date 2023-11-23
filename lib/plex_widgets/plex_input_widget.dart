@@ -293,7 +293,21 @@ class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
                           if (widget.title != null) ...{
                             Text("${widget.title}", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: Dim.small)),
                           },
-                          Text(data != null ? selectionData.map((e) => widget.dropdownItemAsString!(e)).join(", ") : "N/A"),
+                          spaceSmall(),
+                          Wrap(
+                            spacing: Dim.small,
+                            runSpacing: Dim.small,
+                            children: [
+                              ...selectionData.map(
+                                (e) => Chip(
+                                  elevation: Dim.small,
+                                  avatar: Icon(Icons.check_circle, color: Colors.green.shade500),
+                                  label: Text(widget.dropdownItemAsString!(e)),
+                                ),
+                              ),
+                            ],
+                          ),
+                          // Text(data != null ? selectionData.map((e) => widget.dropdownItemAsString!(e)).join(", ") : "N/A"),
                         ],
                       );
                     },

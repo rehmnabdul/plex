@@ -122,7 +122,18 @@ void main() async {
       showThemeSwitch: true,
       showBrightnessSwitch: true,
       showMaterialSwitch: true,
-      appbarActions: [
+      navigationRailBackgroundColor: Colors.green.shade100,
+      navigationRailBottomWidgets: (context) => [
+        const Text("Bottom Widget"),
+      ],
+      navigationRailTopWidgets:  (context) => [
+        const Text("Top Widget"),
+      ],
+      hideNavigationRailVersionInfo: false,
+      hideNavigationRailLogo: false,
+      hideNavigationRailLogoHeight: 100,
+      hideNavigationRailLogoWidth: 200,
+      appbarActions: (context) => [
         MenuItemButton(
           leadingIcon: const Icon(Icons.abc_outlined),
           child: const Text("ABC"),
@@ -149,6 +160,7 @@ void main() async {
           screen: (context) => PlexDataTable(
             enableSearch: true,
             enablePrint: true,
+            enableCopy: false,
             onRefresh: () {
               getTableData();
             },
@@ -164,7 +176,7 @@ void main() async {
               PlexDataCell.text("Grade"),
               PlexDataCell.text("Company"),
             ],
-            rows: List.empty(), //getTableData(),
+            rows: getTableData(),
           ),
         ),
         PlexRoute(

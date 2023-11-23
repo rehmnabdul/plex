@@ -1,3 +1,21 @@
+## 0.3.7
+
+* Add `BuildContext` in `appbarActions` in `PlexDashboardConfig`.
+
+## 0.3.6
+
+* Add `BuildContext` in `navigationRailTopWidgets` and `navigationRailBottomWidgets` in `PlexDashboardConfig`.
+
+## 0.3.5
+
+* Add `enableCopy` in `PlexTable` & `PlexDataTableWithPages` to enable and disable copy text from eny cell.
+
+## 0.3.4
+
+* Add `navigationRailBackgroundColor`, `navigationRailBottomWidgets`, `navigationRailTopWidgets`, `hideNavigationRailVersionInfo`, `hideNavigationRailLogo`, `hideNavigationRailLogoHeight`, `hideNavigationRailLogoWidth` in `PlexDashboardConfig`
+* Update Multiselect selection layout (`PlexInputWidget.typeMultiSelect`) for `PlexInputWidget`. Add `Chips` in selection view.
+* Set `basePath` for `PlexNetworking` is optional.
+
 ## 0.3.3
 
 * Add User Image Caching In the Dashboard

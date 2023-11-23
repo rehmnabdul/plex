@@ -10,7 +10,7 @@ import 'package:plex/plex_utils/plex_dimensions.dart';
 
 class PlexDashboardConfig {
   PlexDashboardConfig({
-    this.appbarActions = const [],
+    this.appbarActions,
     required this.dashboardScreens,
     this.disableExpandNavigationRail = false,
     this.disableNavigationRail = false,
@@ -18,6 +18,13 @@ class PlexDashboardConfig {
     this.showThemeSwitch = true,
     this.showBrightnessSwitch = true,
     this.showMaterialSwitch = true,
+    this.navigationRailBackgroundColor,
+    this.hideNavigationRailLogo = false,
+    this.hideNavigationRailLogoWidth = double.maxFinite,
+    this.hideNavigationRailLogoHeight = 100,
+    this.hideNavigationRailVersionInfo = false,
+    this.navigationRailTopWidgets,
+    this.navigationRailBottomWidgets,
   });
 
   ///Hide and Show Theme Options from the Actions List
@@ -40,7 +47,15 @@ class PlexDashboardConfig {
   final bool disableBottomNavigation;
 
   ///This [appbarActions] will be available on top right submenu link
-  final List<MenuItemButton> appbarActions;
+  final List<MenuItemButton> Function(BuildContext context)? appbarActions;
+
+  final Color? navigationRailBackgroundColor;
+  final bool hideNavigationRailLogo;
+  final double hideNavigationRailLogoWidth;
+  final double hideNavigationRailLogoHeight;
+  final bool hideNavigationRailVersionInfo;
+  final List<Widget> Function(BuildContext context)? navigationRailTopWidgets;
+  final List<Widget> Function(BuildContext context)? navigationRailBottomWidgets;
 
   ///Navigate to other screen present in Dashboard Screen
   void navigateOnDashboard(int index) {
@@ -207,7 +222,7 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
                 child: const Text('Theme'),
               ),
             },
-            ...PlexApp.app.dashboardConfig!.appbarActions,
+            ...?PlexApp.app.dashboardConfig!.appbarActions?.call(context),
             if (PlexApp.app.useAuthorization) ...[
               MenuItemButton(
                 onPressed: () {
@@ -376,10 +391,7 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
             Padding(
               padding: const EdgeInsets.all(Dim.small),
               child: Card(
-                // decoration: BoxDecoration(
-                //   color: Colors.grey[200],
-                //   borderRadius: BorderRadius.circular(Dim.medium), // Adjust the radius as per your preference
-                // ),
+                color: PlexApp.app.dashboardConfig!.navigationRailBackgroundColor ?? PlexTheme.getActiveTheme().navigationRailTheme.backgroundColor,
                 clipBehavior: Clip.hardEdge,
                 elevation: Dim.small,
                 child: LayoutBuilder(
@@ -392,18 +404,35 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
                           child: NavigationRail(
                             useIndicator: true,
                             extended: !PlexApp.app.dashboardConfig!.disableExpandNavigationRail && largeScreen,
-                            backgroundColor: PlexTheme.getActiveTheme().secondaryHeaderColor,
+                            backgroundColor: Colors.transparent,
                             leading: SizedBox(
-                                width: !PlexApp.app.dashboardConfig!.disableExpandNavigationRail && largeScreen ? 200 : 50,
-                                child: Column(
-                                  children: [
-                                    PlexApp.app.getLogo(),
-                                    if (PlexApp.app.appInfo.versionName != null) ...[
-                                      Text("${PlexApp.app.appInfo.versionName}"),
-                                    ],
+                              width: !PlexApp.app.dashboardConfig!.disableExpandNavigationRail && largeScreen ? 200 : 50,
+                              child: Column(
+                                children: [
+                                  spaceSmall(),
+                                  if (!PlexApp.app.dashboardConfig!.hideNavigationRailLogo) ...{
+                                    SizedBox(
+                                      height: PlexApp.app.dashboardConfig!.hideNavigationRailLogoHeight,
+                                      width: PlexApp.app.dashboardConfig!.hideNavigationRailLogoWidth,
+                                      child: PlexApp.app.getLogo(),
+                                    ),
+                                    spaceSmall(),
+                                  },
+                                  if (!PlexApp.app.dashboardConfig!.hideNavigationRailVersionInfo && PlexApp.app.appInfo.versionName != null) ...[
+                                    Text("${PlexApp.app.appInfo.versionName}"),
                                     spaceSmall(),
                                   ],
-                                )),
+                                  ...?PlexApp.app.dashboardConfig!.navigationRailTopWidgets?.call(context),
+                                  spaceSmall(),
+                                ],
+                              ),
+                            ),
+                            trailing: Column(
+                              children: [
+                                ...?PlexApp.app.dashboardConfig?.navigationRailBottomWidgets?.call(context),
+                                spaceMedium(),
+                              ],
+                            ),
                             selectedIndex: navigationSelectedIndex,
                             onDestinationSelected: (value) {
                               setState(() {

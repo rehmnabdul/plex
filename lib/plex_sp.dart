@@ -21,17 +21,17 @@ class PlexSp {
 
   ///Get the string value against a key
   String? getString(String key) {
-    return _prefs!.getString(key);
+    return _prefs?.getString(key);
   }
 
   ///Get the boolean value against a key
   bool? getBool(String key) {
-    return _prefs!.getBool(key);
+    return _prefs?.getBool(key);
   }
 
   ///Get the int value against a key
   int? getInt(String key) {
-    return _prefs!.getInt(key);
+    return _prefs?.getInt(key);
   }
 
   ///Set the string value against a key

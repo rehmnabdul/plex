@@ -33,6 +33,7 @@ class PlexDataTable extends StatefulWidget {
     this.onRefresh,
     this.onLoadMore,
     this.enableSearch = true,
+    this.enableCopy = true,
     this.enablePrint = true,
     this.headerBackground,
     this.headerTextStyle,
@@ -60,6 +61,9 @@ class PlexDataTable extends StatefulWidget {
 
   ///Hide and show Search Field
   final bool enableSearch;
+
+  ///Enable Disable Copy Field Value
+  final bool enableCopy;
 
   ///Hide and show Print Button
   final bool enablePrint;
@@ -263,7 +267,9 @@ class _PlexDataTableState extends State<PlexDataTable> {
                             data.cell?.child ?? Text(data.value ?? "N/A"),
                             onTap: data.cell?.onTap ??
                                 () {
-                                  context.copyToClipboard(data.value ?? "N/A");
+                                  if (widget.enableCopy) {
+                                    context.copyToClipboard(data.value ?? "N/A");
+                                  }
                                 },
                             showEditIcon: data.cell?.showEditIcon ?? false,
                             onDoubleTap: data.cell?.onDoubleTap,
@@ -295,6 +301,7 @@ class PlexDataTableWithPages extends StatefulWidget {
     this.onRefresh,
     this.enableSearch = true,
     this.enablePrint = true,
+    this.enableCopy = true,
     this.headerBackground,
     this.headerTextStyle,
     this.alternateColor = const Color(0xFFA8A8A8),
@@ -324,6 +331,9 @@ class PlexDataTableWithPages extends StatefulWidget {
   ///Hide and show Print Button
   final bool enablePrint;
 
+  ///Enable Disable Copy Field Value
+  final bool enableCopy;
+
   ///OnRefresh Button Click Callback
   Function()? onRefresh;
 
@@ -344,14 +354,14 @@ class PlexDataTableWithPagesState extends State<PlexDataTableWithPages> {
   void initState() {
     super.initState();
     updatedData = widget.rows;
-    _dataSource = _PaginationDataTableSource(context, dataList: updatedData, alternateColor: widget.alternateColor);
+    _dataSource = _PaginationDataTableSource(context, enableCopy: widget.enableCopy, dataList: updatedData, alternateColor: widget.alternateColor);
   }
 
   sortData(List<List<PlexDataCell>> data) {
     if (sortColumnIndex == null) {
       setState(() {
         updatedData = data;
-        _dataSource = _PaginationDataTableSource(context, dataList: updatedData, alternateColor: widget.alternateColor);
+        _dataSource = _PaginationDataTableSource(context, enableCopy: widget.enableCopy, dataList: updatedData, alternateColor: widget.alternateColor);
       });
       return;
     }
@@ -365,7 +375,7 @@ class PlexDataTableWithPagesState extends State<PlexDataTableWithPages> {
     });
     setState(() {
       updatedData = data;
-      _dataSource = _PaginationDataTableSource(context, dataList: updatedData, alternateColor: widget.alternateColor);
+      _dataSource = _PaginationDataTableSource(context, enableCopy: widget.enableCopy, dataList: updatedData, alternateColor: widget.alternateColor);
     });
   }
 
@@ -510,12 +520,14 @@ class _PaginationDataTableSource extends DataTableSource {
   final BuildContext context;
   final List<List<PlexDataCell>> dataList;
   final Color? alternateColor;
+  final bool enableCopy;
   int isAlternate = -1;
 
   _PaginationDataTableSource(
     this.context, {
     required this.dataList,
     required this.alternateColor,
+    required this.enableCopy,
   });
 
   @override
@@ -533,7 +545,9 @@ class _PaginationDataTableSource extends DataTableSource {
             data.cell?.child ?? Text(data.value ?? "N/A"),
             onTap: data.cell?.onTap ??
                 () {
-                  context.copyToClipboard(data.value ?? "N/A");
+                  if (enableCopy) {
+                    context.copyToClipboard(data.value ?? "N/A");
+                  }
                 },
             showEditIcon: data.cell?.showEditIcon ?? false,
             onDoubleTap: data.cell?.onDoubleTap,

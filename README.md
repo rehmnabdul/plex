@@ -350,9 +350,17 @@ void main() async {
     ],
   ];
 
+  ///Setting Theme First Method : Customized Theme
+  PlexTheme.appTheme = ThemeData(
+     useMaterial3: true,
+     colorSchemeSeed: const Color(0xFF26A9E1),
+  );
+  
   runApp(PlexApp(
-    themeFromColor: const Color(0xFF26A9E1),
-    // themeFromImage: const AssetImage("/path/to/image"),
+     ///Setting Theme Second Method : Theme By Color
+     // themeFromColor: const Color(0xFF26A9E1),
+     ///Setting Theme Third Method : Theme By Image
+     // themeFromImage: const AssetImage("assets/img.png"),
     appInfo: PlexAppInfo(
       title: "Auto Backup",
       appLogo: const Icon(Icons.account_balance),

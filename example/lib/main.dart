@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:plex/plex_networking/plex_networking.dart';
 import 'package:plex/plex_package.dart';
 import 'package:plex/plex_route.dart';
@@ -6,6 +7,7 @@ import 'package:plex/plex_screens/plex_dashboard_screen.dart';
 import 'package:plex/plex_screens/plex_login_screen.dart';
 import 'package:plex/plex_theme.dart';
 import 'package:plex/plex_user.dart';
+import 'package:plex/plex_widgets/plex_adv_data_table.dart';
 import 'package:plex/plex_widgets/plex_data_table.dart';
 import 'package:plex_app/screens/home_screen.dart';
 import 'package:plex_app/screens/second_screen.dart';
@@ -59,7 +61,21 @@ class AppUser extends PlexUser {
 void main() async {
   getTableData() => [
         [
-          PlexDataCell.text("1"),
+          PlexDataCell.text(285),
+          PlexDataCell.text("Second"),
+          PlexDataCell.text("Person"),
+          PlexDataCell.text("EMP95313RT"),
+          PlexDataCell.text("Software Engineer"),
+          PlexDataCell.text("Scale"),
+          PlexDataCell.custom(
+            "Second Company Pvt. Ltd",
+            const DataCell(
+              Text("Second Company Pvt. Ltd", style: TextStyle(color: Colors.green)),
+            ),
+          )
+        ],
+        [
+          PlexDataCell.text(29),
           PlexDataCell.text("First"),
           PlexDataCell.text("Person"),
           PlexDataCell.text("EMP953312RT"),
@@ -73,7 +89,7 @@ void main() async {
           ),
         ],
         [
-          PlexDataCell.text("2"),
+          PlexDataCell.text(280),
           PlexDataCell.text("Second"),
           PlexDataCell.text("Person"),
           PlexDataCell.text("EMP95313RT"),
@@ -88,9 +104,18 @@ void main() async {
         ],
       ];
 
+  ///Setting Theme First Method : Customized Theme
+  // PlexTheme.appTheme = ThemeData(
+  //   useMaterial3: true,
+  //   colorSchemeSeed: const Color(0xFF26A9E1),
+  // );
+
   runApp(PlexApp(
-    // themeFromColor: const Color(0xFF26A9E1),
-    themeFromImage: const AssetImage("assets/img.png"),
+    ///Setting Theme Second Method : Theme By Color
+    themeFromColor: const Color(0xFF26A9E1),
+
+    ///Setting Theme Third Method : Theme By Image
+    // themeFromImage: const AssetImage("assets/img.png"),
     appInfo: PlexAppInfo(
       title: "Auto Backup",
       appLogo: Image.asset("assets/app.png"),
@@ -101,6 +126,7 @@ void main() async {
     ),
     useAuthorization: true,
     onInitializationComplete: () {
+      PlexTheme.appTextTheme = GoogleFonts.outfitTextTheme();
       PlexNetworking.instance.allowBadCertificateForHTTPS();
     },
     loginConfig: PlexLoginConfig(
@@ -122,11 +148,11 @@ void main() async {
       showThemeSwitch: true,
       showBrightnessSwitch: true,
       showMaterialSwitch: true,
-      navigationRailBackgroundColor: Colors.green.shade100,
+      // navigationRailBackgroundColor: Colors.green.shade900,
       navigationRailBottomWidgets: (context) => [
         const Text("Bottom Widget"),
       ],
-      navigationRailTopWidgets:  (context) => [
+      navigationRailTopWidgets: (context) => [
         const Text("Top Widget"),
       ],
       hideNavigationRailVersionInfo: false,
@@ -187,7 +213,7 @@ void main() async {
           logo: const Icon(Icons.account_balance_outlined),
           screen: (context) => PlexDataTableWithPages(
             columns: [
-              PlexDataCell.text("Id"),
+              PlexDataCell.text("Id", numberField: true),
               PlexDataCell.text("First Name"),
               PlexDataCell.text("Last Name"),
               PlexDataCell.text("Emp Code"),
@@ -197,6 +223,19 @@ void main() async {
             ],
             rows: getTableData(),
           ),
+        ),
+        PlexRoute(
+          route: "/advance-data-table",
+          title: "Advance Data Table",
+          logo: const Icon(Icons.table_chart),
+          screen: (context) {
+            return const Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                PlexAdvanceDataTable(),
+              ],
+            );
+          },
         ),
         PlexRoute(
           route: "/update-widget",

@@ -9,6 +9,9 @@ import 'package:plex/plex_utils/plex_material.dart';
 class PlexTheme {
   PlexTheme._();
 
+  static ThemeData? appTheme;
+  static TextTheme? appTextTheme;
+
   ///Check theme is Material 3 or not
   static bool isMaterial3() {
     return PlexSp.instance.getBool("UseMaterial3") ?? true;
@@ -35,8 +38,6 @@ class PlexTheme {
   static TextTheme getTextTheme() => getActiveTheme().textTheme;
 
   static ThemeData getThemeByBrightness(Brightness brightness) {
-    debugPrint("Brightness: ${brightness.name}, DarkMode: ${isDarkMode()}");
-
     var colorSchemeSeed = brightness == Brightness.dark
         ? PlexApp.app.themeFromColor
         : PlexApp.app.themeFromImage == null
@@ -47,27 +48,36 @@ class PlexTheme {
         : PlexApp.app.themeFromImage == null
             ? null
             : PlexApp.app.imageColorScheme;
-    return ThemeData(
-        colorSchemeSeed: colorSchemeSeed,
-        colorScheme: colorScheme,
-        useMaterial3: isMaterial3(),
-        navigationBarTheme: NavigationBarThemeData(labelTextStyle: const TextStyle(fontSize: 10).getState()),
-        brightness: brightness);
+    Color? textColor = Brightness.dark == brightness ? Colors.white : null;
+
+    if(PlexTheme.appTheme != null) {
+      return PlexTheme.appTheme!;
+    }
 
     return ThemeData(
-        colorSchemeSeed: isDarkMode()
-            ? PlexApp.app.themeFromColor
-            : PlexApp.app.themeFromImage == null
-                ? PlexApp.app.themeFromColor
-                : null,
-        colorScheme: isDarkMode()
-            ? null
-            : PlexApp.app.themeFromImage == null
-                ? null
-                : PlexApp.app.imageColorScheme,
-        useMaterial3: isMaterial3(),
-        navigationBarTheme: NavigationBarThemeData(labelTextStyle: const TextStyle(fontSize: 10).getState()),
-        brightness: brightness);
+      colorSchemeSeed: colorSchemeSeed,
+      colorScheme: colorScheme,
+      useMaterial3: isMaterial3(),
+      navigationBarTheme: NavigationBarThemeData(labelTextStyle: const TextStyle(fontSize: 10).getState()),
+      brightness: brightness,
+      textTheme: PlexTheme.appTextTheme?.copyWith(
+        displayLarge: TextStyle(color: textColor),
+        displayMedium: TextStyle(color: textColor),
+        displaySmall: TextStyle(color: textColor),
+        headlineLarge: TextStyle(color: textColor),
+        headlineMedium: TextStyle(color: textColor),
+        headlineSmall: TextStyle(color: textColor),
+        titleLarge: TextStyle(color: textColor),
+        titleMedium: TextStyle(color: textColor),
+        titleSmall: TextStyle(color: textColor),
+        labelLarge: TextStyle(color: textColor),
+        labelMedium: TextStyle(color: textColor),
+        labelSmall: TextStyle(color: textColor),
+        bodyMedium: TextStyle(color: textColor),
+        bodyLarge: TextStyle(color: textColor),
+        bodySmall: TextStyle(color: textColor),
+      ),
+    );
   }
 
   static Color randomColor() {

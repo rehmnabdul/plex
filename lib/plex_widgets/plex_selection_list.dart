@@ -24,68 +24,76 @@ showSelectionList<T>(
 
   // ignore: use_build_context_synchronously
   showModalBottomSheet(
+    enableDrag: true,
+    showDragHandle: true,
+    useSafeArea: true,
+    isScrollControlled: true,
     context: context,
     builder: (context) {
       return Padding(
-        padding: const EdgeInsets.all(Dim.medium),
-        child: Column(
-          children: [
-            PlexInputWidget<String>(
-              title: "Search",
-              type: PlexInputWidget.typeInput,
-              inputController: inputController,
-              inputHint: "Search here...",
-              inputOnChange: (data) {
-                var query = data.toLowerCase();
-                if (query.isEmpty) {
-                  filteredListController.setValue(originalListData!);
-                }
-                var filteredList = originalListData!.where((element) {
-                  if (onSearch != null) {
-                    return onSearch.call(query, element);
+        padding: MediaQuery.of(context).viewInsets,
+        child: Container(
+          constraints: const BoxConstraints(maxHeight: 500),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              PlexInputWidget<String>(
+                title: "Search",
+                type: PlexInputWidget.typeInput,
+                inputController: inputController,
+                inputHint: "Search here...",
+                inputOnChange: (data) {
+                  var query = data.toLowerCase();
+                  if (query.isEmpty) {
+                    filteredListController.setValue(originalListData!);
                   }
-                  return itemText(element).toLowerCase().contains(query);
-                }).toList();
-                filteredListController.setValue(filteredList);
-              },
-            ),
-            spaceSmall(),
-            Expanded(
-              child: PlexWidget(
-                controller: filteredListController,
-                createWidget: (con, data) {
-                  var listData = data as List<T>;
-                  return ListView.builder(
-                    physics: const BouncingScrollPhysics(),
-                    itemCount: listData.length,
-                    itemBuilder: (context, index) {
-                      var item = listData[index];
-                      if (itemWidget != null) {
-                        return InkWell(
+                  var filteredList = originalListData!.where((element) {
+                    if (onSearch != null) {
+                      return onSearch.call(query, element);
+                    }
+                    return itemText(element).toLowerCase().contains(query);
+                  }).toList();
+                  filteredListController.setValue(filteredList);
+                },
+              ),
+              spaceSmall(),
+              Expanded(
+                child: PlexWidget(
+                  controller: filteredListController,
+                  createWidget: (con, data) {
+                    var listData = data as List<T>;
+                    return ListView.builder(
+                      physics: const BouncingScrollPhysics(),
+                      itemCount: listData.length,
+                      itemBuilder: (context, index) {
+                        var item = listData[index];
+                        if (itemWidget != null) {
+                          return InkWell(
+                            onTap: () {
+                              onSelect.call(item);
+                              Get.back();
+                            },
+                            child: itemWidget.call(item),
+                          );
+                        }
+                        return ListTile(
+                          selectedTileColor: Colors.green.withOpacity(0.25),
+                          selected: initialSelected != null && itemText.call(item) == itemText.call(initialSelected),
+                          leading: leadingIcon?.call(item),
+                          title: Text(itemText.call(item)),
+                          trailing: initialSelected != null && itemText.call(item) == itemText.call(initialSelected) ? const Icon(Icons.check_circle, color: Colors.green) : null,
                           onTap: () {
                             onSelect.call(item);
                             Get.back();
                           },
-                          child: itemWidget.call(item),
                         );
-                      }
-                      return ListTile(
-                        selectedTileColor: Colors.green.withOpacity(0.25),
-                        selected: initialSelected != null && itemText.call(item) == itemText.call(initialSelected),
-                        leading: leadingIcon?.call(item),
-                        title: Text(itemText.call(item)),
-                        trailing: initialSelected != null && itemText.call(item) == itemText.call(initialSelected) ? const Icon(Icons.check_circle, color: Colors.green) : null,
-                        onTap: () {
-                          onSelect.call(item);
-                          Get.back();
-                        },
-                      );
-                    },
-                  );
-                },
+                      },
+                    );
+                  },
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       );
     },
@@ -117,58 +125,90 @@ showMultiSelection<T>(
 
   // ignore: use_build_context_synchronously
   showModalBottomSheet(
+    enableDrag: true,
+    showDragHandle: true,
+    useSafeArea: true,
+    isScrollControlled: true,
     context: context,
     builder: (context) {
       return Padding(
-        padding: const EdgeInsets.all(Dim.medium),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: PlexInputWidget<String>(
-                    title: "Search",
-                    type: PlexInputWidget.typeInput,
-                    inputController: inputController,
-                    inputHint: "Search here...",
-                    inputOnChange: (data) {
-                      var query = data.toLowerCase();
-                      if (query.isEmpty) {
-                        filteredListController.setValue(originalListData!);
-                      }
-                      var filteredList = originalListData!.where((element) {
-                        if (onSearch != null) {
-                          return onSearch.call(query, element);
+        padding: MediaQuery.of(context).viewInsets,
+        child: Container(
+          constraints: const BoxConstraints(maxHeight: 500),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: PlexInputWidget<String>(
+                      title: "Search",
+                      type: PlexInputWidget.typeInput,
+                      inputController: inputController,
+                      inputHint: "Search here...",
+                      inputOnChange: (data) {
+                        var query = data.toLowerCase();
+                        if (query.isEmpty) {
+                          filteredListController.setValue(originalListData!);
                         }
-                        return itemText(element).toLowerCase().contains(query);
-                      }).toList();
-                      filteredListController.setValue(filteredList);
-                    },
+                        var filteredList = originalListData!.where((element) {
+                          if (onSearch != null) {
+                            return onSearch.call(query, element);
+                          }
+                          return itemText(element).toLowerCase().contains(query);
+                        }).toList();
+                        filteredListController.setValue(filteredList);
+                      },
+                    ),
                   ),
-                ),
-                PlexInputWidget(
-                  type: PlexInputWidget.typeButton,
-                  buttonClick: () {
-                    onSelect.call(selectionList);
-                    Get.back();
-                  },
-                  title: "Done",
-                ),
-              ],
-            ),
-            spaceSmall(),
-            Expanded(
-              child: PlexWidget(
-                  controller: filteredListController,
-                  createWidget: (con, data) {
-                    var listData = data as List<T>;
-                    return ListView.builder(
-                      physics: const BouncingScrollPhysics(),
-                      itemCount: listData.length,
-                      itemBuilder: (context, index) {
-                        var item = listData[index];
-                        if (itemWidget != null) {
-                          return InkWell(
+                  PlexInputWidget(
+                    type: PlexInputWidget.typeButton,
+                    buttonClick: () {
+                      onSelect.call(selectionList);
+                      Get.back();
+                    },
+                    title: "Done",
+                  ),
+                ],
+              ),
+              spaceSmall(),
+              Expanded(
+                child: PlexWidget(
+                    controller: filteredListController,
+                    createWidget: (con, data) {
+                      var listData = data as List<T>;
+                      return ListView.builder(
+                        physics: const BouncingScrollPhysics(),
+                        itemCount: listData.length,
+                        itemBuilder: (context, index) {
+                          var item = listData[index];
+                          if (itemWidget != null) {
+                            return InkWell(
+                              onTap: () {
+                                var prevItem = selectionList.firstWhereOrNull((element) => itemText(item) == itemText(element));
+                                if (prevItem == null) {
+                                  selectionList.add(item);
+                                } else {
+                                  selectionList.removeWhere((element) => itemText(item) == itemText(element));
+                                }
+                                filteredListController.setValue(filteredListController.data);
+                              },
+                              child: itemWidget.call(item),
+                            );
+                          }
+                          return ListTile(
+                            leading: leadingIcon?.call(item),
+                            title: Text(itemText.call(item)),
+                            trailing: Checkbox(
+                              value: selectionList.firstWhereOrNull((element) => itemText(item) == itemText(element)) != null,
+                              onChanged: (value) {
+                                if (value == true) {
+                                  selectionList.add(item);
+                                } else {
+                                  selectionList.removeWhere((element) => itemText(item) == itemText(element));
+                                }
+                                filteredListController.setValue(filteredListController.data);
+                              },
+                            ),
                             onTap: () {
                               var prevItem = selectionList.firstWhereOrNull((element) => itemText(item) == itemText(element));
                               if (prevItem == null) {
@@ -178,38 +218,13 @@ showMultiSelection<T>(
                               }
                               filteredListController.setValue(filteredListController.data);
                             },
-                            child: itemWidget.call(item),
                           );
-                        }
-                        return ListTile(
-                          leading: leadingIcon?.call(item),
-                          title: Text(itemText.call(item)),
-                          trailing: Checkbox(
-                            value: selectionList.firstWhereOrNull((element) => itemText(item) == itemText(element)) != null,
-                            onChanged: (value) {
-                              if (value == true) {
-                                selectionList.add(item);
-                              } else {
-                                selectionList.removeWhere((element) => itemText(item) == itemText(element));
-                              }
-                              filteredListController.setValue(filteredListController.data);
-                            },
-                          ),
-                          onTap: () {
-                            var prevItem = selectionList.firstWhereOrNull((element) => itemText(item) == itemText(element));
-                            if (prevItem == null) {
-                              selectionList.add(item);
-                            } else {
-                              selectionList.removeWhere((element) => itemText(item) == itemText(element));
-                            }
-                            filteredListController.setValue(filteredListController.data);
-                          },
-                        );
-                      },
-                    );
-                  }),
-            ),
-          ],
+                        },
+                      );
+                    }),
+              ),
+            ],
+          ),
         ),
       );
     },

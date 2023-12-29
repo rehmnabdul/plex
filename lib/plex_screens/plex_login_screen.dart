@@ -1,11 +1,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:plex/plex_package.dart';
 import 'package:plex/plex_screens/plex_screen.dart';
 import 'package:plex/plex_sp.dart';
 import 'package:plex/plex_user.dart';
 import 'package:plex/plex_utils/plex_dimensions.dart';
 import 'package:plex/plex_utils/plex_routing.dart';
+import 'package:plex/plex_utils/plex_widgets.dart';
 import 'package:plex/plex_widgets/plex_input_widget.dart';
 
 class PlexLoginConfig {
@@ -74,7 +76,10 @@ class _PlexLoginScreenState extends PlexState<PlexLoginScreen> {
                 if (widget.loginConfig.additionalWidgetsTop != null) ...{
                   widget.loginConfig.additionalWidgetsTop!.call(context),
                 },
-                PlexApp.app.getLogo(),
+                SizedBox(
+                  height: 100,
+                  child: PlexApp.app.getLogo(),
+                ),
                 spaceMedium(),
                 PlexInputWidget(
                   title: "Username / Email",
@@ -123,7 +128,7 @@ class _PlexLoginScreenState extends PlexState<PlexLoginScreen> {
               ],
             ),
           ),
-        ),
+        ).scaleAnim(),
       ),
     );
   }

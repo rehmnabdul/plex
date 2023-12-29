@@ -21,7 +21,7 @@ class _PlexDatePickerWidgetState extends State<PlexDatePickerWidget> {
 
   @override
   Widget build(BuildContext context) {
-    controller.text = widget.startDate?.getFormattedStringFromDate() ?? "N/A";
+    controller.text = widget.startDate?.toDateString() ?? "N/A";
 
     return Container(
       decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.all(Radius.circular(Dim.small))),
@@ -44,7 +44,7 @@ class _PlexDatePickerWidgetState extends State<PlexDatePickerWidget> {
                     useRootNavigator: true,
                   ).then((value) {
                     if (value != null) {
-                      controller.text = value.getFormattedStringFromDate();
+                      controller.text = value.toDateString();
                       widget.onDateSelected(value);
                     }
                   });

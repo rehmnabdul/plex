@@ -7,6 +7,8 @@ import 'package:plex/plex_theme.dart';
 import 'package:plex/plex_user.dart';
 import 'package:plex/plex_utils.dart';
 import 'package:plex/plex_utils/plex_dimensions.dart';
+import 'package:plex/plex_utils/plex_routing.dart';
+import 'package:plex/plex_utils/plex_widgets.dart';
 
 class PlexDashboardConfig {
   PlexDashboardConfig({
@@ -15,6 +17,7 @@ class PlexDashboardConfig {
     this.disableExpandNavigationRail = false,
     this.disableNavigationRail = false,
     this.disableBottomNavigation = false,
+    this.showAnimationSwitch = true,
     this.showThemeSwitch = true,
     this.showBrightnessSwitch = true,
     this.showMaterialSwitch = true,
@@ -28,6 +31,7 @@ class PlexDashboardConfig {
   });
 
   ///Hide and Show Theme Options from the Actions List
+  final bool showAnimationSwitch;
   final bool showThemeSwitch;
   final bool showBrightnessSwitch;
   final bool showMaterialSwitch;
@@ -186,6 +190,25 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
         ],
         MenuAnchor(
           menuChildren: [
+            if(PlexApp.app.dashboardConfig!.showAnimationSwitch) ...{
+              SubmenuButton(
+                leadingIcon: const Icon(Icons.animation),
+                menuChildren: [
+                  MenuItemButton(
+                    leadingIcon: const Icon(Icons.animation),
+                    onPressed: () {},
+                    trailingIcon: Switch(
+                        value: isPlexAnimationsEnable(),
+                        onChanged: (bool value) {
+                          value ? enablePlexAnimations() : disablePlexAnimations();
+                          setState(() {});
+                        }),
+                    child: Text(isPlexAnimationsEnable() ? 'Disable' : 'Enable'),
+                  )
+                ],
+                child: const Text("Animations"),
+              ),
+            },
             if (PlexApp.app.dashboardConfig!.showThemeSwitch && (PlexApp.app.dashboardConfig!.showMaterialSwitch || PlexApp.app.dashboardConfig!.showBrightnessSwitch)) ...{
               SubmenuButton(
                 menuChildren: <Widget>[
@@ -454,7 +477,7 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
                     );
                   },
                 ),
-              ),
+              ).scaleAnim(),
             ),
           },
         },

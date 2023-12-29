@@ -9,19 +9,23 @@ import 'package:plex/plex_widgets/plex_input_widget.dart';
 import 'package:plex/plex_widgets/plex_shimmer.dart';
 
 class PlexDataCell {
-  late final String? value;
+  late final bool isNumber;
+  late final dynamic value;
   late final DataCell? cell;
 
   ///[value] is required as it is text only cell
-  PlexDataCell.text(String this.value) {
+  PlexDataCell.text(this.value, {bool numberField = false}) {
+    value ??= "";
+    isNumber = numberField || value is int || value is double;
     cell = null;
   }
 
   ///For custom design and handling of cell use this constructor.
   ///[value] is optional
   ///[cell] is required for custom cell
-  PlexDataCell.custom(this.value, this.cell) {
-    if (value == null && cell == null) throw Exception("Either Value or DataCell must not be null");
+  PlexDataCell.custom(this.value, this.cell, {bool numberField = false}) {
+    if (value == null && cell == null) value = "";
+    isNumber = numberField || value is int || value is double;
   }
 }
 
@@ -101,10 +105,28 @@ class _PlexDataTableState extends State<PlexDataTable> {
     }
 
     data.sort((r1, r2) {
-      if (sortAscending) {
-        return (r1[sortColumnIndex!].value ?? "").compareTo(r2[sortColumnIndex!].value ?? "");
-      } else {
-        return (r2[sortColumnIndex!].value ?? "").compareTo(r1[sortColumnIndex!].value ?? "");
+      var value1 = !r1[sortColumnIndex!].isNumber
+          ? r1[sortColumnIndex!].value
+          : ((r1[sortColumnIndex!].value is int?)
+              ? r1[sortColumnIndex!].value as int?
+              : (r1[sortColumnIndex!].value is double?)
+                  ? r1[sortColumnIndex!].value as double?
+                  : null);
+      var value2 = !r2[sortColumnIndex!].isNumber
+          ? r2[sortColumnIndex!].value
+          : ((r2[sortColumnIndex!].value is int?)
+              ? r2[sortColumnIndex!].value as int?
+              : (r2[sortColumnIndex!].value is double?)
+                  ? r2[sortColumnIndex!].value as double?
+                  : null);
+      try {
+        if (sortAscending) {
+          return (value1).compareTo(value2);
+        } else {
+          return value2.compareTo(value1);
+        }
+      } catch (e) {
+        return sortAscending ? -1 : 1;
       }
     });
     setState(() {
@@ -124,7 +146,7 @@ class _PlexDataTableState extends State<PlexDataTable> {
       data = data.where((r) {
         var isOk = false;
         for (var colIndex in searchIndexes) {
-          if ((r[colIndex].value ?? "").toLowerCase().contains(searchController.text.toLowerCase())) {
+          if ((r[colIndex].value?.toString() ?? "").toLowerCase().contains(searchController.text.toLowerCase())) {
             isOk = true;
             break;
           }
@@ -228,6 +250,7 @@ class _PlexDataTableState extends State<PlexDataTable> {
               columns: [
                 ...widget.columns.map(
                   (column) => DataColumn(
+                    numeric: column.isNumber,
                     label: Text(column.value ?? "N/A"),
                     tooltip: column.value,
                     onSort: (columnIndex, ascending) {
@@ -264,11 +287,11 @@ class _PlexDataTableState extends State<PlexDataTable> {
                       cells: [
                         ...row.map(
                           (data) => DataCell(
-                            data.cell?.child ?? Text(data.value ?? "N/A"),
+                            data.cell?.child ?? Text(data.value?.toString() ?? "N/A"),
                             onTap: data.cell?.onTap ??
                                 () {
                                   if (widget.enableCopy) {
-                                    context.copyToClipboard(data.value ?? "N/A");
+                                    context.copyToClipboard(data.value?.toString() ?? "N/A");
                                   }
                                 },
                             showEditIcon: data.cell?.showEditIcon ?? false,
@@ -367,12 +390,31 @@ class PlexDataTableWithPagesState extends State<PlexDataTableWithPages> {
     }
 
     data.sort((r1, r2) {
-      if (sortAscending) {
-        return (r1[sortColumnIndex!].value ?? "").compareTo(r2[sortColumnIndex!].value ?? "");
-      } else {
-        return (r2[sortColumnIndex!].value ?? "").compareTo(r1[sortColumnIndex!].value ?? "");
+      var value1 = !r1[sortColumnIndex!].isNumber
+          ? r1[sortColumnIndex!].value
+          : ((r1[sortColumnIndex!].value is int?)
+              ? r1[sortColumnIndex!].value as int?
+              : (r1[sortColumnIndex!].value is double?)
+                  ? r1[sortColumnIndex!].value as double?
+                  : null);
+      var value2 = !r2[sortColumnIndex!].isNumber
+          ? r2[sortColumnIndex!].value
+          : ((r2[sortColumnIndex!].value is int?)
+              ? r2[sortColumnIndex!].value as int?
+              : (r2[sortColumnIndex!].value is double?)
+                  ? r2[sortColumnIndex!].value as double?
+                  : null);
+      try {
+        if (sortAscending) {
+          return (value1).compareTo(value2);
+        } else {
+          return value2.compareTo(value1);
+        }
+      } catch (e) {
+        return sortAscending ? -1 : 1;
       }
     });
+
     setState(() {
       updatedData = data;
       _dataSource = _PaginationDataTableSource(context, enableCopy: widget.enableCopy, dataList: updatedData, alternateColor: widget.alternateColor);
@@ -391,7 +433,7 @@ class PlexDataTableWithPagesState extends State<PlexDataTableWithPages> {
       data = data.where((r) {
         var isOk = false;
         for (var colIndex in searchIndexes) {
-          if ((r[colIndex].value ?? "").toLowerCase().contains(searchController.text.toLowerCase())) {
+          if ((r[colIndex].value.toString() ?? "").toLowerCase().contains(searchController.text.toLowerCase())) {
             isOk = true;
             break;
           }
@@ -495,6 +537,7 @@ class PlexDataTableWithPagesState extends State<PlexDataTableWithPages> {
                   columns: [
                     ...widget.columns.map(
                       (column) => DataColumn(
+                        numeric: column.isNumber,
                         label: Text(column.value ?? "N/A"),
                         tooltip: column.value,
                         onSort: (columnIndex, ascending) {
@@ -542,7 +585,7 @@ class _PaginationDataTableSource extends DataTableSource {
       cells: [
         ...data.map(
           (data) => DataCell(
-            data.cell?.child ?? Text(data.value ?? "N/A"),
+            data.cell?.child ?? Text(data.value.toString() ?? "N/A"),
             onTap: data.cell?.onTap ??
                 () {
                   if (enableCopy) {

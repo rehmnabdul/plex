@@ -22,7 +22,11 @@ class PlexSuccess<T> extends PlexApiResponse<T> {
 
   PlexSuccess(String? body) {
     if (body == null) response = null;
-    response = jsonDecode(body!);
+    try {
+      response = jsonDecode(body!);
+    } catch (e) {
+      response = body!.toString();
+    }
   }
 }
 

@@ -141,7 +141,7 @@ class PlexApp extends StatefulWidget {
       throw Exception("\"loginConfig\" should be unimplemented");
     }
 
-    if (themeFromColor.value != const Color(0xFF007AD7).value && themeFromImage != null) {
+    if (PlexTheme.appTheme == null && themeFromColor.value != const Color(0xFF007AD7).value && themeFromImage != null) {
       throw Exception("Use either \"themeFromColor\" or \"themeFromImage\"");
     }
 

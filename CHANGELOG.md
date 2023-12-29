@@ -1,3 +1,26 @@
+## 0.3.12
+
+* Bug fix in `PlexNetworking`
+* Add animations in UI
+* Create `Date.toDateString()` and `Date.toDateTimeString()` extension functions
+* 
+
+## 0.3.11
+
+* Make `PlexInputWidget.dropdown` scrollable and fix hidden beneath the `keyboard`
+
+## 0.3.10
+
+* Add custom theme for Application by using static theme `PlexTheme.apptheme = ThemeData(Custom Theme Data...)`
+
+## 0.3.9
+
+* Use `PlexTheme.appTextyTheme = GoogleFonts.outfitTextTheme();` to override any text theme for the application.
+
+## 0.3.8
+
+* Fix Bug In `PlexNetworking`. Show error when API response is not an `object` and is `String` instead.
+
 ## 0.3.7
 
 * Add `BuildContext` in `appbarActions` in `PlexDashboardConfig`.

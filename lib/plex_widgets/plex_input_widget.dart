@@ -222,17 +222,18 @@ class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
                         showDatePicker(
                           context: context,
                           initialDate: getDropDownController().data ?? DateTime.now(),
-                          firstDate: DateTime(2020, 1, 1),
-                          lastDate: DateTime(2050, 12, 31),
+                          firstDate: DateTime(1970, 1, 1),
+                          lastDate: DateTime(5000, 12, 31),
                           useRootNavigator: true,
                         ).then((value) {
                           if (value != null) {
                             getDropDownController().setValue(value);
+                            widget.dropdownItemOnSelect?.call(value);
                           }
                         });
                       },
                       enabled: widget.editable,
-                      controller: TextEditingController(text: (data as DateTime?)?.getFormattedStringFromDate() ?? "N/A"),
+                      controller: TextEditingController(text: (data as DateTime?)?.toDateString() ?? "N/A"),
                       decoration: const InputDecoration(
                         border: InputBorder.none,
                       ),

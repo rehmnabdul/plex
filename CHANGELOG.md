@@ -3,7 +3,7 @@
 * Bug fix in `PlexNetworking`
 * Add animations in UI
 * Create `Date.toDateString()` and `Date.toDateTimeString()` extension functions
-* 
+* Add Improvements in Input fields
 
 ## 0.3.11
 

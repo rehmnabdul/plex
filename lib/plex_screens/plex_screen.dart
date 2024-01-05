@@ -116,7 +116,7 @@ abstract class PlexState<T extends PlexScreen> extends State<T> {
 
   var _loadingCount = 0;
 
-  isLoading() => _loadingCount > 0;
+  bool isLoading() => _loadingCount > 0;
 
   showLoading() {
     _loadingCount++;

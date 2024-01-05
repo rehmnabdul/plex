@@ -11,7 +11,7 @@ import 'package:syncfusion_flutter_xlsio/xlsio.dart';
 class PlexPrinter {
   PlexPrinter._();
 
-  static printExcel(String title, List<PlexDataCell> columns, List<List<PlexDataCell>> rows) async {
+  static printExcel(String title, List<dynamic> columns, List<List<dynamic>> rows) async {
     var workbook = Workbook();
 
     final Worksheet productionSheet = workbook.worksheets[0];
@@ -29,14 +29,14 @@ class PlexPrinter {
 
     var currentColumn = 1;
     for (var column in columns) {
-      productionSheet.getRangeByIndex(productionRowNumber, currentColumn++).setText(column.value);
+      productionSheet.getRangeByIndex(productionRowNumber, currentColumn++).setText(column.toString());
     }
 
     productionRowNumber++;
     for (var row in rows) {
       currentColumn = 1;
       for (var data in row) {
-        productionSheet.getRangeByIndex(productionRowNumber, currentColumn++).setText(data.value);
+        productionSheet.getRangeByIndex(productionRowNumber, currentColumn++).setText(data.toString());
       }
       productionRowNumber++;
     }
@@ -50,6 +50,10 @@ class PlexPrinter {
     final List<int> bytes = workbook.saveAsStream();
     workbook.dispose();
 
+    return await saveExcelFile(title, bytes);
+  }
+
+  static Future<String?> saveExcelFile(String title, List<int> bytes) async {
     String ext = "xlsx";
     Future<String?> fileSaveTask;
     title = "$title-${DateFormat("dd-MMM-yyyy-HHmmss").format(DateTime.now())}";
@@ -66,6 +70,39 @@ class PlexPrinter {
         bytes: Uint8List.fromList(bytes),
         ext: ext,
         mimeType: MimeType.microsoftExcel,
+      );
+    }
+
+    final result = await fileSaveTask;
+
+    if (kDebugMode) {
+      print(result ?? "Unable to save file");
+    }
+
+    if (result == null) {
+      return null;
+    }
+    var filePath = File(result).absolute.path;
+    return filePath;
+  }
+
+  static Future<String?> savePdfFile(String title, List<int> bytes) async {
+    String ext = "pdf";
+    Future<String?> fileSaveTask;
+    title = "$title-${DateFormat("dd-MMM-yyyy-HHmmss").format(DateTime.now())}";
+    if (GetPlatform.isAndroid || GetPlatform.isIOS) {
+      fileSaveTask = FileSaver.instance.saveAs(
+        name: "$title.$ext",
+        bytes: Uint8List.fromList(bytes),
+        ext: ext,
+        mimeType: MimeType.pdf,
+      );
+    } else {
+      fileSaveTask = FileSaver.instance.saveFile(
+        name: title,
+        bytes: Uint8List.fromList(bytes),
+        ext: ext,
+        mimeType: MimeType.pdf,
       );
     }
 

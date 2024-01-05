@@ -1,3 +1,8 @@
+## 0.3.13
+
+* Add `PlexAdvanceDataTable` in the library
+* Add `PDF` print in the library
+
 ## 0.3.12
 
 * Bug fix in `PlexNetworking`

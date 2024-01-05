@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:plex/plex_networking/plex_networking.dart';
@@ -7,8 +9,10 @@ import 'package:plex/plex_screens/plex_dashboard_screen.dart';
 import 'package:plex/plex_screens/plex_login_screen.dart';
 import 'package:plex/plex_theme.dart';
 import 'package:plex/plex_user.dart';
+import 'package:plex/plex_widget.dart';
 import 'package:plex/plex_widgets/plex_adv_data_table.dart';
 import 'package:plex/plex_widgets/plex_data_table.dart';
+import 'package:plex/plex_widgets/plex_data_table_paginated.dart';
 import 'package:plex_app/screens/home_screen.dart';
 import 'package:plex_app/screens/second_screen.dart';
 
@@ -103,6 +107,24 @@ void main() async {
           )
         ],
       ];
+
+  List<List<PlexDataTableValueCell>> getAdvanceTableData() {
+    var data = List<List<PlexDataTableValueCell>>.empty(growable: true);
+    for (var a = 0; a < 100; a++) {
+      data.add(
+        [
+          PlexDataTableValueCell.text("Id", Random().nextInt(9999)),
+          PlexDataTableValueCell.text("First", "First $a"),
+          PlexDataTableValueCell.text("Last", "Last $a"),
+          PlexDataTableValueCell.text("EmpCode", "EMP$a"),
+          PlexDataTableValueCell.text("Designation", "Engineer $a"),
+          PlexDataTableValueCell.text("Grade", "Scale $a"),
+          PlexDataTableValueCell.text("Company", "Company Name $a"),
+        ],
+      );
+    }
+    return data;
+  }
 
   ///Setting Theme First Method : Customized Theme
   // PlexTheme.appTheme = ThemeData(
@@ -229,11 +251,18 @@ void main() async {
           title: "Advance Data Table",
           logo: const Icon(Icons.table_chart),
           screen: (context) {
-            return const Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                PlexAdvanceDataTable(),
+            return PlexAdvanceDataTable(
+              title: "Advance Data Table",
+              columns: [
+                PlexDataTableHeaderCell.text("Id"),
+                PlexDataTableHeaderCell.text("First"),
+                PlexDataTableHeaderCell.text("Last"),
+                PlexDataTableHeaderCell.text("EmpCode"),
+                PlexDataTableHeaderCell.text("Designation"),
+                PlexDataTableHeaderCell.text("Grade"),
+                PlexDataTableHeaderCell.text("Company"),
               ],
+              controller: PlexWidgetController(data: getAdvanceTableData()),
             );
           },
         ),

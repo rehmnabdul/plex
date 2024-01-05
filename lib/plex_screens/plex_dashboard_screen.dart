@@ -7,7 +7,6 @@ import 'package:plex/plex_theme.dart';
 import 'package:plex/plex_user.dart';
 import 'package:plex/plex_utils.dart';
 import 'package:plex/plex_utils/plex_dimensions.dart';
-import 'package:plex/plex_utils/plex_routing.dart';
 import 'package:plex/plex_utils/plex_widgets.dart';
 
 class PlexDashboardConfig {
@@ -108,7 +107,8 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
     if (routes.isEmpty) {
       delay(() => PlexApp.app.logout());
     } else {
-      navigationSelectedIndex = 0;
+      var index = routes.indexWhere((element) => element.route == PlexApp.app.appInfo.initialRoute);
+      navigationSelectedIndex = index == -1 ? 0 : index;
     }
 
     PlexApp.app.dashboardConfig?.onNavigation = (index) {
@@ -190,7 +190,7 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
         ],
         MenuAnchor(
           menuChildren: [
-            if(PlexApp.app.dashboardConfig!.showAnimationSwitch) ...{
+            if (PlexApp.app.dashboardConfig!.showAnimationSwitch) ...{
               SubmenuButton(
                 leadingIcon: const Icon(Icons.animation),
                 menuChildren: [
@@ -486,10 +486,8 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
         }
       ],
     );
-    return WillPopScope(
-      onWillPop: () async {
-        return false;
-      },
+    return PopScope(
+      canPop: false,
       child: Padding(
         padding: const EdgeInsets.all(Dim.medium),
         child: body,

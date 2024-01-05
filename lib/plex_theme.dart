@@ -9,6 +9,8 @@ import 'package:plex/plex_utils/plex_material.dart';
 class PlexTheme {
   PlexTheme._();
 
+  static const Color selectionColor = Color(0xFFACCEF7);
+
   static ThemeData? appTheme;
   static TextTheme? appTextTheme;
 

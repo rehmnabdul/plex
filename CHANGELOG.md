@@ -1,3 +1,7 @@
+## 0.3.14
+
+* Add `Group Columns` data in `PlexAdvanceDataTable`
+
 ## 0.3.13
 
 * Add `PlexAdvanceDataTable` in the library

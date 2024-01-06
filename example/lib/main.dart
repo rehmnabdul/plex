@@ -117,8 +117,8 @@ void main() async {
           PlexDataTableValueCell.text("First", "First $a"),
           PlexDataTableValueCell.text("Last", "Last $a"),
           PlexDataTableValueCell.text("EmpCode", "EMP$a"),
-          PlexDataTableValueCell.text("Designation", "Engineer $a"),
-          PlexDataTableValueCell.text("Grade", "Scale $a"),
+          PlexDataTableValueCell.text("Designation", "Engineer ${Random().nextInt(10)+1}"),
+          PlexDataTableValueCell.text("Grade", "Scale ${Random().nextInt(5)+1}"),
           PlexDataTableValueCell.text("Company", "Company Name $a"),
         ],
       );
@@ -142,7 +142,7 @@ void main() async {
       title: "Auto Backup",
       appLogo: Image.asset("assets/app.png"),
       appLogoDark: Image.asset("assets/app.png"),
-      initialRoute: Routes.dashboardScreen,
+      initialRoute: '/advance-data-table',
       versionCode: 1,
       versionName: "v1.0.0",
     ),
@@ -164,7 +164,7 @@ void main() async {
       },
     ),
     dashboardConfig: PlexDashboardConfig(
-      disableExpandNavigationRail: false,
+      disableExpandNavigationRail: true,
       disableNavigationRail: false,
       disableBottomNavigation: false,
       showThemeSwitch: true,

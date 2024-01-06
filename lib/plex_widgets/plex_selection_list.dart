@@ -106,7 +106,7 @@ showMultiSelection<T>(
   Future<List<T>>? asyncItems,
   List<T>? initialSelection,
   required String Function(T item) itemText,
-  required Function(List<T> item) onSelect,
+  required Function(List<T> items) onSelect,
   Widget Function(dynamic item)? itemWidget,
   Widget Function(T item)? leadingIcon,
   bool Function(String query, dynamic item)? onSearch,

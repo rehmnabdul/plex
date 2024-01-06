@@ -1,10 +1,14 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:plex/plex_assets.dart';
 import 'package:plex/plex_theme.dart';
 import 'package:plex/plex_utils/plex_dimensions.dart';
 import 'package:plex/plex_utils/plex_messages.dart';
 import 'package:plex/plex_utils/plex_printer.dart';
 import 'package:plex/plex_widget.dart';
+import 'package:plex/plex_widgets/plex_selection_list.dart';
 import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:syncfusion_flutter_datagrid_export/export.dart';
@@ -61,7 +65,7 @@ class PlexDataTableValueCell extends DataGridCell {
 
 class PlexAdvanceDataTable extends StatefulWidget {
   const PlexAdvanceDataTable({
-    Key? key,
+    super.key,
     required this.title,
     required this.columns,
     required this.controller,
@@ -73,9 +77,10 @@ class PlexAdvanceDataTable extends StatefulWidget {
     this.freezeRows = 0,
     this.alternateColor,
     this.enableCopy = false,
+    this.enableColumnGrouping = true,
     this.enableExcelExport = true,
     this.enablePdfExport = true,
-  }) : super(key: key);
+  });
 
   ///Title to show for the data set
   final String title;
@@ -89,6 +94,9 @@ class PlexAdvanceDataTable extends StatefulWidget {
 
   ///On Refresh Button Click
   final Function()? onRefresh;
+
+  ///Enable Disable Column Grouping
+  final bool enableColumnGrouping;
 
   ///Enable Disable Copy Field Value
   final bool enableCopy;
@@ -143,6 +151,37 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
               children: [
                 Text(widget.title, style: const TextStyle(fontWeight: FontWeight.bold)),
                 Expanded(child: Container()),
+                if (widget.enableColumnGrouping) ...{
+                  FilledButton.tonalIcon(
+                    onPressed: () {
+                      showMultiSelection<ColumnGroup>(
+                        context,
+                        itemText: (item) {
+                          return item.name;
+                        },
+                        onSelect: (items) {
+                          var oldSelection = source.groupedColumns;
+                          for (var column in oldSelection) {
+                            if (items.firstWhereOrNull((item) => item.name == column.name) == null) {
+                              source.removeColumnGroup(column);
+                            }
+                          }
+
+                          oldSelection = source.groupedColumns;
+                          for (var item in items) {
+                            if (oldSelection.firstWhereOrNull((column) => column.name == item.name) == null) {
+                              source.addColumnGroup(item);
+                            }
+                          }
+                        },
+                        initialSelection: source.groupedColumns,
+                        items: widget.columns.map((e) => ColumnGroup(name: e.columnName, sortGroupRows: true)).toList(),
+                      );
+                    },
+                    icon: const Icon(Icons.filter_list),
+                    label: const Text('Group Columns'),
+                  ),
+                },
                 if (widget.enableExcelExport) ...{
                   spaceSmall(),
                   FilledButton.tonal(
@@ -200,6 +239,7 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
                   key: key,
                   allowColumnsResizing: false,
                   allowColumnsDragging: false,
+                  allowExpandCollapseGroup: true,
                   frozenColumnsCount: widget.freezeColumns,
                   frozenRowsCount: widget.freezeRows,
                   allowFiltering: true,
@@ -216,14 +256,14 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
                   showHorizontalScrollbar: true,
                   isScrollbarAlwaysShown: true,
                   navigationMode: GridNavigationMode.cell,
-                  onCellTap: (details) {
-                    if (details.rowColumnIndex.rowIndex == 0) return;
-                    if (widget.enableCopy) {
-                      var cell = source._dataGridRows[details.rowColumnIndex.rowIndex - 1].getCells()[details.rowColumnIndex.columnIndex];
-                      debugPrint(cell.value?.toString());
-                      context.copyToClipboard(cell.value?.toString() ?? "N/A");
-                    }
-                  },
+                  // onCellTap: (details) {
+                  //   if (details.rowColumnIndex.rowIndex == 0) return;
+                  //   if (widget.enableCopy) {
+                  //     var cell = source._dataGridRows[details.rowColumnIndex.rowIndex - 1].getCells()[details.rowColumnIndex.columnIndex];
+                  //     debugPrint(cell.value?.toString());
+                  //     context.copyToClipboard(cell.value?.toString() ?? "N/A");
+                  //   }
+                  // },
                   source: source,
                   columns: widget.columns
                       .map(
@@ -303,6 +343,14 @@ class _PlexAdvanceDataTableDataSource extends DataGridSource {
                 ),
               );
         }).toList());
+  }
+
+  @override
+  Widget? buildGroupCaptionCellWidget(RowColumnIndex rowColumnIndex, String summaryValue) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 15),
+      child: Text(summaryValue),
+    );
   }
 
   @override

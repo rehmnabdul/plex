@@ -39,7 +39,7 @@ showSelectionList<T>(
             children: [
               PlexInputWidget<String>(
                 title: "Search",
-                type: PlexInputWidget.typeInput,
+                type: PlexInputWidgetType.typeInput,
                 inputController: inputController,
                 inputHint: "Search here...",
                 inputOnChange: (data) {
@@ -142,7 +142,7 @@ showMultiSelection<T>(
                   Expanded(
                     child: PlexInputWidget<String>(
                       title: "Search",
-                      type: PlexInputWidget.typeInput,
+                      type: PlexInputWidgetType.typeInput,
                       inputController: inputController,
                       inputHint: "Search here...",
                       inputOnChange: (data) {
@@ -161,7 +161,7 @@ showMultiSelection<T>(
                     ),
                   ),
                   PlexInputWidget(
-                    type: PlexInputWidget.typeButton,
+                    type: PlexInputWidgetType.typeButton,
                     buttonClick: () {
                       onSelect.call(selectionList);
                       Get.back();

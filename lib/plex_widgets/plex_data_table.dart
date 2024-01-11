@@ -197,7 +197,7 @@ class _PlexDataTableState extends State<PlexDataTable> {
                     child: widget.enableSearch
                         ? PlexInputWidget(
                       margin: EdgeInsets.zero,
-                      type: PlexInputWidget.typeInput,
+                      type: PlexInputWidgetType.typeInput,
                       inputController: searchController,
                       title: "Search...",
                       inputHint: "Type here to search whole data...",
@@ -243,7 +243,7 @@ class _PlexDataTableState extends State<PlexDataTable> {
             child: DataTable(
               columnSpacing: widget.columnSpacing,
               border: widget.border ?? TableBorder.all(color: Colors.black38),
-              headingRowColor: widget.headerBackground?.getColorState(),
+              headingRowColor: widget.headerBackground?.getMaterialState(),
               headingTextStyle: widget.headerTextStyle,
               sortColumnIndex: sortColumnIndex,
               sortAscending: sortAscending,
@@ -289,7 +289,7 @@ class _PlexDataTableState extends State<PlexDataTable> {
                     ...?updatedData?.map(
                           (row) =>
                           DataRow(
-                            color: isAlternate++ % 2 == 0 ? widget.alternateColor?.getColorState() : null,
+                            color: isAlternate++ % 2 == 0 ? widget.alternateColor?.getMaterialState() : null,
                             cells: [
                               ...row.map(
                                     (data) =>

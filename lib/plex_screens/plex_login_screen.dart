@@ -84,20 +84,20 @@ class _PlexLoginScreenState extends PlexState<PlexLoginScreen> {
                 PlexInputWidget(
                   title: "Username / Email",
                   inputHint: "Enter Your Email or Username",
-                  type: PlexInputWidget.typeInput,
+                  type: PlexInputWidgetType.typeInput,
                   inputController: usernameController,
                 ),
                 PlexInputWidget(
                   title: "Password",
                   inputHint: "Enter Your Password",
-                  type: PlexInputWidget.typeInput,
+                  type: PlexInputWidgetType.typeInput,
                   inputController: passController,
                   isPassword: true,
                 ),
                 PlexInputWidget(
                   title: "Login",
                   buttonIcon: const Icon(Icons.login),
-                  type: PlexInputWidget.typeButton,
+                  type: PlexInputWidgetType.typeButton,
                   buttonClick: () async {
                     if (usernameController.text.isEmpty) {
                       toast("Username can't be empty");

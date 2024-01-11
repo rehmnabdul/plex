@@ -174,7 +174,7 @@ class PlexDataTableWithPagesState extends State<PlexDataTableWithPages> {
                   child: widget.enableSearch
                       ? PlexInputWidget(
                           margin: EdgeInsets.zero,
-                          type: PlexInputWidget.typeInput,
+                          type: PlexInputWidgetType.typeInput,
                           inputController: searchController,
                           title: "Search...",
                           inputHint: "Type here to search whole data...",
@@ -274,7 +274,7 @@ class _PaginationDataTableSource extends DataTableSource {
     final data = dataList[index];
 
     return DataRow(
-      color: isAlternate++ % 2 == 0 ? alternateColor?.getColorState() : null,
+      color: isAlternate++ % 2 == 0 ? alternateColor?.getMaterialState() : null,
       cells: [
         ...data.map(
           (data) => DataCell(

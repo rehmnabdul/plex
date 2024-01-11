@@ -14,6 +14,7 @@ class PlexRoute {
 
   ///Optional [logo]
   Widget? logo;
+  Widget? selectedLogo;
 
   ///Use this [category] to group the screen in drawer menu
   String category;
@@ -22,5 +23,5 @@ class PlexRoute {
   String? rule;
 
   ///Default constructor
-  PlexRoute({required this.route, required this.title, required this.screen, this.logo, this.category = "Menu", this.rule, this.shortTitle});
+  PlexRoute({required this.route, required this.title, required this.screen, this.logo, this.selectedLogo, this.category = "Menu", this.rule, this.shortTitle});
 }

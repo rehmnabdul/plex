@@ -164,7 +164,7 @@ void main() async {
       },
     ),
     dashboardConfig: PlexDashboardConfig(
-      disableExpandNavigationRail: true,
+      disableExpandNavigationRail: false,
       disableNavigationRail: false,
       disableBottomNavigation: false,
       showThemeSwitch: true,
@@ -205,6 +205,7 @@ void main() async {
           title: "Data Table Widget Usage",
           shortTitle: 'Data Table',
           logo: const Icon(Icons.account_balance_outlined),
+          selectedLogo: const Icon(Icons.account_balance),
           screen: (context) => PlexDataTable(
             enableSearch: true,
             enablePrint: true,
@@ -233,6 +234,7 @@ void main() async {
           title: "Paginated Data Table",
           shortTitle: 'Paginated Table',
           logo: const Icon(Icons.account_balance_outlined),
+          selectedLogo: const Icon(Icons.account_balance),
           screen: (context) => PlexDataTableWithPages(
             columns: [
               PlexDataCell.text("Id", numberField: true),
@@ -249,10 +251,12 @@ void main() async {
         PlexRoute(
           route: "/advance-data-table",
           title: "Advance Data Table",
-          logo: const Icon(Icons.table_chart),
+          logo: const Icon(Icons.table_chart_outlined),
+          selectedLogo: const Icon(Icons.table_chart),
           screen: (context) {
             return PlexAdvanceDataTable(
               title: "Advance Data Table",
+              widthMode: WidthMode.none,
               columns: [
                 PlexDataTableHeaderCell.text("Id"),
                 PlexDataTableHeaderCell.text("First"),
@@ -260,7 +264,7 @@ void main() async {
                 PlexDataTableHeaderCell.text("EmpCode"),
                 PlexDataTableHeaderCell.text("Designation"),
                 PlexDataTableHeaderCell.text("Grade"),
-                PlexDataTableHeaderCell.text("Company"),
+                PlexDataTableHeaderCell.text("Company", widthMode: WidthMode.fill),
               ],
               controller: PlexWidgetController(data: getAdvanceTableData()),
             );
@@ -270,14 +274,16 @@ void main() async {
           route: "/update-widget",
           title: "Updatable Widget Usage",
           shortTitle: 'Updatable Widget',
-          logo: const Icon(Icons.browser_updated),
+          logo: const Icon(Icons.browser_updated_outlined),
+          selectedLogo: const Icon(Icons.browser_updated),
           screen: (context) => const UpdatableScreen(),
         ),
         PlexRoute(
           route: "/form-usage",
           title: "Form Widget Usage",
           shortTitle: 'Form Widget',
-          logo: const Icon(Icons.format_align_center),
+          logo: const Icon(Icons.format_align_center_outlined),
+          selectedLogo: const Icon(Icons.format_align_center),
           screen: (context) => const FormUsageScreen(),
         ),
       ],

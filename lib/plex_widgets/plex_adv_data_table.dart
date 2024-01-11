@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:plex/plex_assets.dart';
 import 'package:plex/plex_theme.dart';
 import 'package:plex/plex_utils/plex_dimensions.dart';
+import 'package:plex/plex_utils/plex_material.dart';
 import 'package:plex/plex_utils/plex_messages.dart';
 import 'package:plex/plex_utils/plex_printer.dart';
 import 'package:plex/plex_widget.dart';
@@ -14,22 +15,47 @@ import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:syncfusion_flutter_datagrid_export/export.dart';
 import 'package:syncfusion_flutter_xlsio/xlsio.dart' as xl;
 
+enum WidthMode {
+  none,
+  fitByColumnName,
+  fitByCellValue,
+  lastColumnFill,
+  fill,
+  auto,
+}
+
 class PlexDataTableHeaderCell {
-  late final String columnName;
-  late final bool isNumber;
+  final String columnName;
+  final bool isNumber;
+  final WidthMode widthMode;
   late final Widget? cell;
 
   ///[columnName] is required as it is text only cell
-  PlexDataTableHeaderCell.text(this.columnName, {this.isNumber = false});
+  PlexDataTableHeaderCell.text(this.columnName, {this.isNumber = false, this.widthMode = WidthMode.auto}){
+    cell = null;
+  }
 
   ///For custom design and handling of cell use this constructor.
   ///[columnName] is optional
   ///[cell] is required for custom cell
-  PlexDataTableHeaderCell.custom(
-    this.columnName,
-    this.cell, {
-    this.isNumber = false,
-  });
+  PlexDataTableHeaderCell.custom(this.columnName, this.cell, {this.isNumber = false, this.widthMode = WidthMode.auto});
+
+  ColumnWidthMode _getWidthMode() {
+    switch(widthMode) {
+      case WidthMode.none:
+        return ColumnWidthMode.none;
+      case WidthMode.fitByColumnName:
+        return ColumnWidthMode.fitByColumnName;
+      case WidthMode.fitByCellValue:
+        return ColumnWidthMode.fitByCellValue;
+      case WidthMode.lastColumnFill:
+        return ColumnWidthMode.lastColumnFill;
+      case WidthMode.fill:
+        return ColumnWidthMode.fill;
+      default:
+        return ColumnWidthMode.auto;
+    }
+  }
 }
 
 class PlexDataTableValueCell extends DataGridCell {
@@ -69,6 +95,7 @@ class PlexAdvanceDataTable extends StatefulWidget {
     required this.title,
     required this.columns,
     required this.controller,
+    this.widthMode,
     this.pageSize,
     this.headerBackground,
     this.headerTextStyle,
@@ -91,6 +118,7 @@ class PlexAdvanceDataTable extends StatefulWidget {
   final Color? headerBackground;
   final TextStyle? headerTextStyle;
   final Color? alternateColor;
+  final WidthMode? widthMode;
 
   ///On Refresh Button Click
   final Function()? onRefresh;
@@ -178,8 +206,9 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
                         items: widget.columns.map((e) => ColumnGroup(name: e.columnName, sortGroupRows: true)).toList(),
                       );
                     },
-                    icon: const Icon(Icons.filter_list),
-                    label: const Text('Group Columns'),
+                    style: ButtonStyle(backgroundColor: Colors.blue.shade100.getMaterialState(), elevation: Dim.smallest.getMaterialState()),
+                    icon: Image.asset(groupData, height: 25, width: 25, color: Colors.blue),
+                    label: const Text('Group Columns', style: TextStyle(color: Colors.blue)),
                   ),
                 },
                 if (widget.enableExcelExport) ...{
@@ -196,6 +225,7 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
                       }
                       context.showSnackBar("Report saved at \"$path\"");
                     },
+                    style: ButtonStyle(backgroundColor: Colors.green.shade100.getMaterialState(), elevation: Dim.smallest.getMaterialState()),
                     child: Image.asset(excel, width: 20, height: 20, color: Colors.green),
                   ),
                 },
@@ -211,6 +241,7 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
                       }
                       context.showSnackBar("Report saved at \"$path\"");
                     },
+                    style: ButtonStyle(backgroundColor: Colors.red.shade100.getMaterialState(), elevation: Dim.smallest.getMaterialState()),
                     child: Image.asset(pdf, width: 20, height: 20, color: Colors.redAccent),
                   ),
                 },
@@ -269,12 +300,13 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
                       .map(
                         (e) => GridColumn(
                           columnName: e.columnName,
-                          columnWidthMode: ColumnWidthMode.auto,
+                          columnWidthMode: e._getWidthMode(),
                           label: Padding(
                             padding: const EdgeInsets.all(Dim.medium),
                             child: Text(
                               e.columnName,
                               style: widget.headerTextStyle,
+                              overflow: TextOverflow.ellipsis,
                               softWrap: true,
                             ),
                           ),

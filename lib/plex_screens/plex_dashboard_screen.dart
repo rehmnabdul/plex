@@ -428,6 +428,14 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
                             useIndicator: true,
                             extended: !PlexApp.app.dashboardConfig!.disableExpandNavigationRail && largeScreen,
                             backgroundColor: Colors.transparent,
+                            selectedIconTheme: PlexTheme.getActiveTheme().iconTheme.copyWith(size: 25),
+                            unselectedIconTheme: PlexTheme.getActiveTheme().iconTheme.copyWith(size: 15),
+                            selectedLabelTextStyle: (PlexTheme.getActiveTheme().navigationRailTheme.selectedLabelTextStyle ??
+                                    TextStyle(
+                                      color: PlexTheme.isDarkMode() ? Colors.white : Colors.black,
+                                    ))
+                                .copyWith(fontWeight: FontWeight.bold),
+                            indicatorShape: null,
                             leading: SizedBox(
                               width: !PlexApp.app.dashboardConfig!.disableExpandNavigationRail && largeScreen ? 200 : 50,
                               child: Column(
@@ -466,8 +474,8 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
                               ...routes.map(
                                 (destination) => NavigationRailDestination(
                                   label: Text(destination.title),
-                                  icon: destination.logo ?? const Icon(Icons.menu),
-                                  selectedIcon: destination.logo ?? const Icon(Icons.circle),
+                                  icon: destination.logo ?? const Icon(Icons.circle_outlined),
+                                  selectedIcon: destination.selectedLogo ?? destination.logo ?? const Icon(Icons.circle_rounded),
                                 ),
                               ),
                             ],

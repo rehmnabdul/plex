@@ -6,6 +6,10 @@ extension PlexDateUtils on DateTime {
   }
 
   String toDateTimeString() {
-    return DateFormat("dd MMM yyyy, HH:mm a").format(this);
+    return DateFormat("dd MMM yyyy, HH:mm").format(this);
+  }
+
+  String toTimeString() {
+    return DateFormat("HH:mm").format(this);
   }
 }

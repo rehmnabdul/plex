@@ -104,15 +104,15 @@ Install the `plex` in your application.
 
 ```dart
 /// Input Types
-/// PlexInputWidget.typeInput
-/// PlexInputWidget.typeDropdown
-/// PlexInputWidget.typeDate
-/// PlexInputWidget.typeButton
+/// PlexInputWidgetType.typeInput
+/// PlexInputWidgetType.typeDropdown
+/// PlexInputWidgetType.typeDate
+/// PlexInputWidgetType.typeButton
 
 PlexInputWidget(
     title: "Username / Email",
     
-    type: PlexInputWidget.typeInput,
+    type: PlexInputWidgetType.typeInput,
     inputHint: "Enter Your Email or Username",
     inputController: usernameController,
     inputOnChange: (value) {},

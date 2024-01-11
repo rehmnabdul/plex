@@ -1,3 +1,16 @@
+## 0.3.17
+
+* Bug Fix in MultiSelection List
+
+## 0.3.16
+
+* Add two new types for `PlexInputWidget` first `PlexInputWidgetType.typeTime` and second is `PlexInputWidgetType.typeDateTime`
+* Highlight the selected menu in side rail in `PlexDashboardScreen`
+
+## 0.3.15
+
+* Update `Group Icon` in `PlexAdvanceDataTable`
+
 ## 0.3.14
 
 * Add `Group Columns` data in `PlexAdvanceDataTable`
@@ -45,7 +58,7 @@
 ## 0.3.4
 
 * Add `navigationRailBackgroundColor`, `navigationRailBottomWidgets`, `navigationRailTopWidgets`, `hideNavigationRailVersionInfo`, `hideNavigationRailLogo`, `hideNavigationRailLogoHeight`, `hideNavigationRailLogoWidth` in `PlexDashboardConfig`
-* Update Multiselect selection layout (`PlexInputWidget.typeMultiSelect`) for `PlexInputWidget`. Add `Chips` in selection view.
+* Update Multiselect selection layout (`PlexInputWidgetType.typeMultiSelect`) for `PlexInputWidget`. Add `Chips` in selection view.
 * Set `basePath` for `PlexNetworking` is optional.
 
 ## 0.3.3

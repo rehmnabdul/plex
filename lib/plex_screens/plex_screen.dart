@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:plex/plex_utils.dart';
 import 'package:plex/plex_utils/plex_messages.dart';
 import 'package:plex/plex_widget.dart';
 import 'package:plex/plex_widgets/plex_loader.dart';
@@ -37,11 +38,13 @@ abstract class PlexState<T extends PlexScreen> extends State<T> {
     );
   }
 
-  getNoOfTabs() => 0;
+  int getNoOfTabs() => 0;
+
+  TabBar? getTabBar() => null;
 
   @override
   Widget build(BuildContext context) {
-    var content = Scaffold(
+    return Scaffold(
       key: key,
       appBar: buildAppBar(),
       drawer: buildSideNavigation(),
@@ -49,7 +52,28 @@ abstract class PlexState<T extends PlexScreen> extends State<T> {
       body: SafeArea(
         child: Stack(
           children: [
-            buildBody(),
+            createWidget(() {
+              if (getNoOfTabs() > 0) {
+                if(getTabBar() == null) {
+                  throw Exception("Please override following methods:\n1. getTabBar()\n2. buildBody() must return TabBarView");
+                }
+                var body = buildBody();
+                if(body is! TabBarView) {
+                  throw Exception("buildBody() must return TabBarView if getTabBar() > 0");
+                }
+                return DefaultTabController(
+                  length: getNoOfTabs(),
+                  child: Column(
+                    children: [
+                      getTabBar()!,
+                      Expanded(child: body),
+                    ],
+                  ),
+                );
+              } else {
+                return buildBody();
+              }
+            }),
             PlexWidget(
               controller: _loadingController,
               createWidget: (context, data) {
@@ -68,17 +92,6 @@ abstract class PlexState<T extends PlexScreen> extends State<T> {
         ),
       ),
     );
-    Widget body;
-    if (getNoOfTabs() > 0) {
-      body = DefaultTabController(
-        length: getNoOfTabs(),
-        child: content,
-      );
-    } else {
-      body = content;
-    }
-
-    return body;
   }
 
   AppBar? buildAppBar() {

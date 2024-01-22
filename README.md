@@ -75,6 +75,7 @@ the resulting application meets the high standards of enterprise-level software.
 5. Free useful utilities
 6. Built in screens and pages
 7. Builtin form builder from model class
+8. Code Generation For Models i.e. `copy()` and `asString()` method generation.
 
 ## Getting started
 
@@ -255,7 +256,51 @@ var dateInString = DateTime.now().toFormattedString("hh:mm:ss a");
 var timeDifference = "20120227 13:27:00".toDate().getDifferenceString();
 ```
 
+-------------------------------------------------------------------------------------------
 
+### Code Generation
+
+Update your code like below:
+
+##### 1. Dependency
+   Add Dev Dependency in the `pubspec.yaml`
+```yaml
+dev_dependencies:
+  # Other Dev Dependencies
+  build_runner: 2.4.8
+  # Other Dev Dependencies
+```
+
+#### 2. Code Changes
+```dart
+import 'package:plex/plex_annotations/plex_annotations.dart';
+
+/// 1. Add part file path in the file, name of the file 
+///    must be same as your model class file
+part 'order.plex.dart';
+
+
+/// 2. Annotate the model class with [plexAnnotationModel]
+@plexAnnotationModel
+class Order {
+  late String name;
+  late String id;
+  late List<String> names;
+  late double amount;
+
+  /// 3. Create an empty constructor with no argument in the model
+  Order();
+}
+```
+
+#### 3. Terminal Command
+Run the following command in terminal of main directory of project
+
+```commandline
+flutter pub run build_runner build --delete-conflicting-outputs
+```
+
+-------------------------------------------------------------------------------------------
 
 ### Complete Example of Using PlexApp
 

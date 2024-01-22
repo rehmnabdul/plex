@@ -31,7 +31,7 @@ class PlexDataTableHeaderCell {
   late final Widget? cell;
 
   ///[columnName] is required as it is text only cell
-  PlexDataTableHeaderCell.text(this.columnName, {this.isNumber = false, this.widthMode = WidthMode.auto}){
+  PlexDataTableHeaderCell.text(this.columnName, {this.isNumber = false, this.widthMode = WidthMode.auto}) {
     cell = null;
   }
 
@@ -41,7 +41,7 @@ class PlexDataTableHeaderCell {
   PlexDataTableHeaderCell.custom(this.columnName, this.cell, {this.isNumber = false, this.widthMode = WidthMode.auto});
 
   ColumnWidthMode _getWidthMode() {
-    switch(widthMode) {
+    switch (widthMode) {
       case WidthMode.none:
         return ColumnWidthMode.none;
       case WidthMode.fitByColumnName:
@@ -177,8 +177,7 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
             spaceSmall(),
             Row(
               children: [
-                Text(widget.title, style: const TextStyle(fontWeight: FontWeight.bold)),
-                Expanded(child: Container()),
+                Expanded(child: Text(widget.title, style: const TextStyle(fontWeight: FontWeight.bold))),
                 if (widget.enableColumnGrouping) ...{
                   FilledButton.tonalIcon(
                     onPressed: () {
@@ -208,7 +207,7 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
                     },
                     style: ButtonStyle(backgroundColor: Colors.blue.shade100.getMaterialState(), elevation: Dim.smallest.getMaterialState()),
                     icon: Image.asset(groupData, height: 25, width: 25, color: Colors.blue),
-                    label: const Text('Group Columns', style: TextStyle(color: Colors.blue)),
+                    label: const Text('Group By', style: TextStyle(color: Colors.blue)),
                   ),
                 },
                 if (widget.enableExcelExport) ...{

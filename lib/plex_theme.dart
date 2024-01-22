@@ -25,19 +25,39 @@ class PlexTheme {
   }
 
   ///Check theme is dark or light
-  static bool isDarkMode() {
-    return PlexSp.instance.getBool("UseDarkMode") ?? false;
+  static bool isDarkMode(BuildContext context) {
+    var brightnessMode = getBrightnessMode();
+    if (brightnessMode == ThemeMode.system) {
+      brightnessMode = MediaQuery.of(context).platformBrightness == Brightness.light ? ThemeMode.light : ThemeMode.dark;
+    }
+    return brightnessMode == ThemeMode.dark;
   }
 
-  ///Set theme to dark
-  static void setDarkMode(bool value) {
-    PlexSp.instance.setBool("UseDarkMode", value);
+  ///Check theme is brightness
+  static ThemeMode getBrightnessMode() {
+    var themeMode = PlexSp.instance.getInt("UseBrightnessMode") ?? 0;
+    return themeMode == 0
+        ? ThemeMode.system
+        : themeMode == 1
+            ? ThemeMode.light
+            : ThemeMode.dark;
+  }
+
+  ///Set theme brightness
+  static void setBrightnessMode(ThemeMode value) {
+    PlexSp.instance.setInt(
+        "UseBrightnessMode",
+        value == ThemeMode.system
+            ? 0
+            : value == ThemeMode.light
+                ? 1
+                : 2);
   }
 
   ///Initial theme data for the app
-  static ThemeData getActiveTheme() => getThemeByBrightness(isDarkMode() ? Brightness.dark : Brightness.light);
+  static ThemeData getActiveTheme(BuildContext context) => getThemeByBrightness(isDarkMode(context) ? Brightness.dark : Brightness.light);
 
-  static TextTheme getTextTheme() => getActiveTheme().textTheme;
+  static TextTheme getTextTheme(BuildContext context) => getActiveTheme(context).textTheme;
 
   static ThemeData getThemeByBrightness(Brightness brightness) {
     var colorSchemeSeed = brightness == Brightness.dark
@@ -52,7 +72,7 @@ class PlexTheme {
             : PlexApp.app.imageColorScheme;
     Color? textColor = Brightness.dark == brightness ? Colors.white : null;
 
-    if(PlexTheme.appTheme != null) {
+    if (PlexTheme.appTheme != null) {
       return PlexTheme.appTheme!;
     }
 

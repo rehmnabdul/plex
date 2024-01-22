@@ -1,3 +1,8 @@
+## 0.3.18
+
+* Add Brightness Mode option as `System`, `Light` and `Dark`
+* Add auto code generation for model. Add part `part '{modelName}.plex.dart';` and annotation `@plexAnnotationModel` and run command in terminal `flutter pub run build_runner build --delete-conflicting-outputs`. It will create `copy()` and `asString()` function automatically for you.
+
 ## 0.3.17
 
 * Bug Fix in MultiSelection List

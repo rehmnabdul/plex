@@ -8,6 +8,9 @@ import 'package:plex/plex_utils/plex_printer.dart';
 import 'package:plex/plex_widgets/plex_input_widget.dart';
 import 'package:plex/plex_widgets/plex_shimmer.dart';
 
+/// [PlexDataCell] class is deprecated and should no longer be used.
+/// Please use [PlexDataTableHeaderCell], [PlexDataTableValueCell] instead
+@Deprecated("Use PlexDataTableHeaderCell, PlexDataTableValueCell instead")
 class PlexDataCell {
   late final bool isNumber;
   late final dynamic value;
@@ -29,7 +32,11 @@ class PlexDataCell {
   }
 }
 
+/// [PlexDataTable] class is deprecated and should no longer be used.
+/// Please use [PlexAdvanceDataTable] instead
+@Deprecated("Use PlexAdvanceDataTable instead")
 class PlexDataTable extends StatefulWidget {
+
   PlexDataTable({
     Key? key,
     required this.columns,

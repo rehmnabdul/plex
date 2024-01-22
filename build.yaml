@@ -1,0 +1,14 @@
+targets:
+  $default:
+    builders:
+      plex:
+        enabled: true
+
+builders:
+  plex:
+    import: "package:plex/plex_annotations/plex_builders/plex_annotation_builders.dart"
+    builder_factories: ["generateJsonClass"]
+    build_extensions: { ".dart": [".plex.dart"] }
+    auto_apply: dependents
+    build_to: source
+    applies_builders: ["source_gen|combining_builder"]

@@ -1,7 +1,7 @@
 name: plex
 description: PLEX is Flutter UI framework for enterprise apps with pre-built components and best practices for efficient development in addition with many built in widgets
 
-version: 0.3.17
+version: 0.3.18
 homepage: https://github.com/rehmnabdul/plex
 
 environment:
@@ -13,37 +13,42 @@ dependencies:
     sdk: flutter
 
   #Navigation
-  get: ^4.6.5
+  get: ^4.6.6
 
   #Path
-  path_provider: ^2.1.1
+  path_provider: ^2.1.2
 
   #Storage
   shared_preferences: ^2.2.2
 
   #Networking
-  http: ^1.1.2
+  http: ^1.2.0
   cached_network_image: ^3.3.1
 
   #Utils
-  intl: ^0.18.0
+  intl: ^0.19.0
 
   #Animations
-  flutter_animate: ^4.3.0
+  flutter_animate: ^4.4.0
 
   #Table
-  syncfusion_flutter_core: ^24.1.45
-  syncfusion_flutter_datagrid: ^24.1.45
-  syncfusion_flutter_datagrid_export: ^24.1.45
+  syncfusion_flutter_core: ^24.1.46
+  syncfusion_flutter_datagrid: ^24.1.46
+  syncfusion_flutter_datagrid_export: ^24.1.46
 
   #Print Excel File
-  syncfusion_flutter_xlsio: ^24.1.45
+  syncfusion_flutter_xlsio: ^24.1.46
   file_saver: ^0.2.9
+
+  #Code Builder
+  build: ^2.4.1
+  source_gen: ^1.5.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^3.0.1
+  build_runner: 2.4.8
 
 flutter:
 

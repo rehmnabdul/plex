@@ -1,4 +1,4 @@
-// ignore_for_file: must_be_immutable
+// ignore_for_file: must_be_immutable, use_build_context_synchronously
 
 library plex;
 
@@ -153,8 +153,8 @@ class PlexApp extends StatefulWidget {
 
   //Public Methods and Variables
   ///Get AppLogo Based on Brightness Mode of Theme
-  Widget getLogo() {
-    return (PlexTheme.isDarkMode() ? appInfo.appLogoDark : appInfo.appLogo) ?? appInfo.appLogo;
+  Widget getLogo(BuildContext context) {
+    return (PlexTheme.isDarkMode(context) ? appInfo.appLogoDark : appInfo.appLogo) ?? appInfo.appLogo;
   }
 
   ///Check the user is logged into the app or not
@@ -187,7 +187,7 @@ class PlexApp extends StatefulWidget {
   void showAboutDialogue(BuildContext context) {
     showAboutDialog(
       context: context,
-      applicationIcon: SizedBox(width: 50, height: 50, child: PlexApp.app.getLogo()),
+      applicationIcon: SizedBox(width: 50, height: 50, child: PlexApp.app.getLogo(context)),
       applicationName: PlexApp.app.appInfo.title,
       applicationVersion: PlexApp.app.appInfo.versionName,
       routeSettings: const RouteSettings(name: "/about"),
@@ -203,10 +203,10 @@ class _PlexAppState extends State<PlexApp> {
   var themeMode = ThemeMode.light;
 
   ///This method will use bool to switch between light and dark mode
-  void handleBrightnessChange(bool useDarkMode) {
+  void handleBrightnessChange(ThemeMode themeMode) {
     setState(() {
-      themeMode = useDarkMode ? ThemeMode.dark : ThemeMode.light;
-      PlexTheme.setDarkMode(useDarkMode);
+      this.themeMode = themeMode;
+      PlexTheme.setBrightnessMode(themeMode);
     });
   }
 
@@ -229,7 +229,7 @@ class _PlexAppState extends State<PlexApp> {
           widget.imageColorScheme = await ColorScheme.fromImageProvider(provider: widget.themeFromImage!);
         }
         useMaterial3 = PlexTheme.isMaterial3();
-        themeMode = PlexTheme.isDarkMode() ? ThemeMode.dark : ThemeMode.light;
+        themeMode = PlexTheme.isDarkMode(context) ? ThemeMode.dark : ThemeMode.light;
         widget.onInitializationComplete?.call();
         setState(() {
           _initialized = true;

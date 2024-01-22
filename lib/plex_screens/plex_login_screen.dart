@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:plex/plex_package.dart';
 import 'package:plex/plex_screens/plex_screen.dart';
 import 'package:plex/plex_sp.dart';
@@ -78,7 +77,7 @@ class _PlexLoginScreenState extends PlexState<PlexLoginScreen> {
                 },
                 SizedBox(
                   height: 100,
-                  child: PlexApp.app.getLogo(),
+                  child: PlexApp.app.getLogo(context),
                 ),
                 spaceMedium(),
                 PlexInputWidget(

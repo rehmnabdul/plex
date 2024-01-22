@@ -117,8 +117,8 @@ void main() async {
           PlexDataTableValueCell.text("First", "First $a"),
           PlexDataTableValueCell.text("Last", "Last $a"),
           PlexDataTableValueCell.text("EmpCode", "EMP$a"),
-          PlexDataTableValueCell.text("Designation", "Engineer ${Random().nextInt(10)+1}"),
-          PlexDataTableValueCell.text("Grade", "Scale ${Random().nextInt(5)+1}"),
+          PlexDataTableValueCell.text("Designation", "Engineer ${Random().nextInt(10) + 1}"),
+          PlexDataTableValueCell.text("Grade", "Scale ${Random().nextInt(5) + 1}"),
           PlexDataTableValueCell.text("Company", "Company Name $a"),
         ],
       );
@@ -214,7 +214,7 @@ void main() async {
               getTableData();
             },
             headerTextStyle: const TextStyle(fontWeight: FontWeight.bold),
-            headerBackground: PlexTheme.getActiveTheme().primaryColor,
+            headerBackground: PlexTheme.getActiveTheme(context).primaryColor,
             border: TableBorder.all(color: Colors.black12),
             columns: [
               PlexDataCell.text("Id"),

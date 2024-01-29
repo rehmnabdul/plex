@@ -17,7 +17,7 @@ enum PlexInputWidgetType {
 // ignore: must_be_immutable
 class PlexInputWidget<T> extends StatefulWidget {
   PlexInputWidget({
-    Key? key,
+    super.key,
     this.title,
     required this.type,
     this.useMargin = true,
@@ -46,7 +46,7 @@ class PlexInputWidget<T> extends StatefulWidget {
     this.buttonColor,
     this.buttonIcon,
     this.buttonClick,
-  }) : super(key: key);
+  });
 
   final String? title;
   final PlexInputWidgetType type;
@@ -223,6 +223,7 @@ class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
                       onTap: () {
                         if (!widget.editable) return;
                         if (widget.editable == false) return;
+                        // ignore: missing_enum_constant_in_switch
                         switch (widget.type) {
                           case PlexInputWidgetType.typeDate:
                             {

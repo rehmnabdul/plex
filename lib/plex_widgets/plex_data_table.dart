@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously, must_be_immutable
+// ignore_for_file: use_build_context_synchronously, must_be_immutable, deprecated_member_use_from_same_package
 
 import 'package:flutter/material.dart';
 import 'package:plex/plex_utils/plex_dimensions.dart';

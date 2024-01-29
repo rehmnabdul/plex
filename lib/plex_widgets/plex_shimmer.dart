@@ -24,7 +24,7 @@ enum PlexShimmerDirection {
 class PlexShimmer extends StatefulWidget {
   /// [PlexShimmer] shows shimmer effect.
   const PlexShimmer({
-    Key? key,
+    super.key,
     required this.child,
     this.gradient,
     this.direction = PlexShimmerDirection.leftToRight,
@@ -34,7 +34,7 @@ class PlexShimmer extends StatefulWidget {
     this.showGradient = false,
     this.mainColor = Colors.grey,
     this.secondaryColor = const Color(0xffE0E0E0),
-  }) : super(key: key);
+  });
 
   /// The child of type [Widget] to display shimmer effect.
   final Widget child;
@@ -134,12 +134,12 @@ class PlexShimmerState extends State<PlexShimmer> with SingleTickerProviderState
 @immutable
 class _PlexShimmer extends SingleChildRenderObjectWidget {
   const _PlexShimmer({
-    Widget? child,
+    super.child,
     this.controllerValue,
     this.direction,
     this.gradient,
     this.showShimmerEffect,
-  }) : super(child: child);
+  });
 
   /// value that controls the animation controller
   final double? controllerValue;

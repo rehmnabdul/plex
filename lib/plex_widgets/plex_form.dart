@@ -80,7 +80,7 @@ class PlexFormField {
 }
 
 class PlexFormWidget<T> extends StatefulWidget {
-  const PlexFormWidget({Key? key, required this.entity, required this.onSubmit}) : super(key: key);
+  const PlexFormWidget({super.key, required this.entity, required this.onSubmit});
 
   final PlexForm entity;
   final void Function(T entity) onSubmit;

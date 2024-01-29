@@ -321,15 +321,25 @@ class Model {
 /// Inject Singleton Object
 injectSingleton(Model(1, "Singleton Model"), "singleton_model");
 
+/// Inject Singleton Object Lazy
+injectSingletonLazy((parm) => const Model(1, parm["title"]), "singleton_model");
+
 /// Inject Factory Object that will be created everytime
-injectFactory(() => Model(2, "Factory Model"), "factory_model");
+injectFactory((parm) => Model(2, parm["title"]), "factory_model");
 ```
 
 ##### 2. Get Dependencies
 ```dart
+///Get the SINGLETON model like this
 var singletonModel = fromPlex<Model>("singleton_model");
 
-var factoryModel = fromPlex<Model>("factory_model");
+///Get the LAZY SINGLETON model like this
+///With optional {parm} to be used by builder
+var singletonModelLazy = fromPlex<Model>("singleton_model", parm: { "title": "Test Model"});
+
+///Get the Factory model like this
+///With optional {parm} to be used by builder 
+var factoryModel = fromPlex<Model>("factory_model", parm: { "title": "Test Model"});
 ```
 
 -------------------------------------------------------------------------------------------

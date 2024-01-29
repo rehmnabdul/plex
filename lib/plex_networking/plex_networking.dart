@@ -73,7 +73,7 @@ class PlexNetworking {
 
   _isValidUrl(String url) {
     try {
-      return Uri.parse(url).scheme.length > 0;
+      return Uri.parse(url).scheme.isNotEmpty;
     } catch (e) {
       return false;
     }

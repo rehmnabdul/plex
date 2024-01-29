@@ -1,11 +1,12 @@
 ## 0.3.19
 
-* Add Dependency Injection in `plex`. Inject any dependency by `injectSingelton({object}, tag: 'onyTag')` or by `injectFactory(() => object, tag: 'anyTag')` and get it anywhere by `var obj = fromPlex<Type>('tagName')`
-* You can now show,hide and check loading on dashboard screen by using `PlexApp.app.showDashboardLoading()`, `PlexApp.app.hideDashboardLoading()` and `PlexApp.app.isDashboardLoading()` respectively.
-
+* Update Dependency Injection: `injectFactory((parm) => object, tag: 'anyTag')` and get it anywhere by `var obj = fromPlex<Type>('tagName', parm: null)`
+* Add new builder DI for singleton: `injectSingeltonLazy((parm) => object, tag: 'anyTag')`
 
 ## 0.3.18
 
+* Add Dependency Injection in `plex`. Inject any dependency by `injectSingelton({object}, tag: 'anyTag')` or by `injectFactory(() => object, tag: 'anyTag')` and get it anywhere by `var obj = fromPlex<Type>('tagName')`
+* You can now show,hide and check loading on dashboard screen by using `PlexApp.app.showDashboardLoading()`, `PlexApp.app.hideDashboardLoading()` and `PlexApp.app.isDashboardLoading()` respectively.
 * Add Brightness Mode option as `System`, `Light` and `Dark`
 * Add auto code generation for model. Add part `part '{modelName}.plex.dart';` and annotation `@plexAnnotationModel` and run command in terminal `flutter pub run build_runner build --delete-conflicting-outputs`. It will create `copy()` and `asString()` function automatically for you.
 

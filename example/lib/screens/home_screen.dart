@@ -78,7 +78,9 @@ class _FormUsageScreenState extends PlexState<FormUsageScreen> {
     var myUser = MyUser("Abdur", "Rahman", 5, DateTime.now(), true, "Pak", [1]);
     print(myUser.toString());
 
-    var user = fromPlex<MyUser>("user");
+    var user = fromPlex<MyUser>("user", parm: {
+      "title": "Test Title"
+    });
 
     return PlexFormWidget<MyUser>(
       entity: myUser,

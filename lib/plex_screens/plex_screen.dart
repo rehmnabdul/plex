@@ -5,7 +5,7 @@ import 'package:plex/plex_widget.dart';
 import 'package:plex/plex_widgets/plex_loader.dart';
 
 abstract class PlexScreen extends StatefulWidget {
-  const PlexScreen({Key? key}) : super(key: key);
+  const PlexScreen({super.key});
 }
 
 abstract class PlexState<T extends PlexScreen> extends State<T> {

@@ -133,7 +133,7 @@ void main() async {
   // );
 
   injectSingleton(MyUser("firstName", "lastName", 5, DateTime.now(), true, "object", [1, 2, 4]), "user");
-  injectFactory(() => const FormUsageScreen(), "form");
+  injectFactory((_) => const FormUsageScreen(), "form");
 
   runApp(PlexApp(
     ///Setting Theme Second Method : Theme By Color

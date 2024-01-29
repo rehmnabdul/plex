@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously, must_be_immutable
+// ignore_for_file: use_build_context_synchronously, must_be_immutable, deprecated_member_use_from_same_package
 import 'package:flutter/material.dart';
 import 'package:plex/plex_utils/plex_dimensions.dart';
 import 'package:plex/plex_utils/plex_material.dart';
@@ -128,7 +128,7 @@ class PlexDataTableWithPagesState extends State<PlexDataTableWithPages> {
       data = data.where((r) {
         var isOk = false;
         for (var colIndex in searchIndexes) {
-          if ((r[colIndex].value.toString() ?? "").toLowerCase().contains(searchController.text.toLowerCase())) {
+          if ((r[colIndex].value.toString()).toLowerCase().contains(searchController.text.toLowerCase())) {
             isOk = true;
             break;
           }
@@ -280,7 +280,7 @@ class _PaginationDataTableSource extends DataTableSource {
       cells: [
         ...data.map(
           (data) => DataCell(
-            data.cell?.child ?? Text(data.value.toString() ?? "N/A"),
+            data.cell?.child ?? Text(data.value.toString()),
             onTap: data.cell?.onTap ??
                 () {
                   if (enableCopy) {

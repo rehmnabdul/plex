@@ -5,7 +5,7 @@ import 'package:plex/plex_utils/plex_dimensions.dart';
 typedef OnDateSelected = Function(DateTime? dateTime);
 
 class PlexDatePickerWidget extends StatefulWidget {
-  const PlexDatePickerWidget({Key? key, required this.onDateSelected, required this.startDate, this.enabled = true, this.removePadding = false}) : super(key: key);
+  const PlexDatePickerWidget({super.key, required this.onDateSelected, required this.startDate, this.enabled = true, this.removePadding = false});
 
   final DateTime? startDate;
   final bool? enabled;

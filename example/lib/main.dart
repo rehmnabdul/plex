@@ -2,10 +2,10 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:plex/plex_di/plex_dependency_injection.dart';
 import 'package:plex/plex_networking/plex_networking.dart';
 import 'package:plex/plex_package.dart';
 import 'package:plex/plex_route.dart';
-import 'package:plex/plex_screens/plex_dashboard_screen.dart';
 import 'package:plex/plex_screens/plex_login_screen.dart';
 import 'package:plex/plex_theme.dart';
 import 'package:plex/plex_user.dart';
@@ -132,6 +132,9 @@ void main() async {
   //   colorSchemeSeed: const Color(0xFF26A9E1),
   // );
 
+  injectSingleton(MyUser("firstName", "lastName", 5, DateTime.now(), true, "object", [1, 2, 4]), "user");
+  injectFactory(() => const FormUsageScreen(), "form");
+
   runApp(PlexApp(
     ///Setting Theme Second Method : Theme By Color
     themeFromColor: const Color(0xFF26A9E1),
@@ -171,26 +174,30 @@ void main() async {
       showBrightnessSwitch: true,
       showMaterialSwitch: true,
       // navigationRailBackgroundColor: Colors.green.shade900,
-      navigationRailBottomWidgets: (context) => [
+      navigationRailBottomWidgets: (state, context) => [
         const Text("Bottom Widget"),
       ],
-      navigationRailTopWidgets: (context) => [
+      navigationRailTopWidgets: (state, context) => [
         const Text("Top Widget"),
       ],
       hideNavigationRailVersionInfo: false,
       hideNavigationRailLogo: false,
       hideNavigationRailLogoHeight: 100,
       hideNavigationRailLogoWidth: 200,
-      appbarActions: (context) => [
+      appbarActions: (state, context) => [
         MenuItemButton(
-          leadingIcon: const Icon(Icons.abc_outlined),
-          child: const Text("ABC"),
-          onPressed: () {},
+          leadingIcon: const Icon(Icons.downloading),
+          child: const Text("Show Dashboard Loading"),
+          onPressed: () {
+            if (!PlexApp.app.isDashboardLoading()) PlexApp.app.showDashboardLoading();
+          },
         ),
         MenuItemButton(
-          leadingIcon: const Icon(Icons.account_tree_outlined),
-          child: const Text("Tree"),
-          onPressed: () {},
+          leadingIcon: const Icon(Icons.clear),
+          child: const Text("Hide Dashboard Loading"),
+          onPressed: () {
+            PlexApp.app.hideDashboardLoading();
+          },
         ),
         MenuItemButton(
           leadingIcon: const Icon(Icons.account_balance_outlined),

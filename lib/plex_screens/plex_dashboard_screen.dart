@@ -1,13 +1,4 @@
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/material.dart';
-import 'package:plex/plex_package.dart';
-import 'package:plex/plex_route.dart';
-import 'package:plex/plex_screens/plex_screen.dart';
-import 'package:plex/plex_theme.dart';
-import 'package:plex/plex_user.dart';
-import 'package:plex/plex_utils.dart';
-import 'package:plex/plex_utils/plex_dimensions.dart';
-import 'package:plex/plex_utils/plex_widgets.dart';
+part of '../plex_package.dart';
 
 class PlexDashboardConfig {
   PlexDashboardConfig({
@@ -50,15 +41,15 @@ class PlexDashboardConfig {
   final bool disableBottomNavigation;
 
   ///This [appbarActions] will be available on top right submenu link
-  final List<MenuItemButton> Function(BuildContext context)? appbarActions;
+  final List<MenuItemButton> Function(PlexState<PlexScreen> state, BuildContext context)? appbarActions;
 
   final Color? navigationRailBackgroundColor;
   final bool hideNavigationRailLogo;
   final double hideNavigationRailLogoWidth;
   final double hideNavigationRailLogoHeight;
   final bool hideNavigationRailVersionInfo;
-  final List<Widget> Function(BuildContext context)? navigationRailTopWidgets;
-  final List<Widget> Function(BuildContext context)? navigationRailBottomWidgets;
+  final List<Widget> Function(PlexState<PlexScreen> state, BuildContext context)? navigationRailTopWidgets;
+  final List<Widget> Function(PlexState<PlexScreen> state, BuildContext context)? navigationRailBottomWidgets;
 
   ///Navigate to other screen present in Dashboard Screen
   void navigateOnDashboard(int index) {
@@ -96,6 +87,10 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
     }
     super.initState();
 
+    PlexApp.app._loadingDelegate = (isLoading) {
+      isLoading ? showLoading() : hideLoading();
+    };
+    PlexApp.app._isLoadingDelegate = () => isLoading();
     routes = PlexApp.app.dashboardConfig?.dashboardScreens ?? List.empty(growable: true);
     routes = routes.where((element) {
       if (element.rule == null) return true;
@@ -116,6 +111,13 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
         navigationSelectedIndex = index;
       });
     };
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    PlexApp.app._loadingDelegate = null;
+    PlexApp.app._isLoadingDelegate = null;
   }
 
   @override
@@ -294,7 +296,7 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
                 child: const Text('Theme'),
               ),
             },
-            ...?PlexApp.app.dashboardConfig!.appbarActions?.call(context),
+            ...?PlexApp.app.dashboardConfig!.appbarActions?.call(this, context),
             if (PlexApp.app.useAuthorization) ...[
               MenuItemButton(
                 onPressed: () {
@@ -502,14 +504,14 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
                                     Text("${PlexApp.app.appInfo.versionName}"),
                                     spaceSmall(),
                                   ],
-                                  ...?PlexApp.app.dashboardConfig!.navigationRailTopWidgets?.call(context),
+                                  ...?PlexApp.app.dashboardConfig!.navigationRailTopWidgets?.call(this, context),
                                   spaceSmall(),
                                 ],
                               ),
                             ),
                             trailing: Column(
                               children: [
-                                ...?PlexApp.app.dashboardConfig?.navigationRailBottomWidgets?.call(context),
+                                ...?PlexApp.app.dashboardConfig?.navigationRailBottomWidgets?.call(this, context),
                                 spaceMedium(),
                               ],
                             ),
@@ -543,12 +545,9 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
         }
       ],
     );
-    return PopScope(
-      canPop: false,
-      child: Padding(
-        padding: const EdgeInsets.all(Dim.medium),
-        child: body,
-      ),
+    return Padding(
+      padding: const EdgeInsets.all(Dim.medium),
+      child: body,
     );
   }
 }

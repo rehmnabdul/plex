@@ -28,7 +28,7 @@ class PlexLoginConfig {
 }
 
 class PlexLoginScreen extends PlexScreen {
-  const PlexLoginScreen({Key? key, required this.loginConfig, required this.nextRoute}) : super(key: key);
+  const PlexLoginScreen({super.key, required this.loginConfig, required this.nextRoute});
 
   final String nextRoute;
   final PlexLoginConfig loginConfig;
@@ -131,6 +131,4 @@ class _PlexLoginScreenState extends PlexState<PlexLoginScreen> {
       ),
     );
   }
-
-  onLogin(String username, String password) async {}
 }

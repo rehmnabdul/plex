@@ -138,7 +138,7 @@ abstract class PlexState<T extends PlexScreen> extends State<T> {
   }
 
   hideLoading() {
-    _loadingCount--;
+    if(_loadingCount > 0) _loadingCount--;
     if (!mounted) return;
     _loadingController.setValue(_loadingCount > 0);
   }

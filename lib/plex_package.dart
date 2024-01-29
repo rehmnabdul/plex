@@ -3,23 +3,23 @@
 library plex;
 
 import 'dart:convert';
-import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:plex/plex_networking/plex_networking.dart';
 import 'package:plex/plex_route.dart';
-import 'package:plex/plex_screens/plex_dashboard_screen.dart';
 import 'package:plex/plex_screens/plex_login_screen.dart';
+import 'package:plex/plex_screens/plex_screen.dart';
 import 'package:plex/plex_scrollview.dart';
 import 'package:plex/plex_sp.dart';
 import 'package:plex/plex_theme.dart';
 import 'package:plex/plex_user.dart';
+import 'package:plex/plex_utils.dart';
 import 'package:plex/plex_utils/plex_dimensions.dart';
 import 'package:plex/plex_utils/plex_routing.dart';
-import 'package:plex/plex_utils/plex_utils.dart';
-import 'package:plex/plex_widget.dart';
-import 'package:plex/plex_widgets/plex_input_widget.dart';
+import 'package:plex/plex_utils/plex_widgets.dart';
+
+part 'plex_screens/plex_dashboard_screen.dart';
 
 class PlexAppInfo {
   PlexAppInfo({
@@ -110,6 +110,9 @@ class PlexApp extends StatefulWidget {
   ///This is a the app instance to access public variable of app anywhere in the applicaiton.
   static late PlexApp app;
 
+  Function(bool isLoading)? _loadingDelegate;
+  bool Function()? _isLoadingDelegate;
+
   PlexApp({
     super.key,
     required this.appInfo,
@@ -149,7 +152,9 @@ class PlexApp extends StatefulWidget {
   }
 
   @override
-  State<PlexApp> createState() => _PlexAppState();
+  State<PlexApp> createState() {
+    return _PlexAppState();
+  }
 
   //Public Methods and Variables
   ///Get AppLogo Based on Brightness Mode of Theme
@@ -177,11 +182,24 @@ class PlexApp extends StatefulWidget {
     }
   }
 
-  ///Logout the user and move user to the signin screen
+  ///Logout the user and move user to the sign-in screen
   logout() {
     PlexSp.instance.setString(PlexSp.loggedInUser, null);
     Plex.offAndToNamed(PlexRoutesPaths.loginPath);
     onLogout?.call();
+  }
+
+  ///Check Dashboard Screen Is Loading if Available and Visible
+  bool isDashboardLoading() => _isLoadingDelegate?.call() ?? false;
+
+  ///Show loading on Dashboard Screen If Available and Visible
+  showDashboardLoading() {
+    _loadingDelegate?.call(true);
+  }
+
+  ///Hide loading on Dashboard Screen If Available and Visible
+  hideDashboardLoading() {
+    _loadingDelegate?.call(false);
   }
 
   void showAboutDialogue(BuildContext context) {
@@ -281,7 +299,7 @@ class _PlexAppState extends State<PlexApp> {
         page: () => widget.unknownRoute?.screen.call(context) ?? const Scaffold(body: Center(child: Text("Page not found: 404"))),
       ),
       routes: {
-        "/": (_) => const Scaffold(body: Center(child: Text("Page not found: 404"))),
+        // "/": (_) => const Scaffold(body: Center(child: Text("Page not found: 404"))),
         if (widget.useAuthorization) ...{
           PlexRoutesPaths.loginPath: (_) => PlexLoginScreen(loginConfig: widget.loginConfig!, nextRoute: widget.appInfo.initialRoute),
         },

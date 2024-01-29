@@ -1,3 +1,9 @@
+## 0.3.19
+
+* Add Dependency Injection in `plex`. Inject any dependency by `injectSingelton({object}, tag: 'onyTag')` or by `injectFactory(() => object, tag: 'anyTag')` and get it anywhere by `var obj = fromPlex<Type>('tagName')`
+* You can now show,hide and check loading on dashboard screen by using `PlexApp.app.showDashboardLoading()`, `PlexApp.app.hideDashboardLoading()` and `PlexApp.app.isDashboardLoading()` respectively.
+
+
 ## 0.3.18
 
 * Add Brightness Mode option as `System`, `Light` and `Dark`

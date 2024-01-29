@@ -24,8 +24,9 @@ class PlexModelVisitor extends SimpleElementVisitor<void> {
   List<PlexMethodModel> methods = [];
   List<PlexMethodModel> constructors = [];
 
-  allFieldsConstructorExists() => constructors.any((c) => c.parameters.length == fields.length);
-  emptyConstructorExists() => constructors.any((c) => c.parameters.isEmpty);
+  bool allFieldsConstructorExists() => constructors.any((c) => c.parameters.length == fields.length);
+
+  bool emptyConstructorExists() => constructors.any((c) => c.parameters.isEmpty);
 
   @override
   void visitConstructorElement(ConstructorElement element) {

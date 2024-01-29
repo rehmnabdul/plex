@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:plex/plex_di/plex_dependency_injection.dart';
 import 'package:plex/plex_screens/plex_screen.dart';
 import 'package:plex/plex_utils/plex_dimensions.dart';
 import 'package:plex/plex_widgets/plex_form.dart';
@@ -76,6 +77,8 @@ class _FormUsageScreenState extends PlexState<FormUsageScreen> {
   Widget buildBody() {
     var myUser = MyUser("Abdur", "Rahman", 5, DateTime.now(), true, "Pak", [1]);
     print(myUser.toString());
+
+    var user = fromPlex<MyUser>("user");
 
     return PlexFormWidget<MyUser>(
       entity: myUser,

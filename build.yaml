@@ -6,8 +6,8 @@ targets:
 
 builders:
   plex:
-    import: "package:plex/plex_annotations/plex_builders/plex_annotation_builders.dart"
-    builder_factories: ["generateJsonClass"]
+    import: "package:plex/plex_annotations/plex_annotation_builders/plex_annotation_builders.dart"
+    builder_factories: ["generateModel"]
     build_extensions: { ".dart": [".plex.dart"] }
     auto_apply: dependents
     build_to: source

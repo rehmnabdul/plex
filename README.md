@@ -76,6 +76,7 @@ the resulting application meets the high standards of enterprise-level software.
 6. Built in screens and pages
 7. Builtin form builder from model class
 8. Code Generation For Models i.e. `copy()` and `asString()` method generation.
+9. Dependency Injection based on TAGs.
 
 ## Getting started
 
@@ -298,6 +299,37 @@ Run the following command in terminal of main directory of project
 
 ```commandline
 flutter pub run build_runner build --delete-conflicting-outputs
+```
+
+-------------------------------------------------------------------------------------------
+
+
+### Dependency Injection
+
+You can use dependency injection as below:
+
+##### 1. Inject Dependencies
+```dart
+///Test Model Class
+class Model {
+  int modelId;
+  String modelTitle;
+  
+  const Model(this.modelId, this.modelTitle);
+}
+
+/// Inject Singleton Object
+injectSingleton(Model(1, "Singleton Model"), "singleton_model");
+
+/// Inject Factory Object that will be created everytime
+injectFactory(() => Model(2, "Factory Model"), "factory_model");
+```
+
+##### 2. Get Dependencies
+```dart
+var singletonModel = fromPlex<Model>("singleton_model");
+
+var factoryModel = fromPlex<Model>("factory_model");
 ```
 
 -------------------------------------------------------------------------------------------

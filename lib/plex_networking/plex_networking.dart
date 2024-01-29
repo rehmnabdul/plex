@@ -72,9 +72,9 @@ class PlexNetworking {
   Future<Map<String, String>> Function()? addHeaders;
 
   _isValidUrl(String url) {
-    try{
+    try {
       return Uri.parse(url).scheme.length > 0;
-    } catch(e){
+    } catch (e) {
       return false;
     }
   }

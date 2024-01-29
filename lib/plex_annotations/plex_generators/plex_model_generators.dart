@@ -35,7 +35,7 @@ class PlexModelGenerator extends GeneratorForAnnotation<PlexAnnotationModel> {
     buffer.writeln('  $className copy() {');
     buffer.writeln('\n');
     buffer.writeln('    var copyObj = $className();');
-    for(var field in visitor.fields) {
+    for (var field in visitor.fields) {
       buffer.writeln('    copyObj.${field.name} = ${field.name};');
     }
     buffer.writeln('    return copyObj;');

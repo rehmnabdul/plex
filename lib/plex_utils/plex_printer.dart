@@ -5,7 +5,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:plex/plex_widgets/plex_data_table.dart';
 import 'package:syncfusion_flutter_xlsio/xlsio.dart';
 
 class PlexPrinter {

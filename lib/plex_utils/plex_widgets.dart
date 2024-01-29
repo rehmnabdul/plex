@@ -20,7 +20,7 @@ extension WidgetsUtils on Widget {
     return isPlexAnimationsEnable()
         ? animate(
             onPlay: (controller) {
-              if(repeat) controller.repeat(reverse: true);
+              if (repeat) controller.repeat(reverse: true);
             },
           ).scale(duration: Duration(milliseconds: durationMillis))
         : this;

@@ -54,11 +54,11 @@ abstract class PlexState<T extends PlexScreen> extends State<T> {
           children: [
             createWidget(() {
               if (getNoOfTabs() > 0) {
-                if(getTabBar() == null) {
+                if (getTabBar() == null) {
                   throw Exception("Please override following methods:\n1. getTabBar()\n2. buildBody() must return TabBarView");
                 }
                 var body = buildBody();
-                if(body is! TabBarView) {
+                if (body is! TabBarView) {
                   throw Exception("buildBody() must return TabBarView if getTabBar() > 0");
                 }
                 return DefaultTabController(
@@ -138,7 +138,7 @@ abstract class PlexState<T extends PlexScreen> extends State<T> {
   }
 
   hideLoading() {
-    if(_loadingCount > 0) _loadingCount--;
+    if (_loadingCount > 0) _loadingCount--;
     if (!mounted) return;
     _loadingController.setValue(_loadingCount > 0);
   }

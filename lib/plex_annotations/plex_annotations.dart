@@ -1,4 +1,3 @@
-
 class PlexAnnotationModel {
   const PlexAnnotationModel();
 }

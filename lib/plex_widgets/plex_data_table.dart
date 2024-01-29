@@ -36,7 +36,6 @@ class PlexDataCell {
 /// Please use [PlexAdvanceDataTable] instead
 @Deprecated("Use PlexAdvanceDataTable instead")
 class PlexDataTable extends StatefulWidget {
-
   PlexDataTable({
     Key? key,
     required this.columns,
@@ -115,17 +114,17 @@ class _PlexDataTableState extends State<PlexDataTable> {
       var value1 = !r1[sortColumnIndex!].isNumber
           ? r1[sortColumnIndex!].value
           : ((r1[sortColumnIndex!].value is int?)
-          ? r1[sortColumnIndex!].value as int?
-          : (r1[sortColumnIndex!].value is double?)
-          ? r1[sortColumnIndex!].value as double?
-          : null);
+              ? r1[sortColumnIndex!].value as int?
+              : (r1[sortColumnIndex!].value is double?)
+                  ? r1[sortColumnIndex!].value as double?
+                  : null);
       var value2 = !r2[sortColumnIndex!].isNumber
           ? r2[sortColumnIndex!].value
           : ((r2[sortColumnIndex!].value is int?)
-          ? r2[sortColumnIndex!].value as int?
-          : (r2[sortColumnIndex!].value is double?)
-          ? r2[sortColumnIndex!].value as double?
-          : null);
+              ? r2[sortColumnIndex!].value as int?
+              : (r2[sortColumnIndex!].value is double?)
+                  ? r2[sortColumnIndex!].value as double?
+                  : null);
       try {
         if (sortAscending) {
           return (value1).compareTo(value2);
@@ -203,15 +202,15 @@ class _PlexDataTableState extends State<PlexDataTable> {
                   Expanded(
                     child: widget.enableSearch
                         ? PlexInputWidget(
-                      margin: EdgeInsets.zero,
-                      type: PlexInputWidgetType.typeInput,
-                      inputController: searchController,
-                      title: "Search...",
-                      inputHint: "Type here to search whole data...",
-                      inputOnChange: (value) {
-                        filterData();
-                      },
-                    )
+                            margin: EdgeInsets.zero,
+                            type: PlexInputWidgetType.typeInput,
+                            inputController: searchController,
+                            title: "Search...",
+                            inputHint: "Type here to search whole data...",
+                            inputOnChange: (value) {
+                              filterData();
+                            },
+                          )
                         : Container(),
                   ),
                   if (widget.onRefresh != null) ...{
@@ -256,70 +255,63 @@ class _PlexDataTableState extends State<PlexDataTable> {
               sortAscending: sortAscending,
               columns: [
                 ...widget.columns.map(
-                      (column) =>
-                      DataColumn(
-                        numeric: column.isNumber,
-                        label: Text(column.value ?? "N/A"),
-                        tooltip: column.value,
-                        onSort: (columnIndex, ascending) {
-                          sortColumnIndex = columnIndex;
-                          sortAscending = ascending;
-                          sortData(updatedData);
-                        },
-                      ),
+                  (column) => DataColumn(
+                    numeric: column.isNumber,
+                    label: Text(column.value ?? "N/A"),
+                    tooltip: column.value,
+                    onSort: (columnIndex, ascending) {
+                      sortColumnIndex = columnIndex;
+                      sortAscending = ascending;
+                      sortData(updatedData);
+                    },
+                  ),
                 ),
               ],
               rows: [
                 if (updatedData == null) ...{
                   ...(List.generate(10, (index) => index)).map(
-                        (e) =>
-                        DataRow(
-                          cells: [
-                            ...widget.columns.map(
-                                  (e) =>
-                                  DataCell(
-                                    PlexShimmer(
-                                      child: Container(
-                                        color: Colors.green,
-                                        height: 25,
-                                        width: 60,
-                                      ),
-                                    ),
-                                  ),
-                            )
-                          ],
-                        ),
+                    (e) => DataRow(
+                      cells: [
+                        ...widget.columns.map(
+                          (e) => DataCell(
+                            PlexShimmer(
+                              child: Container(
+                                color: Colors.green,
+                                height: 25,
+                                width: 60,
+                              ),
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                } else ...{
+                  ...?updatedData?.map(
+                    (row) => DataRow(
+                      color: isAlternate++ % 2 == 0 ? widget.alternateColor?.getMaterialState() : null,
+                      cells: [
+                        ...row.map(
+                          (data) => DataCell(
+                            data.cell?.child ?? Text(data.value?.toString() ?? "N/A"),
+                            onTap: data.cell?.onTap ??
+                                () {
+                                  if (widget.enableCopy) {
+                                    context.copyToClipboard(data.value?.toString() ?? "N/A");
+                                  }
+                                },
+                            showEditIcon: data.cell?.showEditIcon ?? false,
+                            onDoubleTap: data.cell?.onDoubleTap,
+                            onLongPress: data.cell?.onLongPress,
+                            onTapCancel: data.cell?.onTapCancel,
+                            onTapDown: data.cell?.onTapDown,
+                            placeholder: data.cell?.placeholder ?? false,
+                          ),
+                        )
+                      ],
+                    ),
                   ),
                 }
-                else
-                  ...{
-                    ...?updatedData?.map(
-                          (row) =>
-                          DataRow(
-                            color: isAlternate++ % 2 == 0 ? widget.alternateColor?.getMaterialState() : null,
-                            cells: [
-                              ...row.map(
-                                    (data) =>
-                                    DataCell(
-                                      data.cell?.child ?? Text(data.value?.toString() ?? "N/A"),
-                                      onTap: data.cell?.onTap ??
-                                              () {
-                                            if (widget.enableCopy) {
-                                              context.copyToClipboard(data.value?.toString() ?? "N/A");
-                                            }
-                                          },
-                                      showEditIcon: data.cell?.showEditIcon ?? false,
-                                      onDoubleTap: data.cell?.onDoubleTap,
-                                      onLongPress: data.cell?.onLongPress,
-                                      onTapCancel: data.cell?.onTapCancel,
-                                      onTapDown: data.cell?.onTapDown,
-                                      placeholder: data.cell?.placeholder ?? false,
-                                    ),
-                              )
-                            ],
-                          ),
-                    ),
-                  }
               ],
             ),
           ),

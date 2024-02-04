@@ -21,7 +21,8 @@ class PlexInputWidget<T> extends StatefulWidget {
     this.title,
     required this.type,
     this.useMargin = true,
-    this.margin = const EdgeInsets.symmetric(horizontal: Dim.medium, vertical: Dim.small),
+    this.margin =
+        const EdgeInsets.symmetric(horizontal: Dim.medium, vertical: Dim.small),
     this.helperText,
     this.editable = true,
     this.fieldColor = Colors.white,
@@ -71,7 +72,8 @@ class PlexInputWidget<T> extends StatefulWidget {
   final Future<List<dynamic>>? dropdownAsyncItems;
   final Widget Function(dynamic item)? dropdownItemWidget;
   final bool Function(String query, dynamic item)? dropdownOnSearch;
-  String Function(dynamic item)? dropdownItemAsString = (item) => item.toString();
+  String Function(dynamic item)? dropdownItemAsString =
+      (item) => item.toString();
   final Function(dynamic item)? dropdownItemOnSelect;
   final Function? dropdownCustomOnTap;
 
@@ -95,12 +97,14 @@ class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
   PlexWidgetController<List<T>?>? _multiSelectionController;
 
   PlexWidgetController<T?> getDropDownController() {
-    _dropdownSelectionController ??= (widget.dropdownSelectionController ?? PlexWidgetController<T?>()) as PlexWidgetController<T?>;
+    _dropdownSelectionController ??= (widget.dropdownSelectionController ??
+        PlexWidgetController<T?>()) as PlexWidgetController<T?>;
     return _dropdownSelectionController!;
   }
 
   PlexWidgetController<List<T>?> getMultiselectController() {
-    _multiSelectionController ??= (widget.multiSelectionController ?? PlexWidgetController<List<T>?>()) as PlexWidgetController<List<T>?>;
+    _multiSelectionController ??= (widget.multiSelectionController ??
+        PlexWidgetController<List<T>?>()) as PlexWidgetController<List<T>?>;
     return _multiSelectionController!;
   }
 
@@ -175,7 +179,8 @@ class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
               ),
               borderRadius: BorderRadius.circular(Dim.smallest)),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: Dim.small, vertical: Dim.medium),
+            padding: const EdgeInsets.symmetric(
+                horizontal: Dim.small, vertical: Dim.medium),
             child: Row(
               children: [
                 Expanded(
@@ -186,9 +191,14 @@ class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           if (widget.title != null) ...{
-                            Text("${widget.title}", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: Dim.small)),
+                            Text("${widget.title}",
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: Dim.small)),
                           },
-                          Text(data != null ? widget.dropdownItemAsString!(data) : "N/A"),
+                          Text(data != null
+                              ? widget.dropdownItemAsString!(data)
+                              : "N/A"),
                         ],
                       );
                     },
@@ -200,7 +210,11 @@ class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
           ),
         ),
       );
-    } else if ([PlexInputWidgetType.typeDate, PlexInputWidgetType.typeDateTime, PlexInputWidgetType.typeTime].contains(widget.type)) {
+    } else if ([
+      PlexInputWidgetType.typeDate,
+      PlexInputWidgetType.typeDateTime,
+      PlexInputWidgetType.typeTime
+    ].contains(widget.type)) {
       inputWidget = Container(
         decoration: BoxDecoration(
           border: Border.all(
@@ -210,7 +224,8 @@ class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
           borderRadius: BorderRadius.circular(Dim.smallest),
         ),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: Dim.small, vertical: Dim.smallest),
+          padding: const EdgeInsets.symmetric(
+              horizontal: Dim.small, vertical: Dim.smallest),
           child: Row(
             children: [
               Expanded(
@@ -223,81 +238,86 @@ class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
                       onTap: () {
                         if (!widget.editable) return;
                         if (widget.editable == false) return;
-                        // ignore: missing_enum_constant_in_switch
-                        switch (widget.type) {
-                          case PlexInputWidgetType.typeDate:
-                            {
-                              showDatePicker(
-                                context: context,
-                                initialDate: getDropDownController().data as DateTime? ?? DateTime.now(),
-                                firstDate: DateTime(1970, 1, 1),
-                                lastDate: DateTime(5000, 12, 31),
-                                useRootNavigator: true,
-                              ).then((value) {
-                                if (value != null) {
-                                  getDropDownController().setValue(value as T?);
-                                  widget.dropdownItemOnSelect?.call(value);
-                                }
-                              });
-                              break;
+                        if(widget.type == PlexInputWidgetType.typeDate) {
+                          showDatePicker(
+                            context: context,
+                            initialDate:
+                            getDropDownController().data as DateTime? ??
+                                DateTime.now(),
+                            firstDate: DateTime(1970, 1, 1),
+                            lastDate: DateTime(5000, 12, 31),
+                            useRootNavigator: true,
+                          ).then((value) {
+                            if (value != null) {
+                              getDropDownController().setValue(value as T?);
+                              widget.dropdownItemOnSelect?.call(value);
                             }
-                          case PlexInputWidgetType.typeTime:
-                            {
+                          });
+                        }
+                        else if(widget.type == PlexInputWidgetType.typeTime) {
+                          showTimePicker(
+                            context: context,
+                            initialTime: TimeOfDay.fromDateTime(
+                                getDropDownController().data as DateTime? ??
+                                    DateTime.now()),
+                            useRootNavigator: true,
+                          ).then((value) {
+                            if (value != null) {
+                              DateTime dateTime = getDropDownController()
+                                  .data as DateTime? ??
+                                  DateTime.now();
+                              dateTime = DateTime(
+                                dateTime.year,
+                                dateTime.month,
+                                dateTime.day,
+                                value.hour,
+                                value.minute,
+                              );
+                              getDropDownController()
+                                  .setValue(dateTime as T?);
+                              widget.dropdownItemOnSelect?.call(value);
+                            }
+                          });
+                        }
+                        else if(widget.type == PlexInputWidgetType.typeDateTime) {
+                          showDatePicker(
+                            context: context,
+                            initialDate:
+                            getDropDownController().data as DateTime? ??
+                                DateTime.now(),
+                            firstDate: DateTime(1970, 1, 1),
+                            lastDate: DateTime(5000, 12, 31),
+                            useRootNavigator: true,
+                          ).then((selectedDate) {
+                            if (selectedDate != null) {
                               showTimePicker(
                                 context: context,
-                                initialTime: TimeOfDay.fromDateTime(getDropDownController().data as DateTime? ?? DateTime.now()),
+                                initialTime:
+                                TimeOfDay.fromDateTime(selectedDate),
                                 useRootNavigator: true,
+                                builder: (context, child) {
+                                  return MediaQuery(
+                                    data: MediaQuery.of(context).copyWith(
+                                        alwaysUse24HourFormat: true),
+                                    child: child!,
+                                  );
+                                },
                               ).then((value) {
                                 if (value != null) {
-                                  DateTime dateTime = getDropDownController().data as DateTime? ?? DateTime.now();
-                                  dateTime = DateTime(
-                                    dateTime.year,
-                                    dateTime.month,
-                                    dateTime.day,
+                                  var dateTime = DateTime(
+                                    selectedDate.year,
+                                    selectedDate.month,
+                                    selectedDate.day,
                                     value.hour,
                                     value.minute,
                                   );
-                                  getDropDownController().setValue(dateTime as T?);
+                                  getDropDownController()
+                                      .setValue(dateTime as T?);
                                   widget.dropdownItemOnSelect?.call(value);
                                 }
                               });
-                              break;
                             }
-                          case PlexInputWidgetType.typeDateTime:
-                            showDatePicker(
-                              context: context,
-                              initialDate: getDropDownController().data as DateTime? ?? DateTime.now(),
-                              firstDate: DateTime(1970, 1, 1),
-                              lastDate: DateTime(5000, 12, 31),
-                              useRootNavigator: true,
-                            ).then((selectedDate) {
-                              if (selectedDate != null) {
-                                showTimePicker(
-                                  context: context,
-                                  initialTime: TimeOfDay.fromDateTime(selectedDate),
-                                  useRootNavigator: true,
-                                  builder: (context, child) {
-                                    return MediaQuery(
-                                      data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
-                                      child: child!,
-                                    );
-                                  },
-                                ).then((value) {
-                                  if (value != null) {
-                                    var dateTime = DateTime(
-                                      selectedDate.year,
-                                      selectedDate.month,
-                                      selectedDate.day,
-                                      value.hour,
-                                      value.minute,
-                                    );
-                                    getDropDownController().setValue(dateTime as T?);
-                                    widget.dropdownItemOnSelect?.call(value);
-                                  }
-                                });
-                              }
-                            });
-                            break;
+                          });
                         }
                       },
                       enabled: widget.editable,
@@ -306,7 +326,8 @@ class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
                             ? (data as DateTime?)?.toDateString()
                             : widget.type == PlexInputWidgetType.typeTime
                                 ? (data as DateTime?)?.toTimeString()
-                                : widget.type == PlexInputWidgetType.typeDateTime
+                                : widget.type ==
+                                        PlexInputWidgetType.typeDateTime
                                     ? (data as DateTime?)?.toDateTimeString()
                                     : "N/A",
                       ),
@@ -323,7 +344,8 @@ class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
         ),
       );
     } else if (widget.type == PlexInputWidgetType.typeMultiSelect) {
-      getMultiselectController().setValue(widget.multiInitialSelection?.cast<T>());
+      getMultiselectController()
+          .setValue(widget.multiInitialSelection?.cast<T>());
       inputWidget = InkWell(
         onTap: () {
           if (!widget.editable) return;
@@ -356,7 +378,8 @@ class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
               ),
               borderRadius: BorderRadius.circular(Dim.smallest)),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: Dim.small, vertical: Dim.medium),
+            padding: const EdgeInsets.symmetric(
+                horizontal: Dim.small, vertical: Dim.medium),
             child: Row(
               children: [
                 Expanded(
@@ -368,7 +391,10 @@ class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           if (widget.title != null) ...{
-                            Text("${widget.title}", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: Dim.small)),
+                            Text("${widget.title}",
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: Dim.small)),
                           },
                           spaceSmall(),
                           Wrap(
@@ -378,7 +404,8 @@ class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
                               ...selectionData.map(
                                 (e) => Chip(
                                   elevation: Dim.small,
-                                  avatar: Icon(Icons.check_circle, color: Colors.green.shade500),
+                                  avatar: Icon(Icons.check_circle,
+                                      color: Colors.green.shade500),
                                   label: Text(widget.dropdownItemAsString!(e)),
                                 ),
                               ),

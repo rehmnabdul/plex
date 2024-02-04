@@ -23,7 +23,8 @@ class _UpdatableScreenState extends PlexState<UpdatableScreen> {
           PlexWidget(
             controller: updateController,
             createWidget: (context, data) {
-              return Text("Counter: $data", style: const TextStyle(fontSize: 20));
+              return Text("Counter: $data",
+                  style: const TextStyle(fontSize: 20));
             },
           ),
           spaceMedium(),

@@ -21,14 +21,16 @@ class PlexLoginConfig {
 
   final String? debugUsername;
   final String? debugPassword;
-  final Future<PlexUser?> Function(BuildContext context, String email, String password) onLogin;
+  final Future<PlexUser?> Function(
+      BuildContext context, String email, String password) onLogin;
   final Widget Function(BuildContext context)? additionalWidgetsTop;
   final Widget Function(BuildContext context)? additionalWidgetsBottom;
   final PlexUser Function(Map<String, dynamic> userData) userFromJson;
 }
 
 class PlexLoginScreen extends PlexScreen {
-  const PlexLoginScreen({super.key, required this.loginConfig, required this.nextRoute});
+  const PlexLoginScreen(
+      {super.key, required this.loginConfig, required this.nextRoute});
 
   final String nextRoute;
   final PlexLoginConfig loginConfig;
@@ -46,7 +48,8 @@ class _PlexLoginScreenState extends PlexState<PlexLoginScreen> {
     super.initState();
 
     if (PlexSp.instance.getString(PlexSp.loggedInUser) != null) {
-      Future.delayed(const Duration(milliseconds: 100), () => Plex.offAndToNamed(PlexRoutesPaths.homePath));
+      Future.delayed(const Duration(milliseconds: 100),
+          () => Plex.offAndToNamed(PlexRoutesPaths.homePath));
       return;
     }
 
@@ -108,12 +111,17 @@ class _PlexLoginScreenState extends PlexState<PlexLoginScreen> {
                     }
 
                     showLoading();
-                    var result = await widget.loginConfig.onLogin(context, usernameController.text.toString(), passController.text.toString());
+                    var result = await widget.loginConfig.onLogin(
+                        context,
+                        usernameController.text.toString(),
+                        passController.text.toString());
                     hideLoading();
 
                     if (result != null) {
                       result.save();
-                      Plex.offAndToNamed(PlexApp.app.dashboardConfig != null ? PlexRoutesPaths.homePath : PlexApp.app.appInfo.initialRoute);
+                      Plex.offAndToNamed(PlexApp.app.dashboardConfig != null
+                          ? PlexRoutesPaths.homePath
+                          : PlexApp.app.appInfo.initialRoute);
                     }
                   },
                 ),

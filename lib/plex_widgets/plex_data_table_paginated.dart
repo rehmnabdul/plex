@@ -72,14 +72,20 @@ class PlexDataTableWithPagesState extends State<PlexDataTableWithPages> {
   void initState() {
     super.initState();
     updatedData = widget.rows;
-    _dataSource = _PaginationDataTableSource(context, enableCopy: widget.enableCopy, dataList: updatedData, alternateColor: widget.alternateColor);
+    _dataSource = _PaginationDataTableSource(context,
+        enableCopy: widget.enableCopy,
+        dataList: updatedData,
+        alternateColor: widget.alternateColor);
   }
 
   sortData(List<List<PlexDataCell>> data) {
     if (sortColumnIndex == null) {
       setState(() {
         updatedData = data;
-        _dataSource = _PaginationDataTableSource(context, enableCopy: widget.enableCopy, dataList: updatedData, alternateColor: widget.alternateColor);
+        _dataSource = _PaginationDataTableSource(context,
+            enableCopy: widget.enableCopy,
+            dataList: updatedData,
+            alternateColor: widget.alternateColor);
       });
       return;
     }
@@ -112,7 +118,10 @@ class PlexDataTableWithPagesState extends State<PlexDataTableWithPages> {
 
     setState(() {
       updatedData = data;
-      _dataSource = _PaginationDataTableSource(context, enableCopy: widget.enableCopy, dataList: updatedData, alternateColor: widget.alternateColor);
+      _dataSource = _PaginationDataTableSource(context,
+          enableCopy: widget.enableCopy,
+          dataList: updatedData,
+          alternateColor: widget.alternateColor);
     });
   }
 
@@ -128,7 +137,9 @@ class PlexDataTableWithPagesState extends State<PlexDataTableWithPages> {
       data = data.where((r) {
         var isOk = false;
         for (var colIndex in searchIndexes) {
-          if ((r[colIndex].value.toString()).toLowerCase().contains(searchController.text.toLowerCase())) {
+          if ((r[colIndex].value.toString())
+              .toLowerCase()
+              .contains(searchController.text.toLowerCase())) {
             isOk = true;
             break;
           }
@@ -147,12 +158,18 @@ class PlexDataTableWithPagesState extends State<PlexDataTableWithPages> {
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: Dim.medium, vertical: Dim.small),
+              padding: const EdgeInsets.symmetric(
+                  horizontal: Dim.medium, vertical: Dim.small),
               child: Row(
                 children: [
                   SegmentedButton<int>(
                     segments: [
-                      for (var i = 0; i < widget.columns.length; i++) ...{ButtonSegment(value: i, label: Text(widget.columns[i].value!), enabled: true)},
+                      for (var i = 0; i < widget.columns.length; i++) ...{
+                        ButtonSegment(
+                            value: i,
+                            label: Text(widget.columns[i].value!),
+                            enabled: true)
+                      },
                     ],
                     selected: searchColumnIndexes,
                     emptySelectionAllowed: true,
@@ -167,7 +184,9 @@ class PlexDataTableWithPagesState extends State<PlexDataTableWithPages> {
             ),
           ),
         },
-        if (widget.enableSearch || widget.enablePrint || widget.onRefresh != null) ...{
+        if (widget.enableSearch ||
+            widget.enablePrint ||
+            widget.onRefresh != null) ...{
           Padding(
             padding: const EdgeInsets.symmetric(vertical: Dim.small),
             child: Row(

@@ -1,3 +1,7 @@
+## 0.3.20
+
+* Update Dependency Injection, You can use it without and with tag now
+
 ## 0.3.19
 
 * Update Dependency Injection: `injectFactory((parm) => object, tag: 'anyTag')` and get it anywhere by `var obj = fromPlex<Type>('tagName', parm: null)`

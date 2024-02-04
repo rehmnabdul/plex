@@ -16,7 +16,8 @@ class Plex {
     dynamic arguments,
     Map<String, String>? parameters,
   }) {
-    return Get.offAndToNamed<T>(path, arguments: arguments, parameters: parameters);
+    return Get.offAndToNamed<T>(path,
+        arguments: arguments, parameters: parameters);
   }
 
   static void back({dynamic result}) {

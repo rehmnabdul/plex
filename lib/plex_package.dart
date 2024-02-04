@@ -129,14 +129,21 @@ class PlexApp extends StatefulWidget {
     this.onLogout,
   }) {
     if (dashboardConfig == null && pages == null) {
-      throw Exception("Either \"DashboardConfig\" or \"Pages\" must not be null and empty");
+      throw Exception(
+          "Either \"DashboardConfig\" or \"Pages\" must not be null and empty");
     }
 
-    if (pages == null && dashboardConfig!.dashboardScreens.firstWhereOrNull((e) => e.route == appInfo.initialRoute) == null) {
-      throw Exception("\"DashboardConfig.DashboardScreens\" doesn't contain initial route");
+    if (pages == null &&
+        dashboardConfig!.dashboardScreens
+                .firstWhereOrNull((e) => e.route == appInfo.initialRoute) ==
+            null) {
+      throw Exception(
+          "\"DashboardConfig.DashboardScreens\" doesn't contain initial route");
     }
 
-    if (dashboardConfig == null && pages!.firstWhereOrNull((e) => appInfo.initialRoute == e.route) == null) {
+    if (dashboardConfig == null &&
+        pages!.firstWhereOrNull((e) => appInfo.initialRoute == e.route) ==
+            null) {
       throw Exception("\"Pages\" doesn't contain initial route");
     }
 
@@ -144,7 +151,9 @@ class PlexApp extends StatefulWidget {
       throw Exception("\"loginConfig\" should be unimplemented");
     }
 
-    if (PlexTheme.appTheme == null && themeFromColor.value != const Color(0xFF007AD7).value && themeFromImage != null) {
+    if (PlexTheme.appTheme == null &&
+        themeFromColor.value != const Color(0xFF007AD7).value &&
+        themeFromImage != null) {
       throw Exception("Use either \"themeFromColor\" or \"themeFromImage\"");
     }
 
@@ -159,14 +168,18 @@ class PlexApp extends StatefulWidget {
   //Public Methods and Variables
   ///Get AppLogo Based on Brightness Mode of Theme
   Widget getLogo(BuildContext context) {
-    return (PlexTheme.isDarkMode(context) ? appInfo.appLogoDark : appInfo.appLogo) ?? appInfo.appLogo;
+    return (PlexTheme.isDarkMode(context)
+            ? appInfo.appLogoDark
+            : appInfo.appLogo) ??
+        appInfo.appLogo;
   }
 
   ///Check the user is logged into the app or not
   PlexUser? getUser() {
     if (!PlexSp.instance.hasKey(PlexSp.loggedInUser)) return null;
     try {
-      return loginConfig!.userFromJson(jsonDecode(PlexSp.instance.getString(PlexSp.loggedInUser)!));
+      return loginConfig!.userFromJson(
+          jsonDecode(PlexSp.instance.getString(PlexSp.loggedInUser)!));
     } catch (e) {
       logout();
     }
@@ -205,7 +218,8 @@ class PlexApp extends StatefulWidget {
   void showAboutDialogue(BuildContext context) {
     showAboutDialog(
       context: context,
-      applicationIcon: SizedBox(width: 50, height: 50, child: PlexApp.app.getLogo(context)),
+      applicationIcon:
+          SizedBox(width: 50, height: 50, child: PlexApp.app.getLogo(context)),
       applicationName: PlexApp.app.appInfo.title,
       applicationVersion: PlexApp.app.appInfo.versionName,
       routeSettings: const RouteSettings(name: "/about"),
@@ -244,10 +258,12 @@ class _PlexAppState extends State<PlexApp> {
         WidgetsFlutterBinding.ensureInitialized();
         await PlexSp.instance.initialize();
         if (widget.themeFromImage != null) {
-          widget.imageColorScheme = await ColorScheme.fromImageProvider(provider: widget.themeFromImage!);
+          widget.imageColorScheme = await ColorScheme.fromImageProvider(
+              provider: widget.themeFromImage!);
         }
         useMaterial3 = PlexTheme.isMaterial3();
-        themeMode = PlexTheme.isDarkMode(context) ? ThemeMode.dark : ThemeMode.light;
+        themeMode =
+            PlexTheme.isDarkMode(context) ? ThemeMode.dark : ThemeMode.light;
         widget.onInitializationComplete?.call();
         setState(() {
           _initialized = true;
@@ -296,15 +312,20 @@ class _PlexAppState extends State<PlexApp> {
               : widget.appInfo.initialRoute,
       unknownRoute: GetPage(
         name: widget.unknownRoute?.route ?? "/NotFound",
-        page: () => widget.unknownRoute?.screen.call(context) ?? const Scaffold(body: Center(child: Text("Page not found: 404"))),
+        page: () =>
+            widget.unknownRoute?.screen.call(context) ??
+            const Scaffold(body: Center(child: Text("Page not found: 404"))),
       ),
       routes: {
         // "/": (_) => const Scaffold(body: Center(child: Text("Page not found: 404"))),
         if (widget.useAuthorization) ...{
-          PlexRoutesPaths.loginPath: (_) => PlexLoginScreen(loginConfig: widget.loginConfig!, nextRoute: widget.appInfo.initialRoute),
+          PlexRoutesPaths.loginPath: (_) => PlexLoginScreen(
+              loginConfig: widget.loginConfig!,
+              nextRoute: widget.appInfo.initialRoute),
         },
         if (widget.dashboardConfig != null) ...{
-          PlexRoutesPaths.homePath: (_) => PlexDashboardScreen(handleBrightnessChange, handleMaterialVersionChange),
+          PlexRoutesPaths.homePath: (_) => PlexDashboardScreen(
+              handleBrightnessChange, handleMaterialVersionChange),
         },
         if (widget.pages?.isNotEmpty == true) ...{
           for (var page in widget.pages!) ...{

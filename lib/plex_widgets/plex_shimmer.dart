@@ -76,7 +76,8 @@ class PlexShimmer extends StatefulWidget {
   PlexShimmerState createState() => PlexShimmerState();
 }
 
-class PlexShimmerState extends State<PlexShimmer> with SingleTickerProviderStateMixin {
+class PlexShimmerState extends State<PlexShimmer>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late int _count;
 
@@ -117,7 +118,25 @@ class PlexShimmerState extends State<PlexShimmer> with SingleTickerProviderState
         child: widget.child,
         builder: (BuildContext context, Widget? child) => _PlexShimmer(
           direction: widget.direction,
-          gradient: widget.showGradient ? widget.gradient : LinearGradient(begin: Alignment.topLeft, end: Alignment.centerRight, colors: <Color>[widget.mainColor, widget.mainColor, widget.secondaryColor, widget.mainColor, widget.mainColor], stops: const <double>[0, 0.3, 0.5, 0.7, 1]),
+          gradient: widget.showGradient
+              ? widget.gradient
+              : LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.centerRight,
+                  colors: <Color>[
+                      widget.mainColor,
+                      widget.mainColor,
+                      widget.secondaryColor,
+                      widget.mainColor,
+                      widget.mainColor
+                    ],
+                  stops: const <double>[
+                      0,
+                      0.3,
+                      0.5,
+                      0.7,
+                      1
+                    ]),
           controllerValue: _controller.value,
           showShimmerEffect: widget.showShimmerEffect,
           child: child,
@@ -155,7 +174,12 @@ class _PlexShimmer extends SingleChildRenderObjectWidget {
   final bool? showShimmerEffect;
 
   @override
-  PlexShimmerFilter createRenderObject(BuildContext context) => PlexShimmerFilter(value: controllerValue, direction: direction, gradient: gradient, showShimmerEffect: showShimmerEffect);
+  PlexShimmerFilter createRenderObject(BuildContext context) =>
+      PlexShimmerFilter(
+          value: controllerValue,
+          direction: direction,
+          gradient: gradient,
+          showShimmerEffect: showShimmerEffect);
 
   @override
   void updateRenderObject(BuildContext context, PlexShimmerFilter shimmer) {
@@ -165,7 +189,9 @@ class _PlexShimmer extends SingleChildRenderObjectWidget {
 }
 
 class PlexShimmerFilter extends RenderProxyBox {
-  PlexShimmerFilter({this.value, this.direction, this.gradient, this.showShimmerEffect}) : gradientPaint = Paint()..blendMode = BlendMode.srcIn;
+  PlexShimmerFilter(
+      {this.value, this.direction, this.gradient, this.showShimmerEffect})
+      : gradientPaint = Paint()..blendMode = BlendMode.srcIn;
 
   /// Constructs an empty [Paint] object with all fields initialized to their defaults.
   final Paint initialPaint = Paint();
@@ -242,5 +268,6 @@ class PlexShimmerFilter extends RenderProxyBox {
     context.canvas.restore();
   }
 
-  double _offset(double start, double end, double controllerValue) => start + (end - start) * controllerValue;
+  double _offset(double start, double end, double controllerValue) =>
+      start + (end - start) * controllerValue;
 }

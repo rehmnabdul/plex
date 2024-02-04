@@ -5,7 +5,12 @@ import 'package:plex/plex_utils/plex_dimensions.dart';
 typedef OnDateSelected = Function(DateTime? dateTime);
 
 class PlexDatePickerWidget extends StatefulWidget {
-  const PlexDatePickerWidget({super.key, required this.onDateSelected, required this.startDate, this.enabled = true, this.removePadding = false});
+  const PlexDatePickerWidget(
+      {super.key,
+      required this.onDateSelected,
+      required this.startDate,
+      this.enabled = true,
+      this.removePadding = false});
 
   final DateTime? startDate;
   final bool? enabled;
@@ -24,9 +29,12 @@ class _PlexDatePickerWidgetState extends State<PlexDatePickerWidget> {
     controller.text = widget.startDate?.toDateString() ?? "N/A";
 
     return Container(
-      decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.all(Radius.circular(Dim.small))),
+      decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.all(Radius.circular(Dim.small))),
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: (widget.removePadding ? Dim.zero : Dim.small)),
+        padding: EdgeInsets.symmetric(
+            horizontal: (widget.removePadding ? Dim.zero : Dim.small)),
         child: Row(
           children: [
             Expanded(

@@ -58,7 +58,8 @@ class PlexFormField {
     this.initialValue,
   }) {
     if (items == null && itemsAsync == null) {
-      throw Exception("Items must be initialized or async item function must be initialized");
+      throw Exception(
+          "Items must be initialized or async item function must be initialized");
     }
     itemAsString ??= (item) => item.toString();
     fieldType = TYPE_DROPDOWN;
@@ -73,14 +74,16 @@ class PlexFormField {
     this.itemsAsync,
   }) {
     if (items == null && itemsAsync == null) {
-      throw Exception("Items must be initialized or async item function must be initialized");
+      throw Exception(
+          "Items must be initialized or async item function must be initialized");
     }
     fieldType = TYPE_MULTISELECT;
   }
 }
 
 class PlexFormWidget<T> extends StatefulWidget {
-  const PlexFormWidget({super.key, required this.entity, required this.onSubmit});
+  const PlexFormWidget(
+      {super.key, required this.entity, required this.onSubmit});
 
   final PlexForm entity;
   final void Function(T entity) onSubmit;
@@ -101,7 +104,8 @@ class _PlexFormWidgetState extends State<PlexFormWidget> {
               isPassword: value.isPassword,
               inputKeyboardType: value.inputType ?? TextInputType.text,
               inputAction: value.inputAction,
-              inputController: TextEditingController(text: value.initialValue?.toString()),
+              inputController:
+                  TextEditingController(text: value.initialValue?.toString()),
               inputOnChange: (v) => value.onChange(v.toString()),
               editable: value.editable,
             ),
@@ -110,10 +114,13 @@ class _PlexFormWidgetState extends State<PlexFormWidget> {
             PlexInputWidget<int>(
               title: value.title.toUpperCase(),
               type: PlexInputWidgetType.typeInput,
-              inputKeyboardType: value.inputType ?? const TextInputType.numberWithOptions(decimal: false, signed: false),
+              inputKeyboardType: value.inputType ??
+                  const TextInputType.numberWithOptions(
+                      decimal: false, signed: false),
               inputOnChange: (v) => value.onChange(int.tryParse(v)),
               inputAction: value.inputAction,
-              inputController: TextEditingController(text: value.initialValue?.toString()),
+              inputController:
+                  TextEditingController(text: value.initialValue?.toString()),
               isPassword: value.isPassword,
               editable: value.editable,
             ),
@@ -122,10 +129,13 @@ class _PlexFormWidgetState extends State<PlexFormWidget> {
             PlexInputWidget<double>(
               title: value.title.toUpperCase(),
               type: PlexInputWidgetType.typeInput,
-              inputKeyboardType: value.inputType ?? const TextInputType.numberWithOptions(decimal: true, signed: false),
+              inputKeyboardType: value.inputType ??
+                  const TextInputType.numberWithOptions(
+                      decimal: true, signed: false),
               inputAction: value.inputAction,
               inputOnChange: (v) => value.onChange(v),
-              inputController: TextEditingController(text: value.initialValue?.toString()),
+              inputController:
+                  TextEditingController(text: value.initialValue?.toString()),
               isPassword: value.isPassword,
               editable: value.editable,
             ),
@@ -134,7 +144,8 @@ class _PlexFormWidgetState extends State<PlexFormWidget> {
             PlexInputWidget<bool>(
               title: value.title.toUpperCase(),
               type: PlexInputWidgetType.typeDropdown,
-              dropdownSelectionController: PlexWidgetController(data: value.initialValue),
+              dropdownSelectionController:
+                  PlexWidgetController(data: value.initialValue),
               dropdownItems: const [true, false],
               dropdownItemAsString: (v) => v ? "True" : "False",
               dropdownItemOnSelect: (v) => value.onChange(v),
@@ -145,7 +156,8 @@ class _PlexFormWidgetState extends State<PlexFormWidget> {
             PlexInputWidget<DateTime>(
               title: value.title.toUpperCase(),
               type: PlexInputWidgetType.typeDate,
-              dropdownSelectionController: PlexWidgetController(data: value.initialValue),
+              dropdownSelectionController:
+                  PlexWidgetController(data: value.initialValue),
               dropdownItemOnSelect: (v) => value.onChange(v),
               editable: value.editable,
             ),
@@ -154,7 +166,8 @@ class _PlexFormWidgetState extends State<PlexFormWidget> {
           PlexInputWidget(
             title: value.title.toUpperCase(),
             type: PlexInputWidgetType.typeDropdown,
-            dropdownSelectionController: PlexWidgetController(data: value.initialValue),
+            dropdownSelectionController:
+                PlexWidgetController(data: value.initialValue),
             dropdownItemOnSelect: (p) {
               setState(() {
                 value.onChange(p);
@@ -172,7 +185,8 @@ class _PlexFormWidgetState extends State<PlexFormWidget> {
           PlexInputWidget(
             title: value.title.toUpperCase(),
             type: PlexInputWidgetType.typeMultiSelect,
-            dropdownSelectionController: PlexWidgetController(data: value.initialValue),
+            dropdownSelectionController:
+                PlexWidgetController(data: value.initialValue),
             dropdownItemOnSelect: (p) {
               setState(() {
                 value.onChange(p);

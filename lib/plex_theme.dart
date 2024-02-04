@@ -28,7 +28,10 @@ class PlexTheme {
   static bool isDarkMode(BuildContext context) {
     var brightnessMode = getBrightnessMode();
     if (brightnessMode == ThemeMode.system) {
-      brightnessMode = MediaQuery.of(context).platformBrightness == Brightness.light ? ThemeMode.light : ThemeMode.dark;
+      brightnessMode =
+          MediaQuery.of(context).platformBrightness == Brightness.light
+              ? ThemeMode.light
+              : ThemeMode.dark;
     }
     return brightnessMode == ThemeMode.dark;
   }
@@ -55,9 +58,11 @@ class PlexTheme {
   }
 
   ///Initial theme data for the app
-  static ThemeData getActiveTheme(BuildContext context) => getThemeByBrightness(isDarkMode(context) ? Brightness.dark : Brightness.light);
+  static ThemeData getActiveTheme(BuildContext context) => getThemeByBrightness(
+      isDarkMode(context) ? Brightness.dark : Brightness.light);
 
-  static TextTheme getTextTheme(BuildContext context) => getActiveTheme(context).textTheme;
+  static TextTheme getTextTheme(BuildContext context) =>
+      getActiveTheme(context).textTheme;
 
   static ThemeData getThemeByBrightness(Brightness brightness) {
     var colorSchemeSeed = brightness == Brightness.dark
@@ -80,7 +85,8 @@ class PlexTheme {
       colorSchemeSeed: colorSchemeSeed,
       colorScheme: colorScheme,
       useMaterial3: isMaterial3(),
-      navigationBarTheme: NavigationBarThemeData(labelTextStyle: const TextStyle(fontSize: 10).getState()),
+      navigationBarTheme: NavigationBarThemeData(
+          labelTextStyle: const TextStyle(fontSize: 10).getState()),
       brightness: brightness,
       textTheme: PlexTheme.appTextTheme?.copyWith(
         displayLarge: TextStyle(color: textColor),
@@ -104,6 +110,9 @@ class PlexTheme {
 
   static Color randomColor() {
     var colorLimit = 225;
-    return ColorScheme.fromSeed(seedColor: Color.fromARGB(255, Random().nextInt(colorLimit), Random().nextInt(colorLimit), Random().nextInt(colorLimit))).primary;
+    return ColorScheme.fromSeed(
+            seedColor: Color.fromARGB(255, Random().nextInt(colorLimit),
+                Random().nextInt(colorLimit), Random().nextInt(colorLimit)))
+        .primary;
   }
 }

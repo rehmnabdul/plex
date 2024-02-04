@@ -12,6 +12,11 @@ abstract class PlexState<T extends PlexScreen> extends State<T> {
   final GlobalKey<ScaffoldState> key = GlobalKey();
   final _loadingController = PlexWidgetController();
 
+  ///Screen Size Segregation
+  var smallScreen = false;
+  var mediumScreen = false;
+  var largeScreen = true;
+
   getArguments<AT>() {
     var args = ModalRoute.of(context)!.settings.arguments as AT;
     return args;
@@ -55,11 +60,13 @@ abstract class PlexState<T extends PlexScreen> extends State<T> {
             createWidget(() {
               if (getNoOfTabs() > 0) {
                 if (getTabBar() == null) {
-                  throw Exception("Please override following methods:\n1. getTabBar()\n2. buildBody() must return TabBarView");
+                  throw Exception(
+                      "Please override following methods:\n1. getTabBar()\n2. buildBody() must return TabBarView");
                 }
                 var body = buildBody();
                 if (body is! TabBarView) {
-                  throw Exception("buildBody() must return TabBarView if getTabBar() > 0");
+                  throw Exception(
+                      "buildBody() must return TabBarView if getTabBar() > 0");
                 }
                 return DefaultTabController(
                   length: getNoOfTabs(),
@@ -105,10 +112,6 @@ abstract class PlexState<T extends PlexScreen> extends State<T> {
   Widget? buildBottomNavigation() {
     return null;
   }
-
-  var smallScreen = false;
-  var mediumScreen = false;
-  var largeScreen = true;
 
   @override
   void didChangeDependencies() {

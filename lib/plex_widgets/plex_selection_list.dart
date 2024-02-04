@@ -20,7 +20,8 @@ showSelectionList<T>(
   if (originalListData == null) throw Exception("Items are null");
 
   var inputController = TextEditingController();
-  var filteredListController = PlexWidgetController<List<T>>(data: originalListData);
+  var filteredListController =
+      PlexWidgetController<List<T>>(data: originalListData);
 
   // ignore: use_build_context_synchronously
   showModalBottomSheet(
@@ -78,10 +79,17 @@ showSelectionList<T>(
                         }
                         return ListTile(
                           selectedTileColor: Colors.green.withOpacity(0.25),
-                          selected: initialSelected != null && itemText.call(item) == itemText.call(initialSelected),
+                          selected: initialSelected != null &&
+                              itemText.call(item) ==
+                                  itemText.call(initialSelected),
                           leading: leadingIcon?.call(item),
                           title: Text(itemText.call(item)),
-                          trailing: initialSelected != null && itemText.call(item) == itemText.call(initialSelected) ? const Icon(Icons.check_circle, color: Colors.green) : null,
+                          trailing: initialSelected != null &&
+                                  itemText.call(item) ==
+                                      itemText.call(initialSelected)
+                              ? const Icon(Icons.check_circle,
+                                  color: Colors.green)
+                              : null,
                           onTap: () {
                             onSelect.call(item);
                             Get.back();
@@ -116,7 +124,8 @@ showMultiSelection<T>(
   if (originalListData == null) throw Exception("Items are null");
 
   var inputController = TextEditingController();
-  var filteredListController = PlexWidgetController<List<T>>(data: originalListData);
+  var filteredListController =
+      PlexWidgetController<List<T>>(data: originalListData);
 
   var selectionList = List<T>.empty(growable: true);
   if (initialSelection != null) {
@@ -154,7 +163,9 @@ showMultiSelection<T>(
                           if (onSearch != null) {
                             return onSearch.call(query, element);
                           }
-                          return itemText(element).toLowerCase().contains(query);
+                          return itemText(element)
+                              .toLowerCase()
+                              .contains(query);
                         }).toList();
                         filteredListController.setValue(filteredList);
                       },
@@ -184,13 +195,17 @@ showMultiSelection<T>(
                           if (itemWidget != null) {
                             return InkWell(
                               onTap: () {
-                                var prevItem = selectionList.firstWhereOrNull((element) => itemText(item) == itemText(element));
+                                var prevItem = selectionList.firstWhereOrNull(
+                                    (element) =>
+                                        itemText(item) == itemText(element));
                                 if (prevItem == null) {
                                   selectionList.add(item);
                                 } else {
-                                  selectionList.removeWhere((element) => itemText(item) == itemText(element));
+                                  selectionList.removeWhere((element) =>
+                                      itemText(item) == itemText(element));
                                 }
-                                filteredListController.setValue(filteredListController.data);
+                                filteredListController
+                                    .setValue(filteredListController.data);
                               },
                               child: itemWidget.call(item),
                             );
@@ -199,24 +214,32 @@ showMultiSelection<T>(
                             leading: leadingIcon?.call(item),
                             title: Text(itemText.call(item)),
                             trailing: Checkbox(
-                              value: selectionList.firstWhereOrNull((element) => itemText(item) == itemText(element)) != null,
+                              value: selectionList.firstWhereOrNull((element) =>
+                                      itemText(item) == itemText(element)) !=
+                                  null,
                               onChanged: (value) {
                                 if (value == true) {
                                   selectionList.add(item);
                                 } else {
-                                  selectionList.removeWhere((element) => itemText(item) == itemText(element));
+                                  selectionList.removeWhere((element) =>
+                                      itemText(item) == itemText(element));
                                 }
-                                filteredListController.setValue(filteredListController.data);
+                                filteredListController
+                                    .setValue(filteredListController.data);
                               },
                             ),
                             onTap: () {
-                              var prevItem = selectionList.firstWhereOrNull((element) => itemText(item) == itemText(element));
+                              var prevItem = selectionList.firstWhereOrNull(
+                                  (element) =>
+                                      itemText(item) == itemText(element));
                               if (prevItem == null) {
                                 selectionList.add(item);
                               } else {
-                                selectionList.removeWhere((element) => itemText(item) == itemText(element));
+                                selectionList.removeWhere((element) =>
+                                    itemText(item) == itemText(element));
                               }
-                              filteredListController.setValue(filteredListController.data);
+                              filteredListController
+                                  .setValue(filteredListController.data);
                             },
                           );
                         },

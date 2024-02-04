@@ -24,22 +24,31 @@ class PlexModelVisitor extends SimpleElementVisitor<void> {
   List<PlexMethodModel> methods = [];
   List<PlexMethodModel> constructors = [];
 
-  bool allFieldsConstructorExists() => constructors.any((c) => c.parameters.length == fields.length);
+  bool allFieldsConstructorExists() =>
+      constructors.any((c) => c.parameters.length == fields.length);
 
-  bool emptyConstructorExists() => constructors.any((c) => c.parameters.isEmpty);
+  bool emptyConstructorExists() =>
+      constructors.any((c) => c.parameters.isEmpty);
 
   @override
   void visitConstructorElement(ConstructorElement element) {
     final returnType = element.returnType.toString();
     className = returnType;
 
-    var parameters = element.parameters.map((e) => MapEntry(e.name, e.type.toString())).toList();
+    var parameters = element.parameters
+        .map((e) => MapEntry(e.name, e.type.toString()))
+        .toList();
     constructors.add(PlexMethodModel(className, className, parameters));
   }
 
   @override
   void visitMethodElement(MethodElement element) {
-    var method = PlexMethodModel(element.returnType.toString(), element.name, element.parameters.map((e) => MapEntry(e.name, e.type.toString())).toList());
+    var method = PlexMethodModel(
+        element.returnType.toString(),
+        element.name,
+        element.parameters
+            .map((e) => MapEntry(e.name, e.type.toString()))
+            .toList());
     methods.add(method);
   }
 

@@ -23,5 +23,13 @@ class PlexRoute {
   String? rule;
 
   ///Default constructor
-  PlexRoute({required this.route, required this.title, required this.screen, this.logo, this.selectedLogo, this.category = "Menu", this.rule, this.shortTitle});
+  PlexRoute(
+      {required this.route,
+      required this.title,
+      required this.screen,
+      this.logo,
+      this.selectedLogo,
+      this.category = "Menu",
+      this.rule,
+      this.shortTitle});
 }

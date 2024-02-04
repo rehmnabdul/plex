@@ -15,7 +15,8 @@ Widget space(double value) => SizedBox(width: value, height: value);
 
 Widget spaceMini() => const SizedBox(width: Dim.mini, height: Dim.mini);
 
-Widget spaceSmallest() => const SizedBox(width: Dim.smallest, height: Dim.smallest);
+Widget spaceSmallest() =>
+    const SizedBox(width: Dim.smallest, height: Dim.smallest);
 
 Widget spaceSmall() => const SizedBox(width: Dim.small, height: Dim.small);
 

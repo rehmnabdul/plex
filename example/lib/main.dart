@@ -74,7 +74,8 @@ void main() async {
           PlexDataCell.custom(
             "Second Company Pvt. Ltd",
             const DataCell(
-              Text("Second Company Pvt. Ltd", style: TextStyle(color: Colors.green)),
+              Text("Second Company Pvt. Ltd",
+                  style: TextStyle(color: Colors.green)),
             ),
           )
         ],
@@ -88,7 +89,8 @@ void main() async {
           PlexDataCell.custom(
             "First Company Pvt. Ltd",
             const DataCell(
-              Text("First Company Pvt. Ltd", style: TextStyle(color: Colors.brown)),
+              Text("First Company Pvt. Ltd",
+                  style: TextStyle(color: Colors.brown)),
             ),
           ),
         ],
@@ -102,7 +104,8 @@ void main() async {
           PlexDataCell.custom(
             "Second Company Pvt. Ltd",
             const DataCell(
-              Text("Second Company Pvt. Ltd", style: TextStyle(color: Colors.green)),
+              Text("Second Company Pvt. Ltd",
+                  style: TextStyle(color: Colors.green)),
             ),
           )
         ],
@@ -117,8 +120,10 @@ void main() async {
           PlexDataTableValueCell.text("First", "First $a"),
           PlexDataTableValueCell.text("Last", "Last $a"),
           PlexDataTableValueCell.text("EmpCode", "EMP$a"),
-          PlexDataTableValueCell.text("Designation", "Engineer ${Random().nextInt(10) + 1}"),
-          PlexDataTableValueCell.text("Grade", "Scale ${Random().nextInt(5) + 1}"),
+          PlexDataTableValueCell.text(
+              "Designation", "Engineer ${Random().nextInt(10) + 1}"),
+          PlexDataTableValueCell.text(
+              "Grade", "Scale ${Random().nextInt(5) + 1}"),
           PlexDataTableValueCell.text("Company", "Company Name $a"),
         ],
       );
@@ -131,9 +136,6 @@ void main() async {
   //   useMaterial3: true,
   //   colorSchemeSeed: const Color(0xFF26A9E1),
   // );
-
-  injectSingleton(MyUser("firstName", "lastName", 5, DateTime.now(), true, "object", [1, 2, 4]), "user");
-  injectFactory((_) => const FormUsageScreen(), "form");
 
   runApp(PlexApp(
     ///Setting Theme Second Method : Theme By Color
@@ -189,7 +191,8 @@ void main() async {
           leadingIcon: const Icon(Icons.downloading),
           child: const Text("Show Dashboard Loading"),
           onPressed: () {
-            if (!PlexApp.app.isDashboardLoading()) PlexApp.app.showDashboardLoading();
+            if (!PlexApp.app.isDashboardLoading())
+              PlexApp.app.showDashboardLoading();
           },
         ),
         MenuItemButton(
@@ -271,7 +274,8 @@ void main() async {
                 PlexDataTableHeaderCell.text("EmpCode"),
                 PlexDataTableHeaderCell.text("Designation"),
                 PlexDataTableHeaderCell.text("Grade"),
-                PlexDataTableHeaderCell.text("Company", widthMode: WidthMode.fill),
+                PlexDataTableHeaderCell.text("Company",
+                    widthMode: WidthMode.fill),
               ],
               controller: PlexWidgetController(data: getAdvanceTableData()),
             );
@@ -296,4 +300,7 @@ void main() async {
       ],
     ),
   ));
+
+  var user = fromPlex<MyUser>();
+  print(user.toString());
 }

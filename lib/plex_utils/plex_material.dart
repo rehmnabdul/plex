@@ -6,7 +6,8 @@ const double largeWidthBreakpoint = 1500;
 const double transitionLength = 500;
 
 extension ColorUtils on Color {
-  MaterialStateProperty<Color> getMaterialState() => MaterialStateProperty.resolveWith<Color>(
+  MaterialStateProperty<Color> getMaterialState() =>
+      MaterialStateProperty.resolveWith<Color>(
         (Set<MaterialState> states) {
           if (states.contains(MaterialState.disabled)) {
             return withOpacity(0.5);
@@ -48,7 +49,8 @@ extension DoubleUtils on double {
 }
 
 extension TextStyleUtils on TextStyle {
-  MaterialStateProperty<TextStyle> getState() => MaterialStateProperty.resolveWith<TextStyle>(
+  MaterialStateProperty<TextStyle> getState() =>
+      MaterialStateProperty.resolveWith<TextStyle>(
         (Set<MaterialState> states) {
           if (states.contains(MaterialState.disabled)) {
             return copyWith(color: Colors.grey);

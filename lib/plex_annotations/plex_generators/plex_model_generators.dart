@@ -42,7 +42,8 @@ class PlexModelGenerator extends GeneratorForAnnotation<PlexAnnotationModel> {
     buffer.writeln('  }');
     buffer.writeln('\n');
     buffer.writeln('  String asString() {');
-    buffer.writeln('    return "$className(${visitor.fields.map((e) => '${e.name}: \$${e.name}').toList().join(', ')})";');
+    buffer.writeln(
+        '    return "$className(${visitor.fields.map((e) => '${e.name}: \$${e.name}').toList().join(', ')})";');
     buffer.writeln('  }');
     buffer.writeln('\n');
     buffer.writeln('}');
@@ -52,12 +53,14 @@ class PlexModelGenerator extends GeneratorForAnnotation<PlexAnnotationModel> {
   printConstructorsAndMethods(StringBuffer buffer, PlexModelVisitor visitor) {
     //Print Constructors and Methods
     for (var cons in visitor.constructors) {
-      buffer.writeln('//${cons.name} : ${cons.parameters.map((e) => '${e.key}:${e.value}').join(',')}');
+      buffer.writeln(
+          '//${cons.name} : ${cons.parameters.map((e) => '${e.key}:${e.value}').join(',')}');
     }
 
     buffer.writeln('\n');
     for (var meth in visitor.methods) {
-      buffer.writeln('//${meth.returnType}-${meth.name} : ${meth.parameters.map((e) => '${e.key}:${e.value}').join(',')}');
+      buffer.writeln(
+          '//${meth.returnType}-${meth.name} : ${meth.parameters.map((e) => '${e.key}:${e.value}').join(',')}');
     }
     buffer.writeln('\n');
   }

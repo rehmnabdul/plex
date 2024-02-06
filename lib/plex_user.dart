@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:plex/plex_sp.dart';
 
 ///This [PlexUser] will be use hold login user data all over the application
-abstract class PlexUser {
+abstract mixin class PlexUser {
   String? getPictureUrl() => null;
 
   String getLoggedInUsername();

@@ -4,7 +4,7 @@ import 'package:plex/plex_utils/plex_dimensions.dart';
 import 'package:plex/plex_widget.dart';
 import 'package:plex/plex_widgets/plex_input_widget.dart';
 
-abstract class PlexForm {
+abstract mixin class PlexForm {
   List<PlexFormField> getFields();
 }
 

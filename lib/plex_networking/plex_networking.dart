@@ -67,8 +67,8 @@ class PlexNetworking {
 
   ///Call this method to allow bad https certificate and manually verify them.
   ///If you trust your API server and it's certificate you can override the HTTPS system check
-  allowBadCertificateForHTTPS() {
-    HttpOverrides.global = AppHttpOverrides();
+  allowBadCertificateForHTTPS({HttpOverrides? customOverrides}) {
+    HttpOverrides.global = customOverrides ?? AppHttpOverrides();
   }
 
   ///Override this callback to always attach headers in the request i.e. UserId, AuthToken etc.

@@ -1,3 +1,8 @@
+## 0.3.21
+
+* Add optional custom `HttpOverrides` implementation 
+* Make `PlexUser` and `PlexForm` as `mixin class` 
+
 ## 0.3.20
 
 * Update Dependency Injection, You can use it without and with tag now

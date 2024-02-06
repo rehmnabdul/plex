@@ -77,6 +77,7 @@ the resulting application meets the high standards of enterprise-level software.
 7. Builtin form builder from model class
 8. Code Generation For Models i.e. `copy()` and `asString()` method generation.
 9. Dependency Injection based on TAGs.
+10. Support `MVVM` pattern by providing `PlexViewModel` to help reduce boilerplate code and useful features 
 
 ## Getting started
 
@@ -342,7 +343,74 @@ var singletonModelLazy = fromPlex<Model>(tag: "singleton_model", parm: { "title"
 var factoryModel = fromPlex<Model>(parm: { "title": "Test Model"});
 ```
 
--------------------------------------------------------------------------------------------
+------
+
+
+### MVVM Usage
+
+You can use MVVM ViewModel as below:
+
+##### 1. Create Your Screen i.e. `HomeScreen`:
+```dart
+
+class HomeScreen extends PlexScreen {} 
+
+class _HomeScreenState extends PlexState<HomeScreen> {
+  
+  showBottomSheet() {
+    ///Example
+    ///Show Bottom Sheet Logic Here
+  }
+}
+```
+
+##### 2. Create `ViewModel` Your Screen `HomeScreen`:
+```dart
+class HomeScreenViewModel extends PlexViewModel<HomeScreen, _HomeScreenState>{
+   /// Mode All Youe Data Access Logic Here
+   
+   exampleFunction() {
+     showLoading();
+     hideLoading();
+     
+     toast('Your Message');
+     toastDelayed('Your Message');
+     
+     ///state will be of type `_HomeScreenState`
+     ///So you can call any function or access any field from '_HomeScreenState'
+     state?.showBottomSheet();
+   }
+}
+```
+
+##### 3. Initialize `ViewModel` of any Screen and Use in `_HomeScreenState`
+
+```dart
+class _HomeScreenState extends PlexState<HomeScreen> {
+  
+  /// If using Plex Dependency Injection
+  /// i.e. injectSingleton(HomeScreenViewModel());
+  var viewModel = fromPlex<HomeScreenViewModel>();
+  
+  ///Or Simply by creating object of view model
+  var viewModel = HomeScreenViewModel();
+  
+  initState() {
+    super.initState();
+    viewModel.setState(this);
+  }
+  
+  ///Other Logic and Functions
+  ///....
+          
+  showBottomSheet() {
+    ///Example
+    ///Show Bottom Sheet Logic Here
+  }
+}
+```
+
+------
 
 ### Complete Example of Using PlexApp
 

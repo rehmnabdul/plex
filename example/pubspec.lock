@@ -542,7 +542,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "0.3.21"
+    version: "0.3.22"
   plugin_platform_interface:
     dependency: transitive
     description:

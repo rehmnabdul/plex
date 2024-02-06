@@ -34,6 +34,11 @@ class PlexSp {
     return _prefs?.getInt(key);
   }
 
+  ///Get the List<String> value against a key
+  List<String>? getList(String key) {
+    return _prefs?.getStringList(key);
+  }
+
   ///Set the string value against a key
   setString(String key, String? value) {
     if (value == null) {
@@ -56,5 +61,13 @@ class PlexSp {
       return _prefs!.remove(key);
     }
     return _prefs!.setInt(key, value);
+  }
+
+  ///Set the List<String> value against a key
+  setList(String key, List<String>? value) {
+    if (value == null) {
+      return _prefs!.remove(key);
+    }
+    return _prefs!.setStringList(key, value);
   }
 }

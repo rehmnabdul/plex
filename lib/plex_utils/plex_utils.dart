@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 
 enum PlexPlatform { web, android, iOS, fuchsia, linux, macOS, windows, unknown }
 
@@ -24,4 +25,16 @@ PlexPlatform getPlatform() {
       return PlexPlatform.unknown;
     }
   }
+}
+
+isLargeScreen(BuildContext context) {
+  return MediaQuery.of(context).size.width >= 900;
+}
+
+isMediumScreen(BuildContext context) {
+  return MediaQuery.of(context).size.width >= 600 && MediaQuery.of(context).size.width < 900;
+}
+
+isSmallScreen(BuildContext context) {
+  return MediaQuery.of(context).size.width < 600;
 }

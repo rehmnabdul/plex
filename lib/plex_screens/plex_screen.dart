@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:plex/plex_utils.dart';
 import 'package:plex/plex_utils/plex_messages.dart';
+import 'package:plex/plex_utils/plex_utils.dart';
 import 'package:plex/plex_widget.dart';
 import 'package:plex/plex_widgets/plex_loader.dart';
 
@@ -28,7 +29,7 @@ abstract class PlexState<T extends PlexScreen> extends State<T> {
     super.setState(fn);
   }
 
-  toast(String message, {String title = 'Message'}) {
+  toast(String message) {
     if (!mounted) return;
     if (message.length > 1000) message = "${message.substring(0, 1000)}...";
     context.showSnackBar(message);
@@ -116,16 +117,9 @@ abstract class PlexState<T extends PlexScreen> extends State<T> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    smallScreen = mediumScreen = largeScreen = false;
-    if (MediaQuery.of(context).size.width >= 900) {
-      largeScreen = true;
-      return;
-    }
-    if (MediaQuery.of(context).size.width >= 600) {
-      mediumScreen = true;
-      return;
-    }
-    smallScreen = true;
+    smallScreen = isSmallScreen(context);
+    mediumScreen = isMediumScreen(context);
+    largeScreen = isLargeScreen(context);
   }
 
   Widget buildBody();

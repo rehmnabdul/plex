@@ -8,6 +8,7 @@ import 'package:plex/plex_utils/plex_dimensions.dart';
 import 'package:plex/plex_utils/plex_material.dart';
 import 'package:plex/plex_utils/plex_messages.dart';
 import 'package:plex/plex_utils/plex_printer.dart';
+import 'package:plex/plex_utils/plex_utils.dart';
 import 'package:plex/plex_widget.dart';
 import 'package:plex/plex_widgets/plex_selection_list.dart';
 import 'package:syncfusion_flutter_core/theme.dart';
@@ -31,16 +32,14 @@ class PlexDataTableHeaderCell {
   late final Widget? cell;
 
   ///[columnName] is required as it is text only cell
-  PlexDataTableHeaderCell.text(this.columnName,
-      {this.isNumber = false, this.widthMode = WidthMode.auto}) {
+  PlexDataTableHeaderCell.text(this.columnName, {this.isNumber = false, this.widthMode = WidthMode.auto}) {
     cell = null;
   }
 
   ///For custom design and handling of cell use this constructor.
   ///[columnName] is optional
   ///[cell] is required for custom cell
-  PlexDataTableHeaderCell.custom(this.columnName, this.cell,
-      {this.isNumber = false, this.widthMode = WidthMode.auto});
+  PlexDataTableHeaderCell.custom(this.columnName, this.cell, {this.isNumber = false, this.widthMode = WidthMode.auto});
 
   ColumnWidthMode _getWidthMode() {
     switch (widthMode) {
@@ -65,8 +64,7 @@ class PlexDataTableValueCell extends DataGridCell {
   late final Widget? cell;
 
   ///[value] is required as it is text only cell
-  PlexDataTableValueCell.text(String columnName, value,
-      {bool numberField = false})
+  PlexDataTableValueCell.text(String columnName, value, {bool numberField = false})
       : super(
           columnName: columnName,
           value: value,
@@ -180,113 +178,266 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
             spaceSmall(),
             Row(
               children: [
-                Expanded(
-                    child: Text(widget.title,
-                        style: const TextStyle(fontWeight: FontWeight.bold))),
-                if (widget.enableColumnGrouping) ...{
-                  FilledButton.tonalIcon(
-                    onPressed: () {
-                      showMultiSelection<ColumnGroup>(
-                        context,
-                        itemText: (item) {
-                          return item.name;
-                        },
-                        onSelect: (items) {
-                          var oldSelection = source.groupedColumns;
-                          for (var column in oldSelection) {
-                            if (items.firstWhereOrNull(
-                                    (item) => item.name == column.name) ==
-                                null) {
-                              source.removeColumnGroup(column);
+                Expanded(child: Text(widget.title, style: const TextStyle(fontWeight: FontWeight.bold))),
+                if (isLargeScreen(context)) ...{
+                  if (widget.enableColumnGrouping) ...{
+                    FilledButton.tonalIcon(
+                      onPressed: () {
+                        showMultiSelection<ColumnGroup>(
+                          context,
+                          itemText: (item) {
+                            return item.name;
+                          },
+                          onSelect: (items) {
+                            var oldSelection = source.groupedColumns;
+                            for (var column in oldSelection) {
+                              if (items.firstWhereOrNull((item) => item.name == column.name) == null) {
+                                source.removeColumnGroup(column);
+                              }
                             }
-                          }
 
-                          oldSelection = source.groupedColumns;
-                          for (var item in items) {
-                            if (oldSelection.firstWhereOrNull(
-                                    (column) => column.name == item.name) ==
-                                null) {
-                              source.addColumnGroup(item);
+                            oldSelection = source.groupedColumns;
+                            for (var item in items) {
+                              if (oldSelection.firstWhereOrNull((column) => column.name == item.name) == null) {
+                                source.addColumnGroup(item);
+                              }
                             }
+                          },
+                          initialSelection: source.groupedColumns,
+                          items: widget.columns.map((e) => ColumnGroup(name: e.columnName, sortGroupRows: true)).toList(),
+                        );
+                      },
+                      style: ButtonStyle(backgroundColor: Colors.blue.shade100.getMaterialState(), elevation: Dim.smallest.getMaterialState()),
+                      icon: Image.asset(groupData, height: 25, width: 25, color: Colors.blue),
+                      label: const Text('Group By', style: TextStyle(color: Colors.blue)),
+                    ),
+                  },
+                  if (widget.enableExcelExport) ...{
+                    space(8),
+                    FilledButton.tonal(
+                      onPressed: () async {
+                        final xl.Workbook workbook = key.currentState!.exportToExcelWorkbook();
+                        workbook.worksheets[0].getRangeByIndex(1, 1, workbook.worksheets[0].rows.count, workbook.worksheets[0].columns.count).autoFit();
+                        final List<int> bytes = workbook.saveAsStream();
+                        var path = await PlexPrinter.saveExcelFile(widget.title, bytes);
+
+                        if (path == null) {
+                          context.showSnackBar("Unable to save file, Please try again...");
+                        }
+                        context.showSnackBar("Report saved at \"$path\"");
+                      },
+                      style: ButtonStyle(backgroundColor: Colors.green.shade100.getMaterialState(), elevation: Dim.smallest.getMaterialState()),
+                      child: Image.asset(excel, width: 20, height: 20, color: Colors.green),
+                    ),
+                  },
+                  if (widget.enablePdfExport) ...{
+                    space(8),
+                    FilledButton.tonal(
+                      onPressed: () async {
+                        var document = key.currentState!.exportToPdfDocument(autoColumnWidth: true);
+                        final List<int> bytes = document.saveSync();
+                        var path = await PlexPrinter.savePdfFile(widget.title, bytes);
+                        if (path == null) {
+                          context.showSnackBar("Unable to save file, Please try again...");
+                        }
+                        context.showSnackBar("Report saved at \"$path\"");
+                      },
+                      style: ButtonStyle(backgroundColor: Colors.red.shade100.getMaterialState(), elevation: Dim.smallest.getMaterialState()),
+                      child: Image.asset(pdf, width: 20, height: 20, color: Colors.redAccent),
+                    ),
+                  },
+                  if (widget.onRefresh != null) ...{
+                    space(8),
+                    FilledButton.tonal(
+                      onPressed: () async {
+                        widget.onRefresh?.call();
+                      },
+                      child: const Icon(Icons.refresh),
+                    ),
+                  },
+                } else if(isMediumScreen(context)) ...{
+                  if (widget.enableColumnGrouping) ...{
+                    FilledButton.tonalIcon(
+                      onPressed: () {
+                        showMultiSelection<ColumnGroup>(
+                          context,
+                          itemText: (item) {
+                            return item.name;
+                          },
+                          onSelect: (items) {
+                            var oldSelection = source.groupedColumns;
+                            for (var column in oldSelection) {
+                              if (items.firstWhereOrNull((item) => item.name == column.name) == null) {
+                                source.removeColumnGroup(column);
+                              }
+                            }
+
+                            oldSelection = source.groupedColumns;
+                            for (var item in items) {
+                              if (oldSelection.firstWhereOrNull((column) => column.name == item.name) == null) {
+                                source.addColumnGroup(item);
+                              }
+                            }
+                          },
+                          initialSelection: source.groupedColumns,
+                          items: widget.columns.map((e) => ColumnGroup(name: e.columnName, sortGroupRows: true)).toList(),
+                        );
+                      },
+                      style: ButtonStyle(backgroundColor: Colors.blue.shade100.getMaterialState(), elevation: Dim.smallest.getMaterialState()),
+                      icon: Image.asset(groupData, height: 25, width: 25, color: Colors.blue),
+                      label: const Text('Group By', style: TextStyle(color: Colors.blue)),
+                    ),
+                  },
+                  MenuAnchor(
+                    menuChildren: [
+                      if (widget.enableExcelExport) ...{
+                        MenuItemButton(
+                          onPressed: () async {
+                            final xl.Workbook workbook = key.currentState!.exportToExcelWorkbook();
+                            workbook.worksheets[0].getRangeByIndex(1, 1, workbook.worksheets[0].rows.count, workbook.worksheets[0].columns.count).autoFit();
+                            final List<int> bytes = workbook.saveAsStream();
+                            var path = await PlexPrinter.saveExcelFile(widget.title, bytes);
+
+                            if (path == null) {
+                              context.showSnackBar("Unable to save file, Please try again...");
+                            }
+                            context.showSnackBar("Report saved at \"$path\"");
+                          },
+                          style: ButtonStyle(backgroundColor: Colors.green.shade100.getMaterialState(), elevation: Dim.smallest.getMaterialState()),
+                          leadingIcon: Image.asset(excel, width: 20, height: 20, color: Colors.green),
+                          child: const Text('Excel', style: TextStyle(color: Colors.green)),
+                        ),
+                      },
+                      if (widget.enablePdfExport) ...{
+                        MenuItemButton(
+                          onPressed: () async {
+                            var document = key.currentState!.exportToPdfDocument(autoColumnWidth: true);
+                            final List<int> bytes = document.saveSync();
+                            var path = await PlexPrinter.savePdfFile(widget.title, bytes);
+                            if (path == null) {
+                              context.showSnackBar("Unable to save file, Please try again...");
+                            }
+                            context.showSnackBar("Report saved at \"$path\"");
+                          },
+                          style: ButtonStyle(backgroundColor: Colors.red.shade100.getMaterialState(), elevation: Dim.smallest.getMaterialState()),
+                          leadingIcon: Image.asset(pdf, width: 20, height: 20, color: Colors.redAccent),
+                          child: const Text('Pdf', style: TextStyle(color: Colors.redAccent)),
+                        ),
+                      },
+                      if (widget.onRefresh != null) ...{
+                        MenuItemButton(
+                          onPressed: () async {
+                            widget.onRefresh?.call();
+                          },
+                          leadingIcon: const Icon(Icons.refresh),
+                          child: const Text('Refresh'),
+                        ),
+                      },
+                    ],
+                    builder: (context, controller, child) {
+                      return IconButton(
+                        onPressed: () {
+                          if (controller.isOpen) {
+                            controller.close();
+                          } else {
+                            controller.open();
                           }
                         },
-                        initialSelection: source.groupedColumns,
-                        items: widget.columns
-                            .map((e) => ColumnGroup(
-                                name: e.columnName, sortGroupRows: true))
-                            .toList(),
+                        icon: const Icon(Icons.more_vert),
                       );
                     },
-                    style: ButtonStyle(
-                        backgroundColor:
-                            Colors.blue.shade100.getMaterialState(),
-                        elevation: Dim.smallest.getMaterialState()),
-                    icon: Image.asset(groupData,
-                        height: 25, width: 25, color: Colors.blue),
-                    label: const Text('Group By',
-                        style: TextStyle(color: Colors.blue)),
                   ),
-                },
-                if (widget.enableExcelExport) ...{
-                  spaceSmall(),
-                  FilledButton.tonal(
-                    onPressed: () async {
-                      final xl.Workbook workbook =
-                          key.currentState!.exportToExcelWorkbook();
-                      workbook.worksheets[0]
-                          .getRangeByIndex(
-                              1,
-                              1,
-                              workbook.worksheets[0].rows.count,
-                              workbook.worksheets[0].columns.count)
-                          .autoFit();
-                      final List<int> bytes = workbook.saveAsStream();
-                      var path =
-                          await PlexPrinter.saveExcelFile(widget.title, bytes);
+                } else ...{
+                  MenuAnchor(
+                    menuChildren: [
+                      if (widget.enableColumnGrouping) ...{
+                        MenuItemButton(
+                          style: ButtonStyle(backgroundColor: Colors.blue.shade100.getMaterialState(), elevation: Dim.smallest.getMaterialState()),
+                          leadingIcon: Image.asset(groupData, height: 25, width: 25, color: Colors.blue),
+                          onPressed: () {
+                            showMultiSelection<ColumnGroup>(
+                              context,
+                              itemText: (item) {
+                                return item.name;
+                              },
+                              onSelect: (items) {
+                                var oldSelection = source.groupedColumns;
+                                for (var column in oldSelection) {
+                                  if (items.firstWhereOrNull((item) => item.name == column.name) == null) {
+                                    source.removeColumnGroup(column);
+                                  }
+                                }
 
-                      if (path == null) {
-                        context.showSnackBar(
-                            "Unable to save file, Please try again...");
-                      }
-                      context.showSnackBar("Report saved at \"$path\"");
+                                oldSelection = source.groupedColumns;
+                                for (var item in items) {
+                                  if (oldSelection.firstWhereOrNull((column) => column.name == item.name) == null) {
+                                    source.addColumnGroup(item);
+                                  }
+                                }
+                              },
+                              initialSelection: source.groupedColumns,
+                              items: widget.columns.map((e) => ColumnGroup(name: e.columnName, sortGroupRows: true)).toList(),
+                            );
+                          },
+                          child: const Text('Group By', style: TextStyle(color: Colors.blue)),
+                        ),
+                      },
+                      if (widget.enableExcelExport) ...{
+                        MenuItemButton(
+                          onPressed: () async {
+                            final xl.Workbook workbook = key.currentState!.exportToExcelWorkbook();
+                            workbook.worksheets[0].getRangeByIndex(1, 1, workbook.worksheets[0].rows.count, workbook.worksheets[0].columns.count).autoFit();
+                            final List<int> bytes = workbook.saveAsStream();
+                            var path = await PlexPrinter.saveExcelFile(widget.title, bytes);
+
+                            if (path == null) {
+                              context.showSnackBar("Unable to save file, Please try again...");
+                            }
+                            context.showSnackBar("Report saved at \"$path\"");
+                          },
+                          style: ButtonStyle(backgroundColor: Colors.green.shade100.getMaterialState(), elevation: Dim.smallest.getMaterialState()),
+                          leadingIcon: Image.asset(excel, width: 20, height: 20, color: Colors.green),
+                          child: const Text('Excel', style: TextStyle(color: Colors.green)),
+                        ),
+                      },
+                      if (widget.enablePdfExport) ...{
+                        MenuItemButton(
+                          onPressed: () async {
+                            var document = key.currentState!.exportToPdfDocument(autoColumnWidth: true);
+                            final List<int> bytes = document.saveSync();
+                            var path = await PlexPrinter.savePdfFile(widget.title, bytes);
+                            if (path == null) {
+                              context.showSnackBar("Unable to save file, Please try again...");
+                            }
+                            context.showSnackBar("Report saved at \"$path\"");
+                          },
+                          style: ButtonStyle(backgroundColor: Colors.red.shade100.getMaterialState(), elevation: Dim.smallest.getMaterialState()),
+                          leadingIcon: Image.asset(pdf, width: 20, height: 20, color: Colors.redAccent),
+                          child: const Text('Pdf', style: TextStyle(color: Colors.redAccent)),
+                        ),
+                      },
+                      if (widget.onRefresh != null) ...{
+                        MenuItemButton(
+                          onPressed: () async {
+                            widget.onRefresh?.call();
+                          },
+                          leadingIcon: const Icon(Icons.refresh),
+                          child: const Text('Refresh'),
+                        ),
+                      },
+                    ],
+                    builder: (context, controller, child) {
+                      return IconButton(
+                        onPressed: () {
+                          if (controller.isOpen) {
+                            controller.close();
+                          } else {
+                            controller.open();
+                          }
+                        },
+                        icon: const Icon(Icons.more_vert),
+                      );
                     },
-                    style: ButtonStyle(
-                        backgroundColor:
-                            Colors.green.shade100.getMaterialState(),
-                        elevation: Dim.smallest.getMaterialState()),
-                    child: Image.asset(excel,
-                        width: 20, height: 20, color: Colors.green),
-                  ),
-                },
-                if (widget.enablePdfExport) ...{
-                  spaceSmall(),
-                  FilledButton.tonal(
-                    onPressed: () async {
-                      var document = key.currentState!
-                          .exportToPdfDocument(autoColumnWidth: true);
-                      final List<int> bytes = document.saveSync();
-                      var path =
-                          await PlexPrinter.savePdfFile(widget.title, bytes);
-                      if (path == null) {
-                        context.showSnackBar(
-                            "Unable to save file, Please try again...");
-                      }
-                      context.showSnackBar("Report saved at \"$path\"");
-                    },
-                    style: ButtonStyle(
-                        backgroundColor: Colors.red.shade100.getMaterialState(),
-                        elevation: Dim.smallest.getMaterialState()),
-                    child: Image.asset(pdf,
-                        width: 20, height: 20, color: Colors.redAccent),
-                  ),
-                },
-                if (widget.onRefresh != null) ...{
-                  spaceSmall(),
-                  FilledButton.tonal(
-                    onPressed: () async {
-                      widget.onRefresh?.call();
-                    },
-                    child: const Icon(Icons.refresh),
                   ),
                 },
               ],
@@ -296,11 +447,9 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
               child: SfDataGridTheme(
                 data: SfDataGridThemeData(
                   headerColor: widget.headerBackground,
-                  filterIconColor:
-                      widget.headerTextStyle?.color?.withOpacity(0.8),
+                  filterIconColor: widget.headerTextStyle?.color?.withOpacity(0.8),
                   filterIconHoverColor: widget.headerTextStyle?.color,
-                  sortIconColor:
-                      widget.headerTextStyle?.color?.withOpacity(0.8),
+                  sortIconColor: widget.headerTextStyle?.color?.withOpacity(0.8),
                   selectionColor: PlexTheme.selectionColor,
                 ),
                 child: SfDataGrid(
@@ -382,9 +531,7 @@ class _PlexAdvanceDataTableDataSource extends DataGridSource {
     Color? alternateColor,
   }) {
     _data = data.map((e) => DataGridRow(cells: e)).toList();
-    _dataGridRows = pageSize != null && pageSize! <= data.length
-        ? _data.getRange(0, pageSize!).toList(growable: false)
-        : _data;
+    _dataGridRows = pageSize != null && pageSize! <= data.length ? _data.getRange(0, pageSize!).toList(growable: false) : _data;
     _alternateColor = alternateColor;
   }
 
@@ -417,8 +564,7 @@ class _PlexAdvanceDataTableDataSource extends DataGridSource {
   }
 
   @override
-  Widget? buildGroupCaptionCellWidget(
-      RowColumnIndex rowColumnIndex, String summaryValue) {
+  Widget? buildGroupCaptionCellWidget(RowColumnIndex rowColumnIndex, String summaryValue) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 15),
       child: Text(summaryValue),
@@ -432,11 +578,9 @@ class _PlexAdvanceDataTableDataSource extends DataGridSource {
     int endIndex = startIndex + pageSize!;
     if (startIndex < _data.length) {
       if (endIndex <= _data.length) {
-        _dataGridRows =
-            _data.getRange(startIndex, endIndex).toList(growable: false);
+        _dataGridRows = _data.getRange(startIndex, endIndex).toList(growable: false);
       } else {
-        _dataGridRows =
-            _data.getRange(startIndex, _data.length).toList(growable: false);
+        _dataGridRows = _data.getRange(startIndex, _data.length).toList(growable: false);
       }
     } else {
       _dataGridRows = [];
@@ -455,8 +599,7 @@ class CustomColumnSizer extends ColumnSizer {
   }
 
   @override
-  double computeCellWidth(GridColumn column, DataGridRow row, Object? cellValue,
-      TextStyle textStyle) {
+  double computeCellWidth(GridColumn column, DataGridRow row, Object? cellValue, TextStyle textStyle) {
     textStyle = textStyle.copyWith(fontWeight: FontWeight.bold);
     return super.computeCellWidth(column, row, cellValue, textStyle);
   }

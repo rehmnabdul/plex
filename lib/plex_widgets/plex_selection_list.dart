@@ -253,3 +253,88 @@ showMultiSelection<T>(
     },
   );
 }
+
+
+
+showAutoCompleteSelectionList<T>(
+    BuildContext context, {
+      required Future<List<T>> Function(String query) asyncItems,
+      required String Function(T item) itemText,
+      required Function(T item) onSelect,
+      Widget Function(dynamic item)? itemWidget,
+      Widget Function(T item)? leadingIcon,
+    }) async {
+
+  var inputController = TextEditingController();
+  var filteredListController = PlexWidgetController<List<T>>(data: List.empty());
+
+  // ignore: use_build_context_synchronously
+  showModalBottomSheet(
+    enableDrag: true,
+    showDragHandle: true,
+    useSafeArea: true,
+    isScrollControlled: true,
+    context: context,
+    builder: (context) {
+      return Padding(
+        padding: MediaQuery.of(context).viewInsets,
+        child: Container(
+          constraints: const BoxConstraints(maxHeight: 500),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              PlexInputWidget<String>(
+                title: "Search",
+                type: PlexInputWidgetType.typeInput,
+                inputController: inputController,
+                inputHint: "Search here...",
+                inputOnChange: (data) async {
+                  var query = data;
+                  if (query.length < 2) {
+                    return;
+                  }
+                  var filteredList = await asyncItems.call(query);
+                  filteredListController.setValue(filteredList);
+                },
+              ),
+              spaceSmall(),
+              Expanded(
+                child: PlexWidget(
+                  controller: filteredListController,
+                  createWidget: (con, data) {
+                    var listData = data as List<T>;
+                    return ListView.builder(
+                      physics: const BouncingScrollPhysics(),
+                      itemCount: listData.length,
+                      itemBuilder: (context, index) {
+                        var item = listData[index];
+                        if (itemWidget != null) {
+                          return InkWell(
+                            onTap: () {
+                              onSelect.call(item);
+                              Get.back();
+                            },
+                            child: itemWidget.call(item),
+                          );
+                        }
+                        return ListTile(
+                          selectedTileColor: Colors.green.withOpacity(0.25),
+                          leading: leadingIcon?.call(item),
+                          title: Text(itemText.call(item)),
+                          onTap: () {
+                            onSelect.call(item);
+                            Get.back();
+                          },
+                        );
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
+}

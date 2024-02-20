@@ -2,7 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:plex/plex_package.dart';
 import 'package:plex/plex_screens/plex_screen.dart';
 import 'package:plex/plex_utils/plex_dimensions.dart';
+import 'package:plex/plex_view_model/plex_view_model.dart';
 import 'package:plex/plex_widget.dart';
+
+class UpdatableScreenViewModel extends PlexViewModel<UpdatableScreen, _UpdatableScreenState> {
+  var updateController = PlexWidgetController<int>(data: 0);
+}
+
 
 class UpdatableScreen extends PlexScreen {
   const UpdatableScreen({Key? key}) : super(key: key);
@@ -12,7 +18,8 @@ class UpdatableScreen extends PlexScreen {
 }
 
 class _UpdatableScreenState extends PlexState<UpdatableScreen> {
-  var updateController = PlexWidgetController<int>(data: 0);
+
+  var viewModel = UpdatableScreenViewModel();
 
   @override
   Widget buildBody() {
@@ -21,7 +28,7 @@ class _UpdatableScreenState extends PlexState<UpdatableScreen> {
         mainAxisSize: MainAxisSize.min,
         children: [
           PlexWidget(
-            controller: updateController,
+            controller: viewModel.updateController,
             createWidget: (context, data) {
               return Text("Counter: $data",
                   style: const TextStyle(fontSize: 20));
@@ -30,8 +37,9 @@ class _UpdatableScreenState extends PlexState<UpdatableScreen> {
           spaceMedium(),
           ElevatedButton.icon(
             onPressed: () {
-              var oldValue = updateController.data ?? 0;
-              updateController.setValue(oldValue + 1);
+              var oldValue = viewModel.updateController.data ?? 0;
+              viewModel.updateController.setValue(oldValue + 1);
+              viewModel.toast("Added");
             },
             icon: const Icon(Icons.add),
             label: const Text("Add"),

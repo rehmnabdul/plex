@@ -7,6 +7,7 @@ class PlexDashboardConfig {
     this.disableExpandNavigationRail = false,
     this.disableNavigationRail = false,
     this.disableBottomNavigation = false,
+    this.enableNotifications = false,
     this.showAnimationSwitch = true,
     this.showThemeSwitch = true,
     this.showBrightnessSwitch = true,
@@ -26,6 +27,9 @@ class PlexDashboardConfig {
   final bool showBrightnessSwitch;
   final bool showMaterialSwitch;
 
+  ///Hide and Show Notification Button from the AppBar
+  final bool enableNotifications;
+
   ///This [dashboardScreens] list will contains all the routes information for Application
   final List<PlexRoute> dashboardScreens;
 
@@ -41,20 +45,15 @@ class PlexDashboardConfig {
   final bool disableBottomNavigation;
 
   ///This [appbarActions] will be available on top right submenu link
-  final List<MenuItemButton> Function(
-      PlexState<PlexScreen> state, BuildContext context)? appbarActions;
+  final List<MenuItemButton> Function(PlexState<PlexScreen> state, BuildContext context)? appbarActions;
 
   final Color? navigationRailBackgroundColor;
   final bool hideNavigationRailLogo;
   final double hideNavigationRailLogoWidth;
   final double hideNavigationRailLogoHeight;
   final bool hideNavigationRailVersionInfo;
-  final List<Widget> Function(
-          PlexState<PlexScreen> state, BuildContext context)?
-      navigationRailTopWidgets;
-  final List<Widget> Function(
-          PlexState<PlexScreen> state, BuildContext context)?
-      navigationRailBottomWidgets;
+  final List<Widget> Function(PlexState<PlexScreen> state, BuildContext context)? navigationRailTopWidgets;
+  final List<Widget> Function(PlexState<PlexScreen> state, BuildContext context)? navigationRailBottomWidgets;
 
   ///Navigate to other screen present in Dashboard Screen
   void navigateOnDashboard(int index) {
@@ -68,9 +67,7 @@ class PlexDashboardConfig {
 }
 
 class PlexDashboardScreen extends PlexScreen {
-  const PlexDashboardScreen(
-      this.handleBrightnessChange, this.handleMaterialVersionChange,
-      {super.key});
+  const PlexDashboardScreen(this.handleBrightnessChange, this.handleMaterialVersionChange, {super.key});
 
   final Function(ThemeMode mode) handleBrightnessChange;
   final Function() handleMaterialVersionChange;
@@ -82,6 +79,8 @@ class PlexDashboardScreen extends PlexScreen {
 class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
   final int maxBottomNavDestinations = 4;
   var navigationSelectedIndex = -1;
+  var notificationVisibilityController = PlexWidgetController<int>(data: 0);
+  var notificationCountController = PlexWidgetController<int>(data: 0);
 
   PlexUser? user;
   late List<PlexRoute> routes;
@@ -98,8 +97,8 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
       isLoading ? showLoading() : hideLoading();
     };
     PlexApp.app._isLoadingDelegate = () => isLoading();
-    routes = PlexApp.app.dashboardConfig?.dashboardScreens ??
-        List.empty(growable: true);
+    PlexApp.app._notificationDelegate = () => notificationCountController.setValue(PlexApp.app._notifications.length);
+    routes = PlexApp.app.dashboardConfig?.dashboardScreens ?? List.empty(growable: true);
     routes = routes.where((element) {
       if (element.rule == null) return true;
       if (user == null) return true;
@@ -110,8 +109,7 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
     if (routes.isEmpty) {
       delay(() => PlexApp.app.logout());
     } else {
-      var index = routes.indexWhere(
-          (element) => element.route == PlexApp.app.appInfo.initialRoute);
+      var index = routes.indexWhere((element) => element.route == PlexApp.app.appInfo.initialRoute);
       navigationSelectedIndex = index == -1 ? 0 : index;
     }
 
@@ -127,15 +125,14 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
     super.dispose();
     PlexApp.app._loadingDelegate = null;
     PlexApp.app._isLoadingDelegate = null;
+    PlexApp.app._notificationDelegate = null;
   }
 
   @override
   AppBar? buildAppBar() {
     return AppBar(
       centerTitle: true,
-      title: navigationSelectedIndex == -1
-          ? Container()
-          : Text(routes[navigationSelectedIndex].title),
+      title: navigationSelectedIndex == -1 ? Container() : Text(routes[navigationSelectedIndex].title),
       leading: (routes.isNotEmpty)
           ? IconButton(
               icon: const Icon(Icons.menu),
@@ -146,12 +143,7 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
       actions: [
         if (PlexApp.app.useAuthorization) ...[
           if (largeScreen) ...{
-            Center(
-                child: Text(PlexApp.app
-                        .getUser()
-                        ?.getLoggedInFullName()
-                        .toUpperCase() ??
-                    "N/A")),
+            Center(child: Text(PlexApp.app.getUser()?.getLoggedInFullName().toUpperCase() ?? "N/A")),
             spaceSmall(),
           },
           Center(
@@ -159,44 +151,30 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
               width: 40,
               height: 40,
               child: Tooltip(
-                message:
-                    PlexApp.app.getUser()?.getLoggedInFullName().toString() ??
-                        "N/A",
+                message: PlexApp.app.getUser()?.getLoggedInFullName().toString() ?? "N/A",
                 child: Container(
                   decoration: BoxDecoration(
-                    color:
-                        PlexTheme.getActiveTheme(context).colorScheme.secondary,
+                    color: PlexTheme.getActiveTheme(context).colorScheme.secondary,
                     borderRadius: BorderRadius.circular(20),
                   ),
                   clipBehavior: Clip.hardEdge,
                   child: PlexApp.app.getUser()?.getPictureUrl() != null
                       ? CachedNetworkImage(
                           imageUrl: PlexApp.app.getUser()!.getPictureUrl()!,
-                          progressIndicatorBuilder:
-                              (context, url, downloadProgress) {
+                          progressIndicatorBuilder: (context, url, downloadProgress) {
                             debugPrint(downloadProgress.progress.toString());
                             return Stack(
                               children: [
                                 Center(
                                   child: Text(
-                                    PlexApp.app
-                                            .getUser()
-                                            ?.getInitials()
-                                            .toString() ??
-                                        "N/A",
-                                    style: const TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 14),
+                                    PlexApp.app.getUser()?.getInitials().toString() ?? "N/A",
+                                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
                                   ),
                                 ),
                                 Center(
                                   child: CircularProgressIndicator(
                                     color: Colors.yellowAccent,
-                                    value: downloadProgress.totalSize == null
-                                        ? null
-                                        : downloadProgress.downloaded /
-                                            downloadProgress.totalSize!,
+                                    value: downloadProgress.totalSize == null ? null : downloadProgress.downloaded / downloadProgress.totalSize!,
                                   ),
                                 )
                               ],
@@ -204,23 +182,15 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
                           },
                           errorWidget: (context, url, error) => Center(
                             child: Text(
-                              PlexApp.app.getUser()?.getInitials().toString() ??
-                                  "N/A",
-                              style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14),
+                              PlexApp.app.getUser()?.getInitials().toString() ?? "N/A",
+                              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
                             ),
                           ),
                         )
                       : Center(
                           child: Text(
-                            PlexApp.app.getUser()?.getInitials().toString() ??
-                                "N/A",
-                            style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 14),
+                            PlexApp.app.getUser()?.getInitials().toString() ?? "N/A",
+                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
                           ),
                         ),
                 ),
@@ -228,6 +198,53 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
             ),
           ),
         ],
+        if (PlexApp.app.dashboardConfig!.enableNotifications) ...{
+          spaceSmall(),
+          PlexWidget(
+            controller: notificationCountController,
+            createWidget: (context, data) {
+              return Center(
+                child: SizedBox(
+                  width: 40,
+                  height: 40,
+                  child: MouseRegion(
+                    child: Stack(children: [
+                      const Center(child: Icon(Icons.notifications)),
+                      if (data > 0) ...{
+                        Align(
+                          alignment: Alignment.bottomRight,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(10), // Adjust the value to change the roundness
+                            child: Container(
+                              height: 20,
+                              width: 20,
+                              color: Colors.red, // Set the background color of the rounded text box
+                              child: Center(
+                                child: Text(
+                                  data.toString(),
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 10
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      }
+                    ]),
+                    onEnter: (_) {
+                      notificationVisibilityController.increment();
+                    },
+                    onExit: (value) {
+                      delay(() => notificationVisibilityController.decrement());
+                    },
+                  ),
+                ),
+              );
+            },
+          ),
+        },
         MenuAnchor(
           menuChildren: [
             if (PlexApp.app.dashboardConfig!.showAnimationSwitch) ...{
@@ -240,21 +257,16 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
                     trailingIcon: Switch(
                         value: isPlexAnimationsEnable(),
                         onChanged: (bool value) {
-                          value
-                              ? enablePlexAnimations()
-                              : disablePlexAnimations();
+                          value ? enablePlexAnimations() : disablePlexAnimations();
                           setState(() {});
                         }),
-                    child:
-                        Text(isPlexAnimationsEnable() ? 'Disable' : 'Enable'),
+                    child: Text(isPlexAnimationsEnable() ? 'Disable' : 'Enable'),
                   )
                 ],
                 child: const Text("Animations"),
               ),
             },
-            if (PlexApp.app.dashboardConfig!.showThemeSwitch &&
-                (PlexApp.app.dashboardConfig!.showMaterialSwitch ||
-                    PlexApp.app.dashboardConfig!.showBrightnessSwitch)) ...{
+            if (PlexApp.app.dashboardConfig!.showThemeSwitch && (PlexApp.app.dashboardConfig!.showMaterialSwitch || PlexApp.app.dashboardConfig!.showBrightnessSwitch)) ...{
               SubmenuButton(
                 menuChildren: <Widget>[
                   if (PlexApp.app.dashboardConfig!.showMaterialSwitch) ...{
@@ -283,53 +295,44 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
                               actions: [
                                 TextButton.icon(
                                   onPressed: () {
-                                    widget.handleBrightnessChange(
-                                        ThemeMode.system);
+                                    widget.handleBrightnessChange(ThemeMode.system);
                                   },
                                   icon: const Icon(Icons.brightness_4),
                                   label: Row(
                                     children: [
                                       const Text("System Specified"),
-                                      if (PlexTheme.getBrightnessMode() ==
-                                          ThemeMode.system) ...{
+                                      if (PlexTheme.getBrightnessMode() == ThemeMode.system) ...{
                                         Expanded(child: Container()),
-                                        const Icon(Icons.check_circle,
-                                            color: Colors.green),
+                                        const Icon(Icons.check_circle, color: Colors.green),
                                       }
                                     ],
                                   ),
                                 ),
                                 TextButton.icon(
                                     onPressed: () {
-                                      widget.handleBrightnessChange(
-                                          ThemeMode.dark);
+                                      widget.handleBrightnessChange(ThemeMode.dark);
                                     },
                                     icon: const Icon(Icons.dark_mode),
                                     label: Row(
                                       children: [
                                         const Text("Dark Mode"),
-                                        if (PlexTheme.getBrightnessMode() ==
-                                            ThemeMode.dark) ...{
+                                        if (PlexTheme.getBrightnessMode() == ThemeMode.dark) ...{
                                           Expanded(child: Container()),
-                                          const Icon(Icons.check_circle,
-                                              color: Colors.green),
+                                          const Icon(Icons.check_circle, color: Colors.green),
                                         }
                                       ],
                                     )),
                                 TextButton.icon(
                                   onPressed: () {
-                                    widget.handleBrightnessChange(
-                                        ThemeMode.light);
+                                    widget.handleBrightnessChange(ThemeMode.light);
                                   },
                                   icon: const Icon(Icons.light_mode),
                                   label: Row(
                                     children: [
                                       const Text("Light Mode"),
-                                      if (PlexTheme.getBrightnessMode() ==
-                                          ThemeMode.light) ...{
+                                      if (PlexTheme.getBrightnessMode() == ThemeMode.light) ...{
                                         Expanded(child: Container()),
-                                        const Icon(Icons.check_circle,
-                                            color: Colors.green),
+                                        const Icon(Icons.check_circle, color: Colors.green),
                                       }
                                     ],
                                   ),
@@ -428,9 +431,7 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
     if (PlexApp.app.dashboardConfig!.disableBottomNavigation) return null;
     if (!smallScreen || (routes.length) <= 1) return null;
     return NavigationBar(
-      selectedIndex: navigationSelectedIndex > maxBottomNavDestinations
-          ? maxBottomNavDestinations
-          : navigationSelectedIndex,
+      selectedIndex: navigationSelectedIndex > maxBottomNavDestinations ? maxBottomNavDestinations : navigationSelectedIndex,
       labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
       animationDuration: const Duration(milliseconds: 500),
       onDestinationSelected: (int index) {
@@ -440,22 +441,19 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
       },
       destinations: [
         if (routes.length > maxBottomNavDestinations) ...{
-          ...routes
-              .sublist(0, maxBottomNavDestinations)
-              .map((destination) => NavigationDestination(
-                    label: destination.shortTitle ?? destination.title,
-                    icon: destination.logo ?? const Icon(Icons.circle),
-                    selectedIcon: destination.logo,
-                    tooltip: destination.title,
-                  )),
+          ...routes.sublist(0, maxBottomNavDestinations).map((destination) => NavigationDestination(
+                label: destination.shortTitle ?? destination.title,
+                icon: destination.logo ?? const Icon(Icons.circle),
+                selectedIcon: destination.logo,
+                tooltip: destination.title,
+              )),
           MenuAnchor(
             menuChildren: [
               ...routes.sublist(maxBottomNavDestinations).map(
                     (e) => MenuItemButton(
                       onPressed: () {
                         setState(() {
-                          navigationSelectedIndex =
-                              routes.indexWhere((i) => i.route == e.route);
+                          navigationSelectedIndex = routes.indexWhere((i) => i.route == e.route);
                         });
                       },
                       leadingIcon: e.logo ?? const Icon(Icons.logout),
@@ -497,8 +495,7 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
         menus.add(
           Padding(
             padding: const EdgeInsets.fromLTRB(28, 16, 16, 10),
-            child: Text(prevCategory,
-                style: Theme.of(context).textTheme.titleSmall),
+            child: Text(prevCategory, style: Theme.of(context).textTheme.titleSmall),
           ),
         );
       }
@@ -523,11 +520,7 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
             Padding(
               padding: const EdgeInsets.all(Dim.small),
               child: Card(
-                color: PlexApp
-                        .app.dashboardConfig!.navigationRailBackgroundColor ??
-                    PlexTheme.getActiveTheme(context)
-                        .navigationRailTheme
-                        .backgroundColor,
+                color: PlexApp.app.dashboardConfig!.navigationRailBackgroundColor ?? PlexTheme.getActiveTheme(context).navigationRailTheme.backgroundColor,
                 clipBehavior: Clip.hardEdge,
                 elevation: Dim.small,
                 child: LayoutBuilder(
@@ -535,72 +528,45 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
                     return SingleChildScrollView(
                       physics: const BouncingScrollPhysics(),
                       child: ConstrainedBox(
-                        constraints:
-                            BoxConstraints(minHeight: constraints.maxHeight),
+                        constraints: BoxConstraints(minHeight: constraints.maxHeight),
                         child: IntrinsicHeight(
                           child: NavigationRail(
                             useIndicator: true,
-                            extended: !PlexApp.app.dashboardConfig!
-                                    .disableExpandNavigationRail &&
-                                largeScreen,
+                            extended: !PlexApp.app.dashboardConfig!.disableExpandNavigationRail && largeScreen,
                             backgroundColor: Colors.transparent,
-                            selectedIconTheme: PlexTheme.getActiveTheme(context)
-                                .iconTheme
-                                .copyWith(size: 25),
-                            unselectedIconTheme:
-                                PlexTheme.getActiveTheme(context)
-                                    .iconTheme
-                                    .copyWith(size: 15),
-                            selectedLabelTextStyle:
-                                (PlexTheme.getActiveTheme(context)
-                                            .navigationRailTheme
-                                            .selectedLabelTextStyle ??
-                                        TextStyle(
-                                          color: PlexTheme.isDarkMode(context)
-                                              ? Colors.white
-                                              : Colors.black,
-                                        ))
-                                    .copyWith(fontWeight: FontWeight.bold),
+                            selectedIconTheme: PlexTheme.getActiveTheme(context).iconTheme.copyWith(size: 25),
+                            unselectedIconTheme: PlexTheme.getActiveTheme(context).iconTheme.copyWith(size: 15),
+                            selectedLabelTextStyle: (PlexTheme.getActiveTheme(context).navigationRailTheme.selectedLabelTextStyle ??
+                                    TextStyle(
+                                      color: PlexTheme.isDarkMode(context) ? Colors.white : Colors.black,
+                                    ))
+                                .copyWith(fontWeight: FontWeight.bold),
                             indicatorShape: null,
                             leading: SizedBox(
-                              width: !PlexApp.app.dashboardConfig!
-                                          .disableExpandNavigationRail &&
-                                      largeScreen
-                                  ? 200
-                                  : 50,
+                              width: !PlexApp.app.dashboardConfig!.disableExpandNavigationRail && largeScreen ? 200 : 50,
                               child: Column(
                                 children: [
                                   spaceSmall(),
-                                  if (!PlexApp.app.dashboardConfig!
-                                      .hideNavigationRailLogo) ...{
+                                  if (!PlexApp.app.dashboardConfig!.hideNavigationRailLogo) ...{
                                     SizedBox(
-                                      height: PlexApp.app.dashboardConfig!
-                                          .hideNavigationRailLogoHeight,
-                                      width: PlexApp.app.dashboardConfig!
-                                          .hideNavigationRailLogoWidth,
+                                      height: PlexApp.app.dashboardConfig!.hideNavigationRailLogoHeight,
+                                      width: PlexApp.app.dashboardConfig!.hideNavigationRailLogoWidth,
                                       child: PlexApp.app.getLogo(context),
                                     ),
                                     spaceSmall(),
                                   },
-                                  if (!PlexApp.app.dashboardConfig!
-                                          .hideNavigationRailVersionInfo &&
-                                      PlexApp.app.appInfo.versionName !=
-                                          null) ...[
+                                  if (!PlexApp.app.dashboardConfig!.hideNavigationRailVersionInfo && PlexApp.app.appInfo.versionName != null) ...[
                                     Text("${PlexApp.app.appInfo.versionName}"),
                                     spaceSmall(),
                                   ],
-                                  ...?PlexApp.app.dashboardConfig!
-                                      .navigationRailTopWidgets
-                                      ?.call(this, context),
+                                  ...?PlexApp.app.dashboardConfig!.navigationRailTopWidgets?.call(this, context),
                                   spaceSmall(),
                                 ],
                               ),
                             ),
                             trailing: Column(
                               children: [
-                                ...?PlexApp.app.dashboardConfig
-                                    ?.navigationRailBottomWidgets
-                                    ?.call(this, context),
+                                ...?PlexApp.app.dashboardConfig?.navigationRailBottomWidgets?.call(this, context),
                                 spaceMedium(),
                               ],
                             ),
@@ -614,11 +580,8 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
                               ...routes.map(
                                 (destination) => NavigationRailDestination(
                                   label: Text(destination.title),
-                                  icon: destination.logo ??
-                                      const Icon(Icons.circle_outlined),
-                                  selectedIcon: destination.selectedLogo ??
-                                      destination.logo ??
-                                      const Icon(Icons.circle_rounded),
+                                  icon: destination.logo ?? const Icon(Icons.circle_outlined),
+                                  selectedIcon: destination.selectedLogo ?? destination.logo ?? const Icon(Icons.circle_rounded),
                                 ),
                               ),
                             ],
@@ -637,9 +600,64 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
         }
       ],
     );
-    return Padding(
-      padding: const EdgeInsets.all(Dim.medium),
-      child: body,
+    return Stack(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(Dim.medium),
+          child: body,
+        ),
+        PlexWidget(
+          controller: notificationVisibilityController,
+          createWidget: (context, data) {
+            if (data as num <= 0) return Container();
+            return Positioned(
+              top: 0,
+              right: Dim.large,
+              child: MouseRegion(
+                onEnter: (event) {
+                  notificationVisibilityController.increment();
+                },
+                onExit: (event) {
+                  notificationVisibilityController.decrement();
+                },
+                child: Card(
+                  margin: const EdgeInsets.all(Dim.zero),
+                  clipBehavior: Clip.hardEdge,
+                  elevation: Dim.small,
+                  child: Container(
+                    // color: Colors.white60,
+                    width: 300,
+                    constraints: BoxConstraints(
+                      maxHeight: MediaQuery.of(context).size.height - 80 - 80,
+                    ),
+                    child: ListView.separated(
+                      physics: const BouncingScrollPhysics(),
+                      shrinkWrap: true,
+                      itemBuilder: (BuildContext context, int index) {
+                        var notification = PlexApp.app.getNotifications()[index];
+                        return ListTile(
+                          title: Text(notification.title),
+                          subtitle: Text(notification.details),
+                          leading: notification.leadingIcon ?? Icon(Icons.notifications, color: context.theme.primaryColor),
+                          onTap: () {},
+                        );
+                      },
+                      separatorBuilder: (BuildContext context, int index) {
+                        return Container(
+                          color: Colors.grey,
+                          height: 1,
+                          // width: double.maxFinite,
+                        );
+                      },
+                      itemCount: PlexApp.app.getNotifications().length,
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      ],
     );
   }
 }

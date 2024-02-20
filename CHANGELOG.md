@@ -1,3 +1,21 @@
+## 0.4.1
+
+### New Feature
+* Add Notification in `PlexDashboard` screen. Enable `enableNotifications = true` in `PlexDashboardConfig`. Get and set notifications can be used by `PlexApp.app.getNotifications();` and `PlexApp.app.setNotifications(List<PlexNotification> notifications);` respectively.
+* Add `AutoCompleteInput` Field. Just Use `PlexInputWidget` with type `PlexInputWidgetType.typeAutoComplete`. 
+
+### New Utilities
+* In `PlexAdvanceDataTable` you can initialize grouping by `initialColumnGroup`
+* Groups can be auto expand or collapse by default using `autoExpandGroups` in `PlexAdvanceDataTable`
+* Custom group summary can be set using `groupSummary` in `PlexAdvanceDataTable` you can initialize grouping by `initialColumnGroup`
+* Group summary can have custom format by overriding `groupSummaryFormate` in `PlexAdvanceDataTable`
+* If `PlexWidgetController` is of `num` type. You can call `controller.increment()` or `controller.decrement()`
+
+### Issues & Bugs Fixes
+* Print `Exceptions` on console if `ViewModel` state is undefined, and it tries to update UI
+
+---
+
 ## 0.4.0
 
 ### New Feature

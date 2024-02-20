@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:plex/plex_screens/plex_screen.dart';
 
 ///When extend PlexViewModel use your PlexScreen and PlexState like this:
@@ -13,9 +14,9 @@ class PlexViewModel<Sc extends PlexScreen, St extends PlexState<Sc>> {
       return _state;
     }
     if (_state == null) {
-      debugPrint("State not initialized");
+      Exception("----------State not initialized----------").printError(info: 'plex_view_model.dart');
     } else if (_state != null && _state?.mounted == false) {
-      debugPrint("State not not mounted");
+      Exception("----------State not not mounted----------").printError(info: 'plex_view_model.dart');
     }
     return null;
   }

@@ -106,8 +106,12 @@ class PlexAdvanceDataTable extends StatefulWidget {
     this.alternateColor,
     this.enableCopy = false,
     this.enableColumnGrouping = true,
+    this.initialColumnGroup,
     this.enableExcelExport = true,
     this.enablePdfExport = true,
+    this.autoExpandGroups = true,
+    this.groupSummary,
+    this.groupSummaryFormat,
   });
 
   ///Title to show for the data set
@@ -126,6 +130,10 @@ class PlexAdvanceDataTable extends StatefulWidget {
 
   ///Enable Disable Column Grouping
   final bool enableColumnGrouping;
+  final List<String>? initialColumnGroup;
+  final bool autoExpandGroups;
+  final String? groupSummaryFormat;
+  final String Function(String summary)? groupSummary;
 
   ///Enable Disable Copy Field Value
   final bool enableCopy;
@@ -156,6 +164,7 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
   void initState() {
     super.initState();
     initializeDataSource();
+    initializeGrouping();
   }
 
   void initializeDataSource() {
@@ -164,7 +173,18 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
       pageSize: widget.pageSize,
       alternateColor: widget.alternateColor,
       dataGridController: _dataGridController,
+      groupSummary: widget.groupSummary,
     );
+  }
+
+  void initializeGrouping() {
+    if (widget.initialColumnGroup == null) return;
+    var oldSelection = source.groupedColumns;
+    for (var item in widget.initialColumnGroup!) {
+      if (oldSelection.firstWhereOrNull((column) => column.name == item) == null) {
+        source.addColumnGroup(ColumnGroup(name: item, sortGroupRows: true));
+      }
+    }
   }
 
   @override
@@ -173,6 +193,7 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
       controller: widget.controller,
       createWidget: (context, data) {
         initializeDataSource();
+        initializeGrouping();
         return Column(
           children: [
             spaceSmall(),
@@ -220,7 +241,6 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
                         workbook.worksheets[0].getRangeByIndex(1, 1, workbook.worksheets[0].rows.count, workbook.worksheets[0].columns.count).autoFit();
                         final List<int> bytes = workbook.saveAsStream();
                         var path = await PlexPrinter.saveExcelFile(widget.title, bytes);
-
                         if (path == null) {
                           context.showSnackBar("Unable to save file, Please try again...");
                         }
@@ -255,7 +275,7 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
                       child: const Icon(Icons.refresh),
                     ),
                   },
-                } else if(isMediumScreen(context)) ...{
+                } else if (isMediumScreen(context)) ...{
                   if (widget.enableColumnGrouping) ...{
                     FilledButton.tonalIcon(
                       onPressed: () {
@@ -473,6 +493,8 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
                   showHorizontalScrollbar: true,
                   isScrollbarAlwaysShown: true,
                   navigationMode: GridNavigationMode.cell,
+                  autoExpandGroups: widget.autoExpandGroups,
+                  groupCaptionTitleFormat: widget.groupSummaryFormat ?? '{ColumnName} : {Key} - {ItemsCount} Items',
                   // onCellTap: (details) {
                   //   if (details.rowColumnIndex.rowIndex == 0) return;
                   //   if (widget.enableCopy) {
@@ -521,6 +543,7 @@ class _PlexAdvanceDataTableDataSource extends DataGridSource {
   List<DataGridRow> _dataGridRows = [];
   Color? _alternateColor;
   final DataGridController dataGridController;
+  final String Function(String summary)? groupSummary;
 
   final int? pageSize;
 
@@ -528,6 +551,7 @@ class _PlexAdvanceDataTableDataSource extends DataGridSource {
     List<List<PlexDataTableValueCell>> data, {
     required this.pageSize,
     required this.dataGridController,
+    this.groupSummary,
     Color? alternateColor,
   }) {
     _data = data.map((e) => DataGridRow(cells: e)).toList();
@@ -567,7 +591,7 @@ class _PlexAdvanceDataTableDataSource extends DataGridSource {
   Widget? buildGroupCaptionCellWidget(RowColumnIndex rowColumnIndex, String summaryValue) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 15),
-      child: Text(summaryValue),
+      child: Text(groupSummary?.call(summaryValue) ?? summaryValue),
     );
   }
 

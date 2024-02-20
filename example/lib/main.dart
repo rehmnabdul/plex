@@ -74,8 +74,7 @@ void main() async {
           PlexDataCell.custom(
             "Second Company Pvt. Ltd",
             const DataCell(
-              Text("Second Company Pvt. Ltd",
-                  style: TextStyle(color: Colors.green)),
+              Text("Second Company Pvt. Ltd", style: TextStyle(color: Colors.green)),
             ),
           )
         ],
@@ -89,8 +88,7 @@ void main() async {
           PlexDataCell.custom(
             "First Company Pvt. Ltd",
             const DataCell(
-              Text("First Company Pvt. Ltd",
-                  style: TextStyle(color: Colors.brown)),
+              Text("First Company Pvt. Ltd", style: TextStyle(color: Colors.brown)),
             ),
           ),
         ],
@@ -104,8 +102,7 @@ void main() async {
           PlexDataCell.custom(
             "Second Company Pvt. Ltd",
             const DataCell(
-              Text("Second Company Pvt. Ltd",
-                  style: TextStyle(color: Colors.green)),
+              Text("Second Company Pvt. Ltd", style: TextStyle(color: Colors.green)),
             ),
           )
         ],
@@ -120,10 +117,8 @@ void main() async {
           PlexDataTableValueCell.text("First", "First $a"),
           PlexDataTableValueCell.text("Last", "Last $a"),
           PlexDataTableValueCell.text("EmpCode", "EMP$a"),
-          PlexDataTableValueCell.text(
-              "Designation", "Engineer ${Random().nextInt(10) + 1}"),
-          PlexDataTableValueCell.text(
-              "Grade", "Scale ${Random().nextInt(5) + 1}"),
+          PlexDataTableValueCell.text("Designation", "Engineer ${Random().nextInt(10) + 1}"),
+          PlexDataTableValueCell.text("Grade", "Scale ${Random().nextInt(5) + 1}"),
           PlexDataTableValueCell.text("Company", "Company Name $a"),
         ],
       );
@@ -191,8 +186,9 @@ void main() async {
           leadingIcon: const Icon(Icons.downloading),
           child: const Text("Show Dashboard Loading"),
           onPressed: () {
-            if (!PlexApp.app.isDashboardLoading())
+            if (!PlexApp.app.isDashboardLoading()) {
               PlexApp.app.showDashboardLoading();
+            }
           },
         ),
         MenuItemButton(
@@ -274,8 +270,7 @@ void main() async {
                 PlexDataTableHeaderCell.text("EmpCode"),
                 PlexDataTableHeaderCell.text("Designation"),
                 PlexDataTableHeaderCell.text("Grade"),
-                PlexDataTableHeaderCell.text("Company",
-                    widthMode: WidthMode.fill),
+                PlexDataTableHeaderCell.text("Company", widthMode: WidthMode.fill),
               ],
               controller: PlexWidgetController(data: getAdvanceTableData()),
             );
@@ -298,6 +293,9 @@ void main() async {
           screen: (context) => const FormUsageScreen(),
         ),
       ],
+      enableNotifications: true,
+      showAnimationSwitch: true,
+      navigationRailBackgroundColor: null,
     ),
   ));
 

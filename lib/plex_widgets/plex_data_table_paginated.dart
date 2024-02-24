@@ -7,9 +7,6 @@ import 'package:plex/plex_utils/plex_printer.dart';
 import 'package:plex/plex_widgets/plex_data_table.dart';
 import 'package:plex/plex_widgets/plex_input_widget.dart';
 
-/// [PlexDataTable] class is deprecated and should no longer be used.
-/// Please use [PlexAdvanceDataTable] instead
-@Deprecated("Use PlexAdvanceDataTable instead")
 class PlexDataTableWithPages extends StatefulWidget {
   PlexDataTableWithPages({
     super.key,

@@ -1,3 +1,8 @@
+## 0.4.2
+
+### Updates
+* Remove `PlexDataTable` and `PlexDataTableWithPages` Deprecation
+
 ## 0.4.1
 
 ### New Feature

@@ -2,6 +2,8 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:plex/plex_database/plex_database.dart';
+import 'package:plex/plex_database/plex_entity.dart';
 import 'package:plex/plex_di/plex_dependency_injection.dart';
 import 'package:plex/plex_networking/plex_networking.dart';
 import 'package:plex/plex_package.dart';
@@ -59,6 +61,76 @@ class AppUser extends PlexUser {
     userName = map["userName"];
     email = map["email"];
     rules = map["rules"];
+  }
+}
+
+class UserEntity implements PlexEntity {
+  late String email;
+  late String userName;
+  List<String>? rules;
+
+  UserEntity.init({required this.email, required this.userName, this.rules});
+
+  Map<String, dynamic> toJson() {
+    final map = <String, dynamic>{};
+    map['userName'] = userName;
+    map['email'] = email;
+    map['rules'] = rules;
+    return map;
+  }
+
+  UserEntity.fromJson(Map<String, dynamic> map) {
+    userName = map["userName"];
+    email = map["email"];
+    rules = map["rules"];
+  }
+
+  @override
+  int? entityId;
+}
+
+initializeDb() async {
+  var db = await PlexDb.initialize(PlexDbConfig("PlexTestDatabase.db"));
+  testMapDb() async {
+    var usersRefMap = db.getCollection("Users");
+
+    var maps = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((a) => UserEntity.init(email: "ab$a@gmail.com", userName: "ab$a").toJson()).toList();
+    await usersRefMap.insertAll(maps);
+
+    var usersMap = await usersRefMap.getAll();
+    for (var element in usersMap) {
+      element['userName'] += " (Edited)";
+      await usersRefMap.update(element);
+    }
+
+    usersMap = await usersRefMap.getAll();
+    await usersRefMap.delete(usersMap.first);
+
+    usersMap = await usersRefMap.getAll();
+    print("object");
+  }
+
+  testEntityDb() async {
+    var usersRefMap = db.getEntityCollection(
+      "UsersEntities",
+      toJson: (e) => e.toJson(),
+      fromJson: (m) => UserEntity.fromJson(m),
+    );
+
+    var maps = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((a) => UserEntity.init(email: "ab$a@gmail.com", userName: "ab$a")).toList();
+    await usersRefMap.insertAll(maps);
+
+    var usersMap = await usersRefMap.getAll();
+    for (var element in usersMap) {
+      element.userName += " (Edited)";
+      await usersRefMap.update(element);
+    }
+
+    usersMap = await usersRefMap.getAll();
+    await usersRefMap.delete(usersMap.first);
+
+    usersMap = await usersRefMap.getAll();
+    print("object");
   }
 }
 
@@ -132,6 +204,15 @@ void main() async {
   //   colorSchemeSeed: const Color(0xFF26A9E1),
   // );
 
+  ///Dependency Injection
+  injectSingleton(MyUser("firstName", "lastName", 20, DateTime.now(), true, "object", [1, 2, 3]));
+
+  ///Get Injected Objects
+  var user = fromPlex<MyUser>();
+  print(user.toString());
+
+  initializeDb();
+
   runApp(PlexApp(
     ///Setting Theme Second Method : Theme By Color
     themeFromColor: const Color(0xFF26A9E1),
@@ -142,7 +223,7 @@ void main() async {
       title: "Auto Backup",
       appLogo: Image.asset("assets/app.png"),
       appLogoDark: Image.asset("assets/app.png"),
-      initialRoute: '/advance-data-table',
+      initialRoute: Routes.dashboardScreen,
       versionCode: 1,
       versionName: "v1.0.0",
     ),
@@ -212,27 +293,30 @@ void main() async {
           shortTitle: 'Data Table',
           logo: const Icon(Icons.account_balance_outlined),
           selectedLogo: const Icon(Icons.account_balance),
-          screen: (context) => PlexDataTable(
-            enableSearch: true,
-            enablePrint: true,
-            enableCopy: false,
-            onRefresh: () {
-              getTableData();
-            },
-            headerTextStyle: const TextStyle(fontWeight: FontWeight.bold),
-            headerBackground: PlexTheme.getActiveTheme(context).primaryColor,
-            border: TableBorder.all(color: Colors.black12),
-            columns: [
-              PlexDataCell.text("Id"),
-              PlexDataCell.text("First Name"),
-              PlexDataCell.text("Last Name"),
-              PlexDataCell.text("Emp Code"),
-              PlexDataCell.text("Designation"),
-              PlexDataCell.text("Grade"),
-              PlexDataCell.text("Company"),
-            ],
-            rows: getTableData(),
-          ),
+          screen: (context) {
+            return PlexDataTable(
+              key: UniqueKey(),
+              enableSearch: true,
+              enablePrint: true,
+              enableCopy: false,
+              onRefresh: () {
+                getTableData();
+              },
+              headerTextStyle: const TextStyle(fontWeight: FontWeight.bold),
+              headerBackground: PlexTheme.getActiveTheme(context).primaryColor,
+              border: TableBorder.all(color: Colors.black12),
+              columns: [
+                PlexDataCell.text("Id"),
+                PlexDataCell.text("First Name"),
+                PlexDataCell.text("Last Name"),
+                PlexDataCell.text("Emp Code"),
+                PlexDataCell.text("Designation"),
+                PlexDataCell.text("Grade"),
+                PlexDataCell.text("Company"),
+              ],
+              rows: getTableData(),
+            );
+          },
         ),
         PlexRoute(
           route: "/paginated-table",
@@ -260,6 +344,8 @@ void main() async {
           logo: const Icon(Icons.table_chart_outlined),
           selectedLogo: const Icon(Icons.table_chart),
           screen: (context) {
+            var gridController = PlexWidgetController(data: getAdvanceTableData());
+            var controller = TextEditingController();
             return PlexAdvanceDataTable(
               title: "Advance Data Table",
               widthMode: WidthMode.none,
@@ -272,7 +358,17 @@ void main() async {
                 PlexDataTableHeaderCell.text("Grade"),
                 PlexDataTableHeaderCell.text("Company", widthMode: WidthMode.fill),
               ],
-              controller: PlexWidgetController(data: getAdvanceTableData()),
+              controller: gridController,
+              cellEditingWidget: (row, column) {
+                if ([0, 1, 2].contains(column)) {
+                  controller.text = (gridController.data as List<List<PlexDataTableValueCell>>)[row][column].value.toString();
+                  return TextField(controller: controller);
+                }
+              },
+              cellEditingSubmit: (row, column) async {
+                var cell = (gridController.data as List<List<PlexDataTableValueCell>>)[row][column];
+                (gridController.data as List<List<PlexDataTableValueCell>>)[row][column] = cell.clone(newValue: controller.text);
+              },
             );
           },
         ),
@@ -298,7 +394,4 @@ void main() async {
       navigationRailBackgroundColor: null,
     ),
   ));
-
-  var user = fromPlex<MyUser>();
-  print(user.toString());
 }

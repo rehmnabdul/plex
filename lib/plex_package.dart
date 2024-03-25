@@ -7,6 +7,7 @@ import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:plex/plex_database/plex_database.dart';
 import 'package:plex/plex_route.dart';
 import 'package:plex/plex_screens/plex_login_screen.dart';
 import 'package:plex/plex_screens/plex_screen.dart';
@@ -19,6 +20,7 @@ import 'package:plex/plex_utils/plex_dimensions.dart';
 import 'package:plex/plex_utils/plex_routing.dart';
 import 'package:plex/plex_utils/plex_widgets.dart';
 import 'package:plex/plex_widget.dart';
+import 'package:sembast/sembast.dart';
 
 part 'plex_screens/plex_dashboard_screen.dart';
 

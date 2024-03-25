@@ -1,5 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:plex/plex_assets.dart';
@@ -88,6 +90,14 @@ class PlexDataTableValueCell extends DataGridCell {
         ) {
     isNumber = numberField || value is int || value is double;
   }
+
+  PlexDataTableValueCell clone({dynamic newValue}) {
+    if (cell == null) {
+      return PlexDataTableValueCell.text(columnName, newValue ?? value, numberField: isNumber);
+    } else {
+      return PlexDataTableValueCell.custom(columnName, newValue ?? value, cell, numberField: isNumber);
+    }
+  }
 }
 
 class PlexAdvanceDataTable extends StatefulWidget {
@@ -112,6 +122,8 @@ class PlexAdvanceDataTable extends StatefulWidget {
     this.autoExpandGroups = true,
     this.groupSummary,
     this.groupSummaryFormat,
+    this.cellEditingWidget,
+    this.cellEditingSubmit,
   });
 
   ///Title to show for the data set
@@ -134,6 +146,10 @@ class PlexAdvanceDataTable extends StatefulWidget {
   final bool autoExpandGroups;
   final String? groupSummaryFormat;
   final String Function(String summary)? groupSummary;
+
+  ///Editing a Cell
+  final Widget? Function(int row, int column)? cellEditingWidget;
+  final Future Function(int row, int column)? cellEditingSubmit;
 
   ///Enable Disable Copy Field Value
   final bool enableCopy;
@@ -174,6 +190,8 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
       alternateColor: widget.alternateColor,
       dataGridController: _dataGridController,
       groupSummary: widget.groupSummary,
+      cellEditingWidget: widget.cellEditingWidget,
+      cellEditingSubmit: widget.cellEditingSubmit,
     );
   }
 
@@ -481,8 +499,8 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
                   frozenRowsCount: widget.freezeRows,
                   allowFiltering: true,
                   allowSorting: true,
-                  allowSwiping: false,
-                  allowEditing: false,
+                  allowSwiping: true,
+                  allowEditing: true,
                   showSortNumbers: true,
                   showCheckboxColumn: true,
                   selectionMode: SelectionMode.multiple,
@@ -542,8 +560,11 @@ class _PlexAdvanceDataTableDataSource extends DataGridSource {
   late List<DataGridRow> _data;
   List<DataGridRow> _dataGridRows = [];
   Color? _alternateColor;
+  int isAlternate = -1;
   final DataGridController dataGridController;
   final String Function(String summary)? groupSummary;
+  final Widget? Function(int row, int col)? cellEditingWidget;
+  final Future Function(int row, int col)? cellEditingSubmit;
 
   final int? pageSize;
 
@@ -552,6 +573,8 @@ class _PlexAdvanceDataTableDataSource extends DataGridSource {
     required this.pageSize,
     required this.dataGridController,
     this.groupSummary,
+    this.cellEditingWidget,
+    this.cellEditingSubmit,
     Color? alternateColor,
   }) {
     _data = data.map((e) => DataGridRow(cells: e)).toList();
@@ -567,7 +590,15 @@ class _PlexAdvanceDataTableDataSource extends DataGridSource {
     return true;
   }
 
-  int isAlternate = -1;
+  @override
+  Widget? buildEditWidget(DataGridRow dataGridRow, RowColumnIndex rowColumnIndex, GridColumn column, CellSubmit submitCell) {
+    return cellEditingWidget?.call(rowColumnIndex.rowIndex, rowColumnIndex.columnIndex - 1);
+  }
+
+  @override
+  Future<void> onCellSubmit(DataGridRow dataGridRow, RowColumnIndex rowColumnIndex, GridColumn column) async {
+    await cellEditingSubmit?.call(rowColumnIndex.rowIndex, rowColumnIndex.columnIndex - 1);
+  }
 
   @override
   DataGridRowAdapter? buildRow(DataGridRow row) {

@@ -1,3 +1,8 @@
+## 0.4.3
+
+### New Feature
+* Add `POST` api support with `Multipart Body`
+
 ## 0.4.2
 
 ### Updates

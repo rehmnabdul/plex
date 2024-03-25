@@ -14,9 +14,9 @@ abstract class PlexState<T extends PlexScreen> extends State<T> {
   final _loadingController = PlexWidgetController();
 
   ///Screen Size Segregation
-  var smallScreen = false;
+  var smallScreen = true;
   var mediumScreen = false;
-  var largeScreen = true;
+  var largeScreen = false;
 
   getArguments<AT>() {
     var args = ModalRoute.of(context)!.settings.arguments as AT;
@@ -61,13 +61,11 @@ abstract class PlexState<T extends PlexScreen> extends State<T> {
             createWidget(() {
               if (getNoOfTabs() > 0) {
                 if (getTabBar() == null) {
-                  throw Exception(
-                      "Please override following methods:\n1. getTabBar()\n2. buildBody() must return TabBarView");
+                  throw Exception("Please override following methods:\n1. getTabBar()\n2. buildBody() must return TabBarView");
                 }
                 var body = buildBody();
                 if (body is! TabBarView) {
-                  throw Exception(
-                      "buildBody() must return TabBarView if getTabBar() > 0");
+                  throw Exception("buildBody() must return TabBarView if getTabBar() > 0");
                 }
                 return DefaultTabController(
                   length: getNoOfTabs(),
@@ -115,8 +113,14 @@ abstract class PlexState<T extends PlexScreen> extends State<T> {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+
     smallScreen = isSmallScreen(context);
     mediumScreen = isMediumScreen(context);
     largeScreen = isLargeScreen(context);
@@ -134,7 +138,8 @@ abstract class PlexState<T extends PlexScreen> extends State<T> {
     _loadingController.setValue(_loadingCount > 0);
   }
 
-  hideLoading() {
+  hideLoading({bool force = false}) {
+    if (force) _loadingCount = 0;
     if (_loadingCount > 0) _loadingCount--;
     if (!mounted) return;
     _loadingController.setValue(_loadingCount > 0);

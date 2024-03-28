@@ -4,6 +4,9 @@ import 'package:plex/plex_sp.dart';
 
 ///This [PlexUser] will be use hold login user data all over the application
 abstract mixin class PlexUser {
+
+  String? getInitialPath() => null;
+
   String? getPictureUrl() => null;
 
   String getLoggedInUsername();

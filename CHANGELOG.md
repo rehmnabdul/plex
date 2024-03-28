@@ -1,3 +1,8 @@
+## 0.4.4
+
+### New Feature
+* Initial route can also be set by login user by overriding `getInitialPath()` in `UserModel` which is implementing `PlexUse` 
+
 ## 0.4.3
 
 ### New Feature

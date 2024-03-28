@@ -109,7 +109,7 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
     if (routes.isEmpty) {
       delay(() => PlexApp.app.logout());
     } else {
-      var index = routes.indexWhere((element) => element.route == PlexApp.app.appInfo.initialRoute);
+      var index = routes.indexWhere((element) => element.route == PlexApp.app.getInitialPath());
       navigationSelectedIndex = index == -1 ? 0 : index;
     }
 

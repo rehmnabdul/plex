@@ -57,6 +57,11 @@ class AppUser extends PlexUser {
     return map;
   }
 
+  @override
+  String? getInitialPath() {
+    return "/advance-data-table";
+  }
+
   AppUser.fromJson(Map<String, dynamic> map) {
     userName = map["userName"];
     email = map["email"];
@@ -223,7 +228,7 @@ void main() async {
       title: "Auto Backup",
       appLogo: Image.asset("assets/app.png"),
       appLogoDark: Image.asset("assets/app.png"),
-      initialRoute: Routes.dashboardScreen,
+      initialRoute: "/paginated-table",//Routes.dashboardScreen,
       versionCode: 1,
       versionName: "v1.0.0",
     ),
@@ -251,7 +256,6 @@ void main() async {
       showThemeSwitch: true,
       showBrightnessSwitch: true,
       showMaterialSwitch: true,
-      // navigationRailBackgroundColor: Colors.green.shade900,
       navigationRailBottomWidgets: (state, context) => [
         const Text("Bottom Widget"),
       ],
@@ -393,5 +397,6 @@ void main() async {
       showAnimationSwitch: true,
       navigationRailBackgroundColor: null,
     ),
+    pages: [],
   ));
 }

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
@@ -68,6 +69,16 @@ class PlexNetworking {
     HttpOverrides.global = customOverrides ?? AppHttpOverrides();
   }
 
+  Future<bool> isNetworkAvailable() async {
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult == ConnectivityResult.mobile ||
+        connectivityResult == ConnectivityResult.wifi) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   ///Override this callback to always attach headers in the request i.e. UserId, AuthToken etc.
   Future<Map<String, String>> Function()? addHeaders;
 
@@ -80,6 +91,11 @@ class PlexNetworking {
   }
 
   Future<PlexApiResponse> get(String url, {Map<String, dynamic>? query, Map<String, String>? headers}) async {
+
+    if(await isNetworkAvailable() == false) {
+      return PlexError(5000, 'Network not available');
+    }
+
     if (query != null && query.isNotEmpty) {
       url += "?";
       query.forEach((key, value) {
@@ -114,6 +130,11 @@ class PlexNetworking {
   }
 
   Future<PlexApiResponse> post(String url, {Map<String, dynamic>? query, Map<String, String>? headers, Map<String, dynamic>? formData, dynamic body}) async {
+
+    if(await isNetworkAvailable() == false) {
+      return PlexError(5000, 'Network not available');
+    }
+
     if (query?.isNotEmpty == true) {
       url += "?";
       query?.forEach((key, value) {
@@ -166,6 +187,11 @@ class PlexNetworking {
     required Map<String, String> formData,
     required Map<String, File> files,
   }) async {
+
+    if(await isNetworkAvailable() == false) {
+      return PlexError(5000, 'Network not available');
+    }
+
     if (query?.isNotEmpty == true) {
       url += "?";
       query?.forEach((key, value) {
@@ -231,6 +257,11 @@ class PlexNetworking {
   ///
   ///[onProgressUpdate.file] will return download file
   Future downloadFile(String url, {required String filename, required Function(int downloaded, double? percentage, File? file) onProgressUpdate}) async {
+
+    if(await isNetworkAvailable() == false) {
+      return PlexError(5000, 'Network not available');
+    }
+
     var httpClient = http.Client();
     var request = http.Request('GET', Uri.parse(_isValidUrl(url) ? url : _apiUrl() + url));
     var response = httpClient.send(request);

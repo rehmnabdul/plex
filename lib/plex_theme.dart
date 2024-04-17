@@ -85,6 +85,7 @@ class PlexTheme {
       colorSchemeSeed: colorSchemeSeed,
       colorScheme: colorScheme,
       useMaterial3: isMaterial3(),
+      fontFamily: "Roboto",
       navigationBarTheme: NavigationBarThemeData(
           labelTextStyle: const TextStyle(fontSize: 10).getState()),
       brightness: brightness,

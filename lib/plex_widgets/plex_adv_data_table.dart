@@ -241,6 +241,8 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
                                 source.addColumnGroup(item);
                               }
                             }
+
+                            source.notifyListeners();
                           },
                           initialSelection: source.groupedColumns,
                           items: widget.columns.map((e) => ColumnGroup(name: e.columnName, sortGroupRows: true)).toList(),

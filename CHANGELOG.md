@@ -1,3 +1,16 @@
+## 0.4.6
+
+### Feature
+* Check network available or not `PlexNetworking.isNetworkAvailable()`
+
+### Updates
+* `PlexNetworking` will return No Network Error Before Sending API Call
+
+## 0.4.5
+
+### Updates
+* Update Libraries and Dependencies
+
 ## 0.4.4
 
 ### New Feature

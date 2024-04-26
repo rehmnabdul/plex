@@ -1,3 +1,16 @@
+## 0.4.8
+
+### Updates
+* Add remember user functionality in `Plex Login Screen`
+
+### Fix
+* Bug fix when calling `isNetworkAvailable()` utility function
+
+## 0.4.7
+
+### Updates
+* Bug Fix in `PlexNetworking.isNetworkAvailable()`
+
 ## 0.4.6
 
 ### Feature

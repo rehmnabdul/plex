@@ -7,6 +7,7 @@ import 'package:plex/plex_user.dart';
 import 'package:plex/plex_utils/plex_dimensions.dart';
 import 'package:plex/plex_utils/plex_routing.dart';
 import 'package:plex/plex_utils/plex_widgets.dart';
+import 'package:plex/plex_widget.dart';
 import 'package:plex/plex_widgets/plex_input_widget.dart';
 
 class PlexLoginConfig {
@@ -17,11 +18,15 @@ class PlexLoginConfig {
     this.additionalWidgetsBottom,
     this.debugUsername,
     this.debugPassword,
+    this.username,
+    this.password,
     this.createWidget,
   });
 
   final String? debugUsername;
   final String? debugPassword;
+  final String? password;
+  final String? username;
   final Future<PlexUser?> Function(BuildContext context, String email, String password) onLogin;
   final Widget Function(BuildContext context)? additionalWidgetsTop;
   final Widget Function(BuildContext context)? additionalWidgetsBottom;
@@ -44,6 +49,7 @@ class PlexLoginScreen extends PlexScreen {
 class _PlexLoginScreenState extends PlexState<PlexLoginScreen> {
   var usernameController = TextEditingController();
   var passController = TextEditingController();
+  var rememberUserController = PlexWidgetController<bool>(data: false);
 
   @override
   void initState() {
@@ -54,9 +60,19 @@ class _PlexLoginScreenState extends PlexState<PlexLoginScreen> {
       return;
     }
 
-    if (kDebugMode) {
+    if (kDebugMode && widget.loginConfig.debugUsername != null) {
       usernameController.text = widget.loginConfig.debugUsername ?? "";
       passController.text = widget.loginConfig.debugPassword ?? "";
+    } else {
+      if (widget.loginConfig.username != null) {
+        usernameController.text = widget.loginConfig.username ?? "";
+        passController.text = widget.loginConfig.password ?? "";
+      } else {
+        var usersList = PlexSp.instance.getList(PlexSp.rememberUsers) ?? [];
+        usernameController.text = usersList.firstOrNull?.split("|")[0] ?? "";
+        passController.text = usersList.firstOrNull?.split("|")[1] ?? "";
+        if(usersList.isNotEmpty) rememberUserController.setValue(true);
+      }
     }
   }
 
@@ -97,6 +113,26 @@ class _PlexLoginScreenState extends PlexState<PlexLoginScreen> {
                   inputController: passController,
                   isPassword: true,
                 ),
+                Padding(
+                  padding: const EdgeInsets.only(left: Dim.medium, right: Dim.small),
+                  child: Row(
+                    children: [
+                      const Expanded(child: Text("Remember User")),
+                      spaceMedium(),
+                      PlexWidget<bool>(
+                        controller: rememberUserController,
+                        createWidget: (context, data) {
+                          return Checkbox(
+                            value: data,
+                            onChanged: (value) {
+                              rememberUserController.setValue(value);
+                            },
+                          );
+                        },
+                      )
+                    ],
+                  ),
+                ),
                 PlexInputWidget(
                   title: "Login",
                   buttonIcon: const Icon(Icons.login),
@@ -117,6 +153,11 @@ class _PlexLoginScreenState extends PlexState<PlexLoginScreen> {
 
                     if (result != null) {
                       result.save();
+                      if (rememberUserController.data == true) {
+                        PlexSp.instance.setList(PlexSp.rememberUsers, ["${usernameController.text}|${passController.text.toString()}"]);
+                      } else {
+                        PlexSp.instance.setList(PlexSp.rememberUsers, []);
+                      }
                       Plex.offAndToNamed(PlexApp.app.dashboardConfig != null ? PlexRoutesPaths.homePath : PlexApp.app.appInfo.initialRoute);
                     }
                   },

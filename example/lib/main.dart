@@ -238,8 +238,10 @@ void main() async {
       PlexNetworking.instance.allowBadCertificateForHTTPS();
     },
     loginConfig: PlexLoginConfig(
-      debugUsername: 'test',
-      debugPassword: 'password',
+      debugUsername: 'DebugUser',
+      debugPassword: 'DebugPassword',
+      username: "User",
+      password: "Password",
       additionalWidgetsTop: (context) => const Text("Login Screen"),
       additionalWidgetsBottom: (context) => const Text("Login Screen End"),
       onLogin: (context, email, password) async {

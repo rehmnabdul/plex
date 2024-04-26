@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:connectivity/connectivity.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
@@ -70,14 +70,20 @@ class PlexNetworking {
   }
 
   Future<bool> isNetworkAvailable() async {
-    var connectivityResult = await (Connectivity().checkConnectivity());
-    if (connectivityResult == ConnectivityResult.mobile ||
-        connectivityResult == ConnectivityResult.wifi) {
+    try {
+      var connectivityResult = await (Connectivity().checkConnectivity());
+      if (connectivityResult[0] == ConnectivityResult.mobile || connectivityResult[0] == ConnectivityResult.wifi || connectivityResult[0] == ConnectivityResult.ethernet || connectivityResult[0] == ConnectivityResult.bluetooth || connectivityResult[0] == ConnectivityResult.vpn) {
+            return true;
+          } else {
+            return false;
+          }
+    } catch (e) {
       return true;
-    } else {
-      return false;
     }
   }
+
+  final _noNetwork = PlexError(5001, 'Network not available');
+  final _connectionFailed = PlexError(5002, 'Network Available But Unable To Connect With Server');
 
   ///Override this callback to always attach headers in the request i.e. UserId, AuthToken etc.
   Future<Map<String, String>> Function()? addHeaders;
@@ -91,9 +97,8 @@ class PlexNetworking {
   }
 
   Future<PlexApiResponse> get(String url, {Map<String, dynamic>? query, Map<String, String>? headers}) async {
-
-    if(await isNetworkAvailable() == false) {
-      return PlexError(5000, 'Network not available');
+    if (await isNetworkAvailable() == false) {
+      return _noNetwork;
     }
 
     if (query != null && query.isNotEmpty) {
@@ -125,14 +130,17 @@ class PlexNetworking {
         return PlexError(data.statusCode, data.body);
       }
     } catch (e) {
+      if(e is SocketException) {
+        return _connectionFailed;
+      }
+      if (kDebugMode) print("Error: ${e.toString()}");
       return PlexError(400, e.toString());
     }
   }
 
   Future<PlexApiResponse> post(String url, {Map<String, dynamic>? query, Map<String, String>? headers, Map<String, dynamic>? formData, dynamic body}) async {
-
-    if(await isNetworkAvailable() == false) {
-      return PlexError(5000, 'Network not available');
+    if (await isNetworkAvailable() == false) {
+      return _noNetwork;
     }
 
     if (query?.isNotEmpty == true) {
@@ -175,6 +183,9 @@ class PlexNetworking {
         return PlexError(data.statusCode, data.body);
       }
     } catch (e) {
+      if(e is SocketException) {
+        return _connectionFailed;
+      }
       if (kDebugMode) print("Error: ${e.toString()}");
       return PlexError(400, e.toString());
     }
@@ -187,9 +198,8 @@ class PlexNetworking {
     required Map<String, String> formData,
     required Map<String, File> files,
   }) async {
-
-    if(await isNetworkAvailable() == false) {
-      return PlexError(5000, 'Network not available');
+    if (await isNetworkAvailable() == false) {
+      return _noNetwork;
     }
 
     if (query?.isNotEmpty == true) {
@@ -215,7 +225,7 @@ class PlexNetworking {
 
       var multipartFiles = List<http.MultipartFile>.empty(growable: true);
       var filesKeys = files.keys.toList();
-      for(var i =  0; i < filesKeys.length; i++) {
+      for (var i = 0; i < filesKeys.length; i++) {
         var multipart = await http.MultipartFile.fromPath(filesKeys[i], files[filesKeys[i]]!.path);
         multipartFiles.add(multipart);
       }
@@ -238,6 +248,9 @@ class PlexNetworking {
         return PlexError(data.statusCode, responseBody);
       }
     } catch (e) {
+      if(e is SocketException) {
+        return _connectionFailed;
+      }
       if (kDebugMode) print("Error: ${e.toString()}");
       return PlexError(400, e.toString());
     }
@@ -257,9 +270,8 @@ class PlexNetworking {
   ///
   ///[onProgressUpdate.file] will return download file
   Future downloadFile(String url, {required String filename, required Function(int downloaded, double? percentage, File? file) onProgressUpdate}) async {
-
-    if(await isNetworkAvailable() == false) {
-      return PlexError(5000, 'Network not available');
+    if (await isNetworkAvailable() == false) {
+      return _noNetwork;
     }
 
     var httpClient = http.Client();

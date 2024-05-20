@@ -1,5 +1,10 @@
 ## 0.4.8
 
+### Feature
+* Update remember user UI on `Plex Login Screen`
+
+## 0.4.8
+
 ### Updates
 * Add remember user functionality in `Plex Login Screen`
 

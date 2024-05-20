@@ -47,6 +47,14 @@ class _UpdatableScreenState extends PlexState<UpdatableScreen> {
           spaceMedium(),
           ElevatedButton.icon(
             onPressed: () {
+              toast("Test Toast");
+            },
+            icon: const Icon(Icons.message),
+            label: const Text("Show Toast"),
+          ),
+          spaceMedium(),
+          ElevatedButton.icon(
+            onPressed: () {
               PlexApp.app.dashboardConfig?.navigateOnDashboard(0);
             },
             icon: const Icon(Icons.home),

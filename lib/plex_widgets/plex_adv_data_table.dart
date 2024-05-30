@@ -501,7 +501,7 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
                   frozenRowsCount: widget.freezeRows,
                   allowFiltering: true,
                   allowSorting: true,
-                  allowSwiping: true,
+                  allowSwiping: false,
                   allowEditing: true,
                   showSortNumbers: true,
                   showCheckboxColumn: true,

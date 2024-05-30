@@ -1,7 +1,12 @@
-## 0.4.8
+## 0.5.0
 
-### Feature
-* Update remember user UI on `Plex Login Screen`
+### Fixes
+* Fix scroll in `PlexAdvanceDataTable`
+
+## 0.4.9
+
+### Fixes
+* Update Remember User UI On Login Screen
 
 ## 0.4.8
 

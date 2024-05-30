@@ -252,161 +252,101 @@ class _PlexLoginScreenState extends PlexState<PlexLoginScreen> {
   }
 
   _getRecentLoginWidget(String e) {
-    return Container(
-      child: Row(children: [
-        Center(
-          child: SizedBox(
-            width: 40,
-            height: 40,
-            child: Tooltip(
-              message: getUserProperty(e, 2),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: PlexTheme.getActiveTheme(context).colorScheme.secondary,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                clipBehavior: Clip.hardEdge,
-                child: getUserProperty(e, 4) != "N/A"
-                    ? CachedNetworkImage(
-                        imageUrl: getUserProperty(e, 4),
-                        progressIndicatorBuilder: (context, url, downloadProgress) {
-                          debugPrint(downloadProgress.progress.toString());
-                          return Stack(
-                            children: [
-                              Center(
-                                child: Text(
-                                  getUserProperty(e, 3),
-                                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
-                                ),
+    return Row(children: [
+      Center(
+        child: SizedBox(
+          width: 40,
+          height: 40,
+          child: Tooltip(
+            message: getUserProperty(e, 2),
+            child: Container(
+              decoration: BoxDecoration(
+                color: PlexTheme.getActiveTheme(context).colorScheme.secondary,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              clipBehavior: Clip.hardEdge,
+              child: getUserProperty(e, 4) != "N/A" && getUserProperty(e, 4) != ""
+                  ? CachedNetworkImage(
+                      imageUrl: getUserProperty(e, 4),
+                      progressIndicatorBuilder: (context, url, downloadProgress) {
+                        debugPrint(downloadProgress.progress.toString());
+                        return Stack(
+                          children: [
+                            Center(
+                              child: Text(
+                                getUserProperty(e, 3),
+                                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
                               ),
-                              Center(
-                                child: CircularProgressIndicator(
-                                  color: Colors.yellowAccent,
-                                  value: downloadProgress.totalSize == null ? null : downloadProgress.downloaded / downloadProgress.totalSize!,
-                                ),
-                              )
-                            ],
-                          );
-                        },
-                        errorWidget: (context, url, error) => Center(
-                          child: Text(
-                            getUserProperty(e, 3),
-                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
-                          ),
-                        ),
-                      )
-                    : Center(
+                            ),
+                            Center(
+                              child: CircularProgressIndicator(
+                                color: Colors.yellowAccent,
+                                value: downloadProgress.totalSize == null ? null : downloadProgress.downloaded / downloadProgress.totalSize!,
+                              ),
+                            )
+                          ],
+                        );
+                      },
+                      errorWidget: (context, url, error) => Center(
                         child: Text(
                           getUserProperty(e, 3),
-                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 9),
-                        ),
-                      ),
-              ),
-            ),
-          ),
-        ),
-        spaceSmall(),
-        Expanded(child: Text(getUserProperty(e, 0))),
-        FilledButton.tonalIcon(
-          onPressed: () {
-            _login(getUserProperty(e, 0), getUserProperty(e, 1));
-          },
-          icon: const Icon(Icons.login),
-          label: const Text("Login"),
-        ),
-        IconButton(
-          iconSize: 20,
-          onPressed: () {
-            showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return AlertDialog(
-                  title: const Text('Confirmation'),
-                  content: const Text('Are you sure you want to delete?'),
-                  actions: [
-                    TextButton(
-                      child: const Text(
-                        'Delete',
-                        style: TextStyle(color: Colors.red),
-                      ),
-                      onPressed: () {
-                        Plex.back();
-                        _deleteRecentLogins(e);
-                        setState(() {});
-                      },
-                    ),
-                    TextButton(
-                      child: const Text('Cancel'),
-                      onPressed: () {
-                        Plex.back();
-                      },
-                    ),
-                  ],
-                );
-              },
-            );
-          },
-          icon: const Icon(Icons.delete),
-        ),
-      ]),
-    );
-
-    return Container(
-      child: Chip(
-        avatar: Center(
-          child: SizedBox(
-            width: 40,
-            height: 40,
-            child: Tooltip(
-              message: PlexApp.app.getUser()?.getLoggedInFullName().toString() ?? "N/A",
-              child: Container(
-                decoration: BoxDecoration(
-                  color: PlexTheme.getActiveTheme(context).colorScheme.secondary,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                clipBehavior: Clip.hardEdge,
-                child: PlexApp.app.getUser()?.getPictureUrl() != null
-                    ? CachedNetworkImage(
-                        imageUrl: PlexApp.app.getUser()!.getPictureUrl()!,
-                        progressIndicatorBuilder: (context, url, downloadProgress) {
-                          debugPrint(downloadProgress.progress.toString());
-                          return Stack(
-                            children: [
-                              Center(
-                                child: Text(
-                                  PlexApp.app.getUser()?.getInitials().toString() ?? "N/A",
-                                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
-                                ),
-                              ),
-                              Center(
-                                child: CircularProgressIndicator(
-                                  color: Colors.yellowAccent,
-                                  value: downloadProgress.totalSize == null ? null : downloadProgress.downloaded / downloadProgress.totalSize!,
-                                ),
-                              )
-                            ],
-                          );
-                        },
-                        errorWidget: (context, url, error) => Center(
-                          child: Text(
-                            PlexApp.app.getUser()?.getInitials().toString() ?? "N/A",
-                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
-                          ),
-                        ),
-                      )
-                    : Center(
-                        child: Text(
-                          PlexApp.app.getUser()?.getInitials().toString() ?? "N/A",
                           style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
                         ),
                       ),
-              ),
+                    )
+                  : Center(
+                      child: Text(
+                        getUserProperty(e, 3),
+                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 9),
+                      ),
+                    ),
             ),
           ),
         ),
-        label: Text(e.split("|")[0]),
-        onDeleted: () {},
       ),
-    );
+      spaceSmall(),
+      Expanded(child: Text(getUserProperty(e, 0))),
+      FilledButton.tonalIcon(
+        onPressed: () {
+          _login(getUserProperty(e, 0), getUserProperty(e, 1));
+        },
+        icon: const Icon(Icons.login),
+        label: const Text("Login"),
+      ),
+      IconButton(
+        iconSize: 20,
+        onPressed: () {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text('Confirmation'),
+                content: const Text('Are you sure you want to delete?'),
+                actions: [
+                  TextButton(
+                    child: const Text(
+                      'Delete',
+                      style: TextStyle(color: Colors.red),
+                    ),
+                    onPressed: () {
+                      Plex.back();
+                      _deleteRecentLogins(e);
+                      setState(() {});
+                    },
+                  ),
+                  TextButton(
+                    child: const Text('Cancel'),
+                    onPressed: () {
+                      Plex.back();
+                    },
+                  ),
+                ],
+              );
+            },
+          );
+        },
+        icon: const Icon(Icons.delete),
+      ),
+    ]);
   }
 }

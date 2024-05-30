@@ -197,6 +197,16 @@ void main() async {
           PlexDataTableValueCell.text("Designation", "Engineer ${Random().nextInt(10) + 1}"),
           PlexDataTableValueCell.text("Grade", "Scale ${Random().nextInt(5) + 1}"),
           PlexDataTableValueCell.text("Company", "Company Name $a"),
+          PlexDataTableValueCell.text("1", "1 - $a"),
+          PlexDataTableValueCell.text("2", "2 - $a"),
+          PlexDataTableValueCell.text("3", "3 - $a"),
+          PlexDataTableValueCell.text("4", "4 - $a"),
+          PlexDataTableValueCell.text("5", "5 - $a"),
+          PlexDataTableValueCell.text("6", "6 - $a"),
+          PlexDataTableValueCell.text("7", "7 - $a"),
+          PlexDataTableValueCell.text("8", "8 - $a"),
+          PlexDataTableValueCell.text("9", "9 - $a"),
+          PlexDataTableValueCell.text("10", "10 - $a"),
         ],
       );
     }
@@ -228,12 +238,13 @@ void main() async {
       title: "Auto Backup",
       appLogo: Image.asset("assets/app.png"),
       appLogoDark: Image.asset("assets/app.png"),
-      initialRoute: "/paginated-table",//Routes.dashboardScreen,
+      initialRoute: "/paginated-table",
+      //Routes.dashboardScreen,
       versionCode: 1,
       versionName: "v1.0.0",
     ),
     useAuthorization: true,
-    onInitializationComplete: () {
+    onInitializationComplete: () async {
       PlexTheme.appTextTheme = GoogleFonts.outfitTextTheme();
       PlexNetworking.instance.allowBadCertificateForHTTPS();
     },
@@ -362,7 +373,17 @@ void main() async {
                 PlexDataTableHeaderCell.text("EmpCode"),
                 PlexDataTableHeaderCell.text("Designation"),
                 PlexDataTableHeaderCell.text("Grade"),
-                PlexDataTableHeaderCell.text("Company", widthMode: WidthMode.fill),
+                PlexDataTableHeaderCell.text("Company"),
+                PlexDataTableHeaderCell.text("1"),
+                PlexDataTableHeaderCell.text("2"),
+                PlexDataTableHeaderCell.text("3"),
+                PlexDataTableHeaderCell.text("4"),
+                PlexDataTableHeaderCell.text("5"),
+                PlexDataTableHeaderCell.text("6"),
+                PlexDataTableHeaderCell.text("7"),
+                PlexDataTableHeaderCell.text("8"),
+                PlexDataTableHeaderCell.text("9"),
+                PlexDataTableHeaderCell.text("10"),
               ],
               controller: gridController,
               cellEditingWidget: (row, column) {

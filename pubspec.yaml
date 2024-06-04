@@ -21,13 +21,13 @@ dependencies:
     sdk: flutter
 
   #Connectivity
-  connectivity_plus: ^6.0.2
+  connectivity_plus: ^6.0.3
 
   #Navigation
   get: ^4.6.6
 
   # Messages
-  toastification: ^1.2.1
+  toastification: ^2.0.0
 
   #Path
   path_provider: ^2.1.3
@@ -46,13 +46,13 @@ dependencies:
   flutter_animate: ^4.5.0
 
   #Table
-  syncfusion_flutter_core: ^25.2.5
-  syncfusion_flutter_datagrid: ^25.2.5
-  syncfusion_flutter_datagrid_export: ^25.2.5
+  syncfusion_flutter_core: ^25.2.6
+  syncfusion_flutter_datagrid: ^25.2.6
+  syncfusion_flutter_datagrid_export: ^25.2.6
 
   #Print Excel File
-  syncfusion_flutter_xlsio: ^25.2.5
-  file_saver: ^0.2.12
+  syncfusion_flutter_xlsio: ^25.2.6
+  file_saver: ^0.2.13
 
   #Code Builder
   build: ^2.4.1
@@ -65,8 +65,8 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^3.0.2
-  build_runner: ^2.4.9
+  flutter_lints: ^4.0.0
+  build_runner: ^2.4.10
 
 flutter:
 

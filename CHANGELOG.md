@@ -1,7 +1,7 @@
-## 0.5.1
+## 0.5.2
 
 ### Fixes
-* Fix the `PlexInputWidget` multi selection UI Bug
+* Fix the `PlexInputWidget` multiselection UI Bug
 
 ## 0.5.1
 

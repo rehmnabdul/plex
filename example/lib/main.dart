@@ -310,7 +310,7 @@ void main() async {
           shortTitle: 'Data Table',
           logo: const Icon(Icons.account_balance_outlined),
           selectedLogo: const Icon(Icons.account_balance),
-          screen: (context) {
+          screen: (context, {data}) {
             return PlexDataTable(
               key: UniqueKey(),
               enableSearch: true,
@@ -342,7 +342,7 @@ void main() async {
           shortTitle: 'Paginated Table',
           logo: const Icon(Icons.account_balance_outlined),
           selectedLogo: const Icon(Icons.account_balance),
-          screen: (context) => PlexDataTableWithPages(
+          screen: (context, {data}) => PlexDataTableWithPages(
             columns: [
               PlexDataCell.text("Id", numberField: true),
               PlexDataCell.text("First Name"),
@@ -360,7 +360,7 @@ void main() async {
           title: "Advance Data Table",
           logo: const Icon(Icons.table_chart_outlined),
           selectedLogo: const Icon(Icons.table_chart),
-          screen: (context) {
+          screen: (context, {data}) {
             var gridController = PlexWidgetController(data: getAdvanceTableData());
             var controller = TextEditingController();
             return PlexAdvanceDataTable(
@@ -405,7 +405,7 @@ void main() async {
           shortTitle: 'Updatable Widget',
           logo: const Icon(Icons.browser_updated_outlined),
           selectedLogo: const Icon(Icons.browser_updated),
-          screen: (context) => const UpdatableScreen(),
+          screen: (context, {data}) => const UpdatableScreen(),
         ),
         PlexRoute(
           route: "/form-usage",
@@ -413,7 +413,7 @@ void main() async {
           shortTitle: 'Form Widget',
           logo: const Icon(Icons.format_align_center_outlined),
           selectedLogo: const Icon(Icons.format_align_center),
-          screen: (context) => const FormUsageScreen(),
+          screen: (context, {data}) => const FormUsageScreen(),
         ),
       ],
       enableNotifications: true,

@@ -105,7 +105,10 @@ class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
   }
 
   PlexWidgetController<List<T>?> getMultiselectController() {
-    _multiSelectionController ??= (widget.multiSelectionController ?? PlexWidgetController<List<T>?>()) as PlexWidgetController<List<T>?>;
+    if (_multiSelectionController == null || _multiSelectionController!.isDisposed) {
+      _multiSelectionController = (widget.multiSelectionController ?? PlexWidgetController<List<T>?>()) as PlexWidgetController<List<T>?>;
+      _multiSelectionController!.setValue(widget.multiInitialSelection?.cast<T>());
+    }
     return _multiSelectionController!;
   }
 
@@ -319,7 +322,6 @@ class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
         ),
       );
     } else if (widget.type == PlexInputWidgetType.typeMultiSelect) {
-      getMultiselectController().setValue(widget.multiInitialSelection?.cast<T>());
       inputWidget = InkWell(
         onTap: () {
           if (!widget.editable) return;
@@ -334,7 +336,7 @@ class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
             items: widget.dropdownItems,
             asyncItems: widget.dropdownAsyncItems,
             leadingIcon: widget.dropDownLeadingIcon,
-            initialSelection: widget.multiInitialSelection,
+            initialSelection: getMultiselectController().data,
             itemText: (c) => widget.dropdownItemAsString!(c),
             onSelect: (c) {
               getMultiselectController().setValue(c.cast<T>());
@@ -359,7 +361,7 @@ class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
                   child: PlexWidget<List<T>?>(
                     controller: getMultiselectController(),
                     createWidget: (context, data) {
-                      List<T> selectionData = data;
+                      List<T> selectionData = data ?? List<T>.empty();
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [

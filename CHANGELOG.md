@@ -1,3 +1,13 @@
+## 0.5.1
+
+### Fixes
+* Fix the `PlexInputWidget` multi selection UI Bug
+
+## 0.5.1
+
+### Update
+* To update UI from Form add `BuildContext` in `getFields(State<StatefulWidget>)` method of class `PlexForm` 
+
 ## 0.5.0
 
 ### Fixes

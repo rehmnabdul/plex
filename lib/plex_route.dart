@@ -10,7 +10,7 @@ class PlexRoute {
   String? shortTitle;
 
   ///This is the build method to build the screen user defined UI
-  Widget Function(BuildContext context) screen;
+  Widget Function(BuildContext context, {dynamic data}) screen;
 
   ///Optional [logo]
   Widget? logo;

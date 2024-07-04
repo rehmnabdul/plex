@@ -5,7 +5,7 @@ import 'package:plex/plex_widget.dart';
 import 'package:plex/plex_widgets/plex_input_widget.dart';
 
 abstract mixin class PlexForm {
-  List<PlexFormField> getFields();
+  List<PlexFormField> getFields(State<StatefulWidget> context);
 }
 
 class PlexFormField {
@@ -95,7 +95,7 @@ class PlexFormWidget<T> extends StatefulWidget {
 class _PlexFormWidgetState extends State<PlexFormWidget> {
   List<Widget> getFields() {
     var fields = [
-      for (var value in widget.entity.getFields()) ...{
+      for (var value in widget.entity.getFields(this)) ...{
         if (value.fieldType == PlexFormField.TYPE_INPUT) ...{
           if (value.type == String) ...{
             PlexInputWidget<String>(

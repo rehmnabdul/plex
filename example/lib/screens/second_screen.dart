@@ -4,11 +4,11 @@ import 'package:plex/plex_screens/plex_screen.dart';
 import 'package:plex/plex_utils/plex_dimensions.dart';
 import 'package:plex/plex_view_model/plex_view_model.dart';
 import 'package:plex/plex_widget.dart';
+import 'package:plex/plex_widgets/plex_input_widget.dart';
 
 class UpdatableScreenViewModel extends PlexViewModel<UpdatableScreen, _UpdatableScreenState> {
   var updateController = PlexWidgetController<int>(data: 0);
 }
-
 
 class UpdatableScreen extends PlexScreen {
   const UpdatableScreen({Key? key}) : super(key: key);
@@ -18,8 +18,9 @@ class UpdatableScreen extends PlexScreen {
 }
 
 class _UpdatableScreenState extends PlexState<UpdatableScreen> {
-
   var viewModel = UpdatableScreenViewModel();
+
+  var cont = PlexWidgetController<List<int>>(data: []);
 
   @override
   Widget buildBody() {
@@ -27,11 +28,18 @@ class _UpdatableScreenState extends PlexState<UpdatableScreen> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          PlexInputWidget(
+            type: PlexInputWidgetType.typeMultiSelect,
+            title: "Multiselect",
+            dropdownItems: [1,2,3,4,5,6,7,8,9,10],
+            multiSelectionController: cont,
+            multiInitialSelection: [9],
+            dropdownItemAsString: (item) => item.toString(),
+          ),
           PlexWidget(
             controller: viewModel.updateController,
             createWidget: (context, data) {
-              return Text("Counter: $data",
-                  style: const TextStyle(fontSize: 20));
+              return Text("Counter: $data", style: const TextStyle(fontSize: 20));
             },
           ),
           spaceMedium(),

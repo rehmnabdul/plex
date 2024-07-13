@@ -6,9 +6,9 @@ import 'package:plex/plex_screens/plex_screen.dart';
 ///class MyViewModel extends PlexViewModel<MyPlexScreen, MyPlexScreenState> {
 ///}
 class PlexViewModel<Sc extends PlexScreen, St extends PlexState<Sc>> {
-  ///Return the State of Screen
   St? _state;
 
+  ///The State of Screen ()
   St? get state {
     if (_state?.mounted == true) {
       return _state;

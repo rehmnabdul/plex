@@ -68,6 +68,7 @@ class PlexFormField {
   PlexFormField.multiselect({
     required this.title,
     required this.onChange,
+    this.itemAsString,
     this.editable = true,
     this.initialSelection,
     this.items,

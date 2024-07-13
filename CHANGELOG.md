@@ -1,3 +1,13 @@
+## 0.5.4
+
+### Updates
+* In `PlexAdvanceDataTable` fix column width adjustment in case of custom widget 
+
+## 0.5.3
+
+### Updates
+* You can enable or disable sorting and filtering controls in `PlexAdvanceDataTable` by using `PlexDataTableHeaderCell.text(..., showOrderByControl: false, showFilterControl: false)`
+
 ## 0.5.2
 
 ### Fixes

@@ -27,21 +27,51 @@ enum WidthMode {
   auto,
 }
 
+class PlexComparableWidget extends StatelessWidget {
+  final Widget widget;
+  final String value;
+
+  const PlexComparableWidget(this.widget, this.value, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return widget;
+  }
+
+  int compareTo(PlexComparableWidget other) {
+    return other.value.compareTo(value);
+  }
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) => value;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  bool operator ==(Object other) {
+    return hashCode == other.hashCode;
+  }
+}
+
 class PlexDataTableHeaderCell {
   final String columnName;
   final bool isNumber;
   final WidthMode widthMode;
   late final Widget? cell;
 
+  final bool showOrderByControl;
+  final bool showFilterControl;
+
   ///[columnName] is required as it is text only cell
-  PlexDataTableHeaderCell.text(this.columnName, {this.isNumber = false, this.widthMode = WidthMode.auto}) {
+  PlexDataTableHeaderCell.text(this.columnName, {this.isNumber = false, this.widthMode = WidthMode.auto, this.showOrderByControl = true, this.showFilterControl = true}) {
     cell = null;
   }
 
   ///For custom design and handling of cell use this constructor.
   ///[columnName] is optional
   ///[cell] is required for custom cell
-  PlexDataTableHeaderCell.custom(this.columnName, this.cell, {this.isNumber = false, this.widthMode = WidthMode.auto});
+  PlexDataTableHeaderCell.custom(this.columnName, this.cell, {this.isNumber = false, this.widthMode = WidthMode.auto, this.showOrderByControl = true, this.showFilterControl = true});
 
   ColumnWidthMode _getWidthMode() {
     switch (widthMode) {
@@ -63,7 +93,8 @@ class PlexDataTableHeaderCell {
 
 class PlexDataTableValueCell extends DataGridCell {
   late final bool isNumber;
-  late final Widget? cell;
+  late final bool isWidget;
+  late final String? cellValue;
 
   ///[value] is required as it is text only cell
   PlexDataTableValueCell.text(String columnName, value, {bool numberField = false})
@@ -73,7 +104,7 @@ class PlexDataTableValueCell extends DataGridCell {
         ) {
     value ??= "";
     isNumber = numberField || value is int || value is double;
-    cell = null;
+    isWidget = false;
   }
 
   ///For custom design and handling of cell use this constructor.
@@ -81,21 +112,20 @@ class PlexDataTableValueCell extends DataGridCell {
   ///[cell] is required for custom cell
   PlexDataTableValueCell.custom(
     String columnName,
-    value,
-    this.cell, {
+    String textValue,
+    Widget widget, {
     bool numberField = false,
-  }) : super(
-          columnName: columnName,
-          value: value,
-        ) {
+  }) : super(columnName: columnName, value: PlexComparableWidget(widget, textValue)) {
+    cellValue = textValue;
+    isWidget = true;
     isNumber = numberField || value is int || value is double;
   }
 
   PlexDataTableValueCell clone({dynamic newValue}) {
-    if (cell == null) {
+    if (!isWidget) {
       return PlexDataTableValueCell.text(columnName, newValue ?? value, numberField: isNumber);
     } else {
-      return PlexDataTableValueCell.custom(columnName, newValue ?? value, cell, numberField: isNumber);
+      return PlexDataTableValueCell.custom(columnName, newValue ?? cellValue, value, numberField: isNumber);
     }
   }
 }
@@ -501,14 +531,14 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
                   frozenRowsCount: widget.freezeRows,
                   allowFiltering: true,
                   allowSorting: true,
+                  allowMultiColumnSorting: true,
+                  showSortNumbers: true,
                   allowSwiping: false,
                   allowEditing: true,
-                  showSortNumbers: true,
                   showCheckboxColumn: true,
                   selectionMode: SelectionMode.multiple,
                   headerGridLinesVisibility: GridLinesVisibility.both,
                   gridLinesVisibility: GridLinesVisibility.both,
-                  allowMultiColumnSorting: true,
                   showVerticalScrollbar: true,
                   showHorizontalScrollbar: true,
                   isScrollbarAlwaysShown: true,
@@ -529,6 +559,8 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
                         (e) => GridColumn(
                           columnName: e.columnName,
                           columnWidthMode: e._getWidthMode(),
+                          allowSorting: e.showOrderByControl,
+                          allowFiltering: e.showFilterControl,
                           label: Padding(
                             padding: const EdgeInsets.all(Dim.medium),
                             child: Text(
@@ -608,15 +640,16 @@ class _PlexAdvanceDataTableDataSource extends DataGridSource {
         color: isAlternate++ % 2 == 0 ? _alternateColor : null,
         cells: row.getCells().map((dataGridCell) {
           var cell = dataGridCell as PlexDataTableValueCell;
-          return cell.cell ??
-              Padding(
-                padding: const EdgeInsets.all(Dim.medium - 1),
-                child: Text(
-                  dataGridCell.value.toString(),
-                  textAlign: cell.isNumber ? TextAlign.right : TextAlign.left,
-                  softWrap: true,
-                ),
-              );
+          return cell.isWidget
+              ? cell.value as Widget
+              : Padding(
+                  padding: const EdgeInsets.all(Dim.medium - 1),
+                  child: Text(
+                    dataGridCell.value.toString(),
+                    textAlign: cell.isNumber ? TextAlign.right : TextAlign.left,
+                    softWrap: true,
+                  ),
+                );
         }).toList());
   }
 

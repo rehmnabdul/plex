@@ -21,6 +21,10 @@ class PlexViewModel<Sc extends PlexScreen, St extends PlexState<Sc>> {
     return null;
   }
 
+  BuildContext? get context {
+    return state?.context;
+  }
+
   ///Set the State of Screen on Init
   setState(St state) => this._state = state;
 
@@ -36,10 +40,12 @@ class PlexViewModel<Sc extends PlexScreen, St extends PlexState<Sc>> {
     state?.isLoading();
   }
 
+  @Deprecated("Use context.showMessage() or context.showMessageDelayed() instead which has more options and customizations available")
   toast(String message) {
     state?.toast(message);
   }
 
+  @Deprecated("Use context.showMessage() or context.showMessageDelayed() instead which has more options and customizations available")
   toastDelayed(String message) {
     state?.toastDelayed(message);
   }

@@ -1,3 +1,8 @@
+## 0.5.5
+
+### Updates
+* Add customizable in app messages in `Plex`. Use `context.showMessage("Your Message")` and explore other options too 
+
 ## 0.5.4
 
 ### Updates

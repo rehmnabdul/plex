@@ -19,7 +19,10 @@ abstract class PlexState<T extends PlexScreen> extends State<T> {
   var largeScreen = false;
 
   getArguments<AT>() {
-    var args = ModalRoute.of(context)!.settings.arguments as AT;
+    var args = ModalRoute
+        .of(context)!
+        .settings
+        .arguments as AT;
     return args;
   }
 
@@ -29,16 +32,20 @@ abstract class PlexState<T extends PlexScreen> extends State<T> {
     super.setState(fn);
   }
 
-  toast(String message) {
+  @Deprecated("Use context.showMessage() or context.showMessageDelayed() instead which has more options and customizations available")
+  toast(String message, {
+    String title = "Message",
+  }) {
     if (!mounted) return;
     if (message.length > 1000) message = "${message.substring(0, 1000)}...";
     context.showSnackBar(message);
   }
 
-  toastDelayed(String message) async {
+  @Deprecated("Use context.showMessage() or context.showMessageDelayed() instead which has more options and customizations available")
+  toastDelayed(String message,) async {
     return Future.delayed(
       const Duration(milliseconds: 100),
-      () {
+          () {
         toast(message);
       },
     );

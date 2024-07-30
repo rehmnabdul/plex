@@ -206,6 +206,7 @@ showMultiSelection<T>(
                                 }
                                 filteredListController
                                     .setValue(filteredListController.data);
+                                onSelect.call(selectionList);
                               },
                               child: itemWidget.call(item),
                             );
@@ -226,6 +227,7 @@ showMultiSelection<T>(
                                 }
                                 filteredListController
                                     .setValue(filteredListController.data);
+                                onSelect.call(selectionList);
                               },
                             ),
                             onTap: () {

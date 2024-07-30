@@ -73,6 +73,8 @@ class PlexFormField {
     this.initialSelection,
     this.items,
     this.itemsAsync,
+    this.dropdownWidget,
+    this.dropdownLeadingWidget,
   }) {
     if (items == null && itemsAsync == null) {
       throw Exception(

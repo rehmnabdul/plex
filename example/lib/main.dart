@@ -336,6 +336,8 @@ void main() async {
             );
           },
         ),
+        PlexRoute(route: "newPath1", title: "New Screen 1", screen: (context, {data}) => Text("New Screen 1"),),
+        PlexRoute(route: "newPath2", title: "New Screen 2", screen: (context, {data}) => Text("New Screen 2"), logo: SizedBox(width:30, height: 30, child: Image.asset("assets/app.png"))),
         PlexRoute(
           route: "/paginated-table",
           category: "Paginated Tables",

@@ -20,6 +20,7 @@ import 'package:plex/plex_utils/plex_pair.dart';
 import 'package:plex/plex_utils/plex_routing.dart';
 import 'package:plex/plex_utils/plex_widgets.dart';
 import 'package:plex/plex_widget.dart';
+import 'package:plex/plex_widgets/plex_navigation_rail.dart';
 
 part 'plex_screens/plex_dashboard_screen.dart';
 

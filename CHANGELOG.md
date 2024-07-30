@@ -1,3 +1,13 @@
+## 0.5.7
+
+### Updates
+* Update the `NavigationRail` to `PlexNavigationRail` in `PlexDashboardScreen` 
+
+## 0.5.6
+
+### Updates
+* Fix on value update callbacks for MultiSelect 
+
 ## 0.5.5
 
 ### Updates

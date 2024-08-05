@@ -514,82 +514,82 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
       children: [
         if (!PlexApp.app.dashboardConfig!.disableNavigationRail) ...{
           if (!smallScreen && routes.isNotEmpty) ...{
-            // Padding(
-            //   padding: const EdgeInsets.all(Dim.small),
-            //   child: Card(
-            //     color: PlexApp.app.dashboardConfig!.navigationRailBackgroundColor ?? PlexTheme.getActiveTheme(context).navigationRailTheme.backgroundColor,
-            //     clipBehavior: Clip.hardEdge,
-            //     elevation: Dim.small,
-            //     child: LayoutBuilder(
-            //       builder: (context, constraints) {
-            //         return SingleChildScrollView(
-            //           physics: const BouncingScrollPhysics(),
-            //           child: ConstrainedBox(
-            //             constraints: BoxConstraints(minHeight: constraints.maxHeight),
-            //             child: IntrinsicHeight(
-            //               child: NavigationRail(
-            //                 useIndicator: true,
-            //                 extended: !PlexApp.app.dashboardConfig!.disableExpandNavigationRail && largeScreen,
-            //                 backgroundColor: Colors.transparent,
-            //                 selectedIconTheme: PlexTheme.getActiveTheme(context).iconTheme.copyWith(size: 25),
-            //                 unselectedIconTheme: PlexTheme.getActiveTheme(context).iconTheme.copyWith(size: 15),
-            //                 selectedLabelTextStyle: (PlexTheme.getActiveTheme(context).navigationRailTheme.selectedLabelTextStyle ??
-            //                         TextStyle(
-            //                           color: PlexTheme.isDarkMode(context) ? Colors.white : Colors.black,
-            //                         ))
-            //                     .copyWith(fontWeight: FontWeight.bold),
-            //                 indicatorShape: null,
-            //                 leading: SizedBox(
-            //                   width: !PlexApp.app.dashboardConfig!.disableExpandNavigationRail && largeScreen ? 200 : 50,
-            //                   child: Column(
-            //                     children: [
-            //                       spaceSmall(),
-            //                       if (!PlexApp.app.dashboardConfig!.hideNavigationRailLogo) ...{
-            //                         SizedBox(
-            //                           height: PlexApp.app.dashboardConfig!.hideNavigationRailLogoHeight,
-            //                           width: PlexApp.app.dashboardConfig!.hideNavigationRailLogoWidth,
-            //                           child: PlexApp.app.getLogo(context),
-            //                         ),
-            //                         spaceSmall(),
-            //                       },
-            //                       if (!PlexApp.app.dashboardConfig!.hideNavigationRailVersionInfo && PlexApp.app.appInfo.versionName != null) ...[
-            //                         Text("${PlexApp.app.appInfo.versionName}"),
-            //                         spaceSmall(),
-            //                       ],
-            //                       ...?PlexApp.app.dashboardConfig!.navigationRailTopWidgets?.call(this, context),
-            //                       spaceSmall(),
-            //                     ],
-            //                   ),
-            //                 ),
-            //                 trailing: Column(
-            //                   children: [
-            //                     ...?PlexApp.app.dashboardConfig?.navigationRailBottomWidgets?.call(this, context),
-            //                     spaceMedium(),
-            //                   ],
-            //                 ),
-            //                 selectedIndex: navigationSelectedIndex.first,
-            //                 onDestinationSelected: (value) {
-            //                   setState(() {
-            //                     navigationSelectedIndex = PlexPair.create(value, null);
-            //                   });
-            //                 },
-            //                 destinations: [
-            //                   ...routes.map(
-            //                     (destination) => NavigationRailDestination(
-            //                       label: Text(destination.title),
-            //                       icon: destination.logo ?? const Icon(Icons.circle_outlined),
-            //                       selectedIcon: destination.selectedLogo ?? destination.logo ?? const Icon(Icons.circle_rounded),
-            //                     ),
-            //                   ),
-            //                 ],
-            //               ),
-            //             ),
-            //           ),
-            //         );
-            //       },
-            //     ),
-            //   ).scaleAnim(),
-            // ),
+            Padding(
+              padding: const EdgeInsets.all(Dim.small),
+              child: Card(
+                color: PlexApp.app.dashboardConfig!.navigationRailBackgroundColor ?? PlexTheme.getActiveTheme(context).navigationRailTheme.backgroundColor,
+                clipBehavior: Clip.hardEdge,
+                elevation: Dim.small,
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    return SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                        child: IntrinsicHeight(
+                          child: NavigationRail(
+                            useIndicator: true,
+                            extended: !PlexApp.app.dashboardConfig!.disableExpandNavigationRail && largeScreen,
+                            backgroundColor: Colors.transparent,
+                            selectedIconTheme: PlexTheme.getActiveTheme(context).iconTheme.copyWith(size: 25),
+                            unselectedIconTheme: PlexTheme.getActiveTheme(context).iconTheme.copyWith(size: 15),
+                            selectedLabelTextStyle: (PlexTheme.getActiveTheme(context).navigationRailTheme.selectedLabelTextStyle ??
+                                    TextStyle(
+                                      color: PlexTheme.isDarkMode(context) ? Colors.white : Colors.black,
+                                    ))
+                                .copyWith(fontWeight: FontWeight.bold),
+                            indicatorShape: null,
+                            leading: SizedBox(
+                              width: !PlexApp.app.dashboardConfig!.disableExpandNavigationRail && largeScreen ? 200 : 50,
+                              child: Column(
+                                children: [
+                                  spaceSmall(),
+                                  if (!PlexApp.app.dashboardConfig!.hideNavigationRailLogo) ...{
+                                    SizedBox(
+                                      height: PlexApp.app.dashboardConfig!.hideNavigationRailLogoHeight,
+                                      width: PlexApp.app.dashboardConfig!.hideNavigationRailLogoWidth,
+                                      child: PlexApp.app.getLogo(context),
+                                    ),
+                                    spaceSmall(),
+                                  },
+                                  if (!PlexApp.app.dashboardConfig!.hideNavigationRailVersionInfo && PlexApp.app.appInfo.versionName != null) ...[
+                                    Text("${PlexApp.app.appInfo.versionName}"),
+                                    spaceSmall(),
+                                  ],
+                                  ...?PlexApp.app.dashboardConfig!.navigationRailTopWidgets?.call(this, context),
+                                  spaceSmall(),
+                                ],
+                              ),
+                            ),
+                            trailing: Column(
+                              children: [
+                                ...?PlexApp.app.dashboardConfig?.navigationRailBottomWidgets?.call(this, context),
+                                spaceMedium(),
+                              ],
+                            ),
+                            selectedIndex: navigationSelectedIndex.first,
+                            onDestinationSelected: (value) {
+                              setState(() {
+                                navigationSelectedIndex = PlexPair.create(value, null);
+                              });
+                            },
+                            destinations: [
+                              ...routes.map(
+                                (destination) => NavigationRailDestination(
+                                  label: Text(destination.title),
+                                  icon: destination.logo ?? const Icon(Icons.circle_outlined),
+                                  selectedIcon: destination.selectedLogo ?? destination.logo ?? const Icon(Icons.circle_rounded),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ).scaleAnim(),
+            ),
             Padding(
               padding: const EdgeInsets.all(Dim.small),
               child: Card(

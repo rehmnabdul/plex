@@ -31,10 +31,10 @@ class _PlexDatePickerWidgetState extends State<PlexDatePickerWidget> {
     return Container(
       decoration: const BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.all(Radius.circular(Dim.small))),
+          borderRadius: BorderRadius.all(Radius.circular(PlexDim.small))),
       child: Padding(
         padding: EdgeInsets.symmetric(
-            horizontal: (widget.removePadding ? Dim.zero : Dim.small)),
+            horizontal: (widget.removePadding ? PlexDim.zero : PlexDim.small)),
         child: Row(
           children: [
             Expanded(

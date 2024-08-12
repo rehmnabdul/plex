@@ -20,8 +20,9 @@ showSelectionList<T>(
   if (originalListData == null) throw Exception("Items are null");
 
   var inputController = TextEditingController();
-  var filteredListController =
-      PlexWidgetController<List<T>>(data: originalListData);
+  var filteredListController = PlexWidgetController<List<T>>(data: originalListData);
+  var focusNode = FocusNode();
+  focusNode.requestFocus();
 
   // ignore: use_build_context_synchronously
   showModalBottomSheet(
@@ -43,6 +44,7 @@ showSelectionList<T>(
                 type: PlexInputWidgetType.typeInput,
                 inputController: inputController,
                 inputHint: "Search here...",
+                inputFocusNode: focusNode,
                 inputOnChange: (data) {
                   var query = data.toLowerCase();
                   if (query.isEmpty) {
@@ -132,6 +134,9 @@ showMultiSelection<T>(
     selectionList.addAll(initialSelection);
   }
 
+  var focusNode = FocusNode();
+  focusNode.requestFocus();
+
   // ignore: use_build_context_synchronously
   showModalBottomSheet(
     enableDrag: true,
@@ -153,6 +158,7 @@ showMultiSelection<T>(
                       title: "Search",
                       type: PlexInputWidgetType.typeInput,
                       inputController: inputController,
+                      inputFocusNode: focusNode,
                       inputHint: "Search here...",
                       inputOnChange: (data) {
                         var query = data.toLowerCase();
@@ -270,6 +276,9 @@ showAutoCompleteSelectionList<T>(
   var inputController = TextEditingController();
   var filteredListController = PlexWidgetController<List<T>>(data: List.empty());
 
+  var focusNode = FocusNode();
+  focusNode.requestFocus();
+
   // ignore: use_build_context_synchronously
   showModalBottomSheet(
     enableDrag: true,
@@ -290,6 +299,7 @@ showAutoCompleteSelectionList<T>(
                 type: PlexInputWidgetType.typeInput,
                 inputController: inputController,
                 inputHint: "Search here...",
+                inputFocusNode: focusNode,
                 inputOnChange: (data) async {
                   var query = data;
                   if (query.length < 2) {

@@ -21,6 +21,7 @@ import 'package:plex/plex_utils/plex_routing.dart';
 import 'package:plex/plex_utils/plex_widgets.dart';
 import 'package:plex/plex_widget.dart';
 import 'package:plex/plex_widgets/plex_navigation_rail.dart';
+import 'package:toastification/toastification.dart';
 
 part 'plex_screens/plex_dashboard_screen.dart';
 
@@ -90,6 +91,9 @@ class PlexApp extends StatefulWidget {
   final Color themeFromColor;
   var imageColorScheme = const ColorScheme.light();
 
+  ///[forceMaterial3] will force app theme to use material3
+  final bool forceMaterial3;
+
   ///This image will be used to generate app theme
   final ImageProvider? themeFromImage;
 
@@ -150,6 +154,7 @@ class PlexApp extends StatefulWidget {
     this.loginConfig,
     this.onInitializationComplete,
     this.onLogout,
+    this.forceMaterial3 = false,
   }) {
     if (dashboardConfig == null && pages == null) {
       throw Exception("Either \"DashboardConfig\" or \"Pages\" must not be null and empty");
@@ -285,7 +290,8 @@ class _PlexAppState extends State<PlexApp> {
         if (widget.themeFromImage != null) {
           widget.imageColorScheme = await ColorScheme.fromImageProvider(provider: widget.themeFromImage!);
         }
-        useMaterial3 = PlexTheme.isMaterial3();
+        useMaterial3 = widget.forceMaterial3 ? widget.forceMaterial3 : PlexTheme.isMaterial3();
+        if (widget.forceMaterial3) PlexTheme.setMaterial3(true);
         themeMode = PlexTheme.isDarkMode(context) ? ThemeMode.dark : ThemeMode.light;
         widget.onInitializationComplete?.call();
         setState(() {
@@ -298,59 +304,63 @@ class _PlexAppState extends State<PlexApp> {
   @override
   Widget build(BuildContext context) {
     if (!_initialized) {
-      return MaterialApp(
-        title: widget.appInfo.title,
-        debugShowCheckedModeBanner: false,
-        home: Scaffold(
-          body: Padding(
-            padding: const EdgeInsets.all(Dim.medium),
-            child: Stack(
-              children: [
-                Align(
-                  alignment: Alignment.center,
-                  child: widget.appInfo.appLogo,
-                ),
-                const Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Text("Loading Components..."),
-                ),
-              ],
+      return ToastificationWrapper(
+        child: MaterialApp(
+          title: widget.appInfo.title,
+          debugShowCheckedModeBanner: false,
+          home: Scaffold(
+            body: Padding(
+              padding: const EdgeInsets.all(PlexDim.medium),
+              child: Stack(
+                children: [
+                  Align(
+                    alignment: Alignment.center,
+                    child: widget.appInfo.appLogo,
+                  ),
+                  const Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Text("Loading Components..."),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
       );
     }
 
-    return GetMaterialApp(
-      title: widget.appInfo.title,
-      theme: PlexTheme.getThemeByBrightness(Brightness.light),
-      darkTheme: PlexTheme.getThemeByBrightness(Brightness.dark),
-      themeMode: themeMode,
-      debugShowCheckedModeBanner: false,
-      scrollBehavior: PlexScrollBehavior(),
-      initialRoute: widget.useAuthorization
-          ? PlexRoutesPaths.loginPath
-          : widget.dashboardConfig != null
-              ? PlexRoutesPaths.homePath
-              : widget.appInfo.initialRoute,
-      unknownRoute: GetPage(
-        name: widget.unknownRoute?.route ?? "/NotFound",
-        page: () => widget.unknownRoute?.screen.call(context) ?? const Scaffold(body: Center(child: Text("Page not found: 404"))),
-      ),
-      routes: {
-        // "/": (_) => const Scaffold(body: Center(child: Text("Page not found: 404"))),
-        if (widget.useAuthorization) ...{
-          PlexRoutesPaths.loginPath: (_) => PlexLoginScreen(loginConfig: widget.loginConfig!, nextRoute: widget.appInfo.initialRoute),
-        },
-        if (widget.dashboardConfig != null) ...{
-          PlexRoutesPaths.homePath: (_) => PlexDashboardScreen(handleBrightnessChange, handleMaterialVersionChange),
-        },
-        if (widget.pages?.isNotEmpty == true) ...{
-          for (var page in widget.pages!) ...{
-            page.route: (_) => page.screen.call(context),
+    return ToastificationWrapper(
+      child: GetMaterialApp(
+        title: widget.appInfo.title,
+        theme: PlexTheme.getThemeByBrightness(Brightness.light),
+        darkTheme: PlexTheme.getThemeByBrightness(Brightness.dark),
+        themeMode: themeMode,
+        debugShowCheckedModeBanner: false,
+        scrollBehavior: PlexScrollBehavior(),
+        initialRoute: widget.useAuthorization
+            ? PlexRoutesPaths.loginPath
+            : widget.dashboardConfig != null
+                ? PlexRoutesPaths.homePath
+                : widget.appInfo.initialRoute,
+        unknownRoute: GetPage(
+          name: widget.unknownRoute?.route ?? "/NotFound",
+          page: () => widget.unknownRoute?.screen.call(context) ?? const Scaffold(body: Center(child: Text("Page not found: 404"))),
+        ),
+        routes: {
+          // "/": (_) => const Scaffold(body: Center(child: Text("Page not found: 404"))),
+          if (widget.useAuthorization) ...{
+            PlexRoutesPaths.loginPath: (_) => PlexLoginScreen(loginConfig: widget.loginConfig!, nextRoute: widget.appInfo.initialRoute),
+          },
+          if (widget.dashboardConfig != null) ...{
+            PlexRoutesPaths.homePath: (_) => PlexDashboardScreen(handleBrightnessChange, handleMaterialVersionChange),
+          },
+          if (widget.pages?.isNotEmpty == true) ...{
+            for (var page in widget.pages!) ...{
+              page.route: (_) => page.screen.call(context),
+            },
           },
         },
-      },
+      ),
     );
   }
 }

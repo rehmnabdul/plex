@@ -1,3 +1,31 @@
+## 0.6.1
+
+### Updates
+* Add tool tip for tag description in `PlexRoute` by using `tagDescription`
+* Update `newTag` to `tag` and all tag related parameters
+
+## 0.6.0
+
+### Updates
+* Make `PlexApp` to forcefully use `material3` design by using parameter `forceMaterial3` in `PlexApp`
+
+## 0.5.9
+
+### Updates
+* Add exception when dependency injection failed to load object
+* Make `showMessage` available all over the application
+* Add change background color, text color for `Tag` in `PlexRoute`
+* Enable old and new design for `Navigation Rail` on `PlexDashboardScreen` 
+* Enable disable button in `PlexInputWidget`
+* Make Focus `PlexInputWidget` focusable and add parameter to control focus by developer
+
+## 0.5.8
+
+### Updates
+* Change `Dim` name to `PlexDim`
+* Add `PlexFontSize` in library to manage font sizes
+* Add `Tag` option in `PlexRute` to indicate the new or changes page in dashboard
+
 ## 0.5.7
 
 ### Updates

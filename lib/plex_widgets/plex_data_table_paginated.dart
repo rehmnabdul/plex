@@ -156,7 +156,7 @@ class PlexDataTableWithPagesState extends State<PlexDataTableWithPages> {
             scrollDirection: Axis.horizontal,
             child: Padding(
               padding: const EdgeInsets.symmetric(
-                  horizontal: Dim.medium, vertical: Dim.small),
+                  horizontal: PlexDim.medium, vertical: PlexDim.small),
               child: Row(
                 children: [
                   SegmentedButton<int>(
@@ -185,7 +185,7 @@ class PlexDataTableWithPagesState extends State<PlexDataTableWithPages> {
             widget.enablePrint ||
             widget.onRefresh != null) ...{
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: Dim.small),
+            padding: const EdgeInsets.symmetric(vertical: PlexDim.small),
             child: Row(
               children: [
                 Expanded(

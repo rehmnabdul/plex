@@ -93,7 +93,7 @@ class _PlexLoginScreenState extends PlexState<PlexLoginScreen> {
                 ),
                 child: Card(
                   child: Padding(
-                    padding: const EdgeInsets.all(Dim.medium),
+                    padding: const EdgeInsets.all(PlexDim.medium),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -119,7 +119,7 @@ class _PlexLoginScreenState extends PlexState<PlexLoginScreen> {
                           isPassword: true,
                         ),
                         Padding(
-                          padding: const EdgeInsets.only(left: Dim.medium, right: Dim.small),
+                          padding: const EdgeInsets.only(left: PlexDim.medium, right: PlexDim.small),
                           child: Row(
                             children: [
                               const Expanded(child: Text("Remember User")),
@@ -166,8 +166,8 @@ class _PlexLoginScreenState extends PlexState<PlexLoginScreen> {
                           spaceSmall(),
                           Wrap(
                             alignment: WrapAlignment.center,
-                            spacing: Dim.small,
-                            runSpacing: Dim.small,
+                            spacing: PlexDim.small,
+                            runSpacing: PlexDim.small,
                             children: [
                               ..._getRecentLogins().map((e) => _getRecentLoginWidget(e)),
                             ],
@@ -275,7 +275,7 @@ class _PlexLoginScreenState extends PlexState<PlexLoginScreen> {
                             Center(
                               child: Text(
                                 getUserProperty(e, 3),
-                                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: PlexFontSize.normal),
                               ),
                             ),
                             Center(
@@ -290,14 +290,14 @@ class _PlexLoginScreenState extends PlexState<PlexLoginScreen> {
                       errorWidget: (context, url, error) => Center(
                         child: Text(
                           getUserProperty(e, 3),
-                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: PlexFontSize.normal),
                         ),
                       ),
                     )
                   : Center(
                       child: Text(
                         getUserProperty(e, 3),
-                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 9),
+                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: PlexFontSize.smallest),
                       ),
                     ),
             ),

@@ -3,13 +3,17 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:plex/plex_package.dart';
 import 'package:plex/plex_sp.dart';
+import 'package:plex/plex_utils/plex_dimensions.dart';
 import 'package:plex/plex_utils/plex_material.dart';
 
 ///This class will hold theme related information
 class PlexTheme {
+
   PlexTheme._();
 
-  static const Color selectionColor = Color(0xFFACCEF7);
+  static Color selectionColor = const Color(0xFFACCEF7);
+  static var navigationTagColor = Colors.lightGreen;
+  static var navigationTagTextColor = Colors.black;
 
   static ThemeData? appTheme;
   static TextTheme? appTextTheme;
@@ -87,7 +91,7 @@ class PlexTheme {
       useMaterial3: isMaterial3(),
       fontFamily: "Roboto",
       navigationBarTheme: NavigationBarThemeData(
-          labelTextStyle: const TextStyle(fontSize: 10).getState()),
+          labelTextStyle: const TextStyle(fontSize: PlexFontSize.smallest).getState()),
       brightness: brightness,
       textTheme: PlexTheme.appTextTheme?.copyWith(
         displayLarge: TextStyle(color: textColor),

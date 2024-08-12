@@ -22,7 +22,7 @@ class PlexInputWidget<T> extends StatefulWidget {
     this.title,
     required this.type,
     this.useMargin = true,
-    this.margin = const EdgeInsets.symmetric(horizontal: Dim.medium, vertical: Dim.small),
+    this.margin = const EdgeInsets.symmetric(horizontal: PlexDim.medium, vertical: PlexDim.small),
     this.helperText,
     this.editable = true,
     this.fieldColor = Colors.white,
@@ -33,6 +33,7 @@ class PlexInputWidget<T> extends StatefulWidget {
     this.inputAction,
     this.inputOnChange,
     this.inputOnSubmit,
+    this.inputFocusNode,
     this.dropdownItems,
     this.dropDownLeadingIcon,
     this.dropdownAsyncItems,
@@ -48,6 +49,7 @@ class PlexInputWidget<T> extends StatefulWidget {
     this.buttonColor,
     this.buttonIcon,
     this.buttonClick,
+    this.buttonEnabled = true,
   });
 
   final String? title;
@@ -66,6 +68,7 @@ class PlexInputWidget<T> extends StatefulWidget {
   final TextInputAction? inputAction;
   final Function(String value)? inputOnSubmit;
   final Function(String value)? inputOnChange;
+  final FocusNode? inputFocusNode;
 
   ///Dropdown Field
   final List<T>? dropdownItems;
@@ -87,6 +90,7 @@ class PlexInputWidget<T> extends StatefulWidget {
   final Color? buttonColor;
   final Icon? buttonIcon;
   final Function()? buttonClick;
+  final bool buttonEnabled;
 
   final PlexWidgetController<T?>? dropdownSelectionController;
   final PlexWidgetController<List<T>?>? multiSelectionController;
@@ -127,6 +131,7 @@ class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
         onChanged: (c) {
           widget.inputOnChange?.call(c.toString());
         },
+        focusNode: widget?.inputFocusNode,
         obscureText: widget.isPassword,
         decoration: InputDecoration(
           // border: InputBorder.none,
@@ -142,11 +147,11 @@ class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
     } else if (widget.type == PlexInputWidgetType.typeButton) {
       inputWidget = widget.buttonIcon == null
           ? FilledButton(
-              onPressed: () => widget.buttonClick?.call(),
+              onPressed: widget.buttonEnabled ? () => widget.buttonClick?.call() : null,
               child: Text(widget.title ?? ""),
             )
           : FilledButton.tonalIcon(
-              onPressed: () => widget.buttonClick?.call(),
+              onPressed: widget.buttonEnabled ? () => widget.buttonClick?.call() : null,
               icon: widget.buttonIcon!,
               label: Text(widget.title ?? ""),
             );
@@ -181,9 +186,9 @@ class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
                 color: Theme.of(context).colorScheme.outline,
                 width: 1,
               ),
-              borderRadius: BorderRadius.circular(Dim.smallest)),
+              borderRadius: BorderRadius.circular(PlexDim.smallest)),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: Dim.small, vertical: Dim.medium),
+            padding: const EdgeInsets.symmetric(horizontal: PlexDim.small, vertical: PlexDim.medium),
             child: Row(
               children: [
                 Expanded(
@@ -194,7 +199,7 @@ class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           if (widget.title != null) ...{
-                            Text("${widget.title}", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: Dim.small)),
+                            Text("${widget.title}", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: PlexDim.small)),
                           },
                           Text(data != null ? widget.dropdownItemAsString!(data) : "N/A"),
                         ],
@@ -215,10 +220,10 @@ class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
             color: Theme.of(context).colorScheme.outline,
             width: 1,
           ),
-          borderRadius: BorderRadius.circular(Dim.smallest),
+          borderRadius: BorderRadius.circular(PlexDim.smallest),
         ),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: Dim.small, vertical: Dim.smallest),
+          padding: const EdgeInsets.symmetric(horizontal: PlexDim.small, vertical: PlexDim.smallest),
           child: Row(
             children: [
               Expanded(
@@ -352,9 +357,9 @@ class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
                 color: Theme.of(context).colorScheme.outline,
                 width: 1,
               ),
-              borderRadius: BorderRadius.circular(Dim.smallest)),
+              borderRadius: BorderRadius.circular(PlexDim.smallest)),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: Dim.small, vertical: Dim.medium),
+            padding: const EdgeInsets.symmetric(horizontal: PlexDim.small, vertical: PlexDim.medium),
             child: Row(
               children: [
                 Expanded(
@@ -366,16 +371,16 @@ class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           if (widget.title != null) ...{
-                            Text("${widget.title}", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: Dim.small)),
+                            Text("${widget.title}", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: PlexDim.small)),
                           },
                           spaceSmall(),
                           Wrap(
-                            spacing: Dim.small,
-                            runSpacing: Dim.small,
+                            spacing: PlexDim.small,
+                            runSpacing: PlexDim.small,
                             children: [
                               ...selectionData.map(
                                 (e) => Chip(
-                                  elevation: Dim.small,
+                                  elevation: PlexDim.small,
                                   avatar: Icon(Icons.check_circle, color: Colors.green.shade500),
                                   label: Text(widget.dropdownItemAsString!(e)),
                                 ),
@@ -422,9 +427,9 @@ class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
                 color: Theme.of(context).colorScheme.outline,
                 width: 1,
               ),
-              borderRadius: BorderRadius.circular(Dim.smallest)),
+              borderRadius: BorderRadius.circular(PlexDim.smallest)),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: Dim.small, vertical: Dim.medium),
+            padding: const EdgeInsets.symmetric(horizontal: PlexDim.small, vertical: PlexDim.medium),
             child: Row(
               children: [
                 Expanded(
@@ -435,7 +440,7 @@ class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           if (widget.title != null) ...{
-                            Text("${widget.title}", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: Dim.small)),
+                            Text("${widget.title}", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: PlexDim.small)),
                           },
                           Text(data != null ? widget.dropdownItemAsString!(data) : "N/A"),
                         ],

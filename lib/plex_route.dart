@@ -9,6 +9,12 @@ class PlexRoute {
   String title;
   String? shortTitle;
 
+  ///[tag] will be used to show as a tag in navigation rail
+  String? tag;
+  String? tagDescription;
+  Color? tagBgColor;
+  Color? tagTextColor;
+
   ///This is the build method to build the screen user defined UI
   Widget Function(BuildContext context, {dynamic data}) screen;
 
@@ -23,13 +29,18 @@ class PlexRoute {
   String? rule;
 
   ///Default constructor
-  PlexRoute(
-      {required this.route,
-      required this.title,
-      required this.screen,
-      this.logo,
-      this.selectedLogo,
-      this.category = "Menu",
-      this.rule,
-      this.shortTitle});
+  PlexRoute({
+    required this.route,
+    required this.title,
+    required this.screen,
+    this.logo,
+    this.selectedLogo,
+    this.category = "Menu",
+    this.rule,
+    this.shortTitle,
+    this.tag,
+    this.tagDescription,
+    this.tagBgColor,
+    this.tagTextColor,
+  });
 }

@@ -68,5 +68,6 @@ T fromPlex<T>({String? tag, dynamic parm}) {
   } else {
     elements = elements.where((element) => element.tag == null).toList();
   }
+  if(elements.isEmpty) throw Exception("No Dependency Provided\n\nPlease use injectSingleton(...), injectSingletonLazy(...) or injectFactory(...)\n");
   return elements.first.getValue(parm: parm);
 }

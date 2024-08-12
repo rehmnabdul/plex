@@ -91,6 +91,8 @@ Install the `plex` in your application.
    - Updatable widget and controlled by a controller. Replaces the use of BLoC or provider pattern
 2. `PlexDataTable`
    - View Data in a tabular form. Sort By Any Column, Search By Any Column, Export as Excel builtin functions
+2. `PlexAdvanceDataTable`
+   - Modern Data Table for more feature rich experience, Export as Excel & Pdf
 3. `PlexInputWidget`
    - Simple Widget to create a `TextInputField`, `DropdownField`, `DatePickerField` and `MultiSelectionFiel`
    - There are lots of features available for each field
@@ -190,6 +192,30 @@ space(Any Double) //Widget with custom height anf width
 #### Console Utilities
 ```dart
 console("Your Message In Console", '(optional) enable print in release build')
+```
+
+#### Show Messages & Toast
+```dart
+//If Using PlexApp 
+showMessage("Your Message");
+
+// If not using PlexAp 
+context.showMessage("Your Message");
+
+//You can use following options as parameter
+String message
+String title,
+Widget? titleWidget,
+Widget? messageWidget,
+MessageType type = MessageType.info,
+MessageStyle style = MessageStyle.flatColored,
+bool autoClose = true,
+int autoCloseDurationSeconds = 5,
+Alignment alignment = Alignment.bottomRight,
+TextDirection textDirection = TextDirection.ltr,
+bool showAnimation = false,
+int animationDurationMillis = 300,
+Widget? customIcon,
 ```
 
 #### Widget Utilities

@@ -77,7 +77,7 @@ class _FormUsageScreenState extends PlexState<FormUsageScreen> {
   AppBar? buildAppBar() {
     return AppBar(
       automaticallyImplyLeading: true,
-      elevation: Dim.medium,
+      elevation: PlexDim.medium,
       title: const Text("Home", style: TextStyle(fontWeight: FontWeight.w700)),
     );
   }

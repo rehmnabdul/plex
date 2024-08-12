@@ -278,7 +278,7 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
                           items: widget.columns.map((e) => ColumnGroup(name: e.columnName, sortGroupRows: true)).toList(),
                         );
                       },
-                      style: ButtonStyle(backgroundColor: Colors.blue.shade100.getMaterialState(), elevation: Dim.smallest.getMaterialState()),
+                      style: ButtonStyle(backgroundColor: Colors.blue.shade100.getMaterialState(), elevation: PlexDim.smallest.getMaterialState()),
                       icon: Image.asset(groupData, height: 25, width: 25, color: Colors.blue),
                       label: const Text('Group By', style: TextStyle(color: Colors.blue)),
                     ),
@@ -296,7 +296,7 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
                         }
                         context.showSnackBar("Report saved at \"$path\"");
                       },
-                      style: ButtonStyle(backgroundColor: Colors.green.shade100.getMaterialState(), elevation: Dim.smallest.getMaterialState()),
+                      style: ButtonStyle(backgroundColor: Colors.green.shade100.getMaterialState(), elevation: PlexDim.smallest.getMaterialState()),
                       child: Image.asset(excel, width: 20, height: 20, color: Colors.green),
                     ),
                   },
@@ -312,7 +312,7 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
                         }
                         context.showSnackBar("Report saved at \"$path\"");
                       },
-                      style: ButtonStyle(backgroundColor: Colors.red.shade100.getMaterialState(), elevation: Dim.smallest.getMaterialState()),
+                      style: ButtonStyle(backgroundColor: Colors.red.shade100.getMaterialState(), elevation: PlexDim.smallest.getMaterialState()),
                       child: Image.asset(pdf, width: 20, height: 20, color: Colors.redAccent),
                     ),
                   },
@@ -353,7 +353,7 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
                           items: widget.columns.map((e) => ColumnGroup(name: e.columnName, sortGroupRows: true)).toList(),
                         );
                       },
-                      style: ButtonStyle(backgroundColor: Colors.blue.shade100.getMaterialState(), elevation: Dim.smallest.getMaterialState()),
+                      style: ButtonStyle(backgroundColor: Colors.blue.shade100.getMaterialState(), elevation: PlexDim.smallest.getMaterialState()),
                       icon: Image.asset(groupData, height: 25, width: 25, color: Colors.blue),
                       label: const Text('Group By', style: TextStyle(color: Colors.blue)),
                     ),
@@ -373,7 +373,7 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
                             }
                             context.showSnackBar("Report saved at \"$path\"");
                           },
-                          style: ButtonStyle(backgroundColor: Colors.green.shade100.getMaterialState(), elevation: Dim.smallest.getMaterialState()),
+                          style: ButtonStyle(backgroundColor: Colors.green.shade100.getMaterialState(), elevation: PlexDim.smallest.getMaterialState()),
                           leadingIcon: Image.asset(excel, width: 20, height: 20, color: Colors.green),
                           child: const Text('Excel', style: TextStyle(color: Colors.green)),
                         ),
@@ -389,7 +389,7 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
                             }
                             context.showSnackBar("Report saved at \"$path\"");
                           },
-                          style: ButtonStyle(backgroundColor: Colors.red.shade100.getMaterialState(), elevation: Dim.smallest.getMaterialState()),
+                          style: ButtonStyle(backgroundColor: Colors.red.shade100.getMaterialState(), elevation: PlexDim.smallest.getMaterialState()),
                           leadingIcon: Image.asset(pdf, width: 20, height: 20, color: Colors.redAccent),
                           child: const Text('Pdf', style: TextStyle(color: Colors.redAccent)),
                         ),
@@ -422,7 +422,7 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
                     menuChildren: [
                       if (widget.enableColumnGrouping) ...{
                         MenuItemButton(
-                          style: ButtonStyle(backgroundColor: Colors.blue.shade100.getMaterialState(), elevation: Dim.smallest.getMaterialState()),
+                          style: ButtonStyle(backgroundColor: Colors.blue.shade100.getMaterialState(), elevation: PlexDim.smallest.getMaterialState()),
                           leadingIcon: Image.asset(groupData, height: 25, width: 25, color: Colors.blue),
                           onPressed: () {
                             showMultiSelection<ColumnGroup>(
@@ -465,7 +465,7 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
                             }
                             context.showSnackBar("Report saved at \"$path\"");
                           },
-                          style: ButtonStyle(backgroundColor: Colors.green.shade100.getMaterialState(), elevation: Dim.smallest.getMaterialState()),
+                          style: ButtonStyle(backgroundColor: Colors.green.shade100.getMaterialState(), elevation: PlexDim.smallest.getMaterialState()),
                           leadingIcon: Image.asset(excel, width: 20, height: 20, color: Colors.green),
                           child: const Text('Excel', style: TextStyle(color: Colors.green)),
                         ),
@@ -481,7 +481,7 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
                             }
                             context.showSnackBar("Report saved at \"$path\"");
                           },
-                          style: ButtonStyle(backgroundColor: Colors.red.shade100.getMaterialState(), elevation: Dim.smallest.getMaterialState()),
+                          style: ButtonStyle(backgroundColor: Colors.red.shade100.getMaterialState(), elevation: PlexDim.smallest.getMaterialState()),
                           leadingIcon: Image.asset(pdf, width: 20, height: 20, color: Colors.redAccent),
                           child: const Text('Pdf', style: TextStyle(color: Colors.redAccent)),
                         ),
@@ -562,7 +562,7 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
                           allowSorting: e.showOrderByControl,
                           allowFiltering: e.showFilterControl,
                           label: Padding(
-                            padding: const EdgeInsets.all(Dim.medium),
+                            padding: const EdgeInsets.all(PlexDim.medium),
                             child: Text(
                               e.columnName,
                               style: widget.headerTextStyle,
@@ -643,7 +643,7 @@ class _PlexAdvanceDataTableDataSource extends DataGridSource {
           return cell.isWidget
               ? cell.value as Widget
               : Padding(
-                  padding: const EdgeInsets.all(Dim.medium - 1),
+                  padding: const EdgeInsets.all(PlexDim.medium - 1),
                   child: Text(
                     dataGridCell.value.toString(),
                     textAlign: cell.isNumber ? TextAlign.right : TextAlign.left,

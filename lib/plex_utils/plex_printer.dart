@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:plex/plex_utils/plex_dimensions.dart';
 import 'package:syncfusion_flutter_xlsio/xlsio.dart';
 
 class PlexPrinter {
@@ -24,7 +25,7 @@ class PlexPrinter {
 
     final Range productionRange6 = productionSheet.getRangeByIndex(
         productionRowNumber, 1, productionRowNumber, endColumn);
-    productionRange6.cellStyle.fontSize = 10;
+    productionRange6.cellStyle.fontSize = PlexFontSize.smallest;
     productionRange6.cellStyle.bold = true;
     productionRange6.cellStyle.backColorRgb = Colors.grey;
 

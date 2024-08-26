@@ -11,6 +11,7 @@ showSelectionList<T>(
   required String Function(T item) itemText,
   required Function(T item) onSelect,
   dynamic initialSelected,
+  FocusNode? focusNode,
   Widget Function(dynamic item)? itemWidget,
   Widget Function(T item)? leadingIcon,
   bool Function(String query, dynamic item)? onSearch,
@@ -21,8 +22,10 @@ showSelectionList<T>(
 
   var inputController = TextEditingController();
   var filteredListController = PlexWidgetController<List<T>>(data: originalListData);
-  var focusNode = FocusNode();
-  focusNode.requestFocus();
+  if (focusNode == null) {
+    focusNode = FocusNode();
+    focusNode.requestFocus();
+  }
 
   // ignore: use_build_context_synchronously
   showModalBottomSheet(
@@ -81,17 +84,10 @@ showSelectionList<T>(
                         }
                         return ListTile(
                           selectedTileColor: Colors.green.withOpacity(0.25),
-                          selected: initialSelected != null &&
-                              itemText.call(item) ==
-                                  itemText.call(initialSelected),
+                          selected: initialSelected != null && itemText.call(item) == itemText.call(initialSelected),
                           leading: leadingIcon?.call(item),
                           title: Text(itemText.call(item)),
-                          trailing: initialSelected != null &&
-                                  itemText.call(item) ==
-                                      itemText.call(initialSelected)
-                              ? const Icon(Icons.check_circle,
-                                  color: Colors.green)
-                              : null,
+                          trailing: initialSelected != null && itemText.call(item) == itemText.call(initialSelected) ? const Icon(Icons.check_circle, color: Colors.green) : null,
                           onTap: () {
                             onSelect.call(item);
                             Get.back();
@@ -115,6 +111,7 @@ showMultiSelection<T>(
   List<T>? items,
   Future<List<T>>? asyncItems,
   List<T>? initialSelection,
+  FocusNode? focusNode,
   required String Function(T item) itemText,
   required Function(List<T> items) onSelect,
   Widget Function(dynamic item)? itemWidget,
@@ -126,16 +123,17 @@ showMultiSelection<T>(
   if (originalListData == null) throw Exception("Items are null");
 
   var inputController = TextEditingController();
-  var filteredListController =
-      PlexWidgetController<List<T>>(data: originalListData);
+  var filteredListController = PlexWidgetController<List<T>>(data: originalListData);
 
   var selectionList = List<T>.empty(growable: true);
   if (initialSelection != null) {
     selectionList.addAll(initialSelection);
   }
 
-  var focusNode = FocusNode();
-  focusNode.requestFocus();
+  if (focusNode == null) {
+    focusNode = FocusNode();
+    focusNode.requestFocus();
+  }
 
   // ignore: use_build_context_synchronously
   showModalBottomSheet(
@@ -169,9 +167,7 @@ showMultiSelection<T>(
                           if (onSearch != null) {
                             return onSearch.call(query, element);
                           }
-                          return itemText(element)
-                              .toLowerCase()
-                              .contains(query);
+                          return itemText(element).toLowerCase().contains(query);
                         }).toList();
                         filteredListController.setValue(filteredList);
                       },
@@ -201,17 +197,13 @@ showMultiSelection<T>(
                           if (itemWidget != null) {
                             return InkWell(
                               onTap: () {
-                                var prevItem = selectionList.firstWhereOrNull(
-                                    (element) =>
-                                        itemText(item) == itemText(element));
+                                var prevItem = selectionList.firstWhereOrNull((element) => itemText(item) == itemText(element));
                                 if (prevItem == null) {
                                   selectionList.add(item);
                                 } else {
-                                  selectionList.removeWhere((element) =>
-                                      itemText(item) == itemText(element));
+                                  selectionList.removeWhere((element) => itemText(item) == itemText(element));
                                 }
-                                filteredListController
-                                    .setValue(filteredListController.data);
+                                filteredListController.setValue(filteredListController.data);
                                 onSelect.call(selectionList);
                               },
                               child: itemWidget.call(item),
@@ -221,33 +213,25 @@ showMultiSelection<T>(
                             leading: leadingIcon?.call(item),
                             title: Text(itemText.call(item)),
                             trailing: Checkbox(
-                              value: selectionList.firstWhereOrNull((element) =>
-                                      itemText(item) == itemText(element)) !=
-                                  null,
+                              value: selectionList.firstWhereOrNull((element) => itemText(item) == itemText(element)) != null,
                               onChanged: (value) {
                                 if (value == true) {
                                   selectionList.add(item);
                                 } else {
-                                  selectionList.removeWhere((element) =>
-                                      itemText(item) == itemText(element));
+                                  selectionList.removeWhere((element) => itemText(item) == itemText(element));
                                 }
-                                filteredListController
-                                    .setValue(filteredListController.data);
+                                filteredListController.setValue(filteredListController.data);
                                 onSelect.call(selectionList);
                               },
                             ),
                             onTap: () {
-                              var prevItem = selectionList.firstWhereOrNull(
-                                  (element) =>
-                                      itemText(item) == itemText(element));
+                              var prevItem = selectionList.firstWhereOrNull((element) => itemText(item) == itemText(element));
                               if (prevItem == null) {
                                 selectionList.add(item);
                               } else {
-                                selectionList.removeWhere((element) =>
-                                    itemText(item) == itemText(element));
+                                selectionList.removeWhere((element) => itemText(item) == itemText(element));
                               }
-                              filteredListController
-                                  .setValue(filteredListController.data);
+                              filteredListController.setValue(filteredListController.data);
                             },
                           );
                         },
@@ -262,22 +246,22 @@ showMultiSelection<T>(
   );
 }
 
-
-
 showAutoCompleteSelectionList<T>(
-    BuildContext context, {
-      required Future<List<T>> Function(String query) asyncItems,
-      required String Function(T item) itemText,
-      required Function(T item) onSelect,
-      Widget Function(dynamic item)? itemWidget,
-      Widget Function(T item)? leadingIcon,
-    }) async {
-
+  BuildContext context, {
+  FocusNode? focusNode,
+  required Future<List<T>> Function(String query) asyncItems,
+  required String Function(T item) itemText,
+  required Function(T item) onSelect,
+  Widget Function(dynamic item)? itemWidget,
+  Widget Function(T item)? leadingIcon,
+}) async {
   var inputController = TextEditingController();
   var filteredListController = PlexWidgetController<List<T>>(data: List.empty());
 
-  var focusNode = FocusNode();
-  focusNode.requestFocus();
+  if (focusNode == null) {
+    focusNode = FocusNode();
+    focusNode.requestFocus();
+  }
 
   // ignore: use_build_context_synchronously
   showModalBottomSheet(

@@ -66,6 +66,12 @@ class PlexDashboardConfig {
   }
 
   Function(int index, dynamic data)? onNavigation;
+
+  late List<PlexRoute> _routes;
+
+  int indexOfRoute(String route) {
+      return _routes.indexWhere((screen) => screen.route == route);
+  }
 }
 
 class PlexDashboardScreen extends PlexScreen {
@@ -85,7 +91,6 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
   var notificationCountController = PlexWidgetController<int>(data: 0);
 
   PlexUser? user;
-  late List<PlexRoute> routes;
 
   @override
   void initState() {
@@ -100,18 +105,18 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
     };
     PlexApp.app._isLoadingDelegate = () => isLoading();
     PlexApp.app._notificationDelegate = () => notificationCountController.setValue(PlexApp.app._notifications.length);
-    routes = PlexApp.app.dashboardConfig?.dashboardScreens ?? List.empty(growable: true);
-    routes = routes.where((element) {
+    PlexApp.app.dashboardConfig?._routes = PlexApp.app.dashboardConfig?.dashboardScreens ?? List.empty(growable: true);
+    PlexApp.app.dashboardConfig?._routes = PlexApp.app.dashboardConfig!._routes.where((element) {
       if (element.rule == null) return true;
       if (user == null) return true;
       if ((user!.getLoggedInRules() ?? List.empty()).isEmpty) return false;
       return user!.getLoggedInRules()!.contains(element.rule);
     }).toList();
 
-    if (routes.isEmpty) {
+    if (PlexApp.app.dashboardConfig!._routes.isEmpty) {
       delay(() => PlexApp.app.logout());
     } else {
-      var index = routes.indexWhere((element) => element.route == PlexApp.app.getInitialPath());
+      var index = PlexApp.app.dashboardConfig!._routes.indexWhere((element) => element.route == PlexApp.app.getInitialPath());
       navigationSelectedIndex = PlexPair.create(index == -1 ? 0 : index, null);
     }
 
@@ -134,8 +139,8 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
   AppBar? buildAppBar() {
     return AppBar(
       centerTitle: true,
-      title: navigationSelectedIndex.first == -1 ? Container() : Text(routes[navigationSelectedIndex.first].title),
-      leading: (routes.isNotEmpty)
+      title: navigationSelectedIndex.first == -1 ? Container() : Text(PlexApp.app.dashboardConfig!._routes[navigationSelectedIndex.first].title),
+      leading: (PlexApp.app.dashboardConfig!._routes.isNotEmpty)
           ? IconButton(
               icon: const Icon(Icons.menu),
               onPressed: () {
@@ -430,7 +435,7 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
   @override
   Widget? buildBottomNavigation() {
     if (PlexApp.app.dashboardConfig!.disableBottomNavigation) return null;
-    if (!smallScreen || (routes.length) <= 1) return null;
+    if (!smallScreen || (PlexApp.app.dashboardConfig!._routes.length) <= 1) return null;
     return NavigationBar(
       selectedIndex: navigationSelectedIndex.first > maxBottomNavDestinations ? maxBottomNavDestinations : navigationSelectedIndex.first,
       labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
@@ -441,8 +446,8 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
         });
       },
       destinations: [
-        if (routes.length > maxBottomNavDestinations) ...{
-          ...routes.sublist(0, maxBottomNavDestinations).map((destination) => NavigationDestination(
+        if (PlexApp.app.dashboardConfig!._routes.length > maxBottomNavDestinations) ...{
+          ...PlexApp.app.dashboardConfig!._routes.sublist(0, maxBottomNavDestinations).map((destination) => NavigationDestination(
                 label: destination.shortTitle ?? destination.title,
                 icon: destination.logo ?? const Icon(Icons.circle),
                 selectedIcon: destination.logo,
@@ -450,11 +455,11 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
               )),
           MenuAnchor(
             menuChildren: [
-              ...routes.sublist(maxBottomNavDestinations).map(
+              ...PlexApp.app.dashboardConfig!._routes.sublist(maxBottomNavDestinations).map(
                     (e) => MenuItemButton(
                       onPressed: () {
                         setState(() {
-                          navigationSelectedIndex = PlexPair.create(routes.indexWhere((i) => i.route == e.route), null);
+                          navigationSelectedIndex = PlexPair.create(PlexApp.app.dashboardConfig!._routes.indexWhere((i) => i.route == e.route), null);
                         });
                       },
                       leadingIcon: e.logo ?? const Icon(Icons.logout),
@@ -476,7 +481,7 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
             },
           ),
         } else ...{
-          ...routes.map((destination) => NavigationDestination(
+          ...PlexApp.app.dashboardConfig!._routes.map((destination) => NavigationDestination(
                 label: destination.shortTitle ?? destination.title,
                 icon: destination.logo ?? const Icon(Icons.circle),
                 selectedIcon: destination.logo,
@@ -490,7 +495,7 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
   List<Widget> _createSideNavigationButtons() {
     var menus = List<Widget>.empty(growable: true);
     String? prevCategory;
-    for (var e in routes) {
+    for (var e in PlexApp.app.dashboardConfig!._routes) {
       if (prevCategory != e.category) {
         prevCategory = e.category;
         menus.add(
@@ -518,7 +523,7 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         if (!PlexApp.app.dashboardConfig!.disableNavigationRail) ...{
-          if (!smallScreen && routes.isNotEmpty) ...{
+          if (!smallScreen && PlexApp.app.dashboardConfig!._routes.isNotEmpty) ...{
             if (PlexApp.app.dashboardConfig!.navigationRailOldStyle) ...{
               Padding(
                 padding: const EdgeInsets.all(PlexDim.small),
@@ -580,7 +585,7 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
                                 });
                               },
                               destinations: [
-                                ...routes.map(
+                                ...PlexApp.app.dashboardConfig!._routes.map(
                                   (destination) => NavigationRailDestination(
                                     label: Text(destination.title),
                                     icon: destination.logo ?? const Icon(Icons.circle_outlined),
@@ -610,7 +615,7 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
                       extended: !PlexApp.app.dashboardConfig!.disableExpandNavigationRail && largeScreen,
                       backgroundColor: Colors.transparent,
                       selectedDestination: navigationSelectedIndex.first,
-                      destinations: routes,
+                      destinations: PlexApp.app.dashboardConfig!._routes,
                       onSelectDestination: (index) {
                         setState(() {
                           navigationSelectedIndex = PlexPair.create(index, null);
@@ -649,7 +654,7 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
           },
         },
         if (navigationSelectedIndex.first != -1) ...{
-          Expanded(child: routes[navigationSelectedIndex.first].screen.call(context, data: navigationSelectedIndex.second)),
+          Expanded(child: PlexApp.app.dashboardConfig!._routes[navigationSelectedIndex.first].screen.call(context, data: navigationSelectedIndex.second)),
         }
       ],
     );

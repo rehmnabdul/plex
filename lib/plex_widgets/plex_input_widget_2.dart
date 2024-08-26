@@ -4,28 +4,26 @@ import 'package:plex/plex_utils/plex_dimensions.dart';
 import 'package:plex/plex_widget.dart';
 import 'package:plex/plex_widgets/plex_selection_list.dart';
 
-enum PlexInputWidgetType {
+enum PlexInputWidgetType2 {
   typeInput,
   typeDropdown,
   typeDate,
   typeTime,
   typeDateTime,
   typeMultiSelect,
-  typeButton,
   typeAutoComplete,
+  typeButton,
 }
 
 // ignore: must_be_immutable
-class PlexInputWidget<T> extends StatefulWidget {
-  PlexInputWidget({
+class PlexInputWidget2<T> extends StatefulWidget {
+  PlexInputWidget2.input({
     super.key,
     this.title,
-    required this.type,
     this.useMargin = true,
     this.margin = const EdgeInsets.symmetric(horizontal: PlexDim.medium, vertical: PlexDim.small),
-    this.helperText,
     this.editable = true,
-    this.fieldColor = Colors.white,
+    this.helperText,
     this.inputHint,
     this.inputController,
     this.inputKeyboardType = TextInputType.name,
@@ -34,6 +32,17 @@ class PlexInputWidget<T> extends StatefulWidget {
     this.inputOnChange,
     this.inputOnSubmit,
     this.inputFocusNode,
+  }) {
+    this.type = PlexInputWidgetType2.typeInput;
+  }
+
+  PlexInputWidget2.dropdown({
+    super.key,
+    this.title,
+    this.useMargin = true,
+    this.margin = const EdgeInsets.symmetric(horizontal: PlexDim.medium, vertical: PlexDim.small),
+    this.editable = true,
+    this.helperText,
     this.dropdownItems,
     this.dropDownLeadingIcon,
     this.dropdownAsyncItems,
@@ -42,64 +51,152 @@ class PlexInputWidget<T> extends StatefulWidget {
     this.dropdownItemAsString,
     this.dropdownItemOnSelect,
     this.dropdownSelectionController,
-    this.multiSelectionController,
+  }) {
+    this.type = PlexInputWidgetType2.typeDropdown;
+  }
+
+  PlexInputWidget2.date({
+    super.key,
+    this.title,
+    this.useMargin = true,
+    this.margin = const EdgeInsets.symmetric(horizontal: PlexDim.medium, vertical: PlexDim.small),
+    this.editable = true,
+    this.helperText,
+    Function(dynamic item)? itemOnSelect,
+    PlexWidgetController<T?>? selectionController,
+  }) {
+    this.type = PlexInputWidgetType2.typeDate;
+    this.dropdownItemOnSelect = itemOnSelect;
+    this.dropdownSelectionController = selectionController;
+  }
+
+  PlexInputWidget2.time({
+    super.key,
+    this.title,
+    this.useMargin = true,
+    this.margin = const EdgeInsets.symmetric(horizontal: PlexDim.medium, vertical: PlexDim.small),
+    this.editable = true,
+    this.helperText,
+    Function(dynamic item)? itemOnSelect,
+    PlexWidgetController<T?>? selectionController,
+  }) {
+    this.type = PlexInputWidgetType2.typeTime;
+    this.dropdownItemOnSelect = itemOnSelect;
+    this.dropdownSelectionController = selectionController;
+  }
+
+  PlexInputWidget2.dateTime({
+    super.key,
+    this.title,
+    this.useMargin = true,
+    this.margin = const EdgeInsets.symmetric(horizontal: PlexDim.medium, vertical: PlexDim.small),
+    this.editable = true,
+    this.helperText,
+    Function(dynamic item)? itemOnSelect,
+    PlexWidgetController<T?>? selectionController,
+  }) {
+    this.type = PlexInputWidgetType2.typeDateTime;
+    this.dropdownItemOnSelect = itemOnSelect;
+    this.dropdownSelectionController = selectionController;
+  }
+
+  PlexInputWidget2.multiSelect({
+    super.key,
+    this.title,
+    this.useMargin = true,
+    this.margin = const EdgeInsets.symmetric(horizontal: PlexDim.medium, vertical: PlexDim.small),
+    this.editable = true,
+    this.helperText,
+    this.dropdownItemAsString,
+    this.dropdownItems,
+    this.dropdownAsyncItems,
+    this.dropdownOnSearch,
+    this.dropdownItemWidget,
+    this.dropDownLeadingIcon,
     this.multiInitialSelection,
-    this.dropdownCustomOnTap,
+    this.multiSelectionController,
+  }) {
+    this.type = PlexInputWidgetType2.typeMultiSelect;
+  }
+
+  PlexInputWidget2.autoComplete({
+    super.key,
+    this.title,
+    this.useMargin = true,
+    this.margin = const EdgeInsets.symmetric(horizontal: PlexDim.medium, vertical: PlexDim.small),
+    this.editable = true,
+    this.helperText,
     this.autoCompleteItems,
-    this.buttonStyle,
-    this.buttonIcon,
+    this.dropdownItemAsString,
+    this.dropdownSelectionController,
+    this.dropdownItemOnSelect,
+  }) {
+    this.type = PlexInputWidgetType2.typeAutoComplete;
+  }
+
+  PlexInputWidget2.button({
+    super.key,
+    this.title,
+    this.useMargin = true,
+    this.margin = const EdgeInsets.symmetric(horizontal: PlexDim.medium, vertical: PlexDim.small),
+    this.editable = true,
+    this.helperText,
     this.buttonClick,
     this.buttonEnabled = true,
-  });
+    this.buttonColor,
+    this.buttonIcon,
+  }) {
+    this.type = PlexInputWidgetType2.typeAutoComplete;
+  }
+
+  late final PlexInputWidgetType2 type;
 
   final String? title;
-  final PlexInputWidgetType type;
-  final bool editable;
-  final String? helperText;
-  final Color fieldColor;
   final bool useMargin;
   final EdgeInsets margin;
+  final bool editable;
+  final String? helperText;
 
   ///Input Field
-  final String? inputHint;
-  final TextEditingController? inputController;
-  final TextInputType inputKeyboardType;
-  final bool isPassword;
-  final TextInputAction? inputAction;
-  final Function(String value)? inputOnSubmit;
-  final Function(String value)? inputOnChange;
-  final FocusNode? inputFocusNode;
+  String? inputHint;
+  TextEditingController? inputController;
+  TextInputType inputKeyboardType = TextInputType.name;
+  bool isPassword = false;
+  TextInputAction? inputAction;
+  Function(String value)? inputOnChange;
+  Function(String value)? inputOnSubmit;
+  FocusNode? inputFocusNode;
 
   ///Dropdown Field
-  final List<T>? dropdownItems;
-  final Widget Function(dynamic item)? dropDownLeadingIcon;
-  final Future<List<dynamic>>? dropdownAsyncItems;
-  final Widget Function(dynamic item)? dropdownItemWidget;
-  final bool Function(String query, dynamic item)? dropdownOnSearch;
-  String Function(dynamic item)? dropdownItemAsString = (item) => item.toString();
-  final Function(dynamic item)? dropdownItemOnSelect;
-  final Function? dropdownCustomOnTap;
+  List<T>? dropdownItems;
+  Widget Function(dynamic item)? dropDownLeadingIcon;
+  Future<List<dynamic>>? dropdownAsyncItems;
+  Widget Function(dynamic item)? dropdownItemWidget;
+  bool Function(String query, dynamic item)? dropdownOnSearch;
+  String Function(dynamic item)? dropdownItemAsString;
+  Function(dynamic item)? dropdownItemOnSelect;
+  Function? dropdownCustomOnTap;
+  PlexWidgetController<T?>? dropdownSelectionController;
 
   ///AutoComplete Field
-  final Future<List<dynamic>> Function(String query)? autoCompleteItems;
+  Future<List<dynamic>> Function(String query)? autoCompleteItems;
 
   ///Multiselect Fields
-  final List<T>? multiInitialSelection;
+  List<T>? multiInitialSelection;
+  PlexWidgetController<List<T>?>? multiSelectionController;
 
   ///Button Field
-  final Icon? buttonIcon;
-  final Function()? buttonClick;
-  final bool buttonEnabled;
-  final ButtonStyle? buttonStyle;
-
-  final PlexWidgetController<T?>? dropdownSelectionController;
-  final PlexWidgetController<List<T>?>? multiSelectionController;
+  Color? buttonColor;
+  Icon? buttonIcon;
+  Function()? buttonClick;
+  bool buttonEnabled = true;
 
   @override
-  State<PlexInputWidget> createState() => _PlexInputWidgetState<T>();
+  State<PlexInputWidget2> createState() => _PlexInputWidgetState2<T>();
 }
 
-class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
+class _PlexInputWidgetState2<T> extends State<PlexInputWidget2> {
+
   PlexWidgetController<T?>? _dropdownSelectionController;
   PlexWidgetController<List<T>?>? _multiSelectionController;
 
@@ -119,7 +216,7 @@ class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
   @override
   Widget build(BuildContext context) {
     Widget inputWidget = Container();
-    if (widget.type == PlexInputWidgetType.typeInput) {
+    if (widget.type == PlexInputWidgetType2.typeInput) {
       inputWidget = TextField(
         enabled: widget.editable,
         controller: widget.inputController,
@@ -131,7 +228,7 @@ class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
         onChanged: (c) {
           widget.inputOnChange?.call(c.toString());
         },
-        focusNode: widget?.inputFocusNode,
+        focusNode: widget.inputFocusNode,
         obscureText: widget.isPassword,
         decoration: InputDecoration(
           // border: InputBorder.none,
@@ -144,49 +241,18 @@ class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
           filled: true,
         ),
       );
-    } else if (widget.type == PlexInputWidgetType.typeButton) {
+    } else if (widget.type == PlexInputWidgetType2.typeButton) {
       inputWidget = widget.buttonIcon == null
-          ? ElevatedButton(
-              style: widget.buttonStyle ??
-                  ButtonStyle(
-                    elevation: WidgetStateProperty.resolveWith(
-                      (states) {
-                        return states.contains(WidgetState.disabled) ? 0 : PlexDim.small;
-                      },
-                    ),
-                  ),
+          ? FilledButton(
               onPressed: widget.buttonEnabled ? () => widget.buttonClick?.call() : null,
               child: Text(widget.title ?? ""),
             )
-          : ElevatedButton.icon(
-              style: widget.buttonStyle ??
-                  ButtonStyle(
-                    elevation: WidgetStateProperty.resolveWith(
-                      (states) {
-                        return states.contains(WidgetState.disabled) ? 0 : PlexDim.small;
-                      },
-                    ),
-                  ),
+          : FilledButton.tonalIcon(
               onPressed: widget.buttonEnabled ? () => widget.buttonClick?.call() : null,
               icon: widget.buttonIcon!,
               label: Text(widget.title ?? ""),
             );
-      // inputWidget = widget.buttonIcon == null
-      //     ? FilledButton(
-      //         onPressed: widget.buttonEnabled ? () => widget.buttonClick?.call() : null,
-      //         style: ButtonStyle(backgroundColor: widget.buttonColor?.getMaterialState()),
-      //         child: Text(widget.title ?? ""),
-      //       )
-      //     : FilledButton.tonalIcon(
-      //         onPressed: widget.buttonEnabled ? () => widget.buttonClick?.call() : null,
-      //         icon: widget.buttonIcon!,
-      //         style: ButtonStyle(
-      //           backgroundColor: widget.buttonColor?.getMaterialState(),
-      //           textStyle: TextStyle(color: widget.buttonTextColor).getState(),
-      //         ),
-      //         label: Text(widget.title ?? ""),
-      //       );
-    } else if (widget.type == PlexInputWidgetType.typeDropdown) {
+    } else if (widget.type == PlexInputWidgetType2.typeDropdown) {
       inputWidget = InkWell(
         onTap: () {
           if (!widget.editable) return;
@@ -203,7 +269,7 @@ class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
             leadingIcon: widget.dropDownLeadingIcon,
             focusNode: widget.inputFocusNode ?? FocusNode(),
             initialSelected: getDropDownController().data,
-            itemText: (c) => widget.dropdownItemAsString!(c),
+            itemText: (c) => widget.dropdownItemAsString?.call(c) ?? c.toString(),
             onSelect: (c) {
               getDropDownController().setValue(c as T?);
               widget.dropdownItemOnSelect?.call(c);
@@ -233,7 +299,7 @@ class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
                           if (widget.title != null) ...{
                             Text("${widget.title}", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: PlexDim.small)),
                           },
-                          Text(data != null ? widget.dropdownItemAsString!(data) : "N/A"),
+                          Text(data != null ? widget.dropdownItemAsString?.call(data) ?? data.toString() : "N/A"),
                         ],
                       );
                     },
@@ -245,7 +311,7 @@ class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
           ),
         ),
       );
-    } else if ([PlexInputWidgetType.typeDate, PlexInputWidgetType.typeDateTime, PlexInputWidgetType.typeTime].contains(widget.type)) {
+    } else if ([PlexInputWidgetType2.typeDate, PlexInputWidgetType2.typeDateTime, PlexInputWidgetType2.typeTime].contains(widget.type)) {
       inputWidget = Container(
         decoration: BoxDecoration(
           border: Border.all(
@@ -268,7 +334,7 @@ class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
                       onTap: () {
                         if (!widget.editable) return;
                         if (widget.editable == false) return;
-                        if (widget.type == PlexInputWidgetType.typeDate) {
+                        if (widget.type == PlexInputWidgetType2.typeDate) {
                           showDatePicker(
                             context: context,
                             initialDate: getDropDownController().data as DateTime? ?? DateTime.now(),
@@ -281,7 +347,7 @@ class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
                               widget.dropdownItemOnSelect?.call(value);
                             }
                           });
-                        } else if (widget.type == PlexInputWidgetType.typeTime) {
+                        } else if (widget.type == PlexInputWidgetType2.typeTime) {
                           showTimePicker(
                             context: context,
                             initialTime: TimeOfDay.fromDateTime(getDropDownController().data as DateTime? ?? DateTime.now()),
@@ -300,7 +366,7 @@ class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
                               widget.dropdownItemOnSelect?.call(value);
                             }
                           });
-                        } else if (widget.type == PlexInputWidgetType.typeDateTime) {
+                        } else if (widget.type == PlexInputWidgetType2.typeDateTime) {
                           showDatePicker(
                             context: context,
                             initialDate: getDropDownController().data as DateTime? ?? DateTime.now(),
@@ -338,11 +404,11 @@ class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
                       },
                       enabled: widget.editable,
                       controller: TextEditingController(
-                        text: widget.type == PlexInputWidgetType.typeDate
+                        text: widget.type == PlexInputWidgetType2.typeDate
                             ? (data as DateTime?)?.toDateString()
-                            : widget.type == PlexInputWidgetType.typeTime
+                            : widget.type == PlexInputWidgetType2.typeTime
                                 ? (data as DateTime?)?.toTimeString()
-                                : widget.type == PlexInputWidgetType.typeDateTime
+                                : widget.type == PlexInputWidgetType2.typeDateTime
                                     ? (data as DateTime?)?.toDateTimeString()
                                     : "N/A",
                       ),
@@ -358,7 +424,7 @@ class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
           ),
         ),
       );
-    } else if (widget.type == PlexInputWidgetType.typeMultiSelect) {
+    } else if (widget.type == PlexInputWidgetType2.typeMultiSelect) {
       inputWidget = InkWell(
         onTap: () {
           if (!widget.editable) return;
@@ -375,7 +441,7 @@ class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
             leadingIcon: widget.dropDownLeadingIcon,
             initialSelection: getMultiselectController().data,
             focusNode: widget.inputFocusNode ?? FocusNode(),
-            itemText: (c) => widget.dropdownItemAsString!(c),
+            itemText: (c) => widget.dropdownItemAsString?.call(c) ?? c.toString(),
             onSelect: (c) {
               getMultiselectController().setValue(c.cast<T>());
               widget.dropdownItemOnSelect?.call(c);
@@ -415,7 +481,7 @@ class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
                                 (e) => Chip(
                                   elevation: PlexDim.small,
                                   avatar: Icon(Icons.check_circle, color: Colors.green.shade500),
-                                  label: Text(widget.dropdownItemAsString!(e)),
+                                  label: Text(widget.dropdownItemAsString?.call(e) ?? e.toString()),
                                 ),
                               ),
                             ],
@@ -432,7 +498,7 @@ class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
           ),
         ),
       );
-    } else if (widget.type == PlexInputWidgetType.typeAutoComplete) {
+    } else if (widget.type == PlexInputWidgetType2.typeAutoComplete) {
       inputWidget = InkWell(
         onTap: () {
           if (!widget.editable) return;
@@ -446,7 +512,7 @@ class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
             context,
             asyncItems: widget.autoCompleteItems!,
             leadingIcon: widget.dropDownLeadingIcon,
-            itemText: (c) => widget.dropdownItemAsString!(c),
+            itemText: (c) => widget.dropdownItemAsString?.call(c) ?? c.toString(),
             focusNode: widget.inputFocusNode,
             onSelect: (c) {
               getDropDownController().setValue(c as T?);
@@ -476,7 +542,7 @@ class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
                           if (widget.title != null) ...{
                             Text("${widget.title}", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: PlexDim.small)),
                           },
-                          Text(data != null ? widget.dropdownItemAsString!(data) : "N/A"),
+                          Text(data != null ? widget.dropdownItemAsString?.call(data) ?? data.toString() : "N/A"),
                         ],
                       );
                     },

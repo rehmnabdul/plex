@@ -33,6 +33,7 @@ class MyUser extends PlexForm {
       }),
       PlexFormField.multiselect(
         title: "codes",
+        itemAsString: (item) => item.toString(),
         onChange: (dynamic value) {
           codes = (value as List).cast<int>().toList();
         },

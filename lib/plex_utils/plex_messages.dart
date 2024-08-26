@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:get/get.dart';
-import 'package:plex/plex_utils/plex_routing.dart';
 import 'package:toastification/toastification.dart';
 
 class MessageType {
@@ -26,7 +24,6 @@ class MessageStyle {
 }
 
 extension SnackBarUtils on BuildContext {
-
   ///Use [showMessage] If you are not using [PlexApp], If you are using the [PlexApp] use [showMessage] without context
   showMessage(
     String message, {
@@ -155,7 +152,6 @@ extension SnackBarUtils on BuildContext {
 }
 
 extension SnackBarUtilsOnObject on Object {
-
   ///Use [showMessage] without context if you are using [PlexApp]
   showMessage(
     String message, {
@@ -213,6 +209,65 @@ extension SnackBarUtilsOnObject on Object {
         onAutoCompleteCompleted: (toastItem) => print('Toast ${toastItem.id} auto complete completed'),
         onDismissed: (toastItem) => print('Toast ${toastItem.id} dismissed'),
       ),
+    );
+  }
+
+  showMessageError(
+    String message, {
+    String title = "Message",
+    Widget? titleWidget,
+    Widget? messageWidget,
+    MessageStyle style = MessageStyle.flatColored,
+    bool autoClose = true,
+    int autoCloseDurationSeconds = 5,
+    Alignment alignment = Alignment.bottomRight,
+    TextDirection textDirection = TextDirection.ltr,
+    bool showAnimation = false,
+    int animationDurationMillis = 300,
+    Widget? customIcon,
+  }) {
+    showMessage(
+      message,
+      title: title,
+      titleWidget: titleWidget,
+      messageWidget: messageWidget,
+      type: MessageType.error,
+      style: style,
+      autoClose: autoClose,
+      autoCloseDurationSeconds: autoCloseDurationSeconds,
+      alignment: alignment,
+      textDirection: textDirection,
+      showAnimation: autoClose,
+      animationDurationMillis: animationDurationMillis,
+      customIcon: customIcon,
+    );
+  }
+
+  showMessageErrorNoAutoClose(
+    String message, {
+    String title = "Message",
+    Widget? titleWidget,
+    Widget? messageWidget,
+    MessageStyle style = MessageStyle.flatColored,
+    Alignment alignment = Alignment.bottomRight,
+    TextDirection textDirection = TextDirection.ltr,
+    bool showAnimation = false,
+    int animationDurationMillis = 300,
+    Widget? customIcon,
+  }) {
+    showMessage(
+      message,
+      title: title,
+      titleWidget: titleWidget,
+      messageWidget: messageWidget,
+      type: MessageType.error,
+      style: style,
+      autoClose: false,
+      alignment: alignment,
+      textDirection: textDirection,
+      showAnimation: showAnimation,
+      animationDurationMillis: animationDurationMillis,
+      customIcon: customIcon,
     );
   }
 }

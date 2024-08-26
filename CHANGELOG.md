@@ -1,3 +1,14 @@
+## 0.6.3
+
+### Updates
+* Add method to find index of a particular route i.e. `PlexApp.app.dashboardConfig!.indexOfRoute('/route')`
+
+
+## 0.6.2
+
+### Updates
+* Add Custom Focus On `PlexInputWidget`
+
 ## 0.6.1
 
 ### Updates

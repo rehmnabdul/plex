@@ -19,10 +19,7 @@ abstract class PlexState<T extends PlexScreen> extends State<T> {
   var largeScreen = false;
 
   getArguments<AT>() {
-    var args = ModalRoute
-        .of(context)!
-        .settings
-        .arguments as AT;
+    var args = ModalRoute.of(context)!.settings.arguments as AT;
     return args;
   }
 
@@ -33,7 +30,8 @@ abstract class PlexState<T extends PlexScreen> extends State<T> {
   }
 
   @Deprecated("Use context.showMessage() or context.showMessageDelayed() instead which has more options and customizations available")
-  toast(String message, {
+  toast(
+    String message, {
     String title = "Message",
   }) {
     if (!mounted) return;
@@ -42,10 +40,12 @@ abstract class PlexState<T extends PlexScreen> extends State<T> {
   }
 
   @Deprecated("Use context.showMessage() or context.showMessageDelayed() instead which has more options and customizations available")
-  toastDelayed(String message,) async {
+  toastDelayed(
+    String message,
+  ) async {
     return Future.delayed(
       const Duration(milliseconds: 100),
-          () {
+      () {
         toast(message);
       },
     );
@@ -77,6 +77,7 @@ abstract class PlexState<T extends PlexScreen> extends State<T> {
                 return DefaultTabController(
                   length: getNoOfTabs(),
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       getTabBar()!,
                       Expanded(child: body),

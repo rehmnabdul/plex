@@ -4,6 +4,7 @@ import 'package:plex/plex_route.dart';
 import 'package:plex/plex_theme.dart';
 import 'package:plex/plex_utils.dart';
 import 'package:plex/plex_utils/plex_dimensions.dart';
+import 'package:plex/plex_widgets/plex_highlight_widget.dart';
 
 enum PlexNavigationRailItemType { category, item }
 
@@ -113,30 +114,19 @@ class PlexNavigationRail extends StatelessWidget {
                         children: [
                           Stack(
                             children: [
-                              Transform.scale(
-                                scale: isSelected ? 1.2 : 0.7,
-                                child: createWidget(
-                                  () {
+                              PlexHighlightWidget(
+                                enabled: route.route!.tag != null,
+                                tagBgColor: route.route!.tagBgColor,
+                                child: Transform.scale(
+                                  scale: isSelected ? 1.2 : 0.7,
+                                  child: createWidget(() {
                                     if (isSelected) {
                                       return route.route!.selectedLogo ?? route.route!.logo ?? const Icon(Icons.circle);
                                     }
                                     return route.route!.logo ?? const Icon(Icons.circle_outlined);
-                                  },
+                                  }),
                                 ),
                               ),
-                              if (route.route!.tag != null) ...{
-                                Positioned(
-                                  right: 0,
-                                  child: Container(
-                                    width: 10,
-                                    height: 10,
-                                    decoration: BoxDecoration(
-                                      color: route.route!.tagBgColor ?? PlexTheme.navigationTagColor,
-                                      borderRadius: BorderRadius.circular(20.0),
-                                    ),
-                                  ),
-                                ),
-                              },
                             ],
                           ),
                           if (extended) ...{

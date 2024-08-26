@@ -15,6 +15,7 @@ import 'package:plex/plex_widget.dart';
 import 'package:plex/plex_widgets/plex_adv_data_table.dart';
 import 'package:plex/plex_widgets/plex_data_table.dart';
 import 'package:plex/plex_widgets/plex_data_table_paginated.dart';
+import 'package:plex/plex_widgets/plex_input_widget_2.dart';
 import 'package:plex_app/screens/home_screen.dart';
 import 'package:plex_app/screens/second_screen.dart';
 
@@ -239,7 +240,7 @@ void main() async {
       title: "Auto Backup",
       appLogo: Image.asset("assets/app.png"),
       appLogoDark: Image.asset("assets/app.png"),
-      initialRoute: "/paginated-table",
+      initialRoute: "/all-inputs",
       //Routes.dashboardScreen,
       versionCode: 1,
       versionName: "v1.0.0",
@@ -336,8 +337,12 @@ void main() async {
             );
           },
         ),
-        PlexRoute(route: "newPath1", title: "New Screen 1", screen: (context, {data}) => Text("New Screen 1"),),
-        PlexRoute(route: "newPath2", title: "New Screen 2", screen: (context, {data}) => Text("New Screen 2"), logo: SizedBox(width:26, height: 26, child: Image.asset("assets/app.png"))),
+        PlexRoute(
+          route: "newPath1",
+          title: "New Screen 1",
+          screen: (context, {data}) => Text("New Screen 1"),
+        ),
+        PlexRoute(route: "newPath2", title: "New Screen 2", screen: (context, {data}) => Text("New Screen 2"), logo: SizedBox(width: 26, height: 26, child: Image.asset("assets/app.png"))),
         PlexRoute(
           route: "/paginated-table",
           category: "Paginated Tables",
@@ -417,6 +422,26 @@ void main() async {
           logo: const Icon(Icons.format_align_center_outlined),
           selectedLogo: const Icon(Icons.format_align_center),
           screen: (context, {data}) => const FormUsageScreen(),
+        ),
+        PlexRoute(
+          route: "/all-inputs",
+          title: "All Inputs Usage",
+          shortTitle: 'All Inputs',
+          logo: const Icon(Icons.input),
+          selectedLogo: const Icon(Icons.panorama_photosphere_select),
+          screen: (context, {data}) => Column(
+            children: [
+              PlexInputWidget2.input(
+                title: "Input",
+                helperText: "Input Usage",
+              ),
+              PlexInputWidget2.dropdown(
+                title: "Input",
+                helperText: "Input Usage",
+                dropdownItems: const [1,12,13,14,23,5,3,12,55,65],
+              ),
+            ],
+          ),
         ),
       ],
       enableNotifications: true,

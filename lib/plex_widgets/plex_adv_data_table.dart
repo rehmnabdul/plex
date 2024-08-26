@@ -254,6 +254,7 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
                       onPressed: () {
                         showMultiSelection<ColumnGroup>(
                           context,
+                          focusNode: FocusNode(),
                           itemText: (item) {
                             return item.name;
                           },
@@ -331,6 +332,7 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
                       onPressed: () {
                         showMultiSelection<ColumnGroup>(
                           context,
+                          focusNode: FocusNode(),
                           itemText: (item) {
                             return item.name;
                           },
@@ -427,6 +429,7 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
                           onPressed: () {
                             showMultiSelection<ColumnGroup>(
                               context,
+                              focusNode: FocusNode(),
                               itemText: (item) {
                                 return item.name;
                               },

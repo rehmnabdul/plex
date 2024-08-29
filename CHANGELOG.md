@@ -1,3 +1,8 @@
+## 0.6.4
+
+### Updates
+* Add custom widgets in `PlexAdvanceDataTable` by using `customWidgets`
+
 ## 0.6.3
 
 ### Updates

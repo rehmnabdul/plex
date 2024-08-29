@@ -87,13 +87,17 @@ class PlexInputWidget<T> extends StatefulWidget {
   final List<T>? multiInitialSelection;
 
   ///Button Field
-  final Icon? buttonIcon;
+  final Widget? buttonIcon;
   final Function()? buttonClick;
   final bool buttonEnabled;
   final ButtonStyle? buttonStyle;
 
   final PlexWidgetController<T?>? dropdownSelectionController;
   final PlexWidgetController<List<T>?>? multiSelectionController;
+
+  bool isIconButton() {
+    return buttonIcon != null && title == null;
+  }
 
   @override
   State<PlexInputWidget> createState() => _PlexInputWidgetState<T>();
@@ -168,24 +172,9 @@ class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
                     ),
                   ),
               onPressed: widget.buttonEnabled ? () => widget.buttonClick?.call() : null,
-              icon: widget.buttonIcon!,
-              label: Text(widget.title ?? ""),
+              icon: widget.isIconButton() ? null : widget.buttonIcon!,
+              label: widget.title != null  ? Text(widget.title ?? "") : widget.buttonIcon!,
             );
-      // inputWidget = widget.buttonIcon == null
-      //     ? FilledButton(
-      //         onPressed: widget.buttonEnabled ? () => widget.buttonClick?.call() : null,
-      //         style: ButtonStyle(backgroundColor: widget.buttonColor?.getMaterialState()),
-      //         child: Text(widget.title ?? ""),
-      //       )
-      //     : FilledButton.tonalIcon(
-      //         onPressed: widget.buttonEnabled ? () => widget.buttonClick?.call() : null,
-      //         icon: widget.buttonIcon!,
-      //         style: ButtonStyle(
-      //           backgroundColor: widget.buttonColor?.getMaterialState(),
-      //           textStyle: TextStyle(color: widget.buttonTextColor).getState(),
-      //         ),
-      //         label: Text(widget.title ?? ""),
-      //       );
     } else if (widget.type == PlexInputWidgetType.typeDropdown) {
       inputWidget = InkWell(
         onTap: () {

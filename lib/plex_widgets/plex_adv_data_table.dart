@@ -12,6 +12,7 @@ import 'package:plex/plex_utils/plex_messages.dart';
 import 'package:plex/plex_utils/plex_printer.dart';
 import 'package:plex/plex_utils/plex_utils.dart';
 import 'package:plex/plex_widget.dart';
+import 'package:plex/plex_widgets/plex_input_widget.dart';
 import 'package:plex/plex_widgets/plex_selection_list.dart';
 import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
@@ -141,6 +142,7 @@ class PlexAdvanceDataTable extends StatefulWidget {
     this.headerBackground,
     this.headerTextStyle,
     this.onRefresh,
+    this.customWidgets,
     this.freezeColumns = 0,
     this.freezeRows = 0,
     this.alternateColor,
@@ -169,6 +171,7 @@ class PlexAdvanceDataTable extends StatefulWidget {
 
   ///On Refresh Button Click
   final Function()? onRefresh;
+  final List<Widget> Function(BuildContext context)? customWidgets;
 
   ///Enable Disable Column Grouping
   final bool enableColumnGrouping;
@@ -249,9 +252,15 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
               children: [
                 Expanded(child: Text(widget.title, style: const TextStyle(fontWeight: FontWeight.bold))),
                 if (isLargeScreen(context)) ...{
+                  ...?widget.customWidgets?.call(context),
                   if (widget.enableColumnGrouping) ...{
-                    FilledButton.tonalIcon(
-                      onPressed: () {
+                    space(8),
+                    PlexInputWidget(
+                      type: PlexInputWidgetType.typeButton,
+                      title: "Group By",
+                      useMargin: false,
+                      buttonIcon: Image.asset(groupData, height: 25, width: 25, color: PlexTheme.getActiveTheme(context).primaryColor),
+                      buttonClick: () {
                         showMultiSelection<ColumnGroup>(
                           context,
                           focusNode: FocusNode(),
@@ -265,7 +274,6 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
                                 source.removeColumnGroup(column);
                               }
                             }
-
                             oldSelection = source.groupedColumns;
                             for (var item in items) {
                               if (oldSelection.firstWhereOrNull((column) => column.name == item.name) == null) {
@@ -279,15 +287,14 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
                           items: widget.columns.map((e) => ColumnGroup(name: e.columnName, sortGroupRows: true)).toList(),
                         );
                       },
-                      style: ButtonStyle(backgroundColor: Colors.blue.shade100.getMaterialState(), elevation: PlexDim.smallest.getMaterialState()),
-                      icon: Image.asset(groupData, height: 25, width: 25, color: Colors.blue),
-                      label: const Text('Group By', style: TextStyle(color: Colors.blue)),
                     ),
                   },
                   if (widget.enableExcelExport) ...{
                     space(8),
-                    FilledButton.tonal(
-                      onPressed: () async {
+                    PlexInputWidget(
+                      type: PlexInputWidgetType.typeButton,
+                      useMargin: false,
+                      buttonClick: () async {
                         final xl.Workbook workbook = key.currentState!.exportToExcelWorkbook();
                         workbook.worksheets[0].getRangeByIndex(1, 1, workbook.worksheets[0].rows.count, workbook.worksheets[0].columns.count).autoFit();
                         final List<int> bytes = workbook.saveAsStream();
@@ -297,14 +304,15 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
                         }
                         context.showSnackBar("Report saved at \"$path\"");
                       },
-                      style: ButtonStyle(backgroundColor: Colors.green.shade100.getMaterialState(), elevation: PlexDim.smallest.getMaterialState()),
-                      child: Image.asset(excel, width: 20, height: 20, color: Colors.green),
+                      buttonIcon: Image.asset(excel, width: 20, height: 20, color: Colors.green),
                     ),
                   },
                   if (widget.enablePdfExport) ...{
                     space(8),
-                    FilledButton.tonal(
-                      onPressed: () async {
+                    PlexInputWidget(
+                      type: PlexInputWidgetType.typeButton,
+                      useMargin: false,
+                      buttonClick: () async {
                         var document = key.currentState!.exportToPdfDocument(autoColumnWidth: true);
                         final List<int> bytes = document.saveSync();
                         var path = await PlexPrinter.savePdfFile(widget.title, bytes);
@@ -313,19 +321,21 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
                         }
                         context.showSnackBar("Report saved at \"$path\"");
                       },
-                      style: ButtonStyle(backgroundColor: Colors.red.shade100.getMaterialState(), elevation: PlexDim.smallest.getMaterialState()),
-                      child: Image.asset(pdf, width: 20, height: 20, color: Colors.redAccent),
+                      buttonIcon: Image.asset(pdf, width: 20, height: 20, color: Colors.redAccent),
                     ),
                   },
                   if (widget.onRefresh != null) ...{
                     space(8),
-                    FilledButton.tonal(
-                      onPressed: () async {
+                    PlexInputWidget(
+                      type: PlexInputWidgetType.typeButton,
+                      useMargin: false,
+                      buttonClick: () async {
                         widget.onRefresh?.call();
                       },
-                      child: const Icon(Icons.refresh),
+                      buttonIcon: const Icon(Icons.refresh),
                     ),
                   },
+                  space(8),
                 } else if (isMediumScreen(context)) ...{
                   if (widget.enableColumnGrouping) ...{
                     FilledButton.tonalIcon(
@@ -405,6 +415,18 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
                           child: const Text('Refresh'),
                         ),
                       },
+                      ...?widget.customWidgets?.call(context).map((e) {
+                        if(e is PlexInputWidget) {
+                          return MenuItemButton(
+                            onPressed: () async {
+                              e.buttonClick?.call();
+                            },
+                            leadingIcon: e.buttonIcon,
+                            child: Text(e.title ?? ''),
+                          );
+                        }
+                        return e;
+                      }),
                     ],
                     builder: (context, controller, child) {
                       return IconButton(
@@ -498,6 +520,18 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
                           child: const Text('Refresh'),
                         ),
                       },
+                      ...?widget.customWidgets?.call(context).map((e) {
+                        if(e is PlexInputWidget) {
+                          return MenuItemButton(
+                            onPressed: () async {
+                              e.buttonClick?.call();
+                            },
+                            leadingIcon: e.buttonIcon,
+                            child: Text(e.title ?? ''),
+                          );
+                        }
+                        return e;
+                      }),
                     ],
                     builder: (context, controller, child) {
                       return IconButton(

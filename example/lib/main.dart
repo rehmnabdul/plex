@@ -257,6 +257,7 @@ void main() async {
       password: "Password",
       additionalWidgetsTop: (context) => const Text("Login Screen"),
       additionalWidgetsBottom: (context) => const Text("Login Screen End"),
+      additionalWidgetsAboveLoginButton: (context) => Text("Middle Widgets"),
       onLogin: (context, email, password) async {
         return AppUser.init(userName: "Abdur Rahman", email: "ar@mail.com");
       },

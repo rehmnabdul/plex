@@ -1,3 +1,8 @@
+## 0.6.5
+
+### Updates
+* Add custom widgets above login button on Login Screen
+
 ## 0.6.4
 
 ### Updates

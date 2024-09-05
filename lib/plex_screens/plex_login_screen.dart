@@ -18,6 +18,7 @@ class PlexLoginConfig {
     required this.onLogin,
     required this.userFromJson,
     this.additionalWidgetsTop,
+    this.additionalWidgetsAboveLoginButton,
     this.additionalWidgetsBottom,
     this.debugUsername,
     this.debugPassword,
@@ -32,6 +33,7 @@ class PlexLoginConfig {
   final String? username;
   final Future<PlexUser?> Function(BuildContext context, String email, String password) onLogin;
   final Widget Function(BuildContext context)? additionalWidgetsTop;
+  final Widget Function(BuildContext context)? additionalWidgetsAboveLoginButton;
   final Widget Function(BuildContext context)? additionalWidgetsBottom;
   final PlexUser Function(Map<String, dynamic> userData) userFromJson;
 
@@ -138,6 +140,9 @@ class _PlexLoginScreenState extends PlexState<PlexLoginScreen> {
                             ],
                           ),
                         ),
+                        if (widget.loginConfig.additionalWidgetsAboveLoginButton != null) ...{
+                          widget.loginConfig.additionalWidgetsAboveLoginButton!.call(context),
+                        },
                         PlexInputWidget(
                           title: "Login",
                           buttonIcon: const Icon(Icons.login),

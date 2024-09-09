@@ -44,6 +44,7 @@ class PlexInputWidget<T> extends StatefulWidget {
     this.dropdownSelectionController,
     this.multiSelectionController,
     this.multiInitialSelection,
+    this.customMultiSelectedWidget,
     this.dropdownCustomOnTap,
     this.autoCompleteItems,
     this.buttonStyle,
@@ -85,6 +86,7 @@ class PlexInputWidget<T> extends StatefulWidget {
 
   ///Multiselect Fields
   final List<T>? multiInitialSelection;
+  final Widget Function(dynamic)? customMultiSelectedWidget;
 
   ///Button Field
   final Widget? buttonIcon;
@@ -401,7 +403,7 @@ class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
                             runSpacing: PlexDim.small,
                             children: [
                               ...selectionData.map(
-                                (e) => Chip(
+                                (e) => widget.customMultiSelectedWidget?.call(e) ?? Chip(
                                   elevation: PlexDim.small,
                                   avatar: Icon(Icons.check_circle, color: Colors.green.shade500),
                                   label: Text(widget.dropdownItemAsString!(e)),

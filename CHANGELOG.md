@@ -1,3 +1,8 @@
+## 0.6.6
+
+### Updates
+* Customize the selection widget for `PlexInputWidget.multiselect` by using `customMultiSelectedWidget`
+
 ## 0.6.5
 
 ### Updates

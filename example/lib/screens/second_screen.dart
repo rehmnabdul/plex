@@ -28,11 +28,12 @@ class _UpdatableScreenState extends PlexState<UpdatableScreen> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          PlexInputWidget(
+          PlexInputWidget<int>(
             type: PlexInputWidgetType.typeMultiSelect,
             title: "Multiselect",
             dropdownItems: [1,2,3,4,5,6,7,8,9,10],
             multiSelectionController: cont,
+            customMultiSelectedWidget: (p0) => Text("Custom Text:$p0") as Widget,
             multiInitialSelection: [9],
             dropdownItemAsString: (item) => item.toString(),
           ),

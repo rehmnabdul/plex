@@ -51,6 +51,7 @@ class PlexInputWidget<T> extends StatefulWidget {
     this.buttonIcon,
     this.buttonClick,
     this.buttonEnabled = true,
+    this.noDataText = "N/A",
   });
 
   final String? title;
@@ -60,6 +61,7 @@ class PlexInputWidget<T> extends StatefulWidget {
   final Color fieldColor;
   final bool useMargin;
   final EdgeInsets margin;
+  final String noDataText;
 
   ///Input Field
   final String? inputHint;
@@ -224,7 +226,7 @@ class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
                           if (widget.title != null) ...{
                             Text("${widget.title}", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: PlexDim.small)),
                           },
-                          Text(data != null ? widget.dropdownItemAsString!(data) : "N/A"),
+                          Text(data != null ? widget.dropdownItemAsString!(data) : widget.noDataText),
                         ],
                       );
                     },
@@ -335,7 +337,7 @@ class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
                                 ? (data as DateTime?)?.toTimeString()
                                 : widget.type == PlexInputWidgetType.typeDateTime
                                     ? (data as DateTime?)?.toDateTimeString()
-                                    : "N/A",
+                                    : widget.noDataText,
                       ),
                       decoration: const InputDecoration(
                         border: InputBorder.none,
@@ -411,7 +413,7 @@ class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
                               ),
                             ],
                           ),
-                          // Text(data != null ? selectionData.map((e) => widget.dropdownItemAsString!(e)).join(", ") : "N/A"),
+                          // Text(data != null ? selectionData.map((e) => widget.dropdownItemAsString!(e)).join(", ") : widget.noDataText),
                         ],
                       );
                     },
@@ -467,7 +469,7 @@ class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
                           if (widget.title != null) ...{
                             Text("${widget.title}", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: PlexDim.small)),
                           },
-                          Text(data != null ? widget.dropdownItemAsString!(data) : "N/A"),
+                          Text(data != null ? widget.dropdownItemAsString!(data) : widget.noDataText),
                         ],
                       );
                     },

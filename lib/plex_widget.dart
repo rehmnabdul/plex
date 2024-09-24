@@ -2,11 +2,7 @@ import 'package:flutter/material.dart';
 
 ///This [PlexWidget] will be use to uto update the widget by updating its contorller
 class PlexWidget<T> extends StatefulWidget {
-  const PlexWidget(
-      {super.key,
-      required this.controller,
-      required this.createWidget,
-      this.tag});
+  const PlexWidget({super.key, required this.controller, required this.createWidget, this.tag});
 
   final String? tag;
   final Widget Function(BuildContext context, dynamic data) createWidget;
@@ -69,5 +65,17 @@ class PlexWidgetController<T> extends ChangeNotifier {
       super.dispose();
       isDisposed = true;
     }
+  }
+}
+
+class PlexInputWidgetController<T, E> extends PlexWidgetController<T> {
+  PlexInputWidgetController({super.data, this.error});
+
+  E? error;
+
+  void setError(E? error) {
+    this.error = error;
+    if (isDisposed) return;
+    notifyListeners();
   }
 }

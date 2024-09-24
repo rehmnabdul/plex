@@ -1,7 +1,15 @@
-## 0.6.6
+## 0.6.7
 
 ### Updates
 * Customize the selection widget for `PlexInputWidget.multiselect` by using `customMultiSelectedWidget`
+
+## 0.6.6
+
+### Updates
+* Add `noDataText` in `PlexInputWidget`
+
+### Improvements
+* Added multiple form input widgets in the `plex`. You can use them by typing `PlexFormField...` in the code
 
 ## 0.6.5
 

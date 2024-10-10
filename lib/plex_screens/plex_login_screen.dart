@@ -8,9 +8,11 @@ import 'package:plex/plex_sp.dart';
 import 'package:plex/plex_theme.dart';
 import 'package:plex/plex_user.dart';
 import 'package:plex/plex_utils/plex_dimensions.dart';
+import 'package:plex/plex_utils/plex_messages.dart';
 import 'package:plex/plex_utils/plex_routing.dart';
 import 'package:plex/plex_utils/plex_widgets.dart';
 import 'package:plex/plex_widget.dart';
+import 'package:plex/plex_widgets/plex_form_field_widgets.dart';
 import 'package:plex/plex_widgets/plex_input_widget.dart';
 
 class PlexLoginConfig {
@@ -24,6 +26,8 @@ class PlexLoginConfig {
     this.debugPassword,
     this.username,
     this.password,
+    this.passwordMinLength,
+    this.passwordMaxLength,
     this.createWidget,
   });
 
@@ -31,6 +35,8 @@ class PlexLoginConfig {
   final String? debugPassword;
   final String? password;
   final String? username;
+  final int? passwordMinLength;
+  final int? passwordMaxLength;
   final Future<PlexUser?> Function(BuildContext context, String email, String password) onLogin;
   final Widget Function(BuildContext context)? additionalWidgetsTop;
   final Widget Function(BuildContext context)? additionalWidgetsAboveLoginButton;
@@ -53,7 +59,9 @@ class PlexLoginScreen extends PlexScreen {
 
 class _PlexLoginScreenState extends PlexState<PlexLoginScreen> {
   var usernameController = TextEditingController();
+  var usernameErrorController = PlexWidgetController();
   var passController = TextEditingController();
+  var passErrorController = PlexWidgetController();
   var rememberUserController = PlexWidgetController<bool>(data: true);
 
   @override
@@ -74,6 +82,20 @@ class _PlexLoginScreenState extends PlexState<PlexLoginScreen> {
         passController.text = widget.loginConfig.password ?? "";
       }
     }
+  }
+
+  _loginAction() async {
+    var username = usernameController.text.trim();
+    if (username.isEmpty) {
+      usernameErrorController.setValue("Username can't be empty");
+      return;
+    }
+    if (passController.text.isEmpty) {
+      passErrorController.setValue("Password can't be empty");
+      return;
+    }
+
+    await _login(username, passController.text.toString());
   }
 
   @override
@@ -107,18 +129,20 @@ class _PlexLoginScreenState extends PlexState<PlexLoginScreen> {
                           child: PlexApp.app.getLogo(context),
                         ),
                         spaceMedium(),
-                        PlexInputWidget(
-                          title: "Username / Email",
+                        PlexFormFieldInput(
+                          properties: const PlexFormFieldGeneric.title("Username / Email"),
                           inputHint: "Enter Your Email or Username",
-                          type: PlexInputWidgetType.typeInput,
                           inputController: usernameController,
+                          errorController: usernameErrorController,
                         ),
-                        PlexInputWidget(
-                          title: "Password",
+                        PlexFormFieldInput(
+                          properties: const PlexFormFieldGeneric.title("Password"),
                           inputHint: "Enter Your Password",
-                          type: PlexInputWidgetType.typeInput,
                           inputController: passController,
+                          errorController: passErrorController,
                           isPassword: true,
+                          maxInputLength: widget.loginConfig.passwordMaxLength,
+                          inputOnSubmit: (value) => _loginAction(),
                         ),
                         Padding(
                           padding: const EdgeInsets.only(left: PlexDim.medium, right: PlexDim.small),
@@ -147,19 +171,7 @@ class _PlexLoginScreenState extends PlexState<PlexLoginScreen> {
                           title: "Login",
                           buttonIcon: const Icon(Icons.login),
                           type: PlexInputWidgetType.typeButton,
-                          buttonClick: () async {
-                            var username = usernameController.text.trim();
-                            if (username.isEmpty) {
-                              toast("Username can't be empty");
-                              return;
-                            }
-                            if (passController.text.isEmpty) {
-                              toast("Password can't be empty");
-                              return;
-                            }
-
-                            await _login(username, passController.text.toString());
-                          },
+                          buttonClick: () => _loginAction(),
                         ),
                         if (_getRecentLogins().isNotEmpty) ...{
                           Row(

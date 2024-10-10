@@ -14,6 +14,8 @@ class PlexTheme {
   static Color selectionColor = const Color(0xFFACCEF7);
   static var navigationTagColor = Colors.lightGreen;
   static var navigationTagTextColor = Colors.black;
+  static var inputErrorColor = const Color(0xFFba1a1a);
+  static var inputBackgroundColor = const Color(0xFFba1a1a);
 
   static ThemeData? appTheme;
   static TextTheme? appTextTheme;

@@ -15,7 +15,6 @@ import 'package:plex/plex_widget.dart';
 import 'package:plex/plex_widgets/plex_adv_data_table.dart';
 import 'package:plex/plex_widgets/plex_data_table.dart';
 import 'package:plex/plex_widgets/plex_data_table_paginated.dart';
-import 'package:plex/plex_widgets/plex_form.dart';
 import 'package:plex/plex_widgets/plex_form_field_widgets.dart';
 import 'package:plex_app/screens/home_screen.dart';
 import 'package:plex_app/screens/second_screen.dart';
@@ -256,6 +255,7 @@ void main() async {
       debugPassword: 'DebugPassword',
       username: "User",
       password: "Password",
+      passwordMaxLength: 15,
       additionalWidgetsTop: (context) => const Text("Login Screen"),
       additionalWidgetsBottom: (context) => const Text("Login Screen End"),
       additionalWidgetsAboveLoginButton: (context) => Text("Middle Widgets"),
@@ -433,12 +433,55 @@ void main() async {
           selectedLogo: const Icon(Icons.panorama_photosphere_select),
           screen: (context, {data}) => Column(
             children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: PlexFormFieldInput(
+                      properties: const PlexFormFieldGeneric.title("Field One"),
+                      errorController: PlexWidgetController(data: "Dasas"),
+                      inputOnChange: (value) {
+                        print(value);
+                      },
+                    ),
+                  ),
+                  Expanded(
+                    child: PlexFormFieldDate(
+                      type: PlexFormFieldDateType.typeDateTime,
+                      properties: PlexFormFieldGeneric.title("Start Date Time"),
+                      errorController: PlexWidgetController(data: "Dasas"),
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: PlexFormFieldInput(
+                      properties: const PlexFormFieldGeneric.title("Field One"),
+                      errorController: PlexWidgetController(data: "Dasas"),
+                      inputOnChange: (value) {
+                        print(value);
+                      },
+                    ),
+                  ),
+                  Expanded(
+                    child: PlexFormFieldDate(
+                      type: PlexFormFieldDateType.typeDateTime,
+                      properties: PlexFormFieldGeneric.title("Start Date Time"),
+                      errorController: PlexWidgetController(data: "Dasas"),
+                    ),
+                  ),
+                ],
+              ),
               PlexFormFieldInput(
                 properties: const PlexFormFieldGeneric.title("Field One"),
+                errorController: PlexWidgetController(data: "Dasas"),
                 inputOnChange: (value) {
-
+                  print(value);
                 },
-              ),
+              )
             ],
           ),
         ),

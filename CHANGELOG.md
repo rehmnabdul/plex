@@ -1,3 +1,14 @@
+## 0.6.9
+
+### Updates
+* Use `external = true` in `PlexRoute` in `PlexDashboardConfig` to make the screen appear out of dashboard as external screen i.e. `PlexRoute(external: true, ...)`
+
+## 0.6.8
+
+### Updates
+* Add `PlexView` widget as well as `PlexViewViewModel` to use in the following view.
+* Customize loading view background color by using `` 
+
 ## 0.6.7
 
 ### Updates

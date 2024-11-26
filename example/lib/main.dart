@@ -198,7 +198,7 @@ void main() async {
           PlexDataTableValueCell.text("Designation", "Engineer ${Random().nextInt(10) + 1}"),
           PlexDataTableValueCell.text("Grade", "Scale ${Random().nextInt(5) + 1}"),
           // PlexDataTableValueCell.text("Company", "Company Name is Long jhghggjgjggjgjhj $a"),
-          PlexDataTableValueCell.custom("Company", "Long ", Container(color: Colors.redAccent, child: Text("Long Long Long Long Long Long Long Long Long Long"))),
+          PlexDataTableValueCell.custom("Company", "Long ", Container(color: Colors.redAccent, child: const Text("Long Long Long Long Long Long Long Long Long Long"))),
           PlexDataTableValueCell.text("1", "1 - $a"),
           PlexDataTableValueCell.text("2", "2 - $a"),
           PlexDataTableValueCell.text("3", "3 - $a"),
@@ -258,7 +258,7 @@ void main() async {
       passwordMaxLength: 15,
       additionalWidgetsTop: (context) => const Text("Login Screen"),
       additionalWidgetsBottom: (context) => const Text("Login Screen End"),
-      additionalWidgetsAboveLoginButton: (context) => Text("Middle Widgets"),
+      additionalWidgetsAboveLoginButton: (context) => const Text("Middle Widgets"),
       onLogin: (context, email, password) async {
         return AppUser.init(userName: "Abdur Rahman", email: "ar@mail.com");
       },
@@ -308,6 +308,45 @@ void main() async {
       ],
       dashboardScreens: [
         PlexRoute(
+          external: true,
+          route: "${Routes.dashboardScreen}External",
+          category: "External",
+          title: "External Screen",
+          shortTitle: 'Ext Screen',
+          logo: const Icon(Icons.extension_outlined),
+          selectedLogo: const Icon(Icons.extension),
+          screen: (context, {data}) {
+            return Scaffold(
+              appBar: AppBar(
+                automaticallyImplyLeading: true,
+                title: const Text("External Screen"),
+              ),
+              body: PlexDataTable(
+                key: UniqueKey(),
+                enableSearch: true,
+                enablePrint: true,
+                enableCopy: false,
+                onRefresh: () {
+                  getTableData();
+                },
+                headerTextStyle: const TextStyle(fontWeight: FontWeight.bold),
+                headerBackground: PlexTheme.getActiveTheme(context).primaryColor,
+                border: TableBorder.all(color: Colors.black12),
+                columns: [
+                  PlexDataCell.text("Id"),
+                  PlexDataCell.text("First Name"),
+                  PlexDataCell.text("Last Name"),
+                  PlexDataCell.text("Emp Code"),
+                  PlexDataCell.text("Designation"),
+                  PlexDataCell.text("Grade"),
+                  PlexDataCell.text("Company"),
+                ],
+                rows: getTableData(),
+              ),
+            );
+          },
+        ),
+        PlexRoute(
           route: Routes.dashboardScreen,
           category: "Tables",
           title: "Data Table Widget Usage",
@@ -342,9 +381,9 @@ void main() async {
         PlexRoute(
           route: "newPath1",
           title: "New Screen 1",
-          screen: (context, {data}) => Text("New Screen 1"),
+          screen: (context, {data}) => const Text("New Screen 1"),
         ),
-        PlexRoute(route: "newPath2", title: "New Screen 2", screen: (context, {data}) => Text("New Screen 2"), logo: SizedBox(width: 26, height: 26, child: Image.asset("assets/app.png"))),
+        PlexRoute(route: "newPath2", title: "New Screen 2", screen: (context, {data}) => const Text("New Screen 2"), logo: SizedBox(width: 26, height: 26, child: Image.asset("assets/app.png"))),
         PlexRoute(
           route: "/paginated-table",
           category: "Paginated Tables",
@@ -448,7 +487,7 @@ void main() async {
                   Expanded(
                     child: PlexFormFieldDate(
                       type: PlexFormFieldDateType.typeDateTime,
-                      properties: PlexFormFieldGeneric.title("Start Date Time"),
+                      properties: const PlexFormFieldGeneric.title("Start Date Time"),
                       errorController: PlexWidgetController(data: "Dasas"),
                     ),
                   ),
@@ -469,7 +508,7 @@ void main() async {
                   Expanded(
                     child: PlexFormFieldDate(
                       type: PlexFormFieldDateType.typeDateTime,
-                      properties: PlexFormFieldGeneric.title("Start Date Time"),
+                      properties: const PlexFormFieldGeneric.title("Start Date Time"),
                       errorController: PlexWidgetController(data: "Dasas"),
                     ),
                   ),

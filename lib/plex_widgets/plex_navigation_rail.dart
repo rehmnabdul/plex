@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:plex/plex_package.dart';
 import 'package:plex/plex_route.dart';
 import 'package:plex/plex_theme.dart';
 import 'package:plex/plex_utils.dart';
 import 'package:plex/plex_utils/plex_dimensions.dart';
+import 'package:plex/plex_utils/plex_messages.dart';
+import 'package:plex/plex_utils/plex_routing.dart';
 import 'package:plex/plex_widgets/plex_highlight_widget.dart';
 
 enum PlexNavigationRailItemType { category, item }
@@ -103,6 +106,10 @@ class PlexNavigationRail extends StatelessWidget {
                     enableFeedback: true,
                     borderRadius: BorderRadius.circular(PlexDim.large),
                     onTap: () {
+                      if(route.route?.external == true) {
+                        Plex.toNamed(route.route!.route);
+                        return;
+                      }
                       onSelectDestination.call(route.index!);
                     },
                     onHover: (value) {},
@@ -154,7 +161,7 @@ class PlexNavigationRail extends StatelessWidget {
                                 ),
                               ),
                             },
-                            Icon(Icons.arrow_right_outlined, color: Colors.grey.shade500)
+                            Icon(route.route?.external == true ? Icons.launch : Icons.arrow_right_outlined, color: Colors.grey.shade500)
                           },
                         ],
                       ),

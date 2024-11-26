@@ -28,11 +28,15 @@ class PlexRoute {
   ///Use this [rule] to group the screen in drawer menu
   String? rule;
 
+  ///Use this [external] to navigate this screen on stack instead dashboard
+  bool external;
+
   ///Default constructor
   PlexRoute({
     required this.route,
     required this.title,
     required this.screen,
+    this.external = false,
     this.logo,
     this.selectedLogo,
     this.category = "Menu",

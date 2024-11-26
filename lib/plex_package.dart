@@ -347,12 +347,16 @@ class _PlexAppState extends State<PlexApp> {
           page: () => widget.unknownRoute?.screen.call(context) ?? const Scaffold(body: Center(child: Text("Page not found: 404"))),
         ),
         routes: {
-          // "/": (_) => const Scaffold(body: Center(child: Text("Page not found: 404"))),
           if (widget.useAuthorization) ...{
             PlexRoutesPaths.loginPath: (_) => PlexLoginScreen(loginConfig: widget.loginConfig!, nextRoute: widget.appInfo.initialRoute),
           },
           if (widget.dashboardConfig != null) ...{
             PlexRoutesPaths.homePath: (_) => PlexDashboardScreen(handleBrightnessChange, handleMaterialVersionChange),
+          },
+          if(widget.dashboardConfig?.dashboardScreens.where((r) => r.external).isNotEmpty ?? false) ...{
+            for(var page in widget.dashboardConfig!.dashboardScreens.where((r) => r.external)) ...{
+              page.route: (_) => page.screen.call(context),
+            }
           },
           if (widget.pages?.isNotEmpty == true) ...{
             for (var page in widget.pages!) ...{

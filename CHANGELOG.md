@@ -1,3 +1,8 @@
+## 0.7.0
+
+### Updates
+* Fix Bug in `PlexNetworking`. Custom header is overridden by global headers 
+
 ## 0.6.9
 
 ### Updates

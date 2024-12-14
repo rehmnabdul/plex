@@ -109,11 +109,19 @@ class PlexNetworking {
       url = url.substring(0, url.length - 1);
     }
 
-    headers ??= <String, String>{};
-    headers["Content-Type"] = "application/json";
+    var currentHeaders = <String, String>{};
+
     if (addHeaders != null) {
       var constHeaders = await addHeaders!.call();
-      headers.addAll(constHeaders);
+      currentHeaders.addAll(constHeaders);
+    }
+
+    if(headers != null) {
+      currentHeaders.addAll(headers);
+    }
+
+    if(!currentHeaders.containsKey("Content-Type")) {
+      currentHeaders["Content-Type"] = "application/json";
     }
 
     try {
@@ -151,13 +159,19 @@ class PlexNetworking {
       url = url.substring(0, url.length - 1);
     }
 
-    headers ??= <String, String>{};
-    if (formData == null) {
-      headers["Content-Type"] = "application/json";
-    }
+    var currentHeaders = <String, String>{};
+
     if (addHeaders != null) {
       var constHeaders = await addHeaders!.call();
-      headers.addAll(constHeaders);
+      currentHeaders.addAll(constHeaders);
+    }
+
+    if(headers != null) {
+      currentHeaders.addAll(headers);
+    }
+
+    if(formData == null && !currentHeaders.containsKey("Content-Type")) {
+      currentHeaders["Content-Type"] = "application/json";
     }
 
     try {
@@ -210,13 +224,19 @@ class PlexNetworking {
       url = url.substring(0, url.length - 1);
     }
 
-    headers ??= <String, String>{};
-    if (formData == null) {
-      headers["Content-Type"] = "application/json";
-    }
+    var currentHeaders = <String, String>{};
+
     if (addHeaders != null) {
       var constHeaders = await addHeaders!.call();
-      headers.addAll(constHeaders);
+      currentHeaders.addAll(constHeaders);
+    }
+
+    if(headers != null) {
+      currentHeaders.addAll(headers);
+    }
+
+    if(!currentHeaders.containsKey("Content-Type")) {
+      currentHeaders["Content-Type"] = "application/json";
     }
 
     try {

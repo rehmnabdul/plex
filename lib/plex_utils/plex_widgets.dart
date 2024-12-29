@@ -25,4 +25,14 @@ extension WidgetsUtils on Widget {
           ).scale(duration: Duration(milliseconds: durationMillis))
         : this;
   }
+
+  Widget scaleAnim2({int durationMillis = 500, bool repeat = false}) {
+    return isPlexAnimationsEnable()
+        ? animate(
+            onPlay: (controller) {
+              if (repeat) controller.repeat(reverse: true);
+            },
+          ).flip(duration: Duration(milliseconds: durationMillis))
+        : this;
+  }
 }

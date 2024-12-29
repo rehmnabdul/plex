@@ -2,22 +2,22 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
-class PlexLoader extends StatefulWidget {
+class PlexLoaderV1 extends StatefulWidget {
   final Color color1;
   final Color color2;
   final Color color3;
 
-  const PlexLoader(
+  const PlexLoaderV1(
       {super.key,
       this.color1 = Colors.deepOrangeAccent,
       this.color2 = Colors.yellow,
       this.color3 = Colors.lightGreen});
 
   @override
-  PlexLoaderState createState() => PlexLoaderState();
+  PlexLoaderV1State createState() => PlexLoaderV1State();
 }
 
-class PlexLoaderState extends State<PlexLoader> with TickerProviderStateMixin {
+class PlexLoaderV1State extends State<PlexLoaderV1> with TickerProviderStateMixin {
   late Animation<double> animation1;
   late Animation<double> animation2;
   late Animation<double> animation3;

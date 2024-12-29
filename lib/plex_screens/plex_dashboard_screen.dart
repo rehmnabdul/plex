@@ -167,7 +167,6 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
                       ? CachedNetworkImage(
                           imageUrl: PlexApp.app.getUser()!.getPictureUrl()!,
                           progressIndicatorBuilder: (context, url, downloadProgress) {
-                            debugPrint(downloadProgress.progress.toString());
                             return Stack(
                               children: [
                                 Center(

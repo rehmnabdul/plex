@@ -78,12 +78,55 @@ the resulting application meets the high standards of enterprise-level software.
 8. Code Generation For Models i.e. `copy()` and `asString()` method generation.
 9. Dependency Injection based on TAGs.
 10. Support `MVVM` pattern by providing `PlexViewModel` to help reduce boilerplate code and useful features 
+11. Easy to integrate `SignalR` in Flutter
 
 ## Getting started
 
 Install the `plex` in your application.
 
+```dart
+  plex: ^version
+```
+
 ## Usage
+
+## Microsoft SignalR
+
+```dart
+PlexSignalR.config = PlexSignalRConfig(
+  "https://serverurl:port",
+  "hubPath",
+  remoteMethods: [
+  //Define Local Methods To Be Invoked By Server
+  PlexSignalRMethod("OnEvent", (arguments) {
+      print(arguments);
+    }),
+    PlexSignalRMethod("NewTest", (arguments) {
+      print(arguments);
+    }),
+  ],
+  onClose: (error) {},
+  onConnecting: (error) {},
+);
+ 
+await PlexSignalR.instance.start();
+
+//Invoke Server Methods
+PlexSignalR.instance.invoke("JoinGroup", ["FL1"]);
+PlexSignalR.instance.invoke("JoinGroup", ["FL2"]);
+
+//Invoke Server Methods
+PlexSignalR.instance.invoke("SendEventToGroup", ["FL1", "From Group 1"]);
+PlexSignalR.instance.invoke("SendEventToGroup", ["FL2", "From Group 2"]);
+
+//Invoke Server Methods
+PlexSignalR.instance.invoke("LeaveGroup", ["FL2"]);
+
+//Invoke Server Methods
+PlexSignalR.instance.invoke("SendEventToGroup", ["FL1", "From Group 1"]);
+PlexSignalR.instance.invoke("SendEventToGroup", ["FL2", "From Group 2"]);
+PlexSignalR.instance.invoke("SendEventToAllByMethod", ["NewTest", "For New Test"]);
+```
 
 ## Widgets
 
@@ -91,19 +134,19 @@ Install the `plex` in your application.
    - Updatable widget and controlled by a controller. Replaces the use of BLoC or provider pattern
 2. `PlexDataTable`
    - View Data in a tabular form. Sort By Any Column, Search By Any Column, Export as Excel builtin functions
-2. `PlexAdvanceDataTable`
+3. `PlexAdvanceDataTable`
    - Modern Data Table for more feature rich experience, Export as Excel & Pdf
-3. `PlexInputWidget`
+4. `PlexInputWidget`
    - Simple Widget to create a `TextInputField`, `DropdownField`, `DatePickerField` and `MultiSelectionFiel`
    - There are lots of features available for each field
-4. `PlexFormWidget`
+5. `PlexFormWidget`
    - Extend any model class with `PlexForm` and `override` method `getFields()` and configure UI fields. All the form layout will be created automatically.
-5. `PlexLoader`
+6. `PlexLoader`
    - Show loading anywhere in application by displaying widget `PlexLoader`
-6. `PlexShimmer`
+7. `PlexShimmer`
    - Show shimmer widget when data is loading by displaying widget `PlexShimmer`
 
-#### PlexInputWidget
+#### PlexInputWidget - V1
 
 ###### Usage
 
@@ -146,6 +189,27 @@ PlexInputWidget(
     editable: ,
     helperText: ,
 )
+```
+
+#### PlexInputWidget - V2
+
+###### Usage
+
+```dart
+PlexFormFieldInput(...)
+
+//PlexFormFieldDateType.typeDate
+//PlexFormFieldDateType.typeTime
+//PlexFormFieldDateType.typeDateTime
+PlexFormFieldDate(type: PlexFormFieldDateType.typeDateTime, ...)
+
+PlexFormFieldDropdown(...)
+
+PlexFormFieldMultiSelect(...)
+
+PlexFormFieldAutoComplete(...)
+
+PlexFormFieldButton(...)
 ```
 
 #### Persistent Storage
@@ -251,6 +315,13 @@ List<T> result = List<T>.sortAndReturn();
 Map<String, List<User>> usersByCities = List<User>.groupBy((user) {
   return user.city;
 });
+```
+
+#### Loading Widget
+```dart
+PlexLoadingV1()
+
+PlexLoadingV2()
 ```
 
 #### String Utils

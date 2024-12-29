@@ -1,3 +1,23 @@
+## 0.7.4
+
+### Updates
+* Deprecated the implementation of `PlexInputWidget` in favor of `PlexFormFieldInput`, `PlexFormFieldDate`, `PlexFormFieldDropdown`, `PlexFormFieldMultiSelect`, `PlexFormFieldAutoComplete` and `PlexFormFieldButton` widgets.
+
+## 0.7.3
+
+### Updates
+* Add Microsoft SignalR Implementation. Use `await PlexSignalR.instance.start();`
+
+## 0.7.2
+
+### Updates
+* Add Loading Indicator in `PlexFormFieldAutoComplete` and `showAutoCompleteSelectionList(...)` while its loading items asynchronously
+
+## 0.7.1
+
+### Updates
+* Fix Bug in `PlexNetworking`. Header overridden by null for some cases  
+
 ## 0.7.0
 
 ### Updates

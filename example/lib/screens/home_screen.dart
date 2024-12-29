@@ -96,7 +96,6 @@ class _FormUsageScreenState extends PlexState<FormUsageScreen> {
             hideLoading();
           },
         );
-        print(myUser.toString());
       },
     );
   }

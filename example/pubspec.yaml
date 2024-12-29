@@ -5,22 +5,22 @@ publish_to: 'none'
 version: 1.0.0+1
 
 environment:
-  sdk: '>=2.19.2 <3.0.0'
+  sdk: '>=2.19.2 <4.0.0'
 
 dependencies:
   flutter:
     sdk: flutter
 
 #  crypto: ^3.0.3
-  google_fonts: ^6.1.0
+  google_fonts: ^6.2.1
   plex:
     path: ../../plex
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^3.0.1
-  build_runner: 2.4.8
+  flutter_lints: ^5.0.0
+#  build_runner: 2.4.8
 
 flutter:
   uses-material-design: true

@@ -337,7 +337,7 @@ class PlexFormFieldDropdown<T> extends StatelessWidget {
       this.dropdownItemOnSelect,
       this.dropdownSelectionController,
       this.dropdownCustomOnTap,
-      this.inputFocusNode,
+      this.searchInputFocusNode,
       this.noDataText = "N/A"});
 
   final PlexFormFieldGeneric properties;
@@ -349,7 +349,7 @@ class PlexFormFieldDropdown<T> extends StatelessWidget {
   final Function(dynamic item)? dropdownItemOnSelect;
   final Function? dropdownCustomOnTap;
   final PlexWidgetController<T?>? dropdownSelectionController;
-  final FocusNode? inputFocusNode;
+  final FocusNode? searchInputFocusNode;
   final String noDataText;
 
   String Function(dynamic item)? dropdownItemAsString = (item) => item.toString();
@@ -376,7 +376,7 @@ class PlexFormFieldDropdown<T> extends StatelessWidget {
           items: dropdownItems,
           asyncItems: dropdownAsyncItems,
           leadingIcon: dropDownLeadingIcon,
-          focusNode: inputFocusNode ?? FocusNode(),
+          focusNode: searchInputFocusNode ?? FocusNode(),
           initialSelected: getDropDownController().data,
           itemText: (c) => dropdownItemAsString?.call(c) ?? c.toString(),
           onSelect: (c) {
@@ -436,7 +436,7 @@ class PlexFormFieldMultiSelect<T> extends StatelessWidget {
     super.key,
     this.properties = const PlexFormFieldGeneric.empty(),
     this.dropdownItemOnSelect,
-    this.inputFocusNode,
+    this.searchInputFocusNode,
     this.dropdownAsyncItems,
     this.customMultiSelectedWidget,
     this.dropdownItemAsString,
@@ -461,7 +461,7 @@ class PlexFormFieldMultiSelect<T> extends StatelessWidget {
 
   final List<T>? multiInitialSelection;
   final PlexWidgetController<List<T>?>? multiSelectionController;
-  final FocusNode? inputFocusNode;
+  final FocusNode? searchInputFocusNode;
   final Widget Function(dynamic)? customMultiSelectedWidget;
   PlexWidgetController<List<T>?>? _multiSelectionController;
 
@@ -492,7 +492,7 @@ class PlexFormFieldMultiSelect<T> extends StatelessWidget {
           asyncItems: dropdownAsyncItems,
           leadingIcon: dropDownLeadingIcon,
           initialSelection: getMultiselectController().data,
-          focusNode: inputFocusNode ?? FocusNode(),
+          focusNode: searchInputFocusNode ?? FocusNode(),
           itemText: (c) => getItemAsString(c),
           onSelect: (c) {
             getMultiselectController().setValue(c.cast<T>());
@@ -573,7 +573,7 @@ class PlexFormFieldAutoComplete<T> extends StatelessWidget {
     this.dropdownItemOnSelect,
     this.dropdownSelectionController,
     this.dropdownCustomOnTap,
-    this.inputFocusNode,
+    this.searchInputFocusNode,
     this.autoCompleteItems,
     this.noDataText = "N/A",
   });
@@ -584,7 +584,7 @@ class PlexFormFieldAutoComplete<T> extends StatelessWidget {
   final Future<List<dynamic>> Function(String query)? autoCompleteItems;
   final Widget Function(dynamic item)? dropDownLeadingIcon;
   final String Function(dynamic item)? dropdownItemAsString;
-  final FocusNode? inputFocusNode;
+  final FocusNode? searchInputFocusNode;
   final Function(dynamic item)? dropdownItemOnSelect;
   final PlexWidgetController<T?>? dropdownSelectionController;
   final String noDataText;
@@ -612,7 +612,7 @@ class PlexFormFieldAutoComplete<T> extends StatelessWidget {
           asyncItems: autoCompleteItems!,
           leadingIcon: dropDownLeadingIcon,
           itemText: (c) => dropdownItemAsString?.call(c) ?? c.toString(),
-          focusNode: inputFocusNode,
+          focusNode: searchInputFocusNode,
           onSelect: (c) {
             getDropDownController().setValue(c as T?);
             dropdownItemOnSelect?.call(c);
@@ -668,13 +668,13 @@ class PlexFormFieldButton extends StatelessWidget {
   PlexFormFieldButton({
     super.key,
     this.properties = const PlexFormFieldGeneric.empty(),
-    this.inputFocusNode,
+    this.focusNode,
     this.buttonIcon,
     this.buttonClick,
   });
 
   final PlexFormFieldGeneric properties;
-  FocusNode? inputFocusNode;
+  FocusNode? focusNode;
   Icon? buttonIcon;
   Function()? buttonClick;
 
@@ -682,10 +682,12 @@ class PlexFormFieldButton extends StatelessWidget {
   Widget build(BuildContext context) {
     var inputWidget = buttonIcon == null
         ? FilledButton(
+            focusNode: focusNode,
             onPressed: properties.enabled ? () => buttonClick?.call() : null,
             child: Text(properties.title ?? ""),
           )
         : FilledButton.tonalIcon(
+            focusNode: focusNode,
             onPressed: properties.enabled ? () => buttonClick?.call() : null,
             icon: buttonIcon!,
             label: Text(properties.title ?? ""),

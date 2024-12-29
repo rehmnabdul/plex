@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:plex/plex_utils.dart';
 import 'package:plex/plex_utils/plex_messages.dart';
 import 'package:plex/plex_utils/plex_utils.dart';
+import 'package:plex/plex_utils/plex_widgets.dart';
 import 'package:plex/plex_widget.dart';
-import 'package:plex/plex_widgets/plex_loader.dart';
+import 'package:plex/plex_widgets/loading/plex_loader_v1.dart';
+import 'package:plex/plex_widgets/loading/plex_loader_v2.dart';
+import 'package:plex/plex_widgets/loading/plex_loading_enum.dart';
 
 abstract class PlexScreen extends StatefulWidget {
   const PlexScreen({super.key});
@@ -51,6 +54,8 @@ abstract class PlexState<T extends PlexScreen> extends State<T> {
     );
   }
 
+  PlexLoadingEnum loadingType() => PlexLoadingEnum.version2;
+
   int getNoOfTabs() => 0;
 
   TabBar? getTabBar() => null;
@@ -83,9 +88,9 @@ abstract class PlexState<T extends PlexScreen> extends State<T> {
                       Expanded(child: body),
                     ],
                   ),
-                );
+                ).scaleAnim();
               } else {
-                return buildBody();
+                return buildBody().scaleAnim();
               }
             }),
             PlexWidget(
@@ -94,8 +99,8 @@ abstract class PlexState<T extends PlexScreen> extends State<T> {
                 if (data == true) {
                   return Container(
                     color: const Color(0x80000000),
-                    child: const Center(
-                      child: PlexLoader(),
+                    child: Center(
+                      child: loadingType() == PlexLoadingEnum.version1 ? const PlexLoaderV1() : const PlexLoaderV2(),
                     ),
                   );
                 }

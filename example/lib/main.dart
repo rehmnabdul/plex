@@ -9,6 +9,7 @@ import 'package:plex/plex_networking/plex_networking.dart';
 import 'package:plex/plex_package.dart';
 import 'package:plex/plex_route.dart';
 import 'package:plex/plex_screens/plex_login_screen.dart';
+import 'package:plex/plex_signal_r/plex_signal_r.dart';
 import 'package:plex/plex_theme.dart';
 import 'package:plex/plex_user.dart';
 import 'package:plex/plex_widget.dart';
@@ -113,7 +114,6 @@ initializeDb() async {
     await usersRefMap.delete(usersMap.first);
 
     usersMap = await usersRefMap.getAll();
-    print("object");
   }
 
   testEntityDb() async {
@@ -136,7 +136,6 @@ initializeDb() async {
     await usersRefMap.delete(usersMap.first);
 
     usersMap = await usersRefMap.getAll();
-    print("object");
   }
 }
 
@@ -226,9 +225,40 @@ void main() async {
 
   ///Get Injected Objects
   var user = fromPlex<MyUser>();
-  print(user.toString());
 
   initializeDb();
+
+  ///PlexSignalR Implementation
+  // Future.delayed(Duration(seconds: 0), () async {
+  //   PlexSignalR.config = PlexSignalRConfig(
+  //     "https://flh.interloop.com.pk:4433",
+  //     "eventHub",
+  //     remoteMethods: [
+  //       PlexSignalRMethod("OnEvent", (arguments) {
+  //         print(arguments);
+  //       }),
+  //       PlexSignalRMethod("NewTest", (arguments) {
+  //         print(arguments);
+  //       }),
+  //     ],
+  //     onClose: (error) {},
+  //     onConnecting: (error) {},
+  //   );
+  //   await PlexSignalR.instance.start();
+  //
+  //   PlexSignalR.instance.invoke("JoinGroup", ["FL1"]);
+  //   PlexSignalR.instance.invoke("JoinGroup", ["FL2"]);
+  //
+  //   PlexSignalR.instance.invoke("SendEventToGroup", ["FL1", "From Group 1"]);
+  //   PlexSignalR.instance.invoke("SendEventToGroup", ["FL2", "From Group 2"]);
+  //
+  //   PlexSignalR.instance.invoke("LeaveGroup", ["FL2"]);
+  //
+  //   PlexSignalR.instance.invoke("SendEventToGroup", ["FL1", "From Group 1"]);
+  //   PlexSignalR.instance.invoke("SendEventToGroup", ["FL2", "From Group 2"]);
+  //   PlexSignalR.instance.invoke("SendEventToAllByMethod", ["NewTest", "For New Test"]);
+  // });
+  ///PlexSignalR Implementation End
 
   runApp(PlexApp(
     ///Setting Theme Second Method : Theme By Color
@@ -381,7 +411,25 @@ void main() async {
         PlexRoute(
           route: "newPath1",
           title: "New Screen 1",
-          screen: (context, {data}) => const Text("New Screen 1"),
+          screen: (context, {data}) {
+            return Column(
+              children: [
+                PlexFormFieldAutoComplete(
+                  properties: const PlexFormFieldGeneric.title("Test"),
+                  autoCompleteItems: (query) async {
+                    await Future.delayed(const Duration(milliseconds: 1000));
+                    var items = List<String>.empty(growable: true);
+                    for (int i = 1; i <= 10; i++) {
+                      items.add("$query-$i");
+                    }
+
+                    return items;
+                  },
+                ),
+                const Text("New Screen 1"),
+              ],
+            );
+          },
         ),
         PlexRoute(route: "newPath2", title: "New Screen 2", screen: (context, {data}) => const Text("New Screen 2"), logo: SizedBox(width: 26, height: 26, child: Image.asset("assets/app.png"))),
         PlexRoute(

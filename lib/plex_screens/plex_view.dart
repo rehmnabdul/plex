@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:plex/plex_widget.dart';
-import 'package:plex/plex_widgets/plex_loader.dart';
+import 'package:plex/plex_widgets/loading/plex_loader_v1.dart';
+import 'package:plex/plex_widgets/loading/plex_loader_v2.dart';
+import 'package:plex/plex_widgets/loading/plex_loading_enum.dart';
 
 abstract class PlexView extends StatefulWidget {
   const PlexView({
@@ -14,6 +16,8 @@ abstract class PlexView extends StatefulWidget {
 abstract class PlexViewState<T extends PlexView> extends State<T> {
   final _loadingController = PlexWidgetController();
 
+  PlexLoadingEnum loadingType() => PlexLoadingEnum.version2;
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -25,8 +29,8 @@ abstract class PlexViewState<T extends PlexView> extends State<T> {
             if (data == true) {
               return Container(
                 color: widget.loadingBackground,
-                child: const Center(
-                  child: PlexLoader(),
+                child: Center(
+                  child: loadingType() == PlexLoadingEnum.version1 ? const PlexLoaderV1() : const PlexLoaderV2(),
                 ),
               );
             }

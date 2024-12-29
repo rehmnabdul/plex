@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:plex/plex_utils/plex_dimensions.dart';
 import 'package:plex/plex_widget.dart';
+import 'package:plex/plex_widgets/loading/plex_loader_v2.dart';
 import 'package:plex/plex_widgets/plex_input_widget.dart';
 
 showSelectionList<T>(
@@ -252,11 +253,13 @@ showAutoCompleteSelectionList<T>(
   required Future<List<T>> Function(String query) asyncItems,
   required String Function(T item) itemText,
   required Function(T item) onSelect,
+  int minQueryLength = 2,
   Widget Function(dynamic item)? itemWidget,
   Widget Function(T item)? leadingIcon,
 }) async {
   var inputController = TextEditingController();
   var filteredListController = PlexWidgetController<List<T>>(data: List.empty());
+  var loadingController = PlexWidgetController<int>(data: 0);
 
   if (focusNode == null) {
     focusNode = FocusNode();
@@ -286,13 +289,28 @@ showAutoCompleteSelectionList<T>(
                 inputFocusNode: focusNode,
                 inputOnChange: (data) async {
                   var query = data;
-                  if (query.length < 2) {
+                  if (query.length < minQueryLength) {
                     return;
                   }
+                  loadingController.increment();
                   var filteredList = await asyncItems.call(query);
+                  loadingController.decrement();
                   filteredListController.setValue(filteredList);
                 },
               ),
+              spaceSmall(),
+              PlexWidget(
+                  controller: loadingController,
+                  createWidget: (context, data) {
+                    if (data > 0) {
+                      return SizedBox(
+                        width: 50,
+                        height: 50,
+                        child: const PlexLoaderV2(),
+                      );
+                    }
+                    return Container();
+                  }),
               spaceSmall(),
               Expanded(
                 child: PlexWidget(

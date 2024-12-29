@@ -127,7 +127,7 @@ class PlexNetworking {
     try {
       var uri = Uri.parse(_isValidUrl(url) ? url : _apiUrl() + url);
       if (kDebugMode) print("Started: ${uri.toString()}");
-      var data = await http.get(uri, headers: headers);
+      var data = await http.get(uri, headers: currentHeaders);
       if (kDebugMode) print("Completed: ${data.statusCode}: ${uri.toString()}");
       if (data.statusCode == 200) {
         return PlexSuccess(data.body);
@@ -180,11 +180,11 @@ class PlexNetworking {
 
       late http.Response data;
       if (formData != null) {
-        data = await http.post(uri, headers: headers, body: formData);
+        data = await http.post(uri, headers: currentHeaders, body: formData);
       } else if (body != null) {
-        data = await http.post(uri, headers: headers, body: jsonEncode(body));
+        data = await http.post(uri, headers: currentHeaders, body: jsonEncode(body));
       } else {
-        data = await http.post(uri, headers: headers, body: null);
+        data = await http.post(uri, headers: currentHeaders, body: null);
       }
 
       if (kDebugMode) print("Completed: ${data.statusCode}: ${uri.toString()}");

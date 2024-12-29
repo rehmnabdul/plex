@@ -16,6 +16,15 @@ enum PlexInputWidgetType {
 }
 
 // ignore: must_be_immutable
+@Deprecated("""
+Don't Use [PlexInputWidget] anymore instead use
+[PlexFormFieldInput],
+[PlexFormFieldDate],
+[PlexFormFieldDropdown],
+[PlexFormFieldMultiSelect],
+[PlexFormFieldAutoComplete],
+[PlexFormFieldButton]
+""")
 class PlexInputWidget<T> extends StatefulWidget {
   PlexInputWidget({
     super.key,

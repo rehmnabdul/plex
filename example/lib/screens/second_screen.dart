@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:plex/plex_package.dart';
+import 'package:plex/plex_rx/plex_rx.dart';
 import 'package:plex/plex_screens/plex_screen.dart';
 import 'package:plex/plex_utils/plex_dimensions.dart';
 import 'package:plex/plex_view_model/plex_view_model.dart';
@@ -23,15 +24,30 @@ class _UpdatableScreenState extends PlexState<UpdatableScreen> {
   var cont = PlexWidgetController<List<int>>(data: []);
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
+
+  var data = 0.plexObs;
+
+  @override
   Widget buildBody() {
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          Text("${data.value}").plexRxWidget(data),
+          ElevatedButton(
+            onPressed: () {
+              data.value = (data.value as int) + 1;
+            },
+            child: Text("Increment"),
+          ),
           PlexInputWidget(
             type: PlexInputWidgetType.typeMultiSelect,
             title: "Multiselect",
-            dropdownItems: [1,2,3,4,5,6,7,8,9,10],
+            dropdownItems: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
             multiSelectionController: cont,
             customMultiSelectedWidget: (p0) => Text("Custom Text:$p0"),
             multiInitialSelection: [9],

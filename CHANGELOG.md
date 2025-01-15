@@ -1,3 +1,8 @@
+## 0.7.5
+
+### Updates
+* Add request execution time in `PlexNetworking` 
+
 ## 0.7.4
 
 ### Updates

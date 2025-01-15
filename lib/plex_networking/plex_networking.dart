@@ -116,19 +116,25 @@ class PlexNetworking {
       currentHeaders.addAll(constHeaders);
     }
 
-    if(headers != null) {
+    if (headers != null) {
       currentHeaders.addAll(headers);
     }
 
-    if(!currentHeaders.containsKey("Content-Type")) {
+    if (!currentHeaders.containsKey("Content-Type")) {
       currentHeaders["Content-Type"] = "application/json";
     }
 
     try {
+      var startTime = DateTime.now();
       var uri = Uri.parse(_isValidUrl(url) ? url : _apiUrl() + url);
       if (kDebugMode) print("Started: ${uri.toString()}");
-      var data = await http.get(uri, headers: currentHeaders);
-      if (kDebugMode) print("Completed: ${data.statusCode}: ${uri.toString()}");
+
+      var data = await http.get(uri, headers: currentHeaders).timeout(Duration(seconds: 120), onTimeout: () {
+        print("Timeout");
+        return http.Response('Error', 408);
+      });
+      var diffInMillis = DateTime.now().difference(startTime).inMilliseconds;
+      if (kDebugMode) print("Completed: ${data.statusCode}: ${uri.toString()} in ${diffInMillis}ms");
       if (data.statusCode == 200) {
         return PlexSuccess(data.body);
       } else {
@@ -138,7 +144,7 @@ class PlexNetworking {
         return PlexError(data.statusCode, data.body);
       }
     } catch (e) {
-      if(e is SocketException) {
+      if (e is SocketException) {
         return _connectionFailed;
       }
       if (kDebugMode) print("Error: ${e.toString()}");
@@ -166,15 +172,16 @@ class PlexNetworking {
       currentHeaders.addAll(constHeaders);
     }
 
-    if(headers != null) {
+    if (headers != null) {
       currentHeaders.addAll(headers);
     }
 
-    if(formData == null && !currentHeaders.containsKey("Content-Type")) {
+    if (formData == null && !currentHeaders.containsKey("Content-Type")) {
       currentHeaders["Content-Type"] = "application/json";
     }
 
     try {
+      var startTime = DateTime.now();
       var uri = Uri.parse(_isValidUrl(url) ? url : _apiUrl() + url);
       if (kDebugMode) print("Started: ${uri.toString()}");
 
@@ -187,7 +194,8 @@ class PlexNetworking {
         data = await http.post(uri, headers: currentHeaders, body: null);
       }
 
-      if (kDebugMode) print("Completed: ${data.statusCode}: ${uri.toString()}");
+      var diffInMillis = DateTime.now().difference(startTime).inMilliseconds;
+      if (kDebugMode) print("Completed: ${data.statusCode}: ${uri.toString()} in ${diffInMillis}ms");
       if (data.statusCode == 200) {
         return PlexSuccess(data.body);
       } else {
@@ -197,7 +205,7 @@ class PlexNetworking {
         return PlexError(data.statusCode, data.body);
       }
     } catch (e) {
-      if(e is SocketException) {
+      if (e is SocketException) {
         return _connectionFailed;
       }
       if (kDebugMode) print("Error: ${e.toString()}");
@@ -231,15 +239,16 @@ class PlexNetworking {
       currentHeaders.addAll(constHeaders);
     }
 
-    if(headers != null) {
+    if (headers != null) {
       currentHeaders.addAll(headers);
     }
 
-    if(!currentHeaders.containsKey("Content-Type")) {
+    if (!currentHeaders.containsKey("Content-Type")) {
       currentHeaders["Content-Type"] = "application/json";
     }
 
     try {
+      var startTime = DateTime.now();
       var uri = Uri.parse(_isValidUrl(url) ? url : _apiUrl() + url);
       if (kDebugMode) print("Started: ${uri.toString()}");
 
@@ -256,7 +265,8 @@ class PlexNetworking {
 
       var data = await request.send();
 
-      if (kDebugMode) print("Completed: ${data.statusCode}: ${uri.toString()}");
+      var diffInMillis = DateTime.now().difference(startTime).inMilliseconds;
+      if (kDebugMode) print("Completed: ${data.statusCode}: ${uri.toString()} in ${diffInMillis}ms");
       if (data.statusCode == 200) {
         var responseBody = await data.stream.transform(utf8.decoder).join();
         return PlexSuccess(responseBody);
@@ -268,7 +278,7 @@ class PlexNetworking {
         return PlexError(data.statusCode, responseBody);
       }
     } catch (e) {
-      if(e is SocketException) {
+      if (e is SocketException) {
         return _connectionFailed;
       }
       if (kDebugMode) print("Error: ${e.toString()}");

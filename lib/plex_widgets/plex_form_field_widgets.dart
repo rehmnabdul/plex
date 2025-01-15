@@ -671,26 +671,48 @@ class PlexFormFieldButton extends StatelessWidget {
     this.focusNode,
     this.buttonIcon,
     this.buttonClick,
+    this.buttonStyle,
   });
 
   final PlexFormFieldGeneric properties;
   FocusNode? focusNode;
   Icon? buttonIcon;
   Function()? buttonClick;
+  final ButtonStyle? buttonStyle;
+
+  bool isIconButton() {
+    return buttonIcon != null && properties.title == null;
+  }
 
   @override
   Widget build(BuildContext context) {
     var inputWidget = buttonIcon == null
-        ? FilledButton(
+        ? ElevatedButton(
             focusNode: focusNode,
+            style: buttonStyle ??
+                ButtonStyle(
+                  elevation: WidgetStateProperty.resolveWith(
+                    (states) {
+                      return states.contains(WidgetState.disabled) ? 0 : PlexDim.small;
+                    },
+                  ),
+                ),
             onPressed: properties.enabled ? () => buttonClick?.call() : null,
             child: Text(properties.title ?? ""),
           )
-        : FilledButton.tonalIcon(
+        : ElevatedButton.icon(
             focusNode: focusNode,
+            style: buttonStyle ??
+                ButtonStyle(
+                  elevation: WidgetStateProperty.resolveWith(
+                    (states) {
+                      return states.contains(WidgetState.disabled) ? 0 : PlexDim.small;
+                    },
+                  ),
+                ),
             onPressed: properties.enabled ? () => buttonClick?.call() : null,
-            icon: buttonIcon!,
-            label: Text(properties.title ?? ""),
+            icon: isIconButton() ? null : buttonIcon!,
+            label: properties.title != null ? Text(properties.title ?? "") : buttonIcon!,
           );
 
     if (properties.useMargin) {

@@ -34,29 +34,37 @@ class _PlexWidgetState<T> extends State<PlexWidget> {
 }
 
 class PlexWidgetController<T> extends ChangeNotifier {
-  PlexWidgetController({this.data});
+  final void Function(T? previous, T? updated)? onUpdate;
+
+  PlexWidgetController({this.data, this.onUpdate});
 
   T? data;
   bool isDisposed = false;
 
   void setValue(T? data) {
+    var oldData = this.data;
     this.data = data;
     if (isDisposed) return;
     notifyListeners();
+    onUpdate?.call(oldData, this.data);
   }
 
   ///If Data is of type int, double, float or any num, you can increment (default 1)
   void increment({num increment = 1}) {
+    var oldData = this.data;
     this.data = ((this.data as num) + increment) as T?;
     if (isDisposed) return;
     notifyListeners();
+    onUpdate?.call(oldData, this.data);
   }
 
   ///If Data is of type int, double, float or any num, you can decrement (default 1)
   void decrement({num decrement = 1}) {
+    var oldData = this.data;
     this.data = ((this.data as num) - decrement) as T?;
     if (isDisposed) return;
     notifyListeners();
+    onUpdate?.call(oldData, this.data);
   }
 
   @override
@@ -65,6 +73,13 @@ class PlexWidgetController<T> extends ChangeNotifier {
       super.dispose();
       isDisposed = true;
     }
+  }
+
+  static PlexWidgetController<T> controller<T>(PlexWidgetController<T> controller) {
+    if (controller.isDisposed) {
+      controller = PlexWidgetController<T>(data: controller.data, onUpdate: controller.onUpdate);
+    }
+    return controller;
   }
 }
 

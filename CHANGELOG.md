@@ -1,3 +1,9 @@
+## 0.7.6
+
+### Updates
+* Add clear button on `PlexFormFieldDropdown`. To enable use `showClearButton = true` while calling its constructor 
+* In `PlexWidgetController` use `onUpdate` to get update events as a callback with both `T previous` and `T updated` value in the callback
+
 ## 0.7.5
 
 ### Updates

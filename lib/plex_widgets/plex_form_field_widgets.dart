@@ -338,7 +338,8 @@ class PlexFormFieldDropdown<T> extends StatelessWidget {
       this.dropdownSelectionController,
       this.dropdownCustomOnTap,
       this.searchInputFocusNode,
-      this.noDataText = "N/A"});
+      this.noDataText = "N/A",
+      this.showClearButton = false});
 
   final PlexFormFieldGeneric properties;
   final List<T>? dropdownItems;
@@ -351,6 +352,7 @@ class PlexFormFieldDropdown<T> extends StatelessWidget {
   final PlexWidgetController<T?>? dropdownSelectionController;
   final FocusNode? searchInputFocusNode;
   final String noDataText;
+  final bool showClearButton;
 
   String Function(dynamic item)? dropdownItemAsString = (item) => item.toString();
   PlexWidgetController<T?>? _dropdownSelectionController;
@@ -386,7 +388,7 @@ class PlexFormFieldDropdown<T> extends StatelessWidget {
           onSearch: dropdownOnSearch,
           itemWidget: dropdownItemWidget,
         );
-      },
+      },        //   ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
       child: Container(
         decoration: BoxDecoration(
             border: Border.all(
@@ -415,6 +417,15 @@ class PlexFormFieldDropdown<T> extends StatelessWidget {
                 ),
               ),
               const Icon(Icons.arrow_drop_down, color: Colors.grey),
+              if (showClearButton) ...{
+                IconButton(
+                  icon: const Icon(Icons.close),
+                  color: Colors.grey,
+                  onPressed: () {
+                    getDropDownController().setValue(null);
+                  },
+                ),
+              }
             ],
           ),
         ),

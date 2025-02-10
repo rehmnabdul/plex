@@ -1,3 +1,8 @@
+## 0.7.7
+
+### Updates
+* Fix bugs in `PlexFormFieldDropdown` UI
+
 ## 0.7.6
 
 ### Updates

@@ -152,140 +152,141 @@ class PlexFormFieldDate extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget inputWidget = SizedBox(
-      height: 45,
-      child: Container(
-        decoration: BoxDecoration(
-          color: PlexTheme.getActiveTheme(context).splashColor,
-          border: Border.all(color: errorController?.data != null ? PlexTheme.inputErrorColor : Theme.of(context).colorScheme.outline, width: 1),
-          borderRadius: BorderRadius.circular(properties.cornerRadius),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: PlexDim.small, vertical: PlexDim.smallest),
-          child: Row(
-            children: [
-              const Icon(Icons.calendar_month_outlined, color: Colors.grey),
-              Expanded(
-                child: PlexWidget<DateTime?>(
-                  controller: getController(),
-                  createWidget: (context, data) {
-                    return TextField(
-                      readOnly: true,
-                      showCursor: false,
-                      onTap: () {
-                        if (!properties.enabled) return;
-                        if (properties.enabled == false) return;
-                        if (type == PlexFormFieldDateType.typeDate) {
-                          showDatePicker(
-                            context: context,
-                            initialDate: getController().data ?? DateTime.now(),
-                            firstDate: minDatetime ?? DateTime(1970, 1, 1),
-                            lastDate: maxDatetime ?? DateTime(5000, 12, 31),
-                            useRootNavigator: true,
-                          ).then((value) {
-                            if (value != null) {
-                              getController().setValue(value as DateTime?);
-                              onSelect?.call(value);
+    Widget inputWidget = Container(
+      decoration: BoxDecoration(
+        color: PlexTheme.getActiveTheme(context).splashColor,
+        border: Border.all(color: errorController?.data != null ? PlexTheme.inputErrorColor : Theme.of(context).colorScheme.outline, width: 1),
+        borderRadius: BorderRadius.circular(properties.cornerRadius),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: PlexDim.small, vertical: PlexDim.smallest),
+        child: Row(
+          children: [
+            Expanded(
+              child: PlexWidget<DateTime?>(
+                controller: getController(),
+                createWidget: (context, data) {
+                  return TextField(
+                    readOnly: true,
+                    showCursor: false,
+                    onTap: () {
+                      if (!properties.enabled) return;
+                      if (properties.enabled == false) return;
+                      if (type == PlexFormFieldDateType.typeDate) {
+                        showDatePicker(
+                          context: context,
+                          initialDate: getController().data ?? DateTime.now(),
+                          firstDate: minDatetime ?? DateTime(1970, 1, 1),
+                          lastDate: maxDatetime ?? DateTime(5000, 12, 31),
+                          useRootNavigator: true,
+                        ).then((value) {
+                          if (value != null) {
+                            getController().setValue(value as DateTime?);
+                            onSelect?.call(value);
+                          }
+                        });
+                      } else if (type == PlexFormFieldDateType.typeTime) {
+                        showTimePicker(
+                          context: context,
+                          initialTime: TimeOfDay.fromDateTime(getController().data ?? DateTime.now()),
+                          useRootNavigator: true,
+                        ).then((value) {
+                          if (value != null) {
+                            DateTime dateTime = getController().data ?? DateTime.now();
+                            dateTime = DateTime(
+                              dateTime.year,
+                              dateTime.month,
+                              dateTime.day,
+                              value.hour,
+                              value.minute,
+                            );
+                            if (minDatetime != null && dateTime.isBefore(minDatetime!)) {
+                              context.showMessageError("Invalid Time Selection");
+                              return;
                             }
-                          });
-                        } else if (type == PlexFormFieldDateType.typeTime) {
-                          showTimePicker(
-                            context: context,
-                            initialTime: TimeOfDay.fromDateTime(getController().data ?? DateTime.now()),
-                            useRootNavigator: true,
-                          ).then((value) {
-                            if (value != null) {
-                              DateTime dateTime = getController().data ?? DateTime.now();
-                              dateTime = DateTime(
-                                dateTime.year,
-                                dateTime.month,
-                                dateTime.day,
-                                value.hour,
-                                value.minute,
-                              );
-                              if (minDatetime != null && dateTime.isBefore(minDatetime!)) {
-                                context.showMessageError("Invalid Time Selection");
-                                return;
-                              }
-                              if (maxDatetime != null && dateTime.isAfter(maxDatetime!)) {
-                                context.showMessageError("Invalid Time Selection");
-                                return;
-                              }
-                              getController().setValue(dateTime as DateTime?);
-                              onSelect?.call(value);
+                            if (maxDatetime != null && dateTime.isAfter(maxDatetime!)) {
+                              context.showMessageError("Invalid Time Selection");
+                              return;
                             }
-                          });
-                        } else if (type == PlexFormFieldDateType.typeDateTime) {
-                          showDatePicker(
-                            context: context,
-                            initialDate: getController().data ?? DateTime.now(),
-                            firstDate: minDatetime ?? DateTime(1970, 1, 1),
-                            lastDate: maxDatetime ?? DateTime(5000, 12, 31),
-                            useRootNavigator: true,
-                          ).then((selectedDate) {
-                            if (selectedDate != null) {
-                              showTimePicker(
-                                context: context,
-                                initialTime: TimeOfDay.fromDateTime(selectedDate),
-                                useRootNavigator: true,
-                                builder: (context, child) {
-                                  return MediaQuery(
-                                    data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
-                                    child: child!,
-                                  );
-                                },
-                              ).then((value) {
-                                if (value != null) {
-                                  var dateTime = DateTime(
-                                    selectedDate.year,
-                                    selectedDate.month,
-                                    selectedDate.day,
-                                    value.hour,
-                                    value.minute,
-                                  );
-                                  if (minDatetime != null && dateTime.isBefore(minDatetime!)) {
-                                    context.showMessageError("Invalid Time Selection");
-                                    return;
-                                  }
-                                  if (maxDatetime != null && dateTime.isAfter(maxDatetime!)) {
-                                    context.showMessageError("Invalid Time Selection");
-                                    return;
-                                  }
-                                  getController().setValue(dateTime as DateTime?);
-                                  onSelect?.call(value);
+                            getController().setValue(dateTime as DateTime?);
+                            onSelect?.call(value);
+                          }
+                        });
+                      } else if (type == PlexFormFieldDateType.typeDateTime) {
+                        showDatePicker(
+                          context: context,
+                          initialDate: getController().data ?? DateTime.now(),
+                          firstDate: minDatetime ?? DateTime(1970, 1, 1),
+                          lastDate: maxDatetime ?? DateTime(5000, 12, 31),
+                          useRootNavigator: true,
+                        ).then((selectedDate) {
+                          if (selectedDate != null) {
+                            showTimePicker(
+                              context: context,
+                              initialTime: TimeOfDay.fromDateTime(selectedDate),
+                              useRootNavigator: true,
+                              builder: (context, child) {
+                                return MediaQuery(
+                                  data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+                                  child: child!,
+                                );
+                              },
+                            ).then((value) {
+                              if (value != null) {
+                                var dateTime = DateTime(
+                                  selectedDate.year,
+                                  selectedDate.month,
+                                  selectedDate.day,
+                                  value.hour,
+                                  value.minute,
+                                );
+                                if (minDatetime != null && dateTime.isBefore(minDatetime!)) {
+                                  context.showMessageError("Invalid Time Selection");
+                                  return;
                                 }
-                              });
-                            }
-                          });
-                        }
-                      },
-                      enabled: properties.enabled,
-                      controller: TextEditingController(
-                        text: type == PlexFormFieldDateType.typeDate
-                            ? (data as DateTime?)?.toDateString()
-                            : type == PlexFormFieldDateType.typeTime
-                                ? (data as DateTime?)?.toTimeString()
-                                : type == PlexFormFieldDateType.typeDateTime
-                                    ? (data as DateTime?)?.toDateTimeString()
-                                    : "N/A",
-                      ),
-                      decoration: const InputDecoration(
-                        border: InputBorder.none,
-                      ),
-                    );
-                  },
-                ),
-              ),
-              IconButton(
-                icon: const Icon(Icons.close),
-                color: Colors.grey,
-                onPressed: () {
-                  getController().setValue(null);
+                                if (maxDatetime != null && dateTime.isAfter(maxDatetime!)) {
+                                  context.showMessageError("Invalid Time Selection");
+                                  return;
+                                }
+                                getController().setValue(dateTime as DateTime?);
+                                onSelect?.call(value);
+                              }
+                            });
+                          }
+                        });
+                      }
+                    },
+                    enabled: properties.enabled,
+                    controller: TextEditingController(
+                      text: type == PlexFormFieldDateType.typeDate
+                          ? (data as DateTime?)?.toDateString()
+                          : type == PlexFormFieldDateType.typeTime
+                              ? (data as DateTime?)?.toTimeString()
+                              : type == PlexFormFieldDateType.typeDateTime
+                                  ? (data as DateTime?)?.toDateTimeString()
+                                  : "N/A",
+                    ),
+                    decoration: InputDecoration(
+                      border: InputBorder.none,
+                      prefixIcon: const Icon(Icons.calendar_month_outlined, color: Colors.grey),
+                      labelText: properties.title ?? "",
+                      helperText: properties.helperText,
+                      errorText: errorController?.data?.toString(),
+                      filled: false,
+                    ),
+                  );
                 },
               ),
-              // const Icon(Icons.arrow_drop_down, color: Colors.grey),
-            ],
-          ),
+            ),
+            IconButton(
+              icon: const Icon(Icons.close),
+              color: Colors.grey,
+              onPressed: () {
+                getController().setValue(null);
+              },
+            ),
+            // const Icon(Icons.arrow_drop_down, color: Colors.grey),
+          ],
         ),
       ),
     );
@@ -388,14 +389,15 @@ class PlexFormFieldDropdown<T> extends StatelessWidget {
           onSearch: dropdownOnSearch,
           itemWidget: dropdownItemWidget,
         );
-      },        //   ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+      },
+      //   ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
       child: Container(
         decoration: BoxDecoration(
             border: Border.all(
               color: Theme.of(context).colorScheme.outline,
               width: 1,
             ),
-            borderRadius: BorderRadius.circular(PlexDim.smallest)),
+            borderRadius: BorderRadius.circular(properties.cornerRadius)),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: PlexDim.small, vertical: PlexDim.small),
           child: Row(
@@ -519,7 +521,7 @@ class PlexFormFieldMultiSelect<T> extends StatelessWidget {
               color: Theme.of(context).colorScheme.outline,
               width: 1,
             ),
-            borderRadius: BorderRadius.circular(PlexDim.smallest)),
+            borderRadius: BorderRadius.circular(properties.cornerRadius)),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: PlexDim.small, vertical: PlexDim.medium),
           child: Row(
@@ -637,7 +639,7 @@ class PlexFormFieldAutoComplete<T> extends StatelessWidget {
               color: Theme.of(context).colorScheme.outline,
               width: 1,
             ),
-            borderRadius: BorderRadius.circular(PlexDim.smallest)),
+            borderRadius: BorderRadius.circular(properties.cornerRadius)),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: PlexDim.small, vertical: PlexDim.medium),
           child: Row(

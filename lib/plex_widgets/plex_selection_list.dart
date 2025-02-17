@@ -3,7 +3,9 @@ import 'package:get/get.dart';
 import 'package:plex/plex_utils/plex_dimensions.dart';
 import 'package:plex/plex_widget.dart';
 import 'package:plex/plex_widgets/loading/plex_loader_v2.dart';
+import 'package:plex/plex_widgets/plex_form_field_widgets.dart';
 import 'package:plex/plex_widgets/plex_input_widget.dart';
+import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 
 showSelectionList<T>(
   BuildContext context, {
@@ -256,6 +258,7 @@ showAutoCompleteSelectionList<T>(
   int minQueryLength = 2,
   Widget Function(dynamic item)? itemWidget,
   Widget Function(T item)? leadingIcon,
+  bool showBarCode = false,
 }) async {
   var inputController = TextEditingController();
   var filteredListController = PlexWidgetController<List<T>>(data: List.empty());
@@ -264,6 +267,17 @@ showAutoCompleteSelectionList<T>(
   if (focusNode == null) {
     focusNode = FocusNode();
     focusNode.requestFocus();
+  }
+
+  onSearch(String data) async {
+    var query = data;
+    if (query.length < minQueryLength) {
+      return;
+    }
+    loadingController.increment();
+    var filteredList = await asyncItems.call(query);
+    loadingController.decrement();
+    filteredListController.setValue(filteredList);
   }
 
   // ignore: use_build_context_synchronously
@@ -281,22 +295,44 @@ showAutoCompleteSelectionList<T>(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              PlexInputWidget<String>(
-                title: "Search",
-                type: PlexInputWidgetType.typeInput,
-                inputController: inputController,
-                inputHint: "Search here...",
-                inputFocusNode: focusNode,
-                inputOnChange: (data) async {
-                  var query = data;
-                  if (query.length < minQueryLength) {
-                    return;
+              Row(
+                children: [
+                  Expanded(
+                    child: PlexInputWidget<String>(
+                      title: "Search",
+                      type: PlexInputWidgetType.typeInput,
+                      inputController: inputController,
+                      inputHint: "Search here...",
+                      inputFocusNode: focusNode,
+                      inputOnChange: (data) async {
+                        onSearch(data);
+                      },
+                    ),
+                  ),
+                  if (showBarCode) ...{
+                    PlexFormFieldButton(
+                      buttonIcon: Icon(Icons.barcode_reader),
+                      buttonClick: () async {
+                        String? result = await SimpleBarcodeScanner.scanBarcode(
+                          context,
+                          barcodeAppBar: const BarcodeAppBar(
+                            appBarTitle: 'Scan Barcode',
+                            centerTitle: false,
+                            enableBackButton: true,
+                            backButtonIcon: Icon(Icons.arrow_back_ios),
+                          ),
+                          isShowFlashIcon: true,
+                          delayMillis: 2000,
+                          cameraFace: CameraFace.back,
+                        );
+                        if (result != null) {
+                          inputController.text = result;
+                          onSearch(inputController.text);
+                        }
+                      },
+                    )
                   }
-                  loadingController.increment();
-                  var filteredList = await asyncItems.call(query);
-                  loadingController.decrement();
-                  filteredListController.setValue(filteredList);
-                },
+                ],
               ),
               spaceSmall(),
               PlexWidget(

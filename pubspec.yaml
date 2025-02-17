@@ -69,6 +69,8 @@ dependencies:
   #  signalr_netcore: ^0.1.7+1
   signalr_netcore: ^1.4.0
 
+  simple_barcode_scanner: ^0.3.0
+
 dev_dependencies:
   flutter_lints: ^5.0.0
 #  build_runner: ^2.4.14

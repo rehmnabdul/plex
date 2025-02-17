@@ -589,6 +589,7 @@ class PlexFormFieldAutoComplete<T> extends StatelessWidget {
     this.searchInputFocusNode,
     this.autoCompleteItems,
     this.noDataText = "N/A",
+    this.showBarCode = false,
   });
 
   final PlexFormFieldGeneric properties;
@@ -601,6 +602,7 @@ class PlexFormFieldAutoComplete<T> extends StatelessWidget {
   final Function(dynamic item)? dropdownItemOnSelect;
   final PlexWidgetController<T?>? dropdownSelectionController;
   final String noDataText;
+  final bool showBarCode;
 
   PlexWidgetController<T?>? _dropdownSelectionController;
 
@@ -612,27 +614,7 @@ class PlexFormFieldAutoComplete<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var inputWidget = InkWell(
-      onTap: () {
-        if (!properties.enabled) return;
-
-        if (dropdownCustomOnTap != null) {
-          dropdownCustomOnTap?.call();
-          return;
-        }
-
-        showAutoCompleteSelectionList(
-          context,
-          asyncItems: autoCompleteItems!,
-          leadingIcon: dropDownLeadingIcon,
-          itemText: (c) => dropdownItemAsString?.call(c) ?? c.toString(),
-          focusNode: searchInputFocusNode,
-          onSelect: (c) {
-            getDropDownController().setValue(c as T?);
-            dropdownItemOnSelect?.call(c);
-          },
-          itemWidget: dropdownItemWidget,
-        );
-      },
+      onTap: () => onFieldTap(context),
       child: Container(
         decoration: BoxDecoration(
             border: Border.all(
@@ -673,7 +655,31 @@ class PlexFormFieldAutoComplete<T> extends StatelessWidget {
         child: inputWidget,
       );
     }
+
     return inputWidget;
+  }
+
+  onFieldTap(BuildContext context) {
+    if (!properties.enabled) return;
+
+    if (dropdownCustomOnTap != null) {
+      dropdownCustomOnTap?.call();
+      return;
+    }
+
+    showAutoCompleteSelectionList(
+      context,
+      asyncItems: autoCompleteItems!,
+      leadingIcon: dropDownLeadingIcon,
+      itemText: (c) => dropdownItemAsString?.call(c) ?? c.toString(),
+      focusNode: searchInputFocusNode,
+      showBarCode: showBarCode,
+      onSelect: (c) {
+        getDropDownController().setValue(c as T?);
+        dropdownItemOnSelect?.call(c);
+      },
+      itemWidget: dropdownItemWidget,
+    );
   }
 }
 

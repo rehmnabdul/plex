@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:plex/plex_scanner.dart';
 import 'package:plex/plex_utils/plex_dimensions.dart';
+import 'package:plex/plex_utils/plex_routing.dart';
 import 'package:plex/plex_widget.dart';
 import 'package:plex/plex_widgets/loading/plex_loader_v2.dart';
 import 'package:plex/plex_widgets/plex_form_field_widgets.dart';
 import 'package:plex/plex_widgets/plex_input_widget.dart';
-import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 
 showSelectionList<T>(
   BuildContext context, {
@@ -313,20 +314,9 @@ showAutoCompleteSelectionList<T>(
                     PlexFormFieldButton(
                       buttonIcon: Icon(Icons.barcode_reader),
                       buttonClick: () async {
-                        String? result = await SimpleBarcodeScanner.scanBarcode(
-                          context,
-                          barcodeAppBar: const BarcodeAppBar(
-                            appBarTitle: 'Scan Barcode',
-                            centerTitle: false,
-                            enableBackButton: true,
-                            backButtonIcon: Icon(Icons.arrow_back_ios),
-                          ),
-                          isShowFlashIcon: true,
-                          delayMillis: 2000,
-                          cameraFace: CameraFace.back,
-                        );
+                        var result = await Plex.to(PlexScanner());
                         if (result != null) {
-                          inputController.text = result;
+                          inputController.text = result.toString();
                           onSearch(inputController.text);
                         }
                       },

@@ -3,6 +3,13 @@ import 'package:get/get.dart';
 class Plex {
   Plex._();
 
+  static Future<T?>? to<T>(
+    dynamic to, {
+    dynamic arguments,
+  }) {
+    return Get.to(to, arguments: arguments);
+  }
+
   static Future<T?>? toNamed<T>(
     String path, {
     dynamic arguments,
@@ -16,8 +23,7 @@ class Plex {
     dynamic arguments,
     Map<String, String>? parameters,
   }) {
-    return Get.offAndToNamed<T>(path,
-        arguments: arguments, parameters: parameters);
+    return Get.offAndToNamed<T>(path, arguments: arguments, parameters: parameters);
   }
 
   static void back({dynamic result}) {

@@ -412,10 +412,13 @@ void main() async {
           route: "newPath1",
           title: "New Screen 1",
           screen: (context, {data}) {
+            var controller = PlexWidgetController();
             return Column(
               children: [
                 PlexFormFieldAutoComplete(
                   properties: const PlexFormFieldGeneric.title("Test"),
+                  showBarCode: true,
+                  dropdownSelectionController: controller,
                   autoCompleteItems: (query) async {
                     await Future.delayed(const Duration(milliseconds: 1000));
                     var items = List<String>.empty(growable: true);

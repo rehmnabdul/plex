@@ -1,3 +1,13 @@
+## 0.7.9
+
+### Updates
+* Change BarCode scanning, We can scan QR and BarCode both in PlexAutoCompleteField and selection lists
+
+## 0.7.8
+
+### Updates
+* Add BarCode scanning option in PlexAutoCompleteField and selection lists
+
 ## 0.7.7
 
 ### Updates

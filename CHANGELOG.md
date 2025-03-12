@@ -1,3 +1,14 @@
+## 0.8.1
+
+### Updates
+* Bug Fixes `Plex.to` Navigation
+
+## 0.8.0
+
+### Updates
+* Bug Fixes In BarCode Scanning
+* Use `PlexScanner` to scan QR code and Bar Codes In Any Application
+
 ## 0.7.9
 
 ### Updates

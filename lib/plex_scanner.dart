@@ -26,16 +26,6 @@ class _PlexScannerState extends State<PlexScanner> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    if(kDebugMode && !GetPlatform.isMobile) {
-      delay(() {
-        Navigator.pop(context, "FL-941104-602");
-      }, delayMillis: 2000);
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
@@ -84,14 +74,31 @@ class _PlexScannerState extends State<PlexScanner> {
             },
             Positioned(
               top: 0,
+              left: 0,
+              right: 0,
               child: Container(
-                color: Colors.black.withOpacity(0.6),
-                padding: const EdgeInsets.fromLTRB(8, 16, 8, 16),
-                width: MediaQuery.of(context).size.width * 1.0,
-                child: const Text(
-                  "To trace an item, scan the QR code",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Color(0xFFD9E5F8), fontWeight: FontWeight.bold),
+                color: Color.fromRGBO(0, 0, 0, 50),
+                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+                child: Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back, color: Colors.white),
+                      onPressed: () {
+                        Plex.back();
+                      },
+                    ),
+                    Expanded(
+                      child: const Text(
+                        "To trace an item, scan the QR code",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Color(0xFFD9E5F8),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16, // Adjusted for better readability
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -123,6 +130,6 @@ class _PlexScannerState extends State<PlexScanner> {
 
   void _scan(String scannedCode) {
     cameraController.stop();
-    Navigator.pop(context, scannedCode);
+    Plex.back(result: scannedCode);
   }
 }

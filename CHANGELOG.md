@@ -1,3 +1,20 @@
+## 0.8.4
+
+### Updates
+* Bug fix in `PlexFormFieldInput`. UI was crashing when `isPassword = true`
+
+## 0.8.3
+
+### Updates
+* Add Max Lines and Min Lines in `PlexFormFieldInput`
+* Add property to hide and show check box column in `PlexAdvanceDataTable`
+
+## 0.8.2
+
+### Updates
+* Add Search Delay While User Is Typing In `PlexFormFieldAutoComplete` widget by using `inputDelay`. Default value is `1000ms`. 
+* 
+
 ## 0.8.1
 
 ### Updates

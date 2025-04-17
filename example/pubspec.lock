@@ -5,18 +5,18 @@ packages:
     dependency: transitive
     description:
       name: archive
-      sha256: cb6a278ef2dbb298455e1a713bda08524a175630ec643a242c399c932a0a1f7d
+      sha256: "7dcbd0f87fe5f61cb28da39a1a8b70dbc106e2fe0516f7836eb7bb2948481a12"
       url: "https://pub.dev"
     source: hosted
-    version: "3.6.1"
+    version: "4.0.5"
   args:
     dependency: transitive
     description:
       name: args
-      sha256: bf9f5caeea8d8fe6721a9c358dd8a5c1947b27f1cfaa18b39c301273594919e6
+      sha256: d0481093c50b1da8910eb0bb301626d4d8eb7284aa739614d2b394ee09e3ea04
       url: "https://pub.dev"
     source: hosted
-    version: "2.6.0"
+    version: "2.7.0"
   async:
     dependency: transitive
     description:
@@ -276,10 +276,10 @@ packages:
     dependency: transitive
     description:
       name: image
-      sha256: f31d52537dc417fdcde36088fdf11d191026fd5e4fae742491ebd40e5a8bea7d
+      sha256: "4e973fcf4caae1a4be2fa0a13157aa38a8f9cb049db6529aa00b4d71abc4d928"
       url: "https://pub.dev"
     source: hosted
-    version: "4.3.0"
+    version: "4.5.4"
   intl:
     dependency: transitive
     description:
@@ -340,10 +340,10 @@ packages:
     dependency: transitive
     description:
       name: lottie
-      sha256: "377d87b8dcef640c04717e93afb86a510f0e1117a399ab94dc4b3f39c85eaa87"
+      sha256: c5fa04a80a620066c15cf19cc44773e19e9b38e989ff23ea32e5903ef1015950
       url: "https://pub.dev"
     source: hosted
-    version: "3.3.0"
+    version: "3.3.1"
   matcher:
     dependency: transitive
     description:
@@ -486,7 +486,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "0.8.0"
+    version: "0.8.2"
   plugin_platform_interface:
     dependency: transitive
     description:
@@ -503,6 +503,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.5.1"
+  posix:
+    dependency: transitive
+    description:
+      name: posix
+      sha256: a0117dc2167805aa9125b82eee515cc891819bac2f538c83646d355b16f58b9a
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.0.1"
   rxdart:
     dependency: transitive
     description:
@@ -523,10 +531,10 @@ packages:
     dependency: transitive
     description:
       name: shared_preferences
-      sha256: "846849e3e9b68f3ef4b60c60cf4b3e02e9321bc7f4d8c4692cf87ffa82fc8a3a"
+      sha256: "6e8bf70b7fef813df4e9a36f658ac46d107db4b4cfe1048b477d4e453a8159f5"
       url: "https://pub.dev"
     source: hosted
-    version: "2.5.2"
+    version: "2.5.3"
   shared_preferences_android:
     dependency: transitive
     description:
@@ -696,50 +704,50 @@ packages:
     dependency: transitive
     description:
       name: syncfusion_flutter_core
-      sha256: "59b6d2a7deacade6129d2f15615ca49ed56278fea055cd2e52cace78a343dd5e"
+      sha256: f1d2b52697543e13bdefdc62d15868124a265987577f53224a7dbe176c8448f0
       url: "https://pub.dev"
     source: hosted
-    version: "28.2.11"
+    version: "28.2.12"
   syncfusion_flutter_datagrid:
     dependency: transitive
     description:
       name: syncfusion_flutter_datagrid
-      sha256: fe45e8ed2159df5bf4ad2dbef9427c30db6c69379db057add4072338521d6aec
+      sha256: c6a97765f267a8209679ebba056a342c4c58c58a9a59e8c936e6035d72fbe91b
       url: "https://pub.dev"
     source: hosted
-    version: "28.2.11"
+    version: "28.2.12"
   syncfusion_flutter_datagrid_export:
     dependency: transitive
     description:
       name: syncfusion_flutter_datagrid_export
-      sha256: "437b9ca953852d366db0420738bbced345ef8c2613d062512fb006c9d828c43c"
+      sha256: "443f625e7e215ab77ddad47a188861d0edd33c2b8dfd6474ba92048a72ec6284"
       url: "https://pub.dev"
     source: hosted
-    version: "28.2.11"
+    version: "28.2.12"
   syncfusion_flutter_pdf:
     dependency: transitive
     description:
       name: syncfusion_flutter_pdf
-      sha256: f5a17ac2322d3e11140b2f5d2f4994b553d06c1e2287895897fa573c094bdee9
+      sha256: f5e02ac4264bc69eeffa3ec54c9c0ad6e8a9f9161b105451b4a83dd1a317eaf9
       url: "https://pub.dev"
     source: hosted
-    version: "28.2.11"
+    version: "28.2.12"
   syncfusion_flutter_xlsio:
     dependency: transitive
     description:
       name: syncfusion_flutter_xlsio
-      sha256: "861de84e9cbd20ddda1679704b868df751e461ea509e67efff305f003a06bace"
+      sha256: "3c82b621e80357c89b564771cd25c6f7e9977bcba3d0b7248683dd67e37cdcfc"
       url: "https://pub.dev"
     source: hosted
-    version: "28.2.11"
+    version: "28.2.12"
   syncfusion_officecore:
     dependency: transitive
     description:
       name: syncfusion_officecore
-      sha256: "8335f71879d649de465febbf32aaf2e3a825406cf6eb1aca974f64876805e62a"
+      sha256: "0cebd10708df50f4a7ba19f4d0b5f7beedc30887f8dee9bd69e6cdb6b0d1a38b"
       url: "https://pub.dev"
     source: hosted
-    version: "28.2.11"
+    version: "28.2.12"
   synchronized:
     dependency: transitive
     description:

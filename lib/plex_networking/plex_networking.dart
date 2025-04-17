@@ -213,6 +213,67 @@ class PlexNetworking {
     }
   }
 
+  Future<PlexApiResponse> put(String url, {Map<String, dynamic>? query, Map<String, String>? headers, Map<String, dynamic>? formData, dynamic body}) async {
+    if (await isNetworkAvailable() == false) {
+      return _noNetwork;
+    }
+
+    if (query?.isNotEmpty == true) {
+      url += "?";
+      query?.forEach((key, value) {
+        url += "$key=$value&";
+      });
+      url = url.substring(0, url.length - 1);
+    }
+
+    var currentHeaders = <String, String>{};
+
+    if (addHeaders != null) {
+      var constHeaders = await addHeaders!.call();
+      currentHeaders.addAll(constHeaders);
+    }
+
+    if (headers != null) {
+      currentHeaders.addAll(headers);
+    }
+
+    if (formData == null && !currentHeaders.containsKey("Content-Type")) {
+      currentHeaders["Content-Type"] = "application/json";
+    }
+
+    try {
+      var startTime = DateTime.now();
+      var uri = Uri.parse(_isValidUrl(url) ? url : _apiUrl() + url);
+      if (kDebugMode) print("Started: ${uri.toString()}");
+
+      late http.Response data;
+      if (formData != null) {
+        data = await http.put(uri, headers: currentHeaders, body: formData);
+      } else if (body != null) {
+        data = await http.put(uri, headers: currentHeaders, body: jsonEncode(body));
+      } else {
+        data = await http.put(uri, headers: currentHeaders, body: null);
+      }
+
+      var diffInMillis = DateTime.now().difference(startTime).inMilliseconds;
+      if (kDebugMode) print("Completed: ${data.statusCode}: ${uri.toString()} in ${diffInMillis}ms");
+      if (data.statusCode == 200) {
+        return PlexSuccess(data.body);
+      } else {
+        if (data.body.isEmpty) {
+          return PlexError(data.statusCode, data.reasonPhrase ?? data.body);
+        }
+        return PlexError(data.statusCode, data.body);
+      }
+    } catch (e) {
+      if (e is SocketException) {
+        return _connectionFailed;
+      }
+      if (kDebugMode) print("Error: ${e.toString()}");
+      return PlexError(400, e.toString());
+    }
+  }
+
   Future<PlexApiResponse> postMultipart(
     String url, {
     Map<String, dynamic>? query,
@@ -227,7 +288,7 @@ class PlexNetworking {
     if (query?.isNotEmpty == true) {
       url += "?";
       query?.forEach((key, value) {
-        url += "$key=$value&";
+        url += "${Uri.encodeComponent(key)}=${Uri.encodeComponent(value)}&";
       });
       url = url.substring(0, url.length - 1);
     }
@@ -260,6 +321,7 @@ class PlexNetworking {
       }
 
       var request = http.MultipartRequest('POST', uri);
+      request.headers.addAll(currentHeaders);
       request.fields.addAll(formData);
       request.files.addAll(multipartFiles);
 
@@ -276,6 +338,81 @@ class PlexNetworking {
           return PlexError(data.statusCode, data.reasonPhrase ?? responseBody);
         }
         return PlexError(data.statusCode, responseBody);
+      }
+    } catch (e) {
+      if (e is SocketException) {
+        return _connectionFailed;
+      }
+      if (kDebugMode) print("Error: ${e.toString()}");
+      return PlexError(400, e.toString());
+    }
+  }
+
+  Future<PlexApiResponse> postMultipart2(
+      String url, {
+        Map<String, dynamic>? query,
+        Map<String, String>? headers,
+        required Map<String, String> formData,
+        required Map<String, File> files,
+      }) async {
+    if (await isNetworkAvailable() == false) {
+      return _noNetwork;
+    }
+
+    /// Construct query parameters if present
+    if (query?.isNotEmpty == true) {
+      url += "?${query!.entries.map((e) => "${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value.toString())}").join("&")}";
+    }
+
+    /// Prepare headers
+    var currentHeaders = <String, String>{};
+
+    if (addHeaders != null) {
+      var constHeaders = await addHeaders!.call();
+      currentHeaders.addAll(constHeaders);
+    }
+
+    if (headers != null) {
+      currentHeaders.addAll(headers);
+    }
+
+    // ✅ Do not manually set Content-Type for multipart requests
+    if (kDebugMode) print("Headers: $currentHeaders");
+
+    try {
+      var uri = Uri.parse(_isValidUrl(url) ? url : _apiUrl() + url);
+      if (kDebugMode) print("Started: ${uri.toString()}");
+
+      /// Prepare Multipart Request
+      var request = http.MultipartRequest('POST', uri);
+      request.headers.addAll(currentHeaders);
+      request.fields.addAll(formData);
+
+      /// Attach Files
+      for (var entry in files.entries) {
+        var multipartFile = await http.MultipartFile.fromPath(entry.key, entry.value.path);
+        request.files.add(multipartFile);
+      }
+
+      var streamedResponse = await request.send();
+
+
+      var responseBody = await streamedResponse.stream.transform(utf8.decoder).join();
+
+      if (kDebugMode) print("Completed: ${streamedResponse.statusCode}: ${responseBody.toString()}");
+
+      /// Handle JSON & Text Responses Correctly
+      if (streamedResponse.statusCode == 200) {
+        try {
+          return PlexSuccess(responseBody); ///  Return JSON if valid
+        } catch (e) {
+          return PlexSuccess(responseBody); ///  Otherwise, return as plain text
+        }
+      } else {
+        return PlexError(
+          streamedResponse.statusCode,
+          responseBody.isEmpty ? streamedResponse.reasonPhrase ?? "Unknown error" : responseBody,
+        );
       }
     } catch (e) {
       if (e is SocketException) {

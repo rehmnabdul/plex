@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:plex/plex_scanner.dart';
+import 'package:plex/plex_utils.dart';
 import 'package:plex/plex_utils/plex_dimensions.dart';
 import 'package:plex/plex_utils/plex_routing.dart';
 import 'package:plex/plex_widget.dart';
@@ -260,7 +261,12 @@ showAutoCompleteSelectionList<T>(
   Widget Function(dynamic item)? itemWidget,
   Widget Function(T item)? leadingIcon,
   bool showBarCode = false,
+  double inputDelay = 1000,
 }) async {
+  DateTime lastInputAt = DateTime.now();
+  String? query = null;
+  String? searchedQuery = null;
+
   var inputController = TextEditingController();
   var filteredListController = PlexWidgetController<List<T>>(data: List.empty());
   var loadingController = PlexWidgetController<int>(data: 0);
@@ -271,15 +277,25 @@ showAutoCompleteSelectionList<T>(
   }
 
   onSearch(String data) async {
-    var query = data;
-    if (query.length < minQueryLength) {
-      return;
-    }
-    loadingController.increment();
-    var filteredList = await asyncItems.call(query);
-    loadingController.decrement();
-    filteredListController.setValue(filteredList);
+    lastInputAt = DateTime.now();
+    query = data;
+    if (data.length < minQueryLength) return;
+
+    delay(() async {
+
+      if(DateTime.now().difference(lastInputAt).inMilliseconds < inputDelay) return;
+      if(query == null || query!.length < minQueryLength) return;
+      if(searchedQuery == query) return;
+
+      loadingController.increment();
+      searchedQuery = query;
+      var filteredList = await asyncItems.call(searchedQuery!);
+      loadingController.decrement();
+      filteredListController.setValue(filteredList);
+    }, delayMillis: inputDelay.toInt());
   }
+
+
 
   // ignore: use_build_context_synchronously
   showModalBottomSheet(
@@ -299,14 +315,18 @@ showAutoCompleteSelectionList<T>(
               Row(
                 children: [
                   Expanded(
-                    child: PlexInputWidget<String>(
-                      title: "Search",
-                      type: PlexInputWidgetType.typeInput,
-                      inputController: inputController,
-                      inputHint: "Search here...",
-                      inputFocusNode: focusNode,
-                      inputOnChange: (data) async {
-                        onSearch(data);
+                    child: PlexWidget(
+                      controller: loadingController,
+                      createWidget: (context, data) {
+                        return PlexFormFieldInput(
+                          properties: PlexFormFieldGeneric(title: "Search", enabled: data <= 0),
+                          inputController: inputController,
+                          inputHint: "Search Here...",
+                          inputFocusNode: focusNode,
+                          inputOnChange: (value) async {
+                            onSearch(value);
+                          },
+                        );
                       },
                     ),
                   ),

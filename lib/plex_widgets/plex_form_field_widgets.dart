@@ -63,6 +63,8 @@ class PlexFormFieldInput extends StatelessWidget {
     this.prefixIcon,
     this.suffixIcon,
     this.maxInputLength,
+    this.maxLines,
+    this.minLines,
   });
 
   final PlexFormFieldGeneric properties;
@@ -78,6 +80,8 @@ class PlexFormFieldInput extends StatelessWidget {
   final Widget? prefixIcon;
   final Widget? suffixIcon;
   final int? maxInputLength;
+  final int? maxLines;
+  final int? minLines;
 
   @override
   Widget build(BuildContext context) {
@@ -95,6 +99,8 @@ class PlexFormFieldInput extends StatelessWidget {
             onChanged: (c) {
               inputOnChange?.call(c.toString());
             },
+            maxLines: isPassword ? 1 : maxLines,
+            minLines: isPassword ? 1 : minLines,
             maxLength: maxInputLength,
             maxLengthEnforcement: MaxLengthEnforcement.enforced,
             focusNode: inputFocusNode,
@@ -340,6 +346,7 @@ class PlexFormFieldDropdown<T> extends StatelessWidget {
       this.dropdownCustomOnTap,
       this.searchInputFocusNode,
       this.noDataText = "N/A",
+      this.initialSelection,
       this.showClearButton = false});
 
   final PlexFormFieldGeneric properties;
@@ -354,12 +361,19 @@ class PlexFormFieldDropdown<T> extends StatelessWidget {
   final FocusNode? searchInputFocusNode;
   final String noDataText;
   final bool showClearButton;
+  final T? initialSelection;
+
+  bool _initialized = false;
 
   String Function(dynamic item)? dropdownItemAsString = (item) => item.toString();
   PlexWidgetController<T?>? _dropdownSelectionController;
 
   PlexWidgetController<T?> getDropDownController() {
     _dropdownSelectionController ??= (dropdownSelectionController ?? PlexWidgetController<T?>());
+    if(!_initialized && initialSelection != null){
+      _dropdownSelectionController!.setValue(initialSelection);
+      _initialized = true;
+    }
     return _dropdownSelectionController!;
   }
 
@@ -590,6 +604,7 @@ class PlexFormFieldAutoComplete<T> extends StatelessWidget {
     this.autoCompleteItems,
     this.noDataText = "N/A",
     this.showBarCode = false,
+    this.inputDelay = 1000,
   });
 
   final PlexFormFieldGeneric properties;
@@ -603,6 +618,7 @@ class PlexFormFieldAutoComplete<T> extends StatelessWidget {
   final PlexWidgetController<T?>? dropdownSelectionController;
   final String noDataText;
   final bool showBarCode;
+  final double inputDelay;
 
   PlexWidgetController<T?>? _dropdownSelectionController;
 
@@ -679,6 +695,7 @@ class PlexFormFieldAutoComplete<T> extends StatelessWidget {
         dropdownItemOnSelect?.call(c);
       },
       itemWidget: dropdownItemWidget,
+      inputDelay: inputDelay,
     );
   }
 }

@@ -283,6 +283,10 @@ class _PlexAppState extends State<PlexApp> {
   @override
   void initState() {
     super.initState();
+    initializePlex();
+  }
+
+  void initializePlex() {
     Future(
       () async {
         WidgetsFlutterBinding.ensureInitialized();
@@ -337,6 +341,7 @@ class _PlexAppState extends State<PlexApp> {
         themeMode: themeMode,
         debugShowCheckedModeBanner: false,
         scrollBehavior: PlexScrollBehavior(),
+        enableLog: false,
         initialRoute: widget.useAuthorization
             ? PlexRoutesPaths.loginPath
             : widget.dashboardConfig != null
@@ -353,8 +358,8 @@ class _PlexAppState extends State<PlexApp> {
           if (widget.dashboardConfig != null) ...{
             PlexRoutesPaths.homePath: (_) => PlexDashboardScreen(handleBrightnessChange, handleMaterialVersionChange),
           },
-          if(widget.dashboardConfig?.dashboardScreens.where((r) => r.external).isNotEmpty ?? false) ...{
-            for(var page in widget.dashboardConfig!.dashboardScreens.where((r) => r.external)) ...{
+          if (widget.dashboardConfig?.dashboardScreens.where((r) => r.external).isNotEmpty ?? false) ...{
+            for (var page in widget.dashboardConfig!.dashboardScreens.where((r) => r.external)) ...{
               page.route: (_) => page.screen.call(context),
             }
           },

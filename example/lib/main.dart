@@ -9,7 +9,6 @@ import 'package:plex/plex_networking/plex_networking.dart';
 import 'package:plex/plex_package.dart';
 import 'package:plex/plex_route.dart';
 import 'package:plex/plex_screens/plex_login_screen.dart';
-import 'package:plex/plex_signal_r/plex_signal_r.dart';
 import 'package:plex/plex_theme.dart';
 import 'package:plex/plex_user.dart';
 import 'package:plex/plex_widget.dart';
@@ -297,7 +296,7 @@ void main() async {
       },
     ),
     dashboardConfig: PlexDashboardConfig(
-      disableExpandNavigationRail: false,
+      disableExpandNavigationRail: true,
       disableNavigationRail: false,
       disableBottomNavigation: false,
       showThemeSwitch: true,
@@ -521,58 +520,72 @@ void main() async {
           shortTitle: 'All Inputs',
           logo: const Icon(Icons.input),
           selectedLogo: const Icon(Icons.panorama_photosphere_select),
-          screen: (context, {data}) => Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: PlexFormFieldInput(
-                      properties: const PlexFormFieldGeneric.title("Field One"),
-                      errorController: PlexWidgetController(data: "Dasas"),
-                      inputOnChange: (value) {
-                        print(value);
-                      },
+          screen: (context, {data}) => SingleChildScrollView(
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: PlexFormFieldInput(
+                        properties: const PlexFormFieldGeneric.title("Field One"),
+                        errorController: PlexWidgetController(data: "Dasas"),
+                        inputOnChange: (value) {
+                          print(value);
+                        },
+                      ),
                     ),
-                  ),
-                  Expanded(
-                    child: PlexFormFieldDate(
-                      type: PlexFormFieldDateType.typeDateTime,
-                      properties: const PlexFormFieldGeneric.title("Start Date Time"),
-                      errorController: PlexWidgetController(data: "Dasas"),
+                    Expanded(
+                      child: PlexFormFieldDate(
+                        type: PlexFormFieldDateType.typeDateTime,
+                        properties: const PlexFormFieldGeneric.title("Start Date Time"),
+                        errorController: PlexWidgetController(data: "Dasas"),
+                      ),
                     ),
-                  ),
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: PlexFormFieldInput(
-                      properties: const PlexFormFieldGeneric.title("Field One"),
-                      errorController: PlexWidgetController(data: "Dasas"),
-                      inputOnChange: (value) {
-                        print(value);
-                      },
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: PlexFormFieldInput(
+                        properties: const PlexFormFieldGeneric.title("Field One"),
+                        errorController: PlexWidgetController(data: "Dasas"),
+                        inputOnChange: (value) {
+                          print(value);
+                        },
+                      ),
                     ),
-                  ),
-                  Expanded(
-                    child: PlexFormFieldDate(
-                      type: PlexFormFieldDateType.typeDateTime,
-                      properties: const PlexFormFieldGeneric.title("Start Date Time"),
-                      errorController: PlexWidgetController(data: "Dasas"),
+                    Expanded(
+                      child: PlexFormFieldDate(
+                        type: PlexFormFieldDateType.typeDateTime,
+                        properties: const PlexFormFieldGeneric.title("Start Date Time"),
+                        errorController: PlexWidgetController(data: "Dasas"),
+                      ),
                     ),
-                  ),
-                ],
-              ),
-              PlexFormFieldInput(
-                properties: const PlexFormFieldGeneric.title("Field One"),
-                errorController: PlexWidgetController(data: "Dasas"),
-                inputOnChange: (value) {
-                  print(value);
-                },
-              )
-            ],
+                  ],
+                ),
+                PlexFormFieldInput(
+                  properties: const PlexFormFieldGeneric.title("Field One"),
+                  errorController: PlexWidgetController(data: "Dasas"),
+                  inputOnChange: (value) {
+                    print(value);
+                  },
+                ),
+                PlexFormFieldAutoComplete(
+                  properties: PlexFormFieldGeneric.title("Auto Complete"),
+                  dropdownItemAsString: (item) => item.toString(),
+                  autoCompleteItems: (query) async {
+                    print("API Call");
+                    return [query];
+                  },
+                ),
+                PlexFormFieldInput(
+                  properties: PlexFormFieldGeneric.title("Input"),
+                  isPassword: true,
+                ),
+              ],
+            ),
           ),
         ),
       ],

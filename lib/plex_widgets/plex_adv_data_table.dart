@@ -145,6 +145,7 @@ class PlexAdvanceDataTable extends StatefulWidget {
     this.customWidgets,
     this.freezeColumns = 0,
     this.freezeRows = 0,
+    this.showCheckboxColumn = true,
     this.alternateColor,
     this.enableCopy = false,
     this.enableColumnGrouping = true,
@@ -162,6 +163,7 @@ class PlexAdvanceDataTable extends StatefulWidget {
   final String title;
   final int freezeColumns;
   final int freezeRows;
+  final bool showCheckboxColumn;
 
   ///Styles
   final Color? headerBackground;
@@ -572,7 +574,7 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
                   showSortNumbers: true,
                   allowSwiping: false,
                   allowEditing: true,
-                  showCheckboxColumn: true,
+                  showCheckboxColumn: widget.showCheckboxColumn,
                   selectionMode: SelectionMode.multiple,
                   headerGridLinesVisibility: GridLinesVisibility.both,
                   gridLinesVisibility: GridLinesVisibility.both,

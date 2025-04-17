@@ -68,7 +68,7 @@ class PlexDashboardConfig {
   late List<PlexRoute> _routes;
 
   int indexOfRoute(String route) {
-      return _routes.indexWhere((screen) => screen.route == route);
+    return _routes.indexWhere((screen) => screen.route == route);
   }
 }
 
@@ -267,9 +267,7 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
                 child: const Text("Animations"),
               ),
             },
-            if (PlexApp.app.dashboardConfig!.showThemeSwitch
-                && (PlexApp.app.dashboardConfig!.showMaterialSwitch
-                    || PlexApp.app.dashboardConfig!.showBrightnessSwitch)) ...{
+            if (PlexApp.app.dashboardConfig!.showThemeSwitch && (PlexApp.app.dashboardConfig!.showMaterialSwitch || PlexApp.app.dashboardConfig!.showBrightnessSwitch)) ...{
               SubmenuButton(
                 menuChildren: <Widget>[
                   if (!PlexApp.app.forceMaterial3 && PlexApp.app.dashboardConfig!.showMaterialSwitch) ...{
@@ -399,7 +397,7 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
         key.currentState?.closeDrawer();
 
         var route = PlexApp.app.dashboardConfig!._routes[index];
-        if(route.external == true) {
+        if (route.external == true) {
           Plex.toNamed(route.route);
           return;
         } else {
@@ -446,7 +444,7 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
       animationDuration: const Duration(milliseconds: 500),
       onDestinationSelected: (int index) {
         var route = PlexApp.app.dashboardConfig!._routes[index];
-        if(route.external == true) {
+        if (route.external == true) {
           Plex.toNamed(route.route);
           return;
         } else {
@@ -535,28 +533,28 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
         if (!PlexApp.app.dashboardConfig!.disableNavigationRail) ...{
           if (!smallScreen && PlexApp.app.dashboardConfig!._routes.isNotEmpty) ...{
             Padding(
-                padding: const EdgeInsets.all(PlexDim.small),
-                child: Card(
-                  color: PlexApp.app.dashboardConfig!.navigationRailBackgroundColor ?? PlexTheme.getActiveTheme(context).navigationRailTheme.backgroundColor,
-                  clipBehavior: Clip.hardEdge,
-                  elevation: PlexDim.small,
-                  child: SingleChildScrollView(
-                    child: PlexNavigationRail(
-                      topWidgets: PlexApp.app.dashboardConfig!.navigationRailTopWidgets?.call(this, context),
-                      bottomWidgets: PlexApp.app.dashboardConfig!.navigationRailBottomWidgets?.call(this, context),
-                      extended: !PlexApp.app.dashboardConfig!.disableExpandNavigationRail && largeScreen,
-                      backgroundColor: Colors.transparent,
-                      selectedDestination: navigationSelectedIndex.first,
-                      destinations: PlexApp.app.dashboardConfig!._routes,
-                      onSelectDestination: (index) {
-                        setState(() {
-                          navigationSelectedIndex = PlexPair.create(index, null);
-                        });
-                      },
-                    ),
+              padding: const EdgeInsets.all(PlexDim.small),
+              child: Card(
+                color: PlexApp.app.dashboardConfig!.navigationRailBackgroundColor ?? PlexTheme.getActiveTheme(context).navigationRailTheme.backgroundColor,
+                clipBehavior: Clip.hardEdge,
+                elevation: PlexDim.small,
+                child: SingleChildScrollView(
+                  child: PlexNavigationRail(
+                    topWidgets: PlexApp.app.dashboardConfig!.navigationRailTopWidgets?.call(this, context),
+                    bottomWidgets: PlexApp.app.dashboardConfig!.navigationRailBottomWidgets?.call(this, context),
+                    extended: !PlexApp.app.dashboardConfig!.disableExpandNavigationRail && largeScreen,
+                    backgroundColor: Colors.transparent,
+                    selectedDestination: navigationSelectedIndex.first,
+                    destinations: PlexApp.app.dashboardConfig!._routes,
+                    onSelectDestination: (index) {
+                      setState(() {
+                        navigationSelectedIndex = PlexPair.create(index, null);
+                      });
+                    },
                   ),
-                ).scaleAnim(),
-              ),
+                ),
+              ).scaleAnim(),
+            ),
           },
         },
         if (navigationSelectedIndex.first != -1) ...{

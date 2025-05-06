@@ -48,7 +48,7 @@ class PlexLoginConfig {
 }
 
 class PlexLoginScreen extends PlexScreen {
-  const PlexLoginScreen({super.key, required this.loginConfig, required this.nextRoute});
+  const PlexLoginScreen({super.key, super.useScaffold = true, required this.loginConfig, required this.nextRoute});
 
   final String nextRoute;
   final PlexLoginConfig loginConfig;

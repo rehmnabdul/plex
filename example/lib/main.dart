@@ -11,8 +11,10 @@ import 'package:plex/plex_route.dart';
 import 'package:plex/plex_screens/plex_login_screen.dart';
 import 'package:plex/plex_theme.dart';
 import 'package:plex/plex_user.dart';
+import 'package:plex/plex_utils/plex_dimensions.dart';
 import 'package:plex/plex_widget.dart';
 import 'package:plex/plex_widgets/plex_adv_data_table.dart';
+import 'package:plex/plex_widgets/plex_card.dart';
 import 'package:plex/plex_widgets/plex_data_table.dart';
 import 'package:plex/plex_widgets/plex_data_table_paginated.dart';
 import 'package:plex/plex_widgets/plex_form_field_widgets.dart';
@@ -296,7 +298,7 @@ void main() async {
       },
     ),
     dashboardConfig: PlexDashboardConfig(
-      disableExpandNavigationRail: true,
+      disableExpandNavigationRail: false,
       disableNavigationRail: false,
       disableBottomNavigation: false,
       showThemeSwitch: true,

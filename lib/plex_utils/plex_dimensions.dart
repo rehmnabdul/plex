@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 
 class PlexDim {
+  PlexDim._();
   static const _adjustment = 0;
   static const zero = 0.0 + _adjustment;
   static const half = 0.5 + _adjustment;
@@ -13,6 +14,7 @@ class PlexDim {
 }
 
 class PlexFontSize {
+  PlexFontSize._();
   static const _adjustment = 0;
   static const smallest = 9.0 + _adjustment;
   static const small = 11.5 + _adjustment;

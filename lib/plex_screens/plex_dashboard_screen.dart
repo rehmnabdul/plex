@@ -12,6 +12,7 @@ class PlexDashboardConfig {
     this.showThemeSwitch = true,
     this.showBrightnessSwitch = true,
     this.showMaterialSwitch = true,
+    this.navigationRailElevation,
     this.navigationRailBackgroundColor,
     this.hideNavigationRailLogo = false,
     this.hideNavigationRailLogoWidth = double.maxFinite,
@@ -20,6 +21,15 @@ class PlexDashboardConfig {
     this.navigationRailTopWidgets,
     this.navigationRailBottomWidgets,
   });
+
+  PlexWidgetController<Widget?> _dashboardAlertUiController = PlexWidgetController();
+
+  PlexWidgetController<Widget?> get dashboardAlertUiController {
+    if (_dashboardAlertUiController.isDisposed) {
+      _dashboardAlertUiController = PlexWidgetController<Widget?>(data: _dashboardAlertUiController.data);
+    }
+    return _dashboardAlertUiController;
+  }
 
   ///Hide and Show Theme Options from the Actions List
   final bool showAnimationSwitch;
@@ -47,6 +57,7 @@ class PlexDashboardConfig {
   ///This [appbarActions] will be available on top right submenu link
   final List<MenuItemButton> Function(PlexState<PlexScreen> state, BuildContext context)? appbarActions;
 
+  final double? navigationRailElevation;
   final Color? navigationRailBackgroundColor;
   final bool hideNavigationRailLogo;
   final double hideNavigationRailLogoWidth;
@@ -54,6 +65,9 @@ class PlexDashboardConfig {
   final bool hideNavigationRailVersionInfo;
   final List<Widget> Function(PlexState<PlexScreen> state, BuildContext context)? navigationRailTopWidgets;
   final List<Widget> Function(PlexState<PlexScreen> state, BuildContext context)? navigationRailBottomWidgets;
+
+  ///Return Current Application Biuild Context
+  BuildContext? buildContext;
 
   ///Navigate to other screen present in Dashboard Screen
   void navigateOnDashboard(int index, {dynamic data}) {
@@ -73,7 +87,7 @@ class PlexDashboardConfig {
 }
 
 class PlexDashboardScreen extends PlexScreen {
-  const PlexDashboardScreen(this.handleBrightnessChange, this.handleMaterialVersionChange, {super.key});
+  const PlexDashboardScreen(this.handleBrightnessChange, this.handleMaterialVersionChange, {super.key, super.useScaffold = true});
 
   final Function(ThemeMode mode) handleBrightnessChange;
   final Function() handleMaterialVersionChange;
@@ -527,6 +541,7 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
 
   @override
   Widget buildBody() {
+    PlexApp.app.dashboardConfig!.buildContext = context;
     var body = Row(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -537,20 +552,25 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
               child: Card(
                 color: PlexApp.app.dashboardConfig!.navigationRailBackgroundColor ?? PlexTheme.getActiveTheme(context).navigationRailTheme.backgroundColor,
                 clipBehavior: Clip.hardEdge,
-                elevation: PlexDim.small,
-                child: SingleChildScrollView(
-                  child: PlexNavigationRail(
-                    topWidgets: PlexApp.app.dashboardConfig!.navigationRailTopWidgets?.call(this, context),
-                    bottomWidgets: PlexApp.app.dashboardConfig!.navigationRailBottomWidgets?.call(this, context),
-                    extended: !PlexApp.app.dashboardConfig!.disableExpandNavigationRail && largeScreen,
-                    backgroundColor: Colors.transparent,
-                    selectedDestination: navigationSelectedIndex.first,
-                    destinations: PlexApp.app.dashboardConfig!._routes,
-                    onSelectDestination: (index) {
-                      setState(() {
-                        navigationSelectedIndex = PlexPair.create(index, null);
-                      });
-                    },
+                elevation: PlexApp.app.dashboardConfig!.navigationRailElevation ?? PlexDim.large,
+                shadowColor: PlexTheme.getActiveTheme(context).primaryColor,
+                child: ScrollConfiguration(
+                  behavior: PlexScrollBehavior(showScrollbar: false, scrollPhysics: BouncingScrollPhysics()),
+                  child: SingleChildScrollView(
+                    keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+                    child: PlexNavigationRail(
+                      topWidgets: PlexApp.app.dashboardConfig!.navigationRailTopWidgets?.call(this, context),
+                      bottomWidgets: PlexApp.app.dashboardConfig!.navigationRailBottomWidgets?.call(this, context),
+                      extended: !PlexApp.app.dashboardConfig!.disableExpandNavigationRail && largeScreen,
+                      backgroundColor: Colors.transparent,
+                      selectedDestination: navigationSelectedIndex.first,
+                      destinations: PlexApp.app.dashboardConfig!._routes,
+                      onSelectDestination: (index) {
+                        setState(() {
+                          navigationSelectedIndex = PlexPair.create(index, null);
+                        });
+                      },
+                    ),
                   ),
                 ),
               ).scaleAnim(),
@@ -558,7 +578,23 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
           },
         },
         if (navigationSelectedIndex.first != -1) ...{
-          Expanded(child: PlexApp.app.dashboardConfig!._routes[navigationSelectedIndex.first].screen.call(context, data: navigationSelectedIndex.second)),
+          Expanded(
+              child: Column(
+            children: [
+              PlexWidget(
+                controller: PlexApp.app.dashboardConfig!.dashboardAlertUiController,
+                createWidget: (context, data) {
+                  return data ?? Container();
+                },
+              ),
+              Expanded(
+                child: PlexApp.app.dashboardConfig!._routes[navigationSelectedIndex.first].screen.call(
+                  context,
+                  data: navigationSelectedIndex.second,
+                ),
+              ),
+            ],
+          )),
         }
       ],
     );

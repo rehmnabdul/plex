@@ -1,3 +1,29 @@
+## 0.8.9
+
+### Updates
+* Fix `PlexFormFieldDate` parameter `cancellable`
+
+## 0.8.8
+
+### Updates
+* Improve some properties in `PlexCard`
+* Add new text button type in `PlexFornFieldTextButton`
+
+## 0.8.7
+
+### Improvements
+* Add new widget in widgets library named `PlexCard`. Simplifies the card view usage and enhanced controls over UI
+
+## 0.8.6
+
+### Updates
+* UI Updates In Dashboard Screen NavigationRail. Use `PlexDashboardConfig.navigationRailElevation` to customize its elevation
+
+## 0.8.5
+
+### Updates
+* Add Alerts UI on dashboard. Use `PlexApp.app.updateDashboardUIAlert(**Any Widget**);` to show alert view on all dashboard screens
+
 ## 0.8.4
 
 ### Updates

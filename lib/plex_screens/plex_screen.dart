@@ -1,4 +1,3 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:plex/plex_utils.dart';
 import 'package:plex/plex_utils/plex_messages.dart';
@@ -10,7 +9,9 @@ import 'package:plex/plex_widgets/loading/plex_loader_v2.dart';
 import 'package:plex/plex_widgets/loading/plex_loading_enum.dart';
 
 abstract class PlexScreen extends StatefulWidget {
-  const PlexScreen({super.key});
+  const PlexScreen({super.key, this.useScaffold = true});
+
+  final bool useScaffold;
 }
 
 abstract class PlexState<T extends PlexScreen> extends State<T> {
@@ -63,54 +64,56 @@ abstract class PlexState<T extends PlexScreen> extends State<T> {
 
   @override
   Widget build(BuildContext context) {
+    var bodyWidget = Stack(
+      children: [
+        createWidget(() {
+          if (getNoOfTabs() > 0) {
+            if (getTabBar() == null) {
+              throw Exception("Please override following methods:\n1. getTabBar()\n2. buildBody() must return TabBarView");
+            }
+            var body = buildBody();
+            if (body is! TabBarView) {
+              throw Exception("buildBody() must return TabBarView if getTabBar() > 0");
+            }
+            return DefaultTabController(
+              length: getNoOfTabs(),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  getTabBar()!,
+                  Expanded(child: body),
+                ],
+              ),
+            ).scaleAnim();
+          } else {
+            return buildBody().scaleAnim();
+          }
+        }),
+        PlexWidget(
+          controller: _loadingController,
+          createWidget: (context, data) {
+            if (data == true) {
+              return Container(
+                color: const Color(0x80000000),
+                child: Center(
+                  child: loadingType() == PlexLoadingEnum.version1 ? const PlexLoaderV1() : const PlexLoaderV2(),
+                ),
+              );
+            }
+            return Container();
+          },
+        )
+      ],
+    );
+
+    if (!widget.useScaffold) return bodyWidget;
+
     return Scaffold(
       key: key,
       appBar: buildAppBar(),
       drawer: buildSideNavigation(),
       bottomNavigationBar: buildBottomNavigation(),
-      body: SafeArea(
-        child: Stack(
-          children: [
-            createWidget(() {
-              if (getNoOfTabs() > 0) {
-                if (getTabBar() == null) {
-                  throw Exception("Please override following methods:\n1. getTabBar()\n2. buildBody() must return TabBarView");
-                }
-                var body = buildBody();
-                if (body is! TabBarView) {
-                  throw Exception("buildBody() must return TabBarView if getTabBar() > 0");
-                }
-                return DefaultTabController(
-                  length: getNoOfTabs(),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      getTabBar()!,
-                      Expanded(child: body),
-                    ],
-                  ),
-                ).scaleAnim();
-              } else {
-                return buildBody().scaleAnim();
-              }
-            }),
-            PlexWidget(
-              controller: _loadingController,
-              createWidget: (context, data) {
-                if (data == true) {
-                  return Container(
-                    color: const Color(0x80000000),
-                    child: Center(
-                      child: loadingType() == PlexLoadingEnum.version1 ? const PlexLoaderV1() : const PlexLoaderV2(),
-                    ),
-                  );
-                }
-                return Container();
-              },
-            )
-          ],
-        ),
-      ),
+      body: SafeArea(child: bodyWidget),
     );
   }
 

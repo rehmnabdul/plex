@@ -94,6 +94,9 @@ class PlexApp extends StatefulWidget {
   ///[forceMaterial3] will force app theme to use material3
   final bool forceMaterial3;
 
+  ///[scrollBehaviour] will force app to use provided scroll behaviour
+  final PlexScrollBehavior? scrollBehaviour;
+
   ///This image will be used to generate app theme
   final ImageProvider? themeFromImage;
 
@@ -155,6 +158,7 @@ class PlexApp extends StatefulWidget {
     this.onInitializationComplete,
     this.onLogout,
     this.forceMaterial3 = false,
+    this.scrollBehaviour,
   }) {
     if (dashboardConfig == null && pages == null) {
       throw Exception("Either \"DashboardConfig\" or \"Pages\" must not be null and empty");
@@ -240,6 +244,10 @@ class PlexApp extends StatefulWidget {
       applicationLegalese: PlexApp.app.appInfo.legalese,
       children: PlexApp.app.appInfo.aboutDialogWidgets,
     );
+  }
+
+  void updateDashboardUIAlert(Widget? widget) {
+    dashboardConfig?.dashboardAlertUiController.setValue(widget);
   }
 
   void setNotifications(List<PlexNotification> notifications) {
@@ -340,7 +348,7 @@ class _PlexAppState extends State<PlexApp> {
         darkTheme: PlexTheme.getThemeByBrightness(Brightness.dark),
         themeMode: themeMode,
         debugShowCheckedModeBanner: false,
-        scrollBehavior: PlexScrollBehavior(),
+        scrollBehavior: widget.scrollBehaviour ?? PlexScrollBehavior(),
         enableLog: false,
         initialRoute: widget.useAuthorization
             ? PlexRoutesPaths.loginPath
@@ -356,7 +364,7 @@ class _PlexAppState extends State<PlexApp> {
             PlexRoutesPaths.loginPath: (_) => PlexLoginScreen(loginConfig: widget.loginConfig!, nextRoute: widget.appInfo.initialRoute),
           },
           if (widget.dashboardConfig != null) ...{
-            PlexRoutesPaths.homePath: (_) => PlexDashboardScreen(handleBrightnessChange, handleMaterialVersionChange),
+            PlexRoutesPaths.homePath: (_) => PlexDashboardScreen(handleBrightnessChange, handleMaterialVersionChange, ),
           },
           if (widget.dashboardConfig?.dashboardScreens.where((r) => r.external).isNotEmpty ?? false) ...{
             for (var page in widget.dashboardConfig!.dashboardScreens.where((r) => r.external)) ...{

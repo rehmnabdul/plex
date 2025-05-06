@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:plex/plex_screens/plex_screen.dart';
 import 'package:plex/plex_utils/plex_dimensions.dart';
+import 'package:plex/plex_widgets/plex_card.dart';
 import 'package:plex/plex_widgets/plex_form.dart';
+import 'package:plex/plex_widgets/plex_form_field_widgets.dart';
 
 class MyUser extends PlexForm {
   String firstName;
@@ -27,10 +29,14 @@ class MyUser extends PlexForm {
         PlexFormField.input(title: "lastName", initialValue: lastName, inputType: TextInputType.name, type: String, onChange: (value) => lastName = value ?? ""),
         PlexFormField.input(title: "dob", initialValue: dob, type: DateTime, onChange: (value) => dob = value ?? DateTime.now()),
       },
-      PlexFormField.input(title: "male", initialValue: male, type: bool, onChange: (value) {
-        male = value;
-        context.setState(() {});
-      }),
+      PlexFormField.input(
+          title: "male",
+          initialValue: male,
+          type: bool,
+          onChange: (value) {
+            male = value;
+            context.setState(() {});
+          }),
       PlexFormField.multiselect(
         title: "codes",
         itemAsString: (item) => item.toString(),
@@ -86,17 +92,33 @@ class _FormUsageScreenState extends PlexState<FormUsageScreen> {
   @override
   Widget buildBody() {
     var myUser = MyUser("Abdur", "Rahman", 5, DateTime.now(), true, "Pak", [1]);
-    return PlexFormWidget<MyUser>(
-      entity: myUser,
-      onSubmit: (dynamic myUser) {
-        Future(
-          () async {
-            showLoading();
-            await Future.delayed(const Duration(milliseconds: 5000));
-            hideLoading();
-          },
-        );
-      },
+    return Column(
+      children: [
+        PlexFormFieldTextButton(
+          properties: PlexFormFieldGeneric.title("Data"),
+          buttonIcon: Icon(Icons.abc),
+        ),
+        PlexCard(
+          child: Padding(
+            padding: EdgeInsets.all(PlexDim.medium),
+            child: Text("Plex Card"),
+          ),
+        ),
+        Expanded(
+          child: PlexFormWidget<MyUser>(
+            entity: myUser,
+            onSubmit: (dynamic myUser) {
+              Future(
+                () async {
+                  showLoading();
+                  await Future.delayed(const Duration(milliseconds: 5000));
+                  hideLoading();
+                },
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 }

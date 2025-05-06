@@ -47,9 +47,8 @@ showSelectionList<T>(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              PlexInputWidget<String>(
-                title: "Search",
-                type: PlexInputWidgetType.typeInput,
+              PlexFormFieldInput(
+                properties: PlexFormFieldGeneric.title("Search"),
                 inputController: inputController,
                 inputHint: "Search here...",
                 inputFocusNode: focusNode,
@@ -157,9 +156,8 @@ showMultiSelection<T>(
               Row(
                 children: [
                   Expanded(
-                    child: PlexInputWidget<String>(
-                      title: "Search",
-                      type: PlexInputWidgetType.typeInput,
+                    child: PlexFormFieldInput(
+                      properties: PlexFormFieldGeneric.title("Search"),
                       inputController: inputController,
                       inputFocusNode: focusNode,
                       inputHint: "Search here...",
@@ -178,13 +176,12 @@ showMultiSelection<T>(
                       },
                     ),
                   ),
-                  PlexInputWidget(
-                    type: PlexInputWidgetType.typeButton,
+                  PlexFormFieldButton(
+                    properties: PlexFormFieldGeneric.title("Done"),
                     buttonClick: () {
                       onSelect.call(selectionList);
                       Get.back();
                     },
-                    title: "Done",
                   ),
                 ],
               ),

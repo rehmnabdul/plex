@@ -167,10 +167,9 @@ class _PlexLoginScreenState extends PlexState<PlexLoginScreen> {
                         if (widget.loginConfig.additionalWidgetsAboveLoginButton != null) ...{
                           widget.loginConfig.additionalWidgetsAboveLoginButton!.call(context),
                         },
-                        PlexInputWidget(
-                          title: "Login",
+                        PlexFormFieldButton(
+                          properties: PlexFormFieldGeneric(title: "Login", useMargin: false),
                           buttonIcon: const Icon(Icons.login),
-                          type: PlexInputWidgetType.typeButton,
                           buttonClick: () => _loginAction(),
                         ),
                         if (_getRecentLogins().isNotEmpty) ...{

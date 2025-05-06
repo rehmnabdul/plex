@@ -20,16 +20,8 @@ class UpdatableScreen extends PlexScreen {
 
 class _UpdatableScreenState extends PlexState<UpdatableScreen> {
   var viewModel = UpdatableScreenViewModel();
-
   var cont = PlexWidgetController<List<int>>(data: []);
 
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-  }
-
-  var data = 0.plexObs;
 
   @override
   Widget buildBody() {
@@ -37,13 +29,8 @@ class _UpdatableScreenState extends PlexState<UpdatableScreen> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text("${data.value}").plexRxWidget(data),
-          ElevatedButton(
-            onPressed: () {
-              data.value = (data.value as int) + 1;
-            },
-            child: Text("Increment"),
-          ),
+          const SizedBox(height: 20),
+          
           PlexInputWidget(
             type: PlexInputWidgetType.typeMultiSelect,
             title: "Multiselect",
@@ -56,7 +43,7 @@ class _UpdatableScreenState extends PlexState<UpdatableScreen> {
           PlexWidget(
             controller: viewModel.updateController,
             createWidget: (context, data) {
-              return Text("Counter: $data", style: const TextStyle(fontSize: PlexFontSize.large));
+              return Text("PlexWidget Counter: $data", style: const TextStyle(fontSize: PlexFontSize.large));
             },
           ),
           spaceMedium(),
@@ -67,7 +54,7 @@ class _UpdatableScreenState extends PlexState<UpdatableScreen> {
               viewModel.toast("Added");
             },
             icon: const Icon(Icons.add),
-            label: const Text("Add"),
+            label: const Text("Add PlexWidget Counter"),
           ),
           spaceMedium(),
           ElevatedButton.icon(

@@ -12,6 +12,7 @@ import 'package:plex/plex_utils/plex_messages.dart';
 import 'package:plex/plex_utils/plex_printer.dart';
 import 'package:plex/plex_utils/plex_utils.dart';
 import 'package:plex/plex_widget.dart';
+import 'package:plex/plex_widgets/plex_form_field_widgets.dart';
 import 'package:plex/plex_widgets/plex_input_widget.dart';
 import 'package:plex/plex_widgets/plex_selection_list.dart';
 import 'package:syncfusion_flutter_core/theme.dart';
@@ -257,10 +258,8 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
                   ...?widget.customWidgets?.call(context),
                   if (widget.enableColumnGrouping) ...{
                     space(8),
-                    PlexInputWidget(
-                      type: PlexInputWidgetType.typeButton,
-                      title: "Group By",
-                      useMargin: false,
+                    PlexFormFieldButton(
+                      properties: PlexFormFieldGeneric(title: "Group By", useMargin: false),
                       buttonIcon: Image.asset(groupData, height: 25, width: 25, color: PlexTheme.getActiveTheme(context).primaryColor),
                       buttonClick: () {
                         showMultiSelection<ColumnGroup>(
@@ -293,9 +292,8 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
                   },
                   if (widget.enableExcelExport) ...{
                     space(8),
-                    PlexInputWidget(
-                      type: PlexInputWidgetType.typeButton,
-                      useMargin: false,
+                    PlexFormFieldButton(
+                      properties: PlexFormFieldGeneric(useMargin: false),
                       buttonClick: () async {
                         final xl.Workbook workbook = key.currentState!.exportToExcelWorkbook();
                         workbook.worksheets[0].getRangeByIndex(1, 1, workbook.worksheets[0].rows.count, workbook.worksheets[0].columns.count).autoFit();
@@ -311,9 +309,8 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
                   },
                   if (widget.enablePdfExport) ...{
                     space(8),
-                    PlexInputWidget(
-                      type: PlexInputWidgetType.typeButton,
-                      useMargin: false,
+                    PlexFormFieldButton(
+                      properties: PlexFormFieldGeneric(useMargin: false),
                       buttonClick: () async {
                         var document = key.currentState!.exportToPdfDocument(autoColumnWidth: true);
                         final List<int> bytes = document.saveSync();
@@ -328,9 +325,8 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
                   },
                   if (widget.onRefresh != null) ...{
                     space(8),
-                    PlexInputWidget(
-                      type: PlexInputWidgetType.typeButton,
-                      useMargin: false,
+                    PlexFormFieldButton(
+                      properties: PlexFormFieldGeneric(useMargin: false),
                       buttonClick: () async {
                         widget.onRefresh?.call();
                       },
@@ -418,13 +414,13 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
                         ),
                       },
                       ...?widget.customWidgets?.call(context).map((e) {
-                        if(e is PlexInputWidget) {
+                        if(e is PlexFormFieldButton) {
                           return MenuItemButton(
                             onPressed: () async {
                               e.buttonClick?.call();
                             },
                             leadingIcon: e.buttonIcon,
-                            child: Text(e.title ?? ''),
+                            child: Text(e.properties.title ?? ''),
                           );
                         }
                         return e;
@@ -523,13 +519,13 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
                         ),
                       },
                       ...?widget.customWidgets?.call(context).map((e) {
-                        if(e is PlexInputWidget) {
+                        if(e is PlexFormFieldButton) {
                           return MenuItemButton(
                             onPressed: () async {
                               e.buttonClick?.call();
                             },
                             leadingIcon: e.buttonIcon,
-                            child: Text(e.title ?? ''),
+                            child: Text(e.properties.title ?? ''),
                           );
                         }
                         return e;

@@ -94,9 +94,10 @@ class _FormUsageScreenState extends PlexState<FormUsageScreen> {
     var myUser = MyUser("Abdur", "Rahman", 5, DateTime.now(), true, "Pak", [1]);
     return Column(
       children: [
-        PlexFormFieldTextButton(
+        PlexFormFieldButton(
           properties: PlexFormFieldGeneric.title("Data"),
           buttonIcon: Icon(Icons.abc),
+          buttonType: PlexButtonType.outlined,
         ),
         PlexCard(
           child: Padding(

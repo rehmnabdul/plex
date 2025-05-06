@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:plex/plex_utils/plex_dimensions.dart';
 import 'package:plex/plex_widget.dart';
+import 'package:plex/plex_widgets/plex_form_field_widgets.dart';
 import 'package:plex/plex_widgets/plex_input_widget.dart';
 
 abstract mixin class PlexForm {
@@ -108,65 +109,55 @@ class _PlexFormWidgetState extends State<PlexFormWidget> {
       for (var value in widget.entity.getFields(this)) ...{
         if (value.fieldType == PlexFormField.TYPE_INPUT) ...{
           if (value.type == String) ...{
-            PlexInputWidget<String>(
-              title: value.title.toUpperCase(),
-              type: PlexInputWidgetType.typeInput,
+            PlexFormFieldInput(
+              properties: PlexFormFieldGeneric(title: value.title.toUpperCase(), enabled: value.editable),
               isPassword: value.isPassword,
               inputKeyboardType: value.inputType ?? TextInputType.text,
               inputAction: value.inputAction,
               inputController: TextEditingController(text: value.initialValue?.toString()),
               inputOnChange: (v) => value.onChange(v.toString()),
-              editable: value.editable,
             ),
           },
           if (value.type == int) ...{
-            PlexInputWidget<int>(
-              title: value.title.toUpperCase(),
-              type: PlexInputWidgetType.typeInput,
+            PlexFormFieldInput(
+              properties: PlexFormFieldGeneric(title: value.title.toUpperCase(), enabled: value.editable),
               inputKeyboardType: value.inputType ?? const TextInputType.numberWithOptions(decimal: false, signed: false),
               inputOnChange: (v) => value.onChange(int.tryParse(v)),
               inputAction: value.inputAction,
               inputController: TextEditingController(text: value.initialValue?.toString()),
               isPassword: value.isPassword,
-              editable: value.editable,
             ),
           },
           if (value.type == double) ...{
-            PlexInputWidget<double>(
-              title: value.title.toUpperCase(),
-              type: PlexInputWidgetType.typeInput,
+            PlexFormFieldInput(
+              properties: PlexFormFieldGeneric(title: value.title.toUpperCase(), enabled: value.editable),
               inputKeyboardType: value.inputType ?? const TextInputType.numberWithOptions(decimal: true, signed: false),
               inputAction: value.inputAction,
               inputOnChange: (v) => value.onChange(v),
               inputController: TextEditingController(text: value.initialValue?.toString()),
               isPassword: value.isPassword,
-              editable: value.editable,
             ),
           },
           if (value.type == bool) ...{
-            PlexInputWidget<bool>(
-              title: value.title.toUpperCase(),
-              type: PlexInputWidgetType.typeDropdown,
+            PlexFormFieldDropdown<bool>(
+              properties: PlexFormFieldGeneric(title: value.title.toUpperCase(), enabled: value.editable),
               dropdownSelectionController: PlexWidgetController(data: value.initialValue),
               dropdownItems: const [true, false],
               dropdownItemAsString: (v) => v ? "True" : "False",
               dropdownItemOnSelect: (v) => value.onChange(v),
-              editable: value.editable,
             ),
           },
           if (value.type == DateTime) ...{
-            PlexInputWidget<DateTime>(
-              title: value.title.toUpperCase(),
-              type: PlexInputWidgetType.typeDate,
-              dropdownSelectionController: PlexWidgetController(data: value.initialValue),
-              dropdownItemOnSelect: (v) => value.onChange(v),
-              editable: value.editable,
+            PlexFormFieldDate(
+              properties: PlexFormFieldGeneric(title: value.title.toUpperCase(), enabled: value.editable),
+              type: PlexFormFieldDateType.typeDateTime,
+              selectionController: PlexWidgetController(data: value.initialValue),
+              onSelect: (v) => value.onChange(v),
             ),
           },
         } else if (value.fieldType == PlexFormField.TYPE_DROPDOWN) ...{
-          PlexInputWidget(
-            title: value.title.toUpperCase(),
-            type: PlexInputWidgetType.typeDropdown,
+          PlexFormFieldDropdown(
+            properties: PlexFormFieldGeneric(title: value.title.toUpperCase(), enabled: value.editable),
             dropdownSelectionController: PlexWidgetController(data: value.initialValue),
             dropdownItemOnSelect: (p) {
               setState(() {
@@ -179,13 +170,11 @@ class _PlexFormWidgetState extends State<PlexFormWidget> {
             dropdownOnSearch: value.onSearch,
             dropdownItemWidget: value.dropdownWidget,
             dropDownLeadingIcon: value.dropdownLeadingWidget,
-            editable: value.editable,
           ),
         } else if (value.fieldType == PlexFormField.TYPE_MULTISELECT) ...{
-          PlexInputWidget(
-            title: value.title.toUpperCase(),
-            type: PlexInputWidgetType.typeMultiSelect,
-            dropdownSelectionController: PlexWidgetController(data: value.initialValue),
+          PlexFormFieldMultiSelect<dynamic>(
+            properties: PlexFormFieldGeneric(title: value.title.toUpperCase(), enabled: value.editable),
+            multiSelectionController: PlexWidgetController(data: value.initialValue),
             dropdownItemOnSelect: (p) {
               setState(() {
                 value.onChange(p);
@@ -198,14 +187,13 @@ class _PlexFormWidgetState extends State<PlexFormWidget> {
             dropdownItemWidget: value.dropdownWidget,
             dropDownLeadingIcon: value.dropdownLeadingWidget,
             multiInitialSelection: value.initialSelection,
-            editable: value.editable,
           ),
         } else if (value.fieldType == PlexFormField.TYPE_DATETIME) ...{
-          PlexInputWidget(
-            title: value.title.toUpperCase(),
-            type: PlexInputWidgetType.typeDateTime,
-            dropdownSelectionController: PlexWidgetController(data: value.initialValue),
-            dropdownItemOnSelect: (p) {
+          PlexFormFieldDate(
+            properties: PlexFormFieldGeneric(title: value.title.toUpperCase(), enabled: value.editable),
+            type: PlexFormFieldDateType.typeDateTime,
+            selectionController: PlexWidgetController(data: value.initialValue),
+            onSelect: (p) {
               setState(() {
                 value.onChange(p);
               });
@@ -226,9 +214,8 @@ class _PlexFormWidgetState extends State<PlexFormWidget> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           ...getFields(),
-          PlexInputWidget(
-            type: PlexInputWidgetType.typeButton,
-            title: "Save",
+          PlexFormFieldButton(
+            properties: PlexFormFieldGeneric.title("Save"),
             buttonClick: () => widget.onSubmit(widget.entity),
             buttonIcon: const Icon(Icons.save),
           ),

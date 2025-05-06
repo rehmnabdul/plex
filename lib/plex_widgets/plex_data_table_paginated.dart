@@ -5,7 +5,7 @@ import 'package:plex/plex_utils/plex_material.dart';
 import 'package:plex/plex_utils/plex_messages.dart';
 import 'package:plex/plex_utils/plex_printer.dart';
 import 'package:plex/plex_widgets/plex_data_table.dart';
-import 'package:plex/plex_widgets/plex_input_widget.dart';
+import 'package:plex/plex_widgets/plex_form_field_widgets.dart';
 
 class PlexDataTableWithPages extends StatefulWidget {
   PlexDataTableWithPages({
@@ -69,20 +69,14 @@ class PlexDataTableWithPagesState extends State<PlexDataTableWithPages> {
   void initState() {
     super.initState();
     updatedData = widget.rows;
-    _dataSource = _PaginationDataTableSource(context,
-        enableCopy: widget.enableCopy,
-        dataList: updatedData,
-        alternateColor: widget.alternateColor);
+    _dataSource = _PaginationDataTableSource(context, enableCopy: widget.enableCopy, dataList: updatedData, alternateColor: widget.alternateColor);
   }
 
   sortData(List<List<PlexDataCell>> data) {
     if (sortColumnIndex == null) {
       setState(() {
         updatedData = data;
-        _dataSource = _PaginationDataTableSource(context,
-            enableCopy: widget.enableCopy,
-            dataList: updatedData,
-            alternateColor: widget.alternateColor);
+        _dataSource = _PaginationDataTableSource(context, enableCopy: widget.enableCopy, dataList: updatedData, alternateColor: widget.alternateColor);
       });
       return;
     }
@@ -115,10 +109,7 @@ class PlexDataTableWithPagesState extends State<PlexDataTableWithPages> {
 
     setState(() {
       updatedData = data;
-      _dataSource = _PaginationDataTableSource(context,
-          enableCopy: widget.enableCopy,
-          dataList: updatedData,
-          alternateColor: widget.alternateColor);
+      _dataSource = _PaginationDataTableSource(context, enableCopy: widget.enableCopy, dataList: updatedData, alternateColor: widget.alternateColor);
     });
   }
 
@@ -134,9 +125,7 @@ class PlexDataTableWithPagesState extends State<PlexDataTableWithPages> {
       data = data.where((r) {
         var isOk = false;
         for (var colIndex in searchIndexes) {
-          if ((r[colIndex].value.toString())
-              .toLowerCase()
-              .contains(searchController.text.toLowerCase())) {
+          if ((r[colIndex].value.toString()).toLowerCase().contains(searchController.text.toLowerCase())) {
             isOk = true;
             break;
           }
@@ -155,18 +144,12 @@ class PlexDataTableWithPagesState extends State<PlexDataTableWithPages> {
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Padding(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: PlexDim.medium, vertical: PlexDim.small),
+              padding: const EdgeInsets.symmetric(horizontal: PlexDim.medium, vertical: PlexDim.small),
               child: Row(
                 children: [
                   SegmentedButton<int>(
                     segments: [
-                      for (var i = 0; i < widget.columns.length; i++) ...{
-                        ButtonSegment(
-                            value: i,
-                            label: Text(widget.columns[i].value!),
-                            enabled: true)
-                      },
+                      for (var i = 0; i < widget.columns.length; i++) ...{ButtonSegment(value: i, label: Text(widget.columns[i].value!), enabled: true)},
                     ],
                     selected: searchColumnIndexes,
                     emptySelectionAllowed: true,
@@ -181,20 +164,16 @@ class PlexDataTableWithPagesState extends State<PlexDataTableWithPages> {
             ),
           ),
         },
-        if (widget.enableSearch ||
-            widget.enablePrint ||
-            widget.onRefresh != null) ...{
+        if (widget.enableSearch || widget.enablePrint || widget.onRefresh != null) ...{
           Padding(
             padding: const EdgeInsets.symmetric(vertical: PlexDim.small),
             child: Row(
               children: [
                 Expanded(
                   child: widget.enableSearch
-                      ? PlexInputWidget(
-                          margin: EdgeInsets.zero,
-                          type: PlexInputWidgetType.typeInput,
+                      ? PlexFormFieldInput(
+                          properties: PlexFormFieldGeneric(title: "Search...", useMargin: false),
                           inputController: searchController,
-                          title: "Search...",
                           inputHint: "Type here to search whole data...",
                           inputOnChange: (value) {
                             filterData();

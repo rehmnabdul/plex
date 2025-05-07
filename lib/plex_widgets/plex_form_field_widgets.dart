@@ -398,7 +398,7 @@ class PlexFormFieldDropdown<T> extends StatelessWidget {
           return;
         }
 
-        showSelectionList(
+        showPlexSelectionList(
           context,
           items: dropdownItems,
           asyncItems: dropdownAsyncItems,
@@ -523,7 +523,7 @@ class PlexFormFieldMultiSelect<T> extends StatelessWidget {
           return;
         }
 
-        showMultiSelection(
+        showPlexMultiSelection(
           context,
           items: dropdownItems,
           asyncItems: dropdownAsyncItems,
@@ -693,7 +693,7 @@ class PlexFormFieldAutoComplete<T> extends StatelessWidget {
       return;
     }
 
-    showAutoCompleteSelectionList(
+    showPlexAutoCompleteSelectionList(
       context,
       asyncItems: autoCompleteItems!,
       leadingIcon: dropDownLeadingIcon,
@@ -867,122 +867,3 @@ class PlexFormFieldButton extends StatelessWidget {
     return buttonWidget;
   }
 }
-
-// class PlexFormFieldButton extends StatelessWidget {
-//   PlexFormFieldButton({
-//     super.key,
-//     this.properties = const PlexFormFieldGeneric.empty(),
-//     this.focusNode,
-//     this.buttonIcon,
-//     this.buttonClick,
-//     this.buttonStyle,
-//   });
-//
-//   final PlexFormFieldGeneric properties;
-//   FocusNode? focusNode;
-//   Icon? buttonIcon;
-//   Function()? buttonClick;
-//   final ButtonStyle? buttonStyle;
-//
-//   bool isIconButton() {
-//     return buttonIcon != null && properties.title == null;
-//   }
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     var inputWidget = buttonIcon == null
-//         ? ElevatedButton(
-//             focusNode: focusNode,
-//             style: buttonStyle ??
-//                 ButtonStyle(elevation: WidgetStateProperty.resolveWith(
-//                   (states) {
-//                     return states.contains(WidgetState.disabled) ? 0 : PlexDim.small;
-//                   },
-//                 )),
-//             onPressed: properties.enabled ? () => buttonClick?.call() : null,
-//             child: Text(properties.title ?? ""),
-//           )
-//         : ElevatedButton.icon(
-//             focusNode: focusNode,
-//             style: buttonStyle ??
-//                 ButtonStyle(
-//                   elevation: WidgetStateProperty.resolveWith(
-//                     (states) {
-//                       return states.contains(WidgetState.disabled) ? 0 : PlexDim.small;
-//                     },
-//                   ),
-//                 ),
-//             onPressed: properties.enabled ? () => buttonClick?.call() : null,
-//             icon: isIconButton() ? null : buttonIcon!,
-//             label: properties.title != null ? Text(properties.title ?? "") : buttonIcon!,
-//           );
-//
-//     if (properties.useMargin) {
-//       return Padding(
-//         padding: properties.margin,
-//         child: inputWidget,
-//       );
-//     }
-//     return inputWidget;
-//   }
-// }
-
-// class PlexFormFieldTextButton extends StatelessWidget {
-//
-//   PlexFormFieldTextButton({
-//     super.key,
-//     this.properties = const PlexFormFieldGeneric.empty(),
-//     this.focusNode,
-//     this.buttonIcon,
-//     this.buttonClick,
-//     this.buttonStyle,
-//   });
-//
-//   final PlexFormFieldGeneric properties;
-//   FocusNode? focusNode;
-//   Icon? buttonIcon;
-//   Function()? buttonClick;
-//   final ButtonStyle? buttonStyle;
-//
-//   bool isIconButton() {
-//     return buttonIcon != null && properties.title == null;
-//   }
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     var inputWidget = buttonIcon == null
-//         ? TextButton(
-//             focusNode: focusNode,
-//             style: buttonStyle ??
-//                 ButtonStyle(elevation: WidgetStateProperty.resolveWith(
-//                   (states) {
-//                     return states.contains(WidgetState.disabled) ? 0 : PlexDim.small;
-//                   },
-//                 )),
-//             onPressed: properties.enabled ? () => buttonClick?.call() : null,
-//             child: Text(properties.title ?? ""),
-//           )
-//         : TextButton.icon(
-//             focusNode: focusNode,
-//             style: buttonStyle ??
-//                 ButtonStyle(
-//                   elevation: WidgetStateProperty.resolveWith(
-//                     (states) {
-//                       return states.contains(WidgetState.disabled) ? 0 : PlexDim.small;
-//                     },
-//                   ),
-//                 ),
-//             onPressed: properties.enabled ? () => buttonClick?.call() : null,
-//             icon: isIconButton() ? null : buttonIcon!,
-//             label: properties.title != null ? Text(properties.title ?? "") : buttonIcon!,
-//           );
-//
-//     if (properties.useMargin) {
-//       return Padding(
-//         padding: properties.margin,
-//         child: inputWidget,
-//       );
-//     }
-//     return inputWidget;
-//   }
-// }

@@ -262,7 +262,7 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
                       properties: PlexFormFieldGeneric(title: "Group By", useMargin: false),
                       buttonIcon: Image.asset(groupData, height: 25, width: 25, color: PlexTheme.getActiveTheme(context).primaryColor),
                       buttonClick: () {
-                        showMultiSelection<ColumnGroup>(
+                        showPlexMultiSelection<ColumnGroup>(
                           context,
                           focusNode: FocusNode(),
                           itemText: (item) {
@@ -338,7 +338,7 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
                   if (widget.enableColumnGrouping) ...{
                     FilledButton.tonalIcon(
                       onPressed: () {
-                        showMultiSelection<ColumnGroup>(
+                        showPlexMultiSelection<ColumnGroup>(
                           context,
                           focusNode: FocusNode(),
                           itemText: (item) {
@@ -447,7 +447,7 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
                           style: ButtonStyle(backgroundColor: Colors.blue.shade100.getMaterialState(), elevation: PlexDim.smallest.getMaterialState()),
                           leadingIcon: Image.asset(groupData, height: 25, width: 25, color: Colors.blue),
                           onPressed: () {
-                            showMultiSelection<ColumnGroup>(
+                            showPlexMultiSelection<ColumnGroup>(
                               context,
                               focusNode: FocusNode(),
                               itemText: (item) {

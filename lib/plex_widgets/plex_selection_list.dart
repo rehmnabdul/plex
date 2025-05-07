@@ -7,9 +7,8 @@ import 'package:plex/plex_utils/plex_routing.dart';
 import 'package:plex/plex_widget.dart';
 import 'package:plex/plex_widgets/loading/plex_loader_v2.dart';
 import 'package:plex/plex_widgets/plex_form_field_widgets.dart';
-import 'package:plex/plex_widgets/plex_input_widget.dart';
 
-showSelectionList<T>(
+showPlexSelectionList<T>(
   BuildContext context, {
   List<T>? items,
   Future<List<T>>? asyncItems,
@@ -87,7 +86,7 @@ showSelectionList<T>(
                           );
                         }
                         return ListTile(
-                          selectedTileColor: Colors.green.withOpacity(0.25),
+                          selectedTileColor: Colors.green.withValues(alpha: 0.25),
                           selected: initialSelected != null && itemText.call(item) == itemText.call(initialSelected),
                           leading: leadingIcon?.call(item),
                           title: Text(itemText.call(item)),
@@ -110,7 +109,7 @@ showSelectionList<T>(
   );
 }
 
-showMultiSelection<T>(
+showPlexMultiSelection<T>(
   BuildContext context, {
   List<T>? items,
   Future<List<T>>? asyncItems,
@@ -248,7 +247,7 @@ showMultiSelection<T>(
   );
 }
 
-showAutoCompleteSelectionList<T>(
+showPlexAutoCompleteSelectionList<T>(
   BuildContext context, {
   FocusNode? focusNode,
   required Future<List<T>> Function(String query) asyncItems,
@@ -261,8 +260,8 @@ showAutoCompleteSelectionList<T>(
   double inputDelay = 1000,
 }) async {
   DateTime lastInputAt = DateTime.now();
-  String? query = null;
-  String? searchedQuery = null;
+  String? query;
+  String? searchedQuery;
 
   var inputController = TextEditingController();
   var filteredListController = PlexWidgetController<List<T>>(data: List.empty());
@@ -279,10 +278,9 @@ showAutoCompleteSelectionList<T>(
     if (data.length < minQueryLength) return;
 
     delay(() async {
-
-      if(DateTime.now().difference(lastInputAt).inMilliseconds < inputDelay) return;
-      if(query == null || query!.length < minQueryLength) return;
-      if(searchedQuery == query) return;
+      if (DateTime.now().difference(lastInputAt).inMilliseconds < inputDelay) return;
+      if (query == null || query!.length < minQueryLength) return;
+      if (searchedQuery == query) return;
 
       loadingController.increment();
       searchedQuery = query;
@@ -291,8 +289,6 @@ showAutoCompleteSelectionList<T>(
       filteredListController.setValue(filteredList);
     }, delayMillis: inputDelay.toInt());
   }
-
-
 
   // ignore: use_build_context_synchronously
   showModalBottomSheet(
@@ -375,7 +371,7 @@ showAutoCompleteSelectionList<T>(
                           );
                         }
                         return ListTile(
-                          selectedTileColor: Colors.green.withOpacity(0.25),
+                          selectedTileColor: Colors.green.withValues(alpha: 0.25),
                           leading: leadingIcon?.call(item),
                           title: Text(itemText.call(item)),
                           onTap: () {
@@ -392,6 +388,31 @@ showAutoCompleteSelectionList<T>(
           ),
         ),
       );
+    },
+  );
+}
+
+showPlexBottomSheet({
+  required BuildContext context,
+  required String title,
+  required Widget Function() builder,
+  Color? backgroundColor,
+  bool isScrollControlled = true,
+  bool isDismissible = true,
+  bool useSafeArea = true,
+  bool showDragHandle = true,
+  bool enableDrag = true,
+}) {
+  showModalBottomSheet(
+    enableDrag: enableDrag,
+    showDragHandle: showDragHandle,
+    useSafeArea: useSafeArea,
+    isDismissible: isDismissible,
+    isScrollControlled: isScrollControlled,
+    backgroundColor: backgroundColor,
+    context: context,
+    builder: (BuildContext context) {
+      return builder.call();
     },
   );
 }

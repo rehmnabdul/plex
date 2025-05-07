@@ -198,7 +198,7 @@ class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
             return;
           }
 
-          showSelectionList(
+          showPlexSelectionList(
             context,
             items: widget.dropdownItems,
             asyncItems: widget.dropdownAsyncItems,
@@ -370,7 +370,7 @@ class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
             return;
           }
 
-          showMultiSelection(
+          showPlexMultiSelection(
             context,
             items: widget.dropdownItems,
             asyncItems: widget.dropdownAsyncItems,
@@ -444,7 +444,7 @@ class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
             return;
           }
 
-          showAutoCompleteSelectionList(
+          showPlexAutoCompleteSelectionList(
             context,
             asyncItems: widget.autoCompleteItems!,
             leadingIcon: widget.dropDownLeadingIcon,

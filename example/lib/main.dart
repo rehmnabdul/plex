@@ -672,7 +672,7 @@ void main() async {
                     },
                   ),
                   const SizedBox(height: 16),
-                  const Text("PlexFormFieldTextButton", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  const Text("PlexFormFieldButton", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   // Elevated Button (default)
                   PlexFormFieldButton(
                     properties: const PlexFormFieldGeneric.title("Unified Elevated Button"),

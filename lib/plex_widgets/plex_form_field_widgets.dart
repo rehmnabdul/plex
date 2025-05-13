@@ -811,40 +811,40 @@ class PlexFormFieldButton extends StatelessWidget {
             focusNode: focusNode,
             style: buttonStyle ?? defaultStyle,
             onPressed: properties.enabled ? () => buttonClick?.call() : null,
-            icon: isIconButton() ? buttonIcon! : buttonIcon!,
-            label: properties.title != null ? Text(properties.title ?? "") : const SizedBox.shrink(),
+            icon: isIconButton() ? null : buttonIcon!,
+            label: properties.title != null ? Text(properties.title ?? "") : buttonIcon!,
           );
         case PlexButtonType.text:
           return TextButton.icon(
             focusNode: focusNode,
             style: buttonStyle,
             onPressed: properties.enabled ? () => buttonClick?.call() : null,
-            icon: isIconButton() ? buttonIcon! : buttonIcon!,
-            label: properties.title != null ? Text(properties.title ?? "") : const SizedBox.shrink(),
+            icon: isIconButton() ? null : buttonIcon!,
+            label: properties.title != null ? Text(properties.title ?? "") : buttonIcon!,
           );
         case PlexButtonType.outlined:
           return OutlinedButton.icon(
             focusNode: focusNode,
             style: buttonStyle,
             onPressed: properties.enabled ? () => buttonClick?.call() : null,
-            icon: isIconButton() ? buttonIcon! : buttonIcon!,
-            label: properties.title != null ? Text(properties.title ?? "") : const SizedBox.shrink(),
+            icon: isIconButton() ? null : buttonIcon!,
+            label: properties.title != null ? Text(properties.title ?? "") : buttonIcon!,
           );
         case PlexButtonType.filled:
           return FilledButton.icon(
             focusNode: focusNode,
             style: buttonStyle,
             onPressed: properties.enabled ? () => buttonClick?.call() : null,
-            icon: isIconButton() ? buttonIcon! : buttonIcon!,
-            label: properties.title != null ? Text(properties.title ?? "") : const SizedBox.shrink(),
+            icon: isIconButton() ? null : buttonIcon!,
+            label: properties.title != null ? Text(properties.title ?? "") : buttonIcon!,
           );
         case PlexButtonType.filledTonal:
           return FilledButton.tonalIcon(
             focusNode: focusNode,
             style: buttonStyle,
             onPressed: properties.enabled ? () => buttonClick?.call() : null,
-            icon: isIconButton() ? buttonIcon! : buttonIcon!,
-            label: properties.title != null ? Text(properties.title ?? "") : const SizedBox.shrink(),
+            icon: isIconButton() ? null : buttonIcon!,
+            label: properties.title != null ? Text(properties.title ?? "") : buttonIcon!,
           );
       }
     }

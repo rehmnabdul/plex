@@ -1,3 +1,8 @@
+## 0.9.0
+
+### Updates
+* `PlexFormFieldButton` show space on right when its icon only button. Fixed the UI bug
+
 ## 0.8.9
 
 ### Updates

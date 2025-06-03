@@ -1,3 +1,9 @@
+## 0.9.1
+
+### Updates
+* `PlexFormFieldWidgets` Fix Size Bug
+* `PlexAdvanceDataTable` Fix Size Bug
+
 ## 0.9.0
 
 ### Updates

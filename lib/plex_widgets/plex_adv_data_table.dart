@@ -194,7 +194,6 @@ class PlexAdvanceDataTable extends StatefulWidget {
   final bool enableExcelExport;
   final bool enablePdfExport;
 
-  ///Hide and show Print Button
   final int? pageSize;
   final List<PlexDataTableHeaderCell> columns;
   final PlexWidgetController<List<List<PlexDataTableValueCell>>?> controller;
@@ -260,7 +259,7 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
                     space(8),
                     PlexFormFieldButton(
                       properties: PlexFormFieldGeneric(title: "Group By", useMargin: false),
-                      buttonIcon: Image.asset(groupData, height: 25, width: 25, color: PlexTheme.getActiveTheme(context).primaryColor),
+                      buttonIcon: Icon(Icons.grid_view_outlined),
                       buttonClick: () {
                         showPlexMultiSelection<ColumnGroup>(
                           context,
@@ -577,6 +576,9 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
                   showVerticalScrollbar: true,
                   showHorizontalScrollbar: true,
                   isScrollbarAlwaysShown: true,
+                  shrinkWrapRows: false,
+                  shrinkWrapColumns: false,
+                  columnWidthCalculationRange: ColumnWidthCalculationRange.allRows,
                   navigationMode: GridNavigationMode.cell,
                   autoExpandGroups: widget.autoExpandGroups,
                   groupCaptionTitleFormat: widget.groupSummaryFormat ?? '{ColumnName} : {Key} - {ItemsCount} Items',

@@ -407,8 +407,8 @@ class PlexFormFieldDropdown<T> extends StatelessWidget {
           initialSelected: getDropDownController().data,
           itemText: (c) => dropdownItemAsString?.call(c) ?? c.toString(),
           onSelect: (c) {
-            getDropDownController().setValue(c as T?);
             dropdownItemOnSelect?.call(c);
+            getDropDownController().setValue(c as T?);
           },
           onSearch: dropdownOnSearch,
           itemWidget: dropdownItemWidget,
@@ -547,7 +547,7 @@ class PlexFormFieldMultiSelect<T> extends StatelessWidget {
             ),
             borderRadius: BorderRadius.circular(properties.cornerRadius)),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: PlexDim.small, vertical: PlexDim.medium),
+          padding: const EdgeInsets.symmetric(horizontal: PlexDim.small, vertical: PlexDim.small),
           child: Row(
             children: [
               Expanded(
@@ -649,7 +649,7 @@ class PlexFormFieldAutoComplete<T> extends StatelessWidget {
             ),
             borderRadius: BorderRadius.circular(properties.cornerRadius)),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: PlexDim.small, vertical: PlexDim.medium),
+          padding: const EdgeInsets.symmetric(horizontal: PlexDim.small, vertical: PlexDim.small),
           child: Row(
             children: [
               Expanded(

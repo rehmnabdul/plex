@@ -113,7 +113,7 @@ abstract class PlexState<T extends PlexScreen> extends State<T> {
       appBar: buildAppBar(),
       drawer: buildSideNavigation(),
       bottomNavigationBar: buildBottomNavigation(),
-      body: SafeArea(child: bodyWidget),
+      body: SafeArea(child: SelectionArea(child: bodyWidget)),
     );
   }
 

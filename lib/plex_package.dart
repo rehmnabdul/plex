@@ -364,7 +364,7 @@ class _PlexAppState extends State<PlexApp> {
             PlexRoutesPaths.loginPath: (_) => PlexLoginScreen(loginConfig: widget.loginConfig!, nextRoute: widget.appInfo.initialRoute),
           },
           if (widget.dashboardConfig != null) ...{
-            PlexRoutesPaths.homePath: (_) => PlexDashboardScreen(handleBrightnessChange, handleMaterialVersionChange, ),
+            PlexRoutesPaths.homePath: (_) => PlexDashboardScreen(handleBrightnessChange, handleMaterialVersionChange),
           },
           if (widget.dashboardConfig?.dashboardScreens.where((r) => r.external).isNotEmpty ?? false) ...{
             for (var page in widget.dashboardConfig!.dashboardScreens.where((r) => r.external)) ...{

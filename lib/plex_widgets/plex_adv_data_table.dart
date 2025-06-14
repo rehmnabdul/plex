@@ -13,7 +13,6 @@ import 'package:plex/plex_utils/plex_printer.dart';
 import 'package:plex/plex_utils/plex_utils.dart';
 import 'package:plex/plex_widget.dart';
 import 'package:plex/plex_widgets/plex_form_field_widgets.dart';
-import 'package:plex/plex_widgets/plex_input_widget.dart';
 import 'package:plex/plex_widgets/plex_selection_list.dart';
 import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
@@ -156,6 +155,7 @@ class PlexAdvanceDataTable extends StatefulWidget {
     this.autoExpandGroups = true,
     this.groupSummary,
     this.groupSummaryFormat,
+    this.customGroupingSummary,
     this.cellEditingWidget,
     this.cellEditingSubmit,
   });
@@ -182,6 +182,7 @@ class PlexAdvanceDataTable extends StatefulWidget {
   final bool autoExpandGroups;
   final String? groupSummaryFormat;
   final String Function(String summary)? groupSummary;
+  final String Function(String columnName, DataGridRow row, List<DataGridRow> rows)? customGroupingSummary;
 
   ///Editing a Cell
   final Widget? Function(int row, int column)? cellEditingWidget;
@@ -227,6 +228,7 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
       groupSummary: widget.groupSummary,
       cellEditingWidget: widget.cellEditingWidget,
       cellEditingSubmit: widget.cellEditingSubmit,
+      customGroupingSummary: widget.customGroupingSummary,
     );
   }
 
@@ -413,7 +415,7 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
                         ),
                       },
                       ...?widget.customWidgets?.call(context).map((e) {
-                        if(e is PlexFormFieldButton) {
+                        if (e is PlexFormFieldButton) {
                           return MenuItemButton(
                             onPressed: () async {
                               e.buttonClick?.call();
@@ -518,7 +520,7 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
                         ),
                       },
                       ...?widget.customWidgets?.call(context).map((e) {
-                        if(e is PlexFormFieldButton) {
+                        if (e is PlexFormFieldButton) {
                           return MenuItemButton(
                             onPressed: () async {
                               e.buttonClick?.call();
@@ -636,6 +638,7 @@ class _PlexAdvanceDataTableDataSource extends DataGridSource {
   final String Function(String summary)? groupSummary;
   final Widget? Function(int row, int col)? cellEditingWidget;
   final Future Function(int row, int col)? cellEditingSubmit;
+  final String Function(String columnName, DataGridRow row, List<DataGridRow> rows)? customGroupingSummary;
 
   final int? pageSize;
 
@@ -646,6 +649,7 @@ class _PlexAdvanceDataTableDataSource extends DataGridSource {
     this.groupSummary,
     this.cellEditingWidget,
     this.cellEditingSubmit,
+    this.customGroupingSummary,
     Color? alternateColor,
   }) {
     _data = data.map((e) => DataGridRow(cells: e)).toList();
@@ -715,6 +719,14 @@ class _PlexAdvanceDataTableDataSource extends DataGridSource {
     notifyListeners();
 
     return true;
+  }
+
+  @override
+  String performGrouping(String columnName, DataGridRow row) {
+    if (customGroupingSummary != null) {
+      return customGroupingSummary!(columnName, row, rows);
+    }
+    return super.performGrouping(columnName, row);
   }
 }
 

@@ -407,8 +407,8 @@ class PlexFormFieldDropdown<T> extends StatelessWidget {
           initialSelected: getDropDownController().data,
           itemText: (c) => dropdownItemAsString?.call(c) ?? c.toString(),
           onSelect: (c) {
-            dropdownItemOnSelect?.call(c);
             getDropDownController().setValue(c as T?);
+            dropdownItemOnSelect?.call(c);
           },
           onSearch: dropdownOnSearch,
           itemWidget: dropdownItemWidget,

@@ -1,3 +1,9 @@
+## 0.9.2
+
+### Updates
+* Bug Fix `PlexFormFieldWidgets`
+* Add Custom Grouping Summary `customGroupingSummary`
+
 ## 0.9.1
 
 ### Updates

@@ -30,7 +30,6 @@ class _UpdatableScreenState extends PlexState<UpdatableScreen> {
         mainAxisSize: MainAxisSize.min,
         children: [
           const SizedBox(height: 20),
-          
           PlexInputWidget(
             type: PlexInputWidgetType.typeMultiSelect,
             title: "Multiselect",

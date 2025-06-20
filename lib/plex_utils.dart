@@ -7,16 +7,10 @@ console(String message, {bool printInRelease = false}) {
   }
 }
 
-T createWidget<T>(T Function() callBack) {
-  return callBack.call();
-}
+doWork<T>(T Function() callBack) => callBack();
 
-dynamic delay(dynamic Function() callBack, {int delayMillis = 500}) async {
-  return (await Future.delayed(Duration(milliseconds: delayMillis), callBack));
-}
+T createWidget<T>(T Function() callBack) => callBack.call();
 
-dynamic runAsync(dynamic Function() callBack) async {
-  return (await Future(
-    () => callBack.call(),
-  ));
-}
+dynamic delay(dynamic Function() callBack, {int delayMillis = 500}) async => (await Future.delayed(Duration(milliseconds: delayMillis), callBack));
+
+dynamic runAsync(dynamic Function() callBack) async => (await Future(() => callBack.call()));

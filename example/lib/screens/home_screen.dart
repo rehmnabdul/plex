@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:plex/plex_package.dart';
 import 'package:plex/plex_screens/plex_screen.dart';
 import 'package:plex/plex_utils/plex_dimensions.dart';
 import 'package:plex/plex_widgets/plex_card.dart';
+import 'package:plex/plex_widgets/plex_card_glass.dart';
 import 'package:plex/plex_widgets/plex_form.dart';
 import 'package:plex/plex_widgets/plex_form_field_widgets.dart';
 
@@ -92,34 +94,39 @@ class _FormUsageScreenState extends PlexState<FormUsageScreen> {
   @override
   Widget buildBody() {
     var myUser = MyUser("Abdur", "Rahman", 5, DateTime.now(), true, "Pak", [1]);
-    return Column(
-      children: [
-        PlexFormFieldButton(
-          properties: PlexFormFieldGeneric.title("Data"),
-          buttonIcon: Icon(Icons.abc),
-          buttonType: PlexButtonType.outlined,
-        ),
-        PlexCard(
-          child: Padding(
-            padding: EdgeInsets.all(PlexDim.medium),
-            child: Text("Plex Card"),
+    return Container(
+      child: Column(
+        children: [
+          PlexFormFieldButton(
+            properties: PlexFormFieldGeneric.title("Data"),
+            buttonIcon: Icon(Icons.abc),
+            buttonType: PlexButtonType.outlined,
           ),
-        ),
-        Expanded(
-          child: PlexFormWidget<MyUser>(
-            entity: myUser,
-            onSubmit: (dynamic myUser) {
-              Future(
-                () async {
-                  showLoading();
-                  await Future.delayed(const Duration(milliseconds: 5000));
-                  hideLoading();
-                },
-              );
-            },
+          PlexCard(
+            child: Padding(
+              padding: EdgeInsets.all(PlexDim.medium),
+              child: Text("Plex Card"),
+            ),
           ),
-        ),
-      ],
+          PlexGlassEffect(
+            child: Text("data"),
+          ),
+          Expanded(
+            child: PlexFormWidget<MyUser>(
+              entity: myUser,
+              onSubmit: (dynamic myUser) {
+                Future(
+                      () async {
+                    showLoading();
+                    await Future.delayed(const Duration(milliseconds: 5000));
+                    hideLoading();
+                  },
+                );
+              },
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

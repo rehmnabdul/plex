@@ -7,6 +7,7 @@ import 'package:plex/plex_widget.dart';
 import 'package:plex/plex_widgets/loading/plex_loader_v1.dart';
 import 'package:plex/plex_widgets/loading/plex_loader_v2.dart';
 import 'package:plex/plex_widgets/loading/plex_loading_enum.dart';
+import 'package:plex/plex_widgets/plex_card_glass.dart';
 
 abstract class PlexScreen extends StatefulWidget {
   const PlexScreen({super.key, this.useScaffold = true});
@@ -64,7 +65,7 @@ abstract class PlexState<T extends PlexScreen> extends State<T> {
 
   @override
   Widget build(BuildContext context) {
-    var bodyWidget = Stack(
+    var bodyWidget = SelectionArea(child: Stack(
       children: [
         createWidget(() {
           if (getNoOfTabs() > 0) {
@@ -104,7 +105,7 @@ abstract class PlexState<T extends PlexScreen> extends State<T> {
           },
         )
       ],
-    );
+    ));
 
     if (!widget.useScaffold) return bodyWidget;
 
@@ -113,7 +114,7 @@ abstract class PlexState<T extends PlexScreen> extends State<T> {
       appBar: buildAppBar(),
       drawer: buildSideNavigation(),
       bottomNavigationBar: buildBottomNavigation(),
-      body: SafeArea(child: SelectionArea(child: bodyWidget)),
+      body: SafeArea(child: bodyWidget),
     );
   }
 

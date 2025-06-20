@@ -549,9 +549,9 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
           if (!smallScreen && PlexApp.app.dashboardConfig!._routes.isNotEmpty) ...{
             Padding(
               padding: const EdgeInsets.all(PlexDim.small),
-              child: Card(
+              child: PlexCard(
+                margin: EdgeInsets.zero,
                 color: PlexApp.app.dashboardConfig!.navigationRailBackgroundColor ?? PlexTheme.getActiveTheme(context).navigationRailTheme.backgroundColor,
-                clipBehavior: Clip.hardEdge,
                 elevation: PlexApp.app.dashboardConfig!.navigationRailElevation ?? PlexDim.large,
                 shadowColor: PlexTheme.getActiveTheme(context).primaryColor,
                 child: ScrollConfiguration(

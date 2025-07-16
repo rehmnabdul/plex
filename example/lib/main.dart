@@ -17,6 +17,7 @@ import 'package:plex/plex_widgets/plex_data_table.dart';
 import 'package:plex/plex_widgets/plex_data_table_paginated.dart';
 import 'package:plex/plex_widgets/plex_form_field_widgets.dart';
 import 'package:plex_app/screens/home_screen.dart';
+import 'package:plex_app/screens/plex_info_sheet_demo_screen.dart';
 import 'package:plex_app/screens/second_screen.dart';
 
 class Routes {
@@ -24,6 +25,7 @@ class Routes {
   static const secondScreen = "/second";
   static const formBuilderScreen = "/form-builder";
   static const getxExampleScreen = "/getx-example";
+  static const infoSheetDemoScreen = "/info-sheet-demo";
 }
 
 class AppUser extends PlexUser {
@@ -837,6 +839,14 @@ void main() async {
               ),
             );
           },
+        ),
+        PlexRoute(
+          route: Routes.infoSheetDemoScreen,
+          title: "Info Sheet Demo",
+          shortTitle: "InfoSheet",
+          logo: const Icon(Icons.info_outline),
+          selectedLogo: const Icon(Icons.info),
+          screen: (context, {data}) => const PlexInfoSheetDemoScreen(),
         ),
       ],
       enableNotifications: true,

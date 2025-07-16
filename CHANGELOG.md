@@ -1,3 +1,8 @@
+## 0.9.4
+
+### Added
+- New `PlexInfoSheet` utility for showing highly configurable bottom sheets (info, error, alert, custom actions, etc.). Demo screen in the example project demonstrating all usage patterns of `PlexInfoSheet`.
+
 ## 0.9.3
 
 ### Updates

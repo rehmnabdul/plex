@@ -129,20 +129,6 @@ extension SnackBarUtils on BuildContext {
     if (!mounted) return;
     showMessage(message);
     return;
-
-    final snackBar = SnackBar(
-      behavior: SnackBarBehavior.floating,
-      width: 400.0,
-      content: Text(message),
-      action: SnackBarAction(
-        label: 'Close',
-        onPressed: () {
-          ScaffoldMessenger.of(this).hideCurrentSnackBar();
-        },
-      ),
-    );
-    ScaffoldMessenger.of(this).hideCurrentSnackBar();
-    ScaffoldMessenger.of(this).showSnackBar(snackBar);
   }
 
   copyToClipboard(String text, {bool showCopiedInfo = true}) {

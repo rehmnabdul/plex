@@ -22,7 +22,6 @@ import 'package:plex/plex_utils/plex_routing.dart';
 import 'package:plex/plex_utils/plex_widgets.dart';
 import 'package:plex/plex_widget.dart';
 import 'package:plex/plex_widgets/plex_card.dart';
-import 'package:plex/plex_widgets/plex_card_glass.dart';
 import 'package:plex/plex_widgets/plex_navigation_rail.dart';
 import 'package:toastification/toastification.dart';
 

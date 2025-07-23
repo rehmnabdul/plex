@@ -130,6 +130,10 @@ extension SnackBarUtils on BuildContext {
     return showMessage(message);
   }
 
+  hideMessageById(String id) {
+    toastification.dismissById(id);
+  }
+
   copyToClipboard(String text, {bool showCopiedInfo = true}) {
     Clipboard.setData(ClipboardData(text: text));
     if (showCopiedInfo) showSnackBar("Text copied on clipboard");
@@ -254,5 +258,9 @@ extension SnackBarUtilsOnObject on Object {
       animationDurationMillis: animationDurationMillis,
       customIcon: customIcon,
     );
+  }
+
+  hideMessageById(String id) {
+    toastification.dismissById(id);
   }
 }

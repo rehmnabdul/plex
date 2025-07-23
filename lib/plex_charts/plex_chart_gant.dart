@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Represents a task in the Gantt chart.
+/// Model representing a single task in the Gantt chart.
 class GantTask {
   final String id;
   final String title;
@@ -17,50 +17,77 @@ class GantTask {
   }) : assert(start.isBefore(end), 'Start time must be before end time');
 }
 
-/// Displays a time-based Gantt chart for a list of tasks.
+/// A reusable, time-based Gantt chart widget for Plex.
+///
+/// Example usage:
+/// ```dart
+/// PlexChartGant(
+///   tasks: [
+///     GantTask(
+///       id: '1',
+///       title: 'Design',
+///       start: DateTime(2024, 6, 1, 9),
+///       end: DateTime(2024, 6, 1, 12),
+///       color: Colors.blue,
+///     ),
+///     GantTask(
+///       id: '2',
+///       title: 'Development',
+///       start: DateTime(2024, 6, 1, 13),
+///       end: DateTime(2024, 6, 1, 17),
+///       color: Colors.green,
+///     ),
+///   ],
+///   chartStart: DateTime(2024, 6, 1, 8),
+///   chartEnd: DateTime(2024, 6, 1, 18),
+/// )
+/// ```
 class PlexChartGant extends StatelessWidget {
   final List<GantTask> tasks;
   final DateTime chartStart;
   final DateTime chartEnd;
   final double pixelsPerHour;
+  final double rowHeight;
+  final double barHeight;
+  final TextStyle? timeLabelStyle;
+  final TextStyle? taskLabelStyle;
 
   const PlexChartGant({
-    super.key,
+    Key? key,
     required this.tasks,
     required this.chartStart,
     required this.chartEnd,
-    this.pixelsPerHour = 50,
-  });
+    this.pixelsPerHour = 60,
+    this.rowHeight = 48,
+    this.barHeight = 32,
+    this.timeLabelStyle,
+    this.taskLabelStyle,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final totalHours = chartEnd.difference(chartStart).inHours;
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _GantChartGrid(
+          _GantChartTimeGrid(
             start: chartStart,
             end: chartEnd,
             pixelsPerHour: pixelsPerHour,
+            labelStyle: timeLabelStyle,
           ),
           const SizedBox(height: 8),
-          Column(
-            children: tasks.map((task) {
-              return SizedBox(
-                height: 40,
-                child: Stack(
-                  children: [
-                    _GantChartBar(
-                      task: task,
-                      chartStart: chartStart,
-                      pixelsPerHour: pixelsPerHour,
-                    ),
-                  ],
-                ),
-              );
-            }).toList(),
-          ),
+          ...tasks.map((task) => _GantChartTaskRow(
+                task: task,
+                chartStart: chartStart,
+                chartEnd: chartEnd,
+                pixelsPerHour: pixelsPerHour,
+                rowHeight: rowHeight,
+                barHeight: barHeight,
+                labelStyle: taskLabelStyle,
+              )),
         ],
       ),
     );
@@ -68,15 +95,17 @@ class PlexChartGant extends StatelessWidget {
 }
 
 /// Renders the horizontal time grid of the Gantt chart.
-class _GantChartGrid extends StatelessWidget {
+class _GantChartTimeGrid extends StatelessWidget {
   final DateTime start;
   final DateTime end;
   final double pixelsPerHour;
+  final TextStyle? labelStyle;
 
-  const _GantChartGrid({
+  const _GantChartTimeGrid({
     required this.start,
     required this.end,
     required this.pixelsPerHour,
+    this.labelStyle,
   });
 
   @override
@@ -90,10 +119,10 @@ class _GantChartGrid extends StatelessWidget {
           decoration: BoxDecoration(
             border: Border(right: BorderSide(color: Colors.grey.shade300)),
           ),
-          alignment: Alignment.topCenter,
+          alignment: Alignment.center,
           child: Text(
             '${hourTime.hour.toString().padLeft(2, '0')}:00',
-            style: TextStyle(fontSize: 10, color: Colors.grey),
+            style: labelStyle ?? const TextStyle(fontSize: 12, color: Colors.grey),
           ),
         );
       }),
@@ -102,39 +131,64 @@ class _GantChartGrid extends StatelessWidget {
 }
 
 /// Renders a single task as a colored horizontal bar on the Gantt chart.
-class _GantChartBar extends StatelessWidget {
+class _GantChartTaskRow extends StatelessWidget {
   final GantTask task;
   final DateTime chartStart;
+  final DateTime chartEnd;
   final double pixelsPerHour;
+  final double rowHeight;
+  final double barHeight;
+  final TextStyle? labelStyle;
 
-  const _GantChartBar({
+  const _GantChartTaskRow({
     required this.task,
     required this.chartStart,
+    required this.chartEnd,
     required this.pixelsPerHour,
+    required this.rowHeight,
+    required this.barHeight,
+    this.labelStyle,
   });
 
   @override
   Widget build(BuildContext context) {
     final startOffset = task.start.difference(chartStart).inMinutes / 60 * pixelsPerHour;
     final duration = task.end.difference(task.start).inMinutes / 60 * pixelsPerHour;
+    final totalHours = chartEnd.difference(chartStart).inHours;
+    final totalWidth = totalHours * pixelsPerHour;
 
-    return Positioned(
-      left: startOffset,
-      top: 0,
-      child: Container(
-        width: duration,
-        height: 30,
-        decoration: BoxDecoration(
-          color: task.color,
-          borderRadius: BorderRadius.circular(4),
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 4),
-        alignment: Alignment.centerLeft,
-        child: Text(
-          task.title,
-          style: const TextStyle(color: Colors.white, fontSize: 12),
-          overflow: TextOverflow.ellipsis,
-        ),
+    return SizedBox(
+      height: rowHeight,
+      width: totalWidth, // Ensure the Stack has a bounded width!
+      child: Stack(
+        children: [
+          Positioned(
+            left: startOffset,
+            top: (rowHeight - barHeight) / 2,
+            child: Container(
+              width: duration,
+              height: barHeight,
+              decoration: BoxDecoration(
+                color: task.color,
+                borderRadius: BorderRadius.circular(6),
+                boxShadow: [
+                  BoxShadow(
+                    color: task.color.withOpacity(0.2),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              alignment: Alignment.centerLeft,
+              child: Text(
+                task.title,
+                style: labelStyle ?? const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

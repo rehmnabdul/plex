@@ -19,6 +19,7 @@ import 'package:plex/plex_widgets/plex_data_table_paginated.dart';
 import 'package:plex/plex_widgets/plex_form_field_widgets.dart';
 import 'package:plex_app/screens/home_screen.dart';
 import 'package:plex_app/screens/plex_info_sheet_demo_screen.dart';
+import 'package:plex_app/screens/plex_gantt_demo_screen.dart';
 import 'package:plex_app/screens/second_screen.dart';
 
 class Routes {
@@ -27,6 +28,7 @@ class Routes {
   static const formBuilderScreen = "/form-builder";
   static const getxExampleScreen = "/getx-example";
   static const infoSheetDemoScreen = "/info-sheet-demo";
+  static const ganttDemoScreen = "/gantt-demo";
 }
 
 class AppUser extends PlexUser {
@@ -396,15 +398,13 @@ void main() async {
       ],
       dashboardScreens: [
         PlexRoute(
-          route: "/GantChart",
+          route: Routes.ganttDemoScreen,
           category: "Charts",
-          title: "Gant Charts",
-          shortTitle: 'Gant',
-          logo: const Icon(Icons.waterfall_chart),
-          selectedLogo: const Icon(Icons.waterfall_chart_rounded),
-          screen: (context, {data}) {
-            return GanttChartDemoPage();
-          }
+          title: "Gantt Chart Demo",
+          shortTitle: 'Gantt Demo',
+          logo: const Icon(Icons.timeline_outlined),
+          selectedLogo: const Icon(Icons.timeline),
+          screen: (context, {data}) => const PlexGanttDemoScreen(),
         ),
         PlexRoute(
           external: true,

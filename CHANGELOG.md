@@ -1,3 +1,9 @@
+## 0.9.5
+
+### Added
+- Cancellable messages `context.hideMessageById()`
+
+
 ## 0.9.4
 
 ### Added

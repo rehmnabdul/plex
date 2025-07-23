@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:plex/plex_charts/plex_chart_gant.dart';
 import 'package:plex/plex_database/plex_database.dart';
 import 'package:plex/plex_database/plex_entity.dart';
 import 'package:plex/plex_di/plex_dependency_injection.dart';
@@ -139,6 +140,60 @@ initializeDb() async {
     await usersRefMap.delete(usersMap.first);
 
     usersMap = await usersRefMap.getAll();
+  }
+}
+
+class GanttChartDemoPage extends StatelessWidget {
+  const GanttChartDemoPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final chartStart = DateTime(2025, 7, 23, 8); // 8 AM
+    final chartEnd = DateTime(2025, 7, 23, 18);  // 6 PM
+
+    final tasks = [
+      GantTask(
+        id: 'task1',
+        title: 'Project Kickoff',
+        start: DateTime(2025, 7, 23, 9),
+        end: DateTime(2025, 7, 23, 10),
+        color: Colors.blueAccent,
+      ),
+      GantTask(
+        id: 'task2',
+        title: 'UI Design',
+        start: DateTime(2025, 7, 23, 10),
+        end: DateTime(2025, 7, 23, 12),
+        color: Colors.purple,
+      ),
+      GantTask(
+        id: 'task3',
+        title: 'API Integration',
+        start: DateTime(2025, 7, 23, 13),
+        end: DateTime(2025, 7, 23, 15),
+        color: Colors.green,
+      ),
+      GantTask(
+        id: 'task4',
+        title: 'Testing & QA',
+        start: DateTime(2025, 7, 23, 15),
+        end: DateTime(2025, 7, 23, 17),
+        color: Colors.deepOrange,
+      ),
+    ];
+
+    return Scaffold(
+      appBar: AppBar(title: const Text('Plex Gantt Chart')),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: PlexChartGant(
+          chartStart: chartStart,
+          chartEnd: chartEnd,
+          tasks: tasks,
+          pixelsPerHour: 60,
+        ),
+      ),
+    );
   }
 }
 
@@ -340,6 +395,17 @@ void main() async {
         ),
       ],
       dashboardScreens: [
+        PlexRoute(
+          route: "/GantChart",
+          category: "Charts",
+          title: "Gant Charts",
+          shortTitle: 'Gant',
+          logo: const Icon(Icons.waterfall_chart),
+          selectedLogo: const Icon(Icons.waterfall_chart_rounded),
+          screen: (context, {data}) {
+            return GanttChartDemoPage();
+          }
+        ),
         PlexRoute(
           external: true,
           route: "${Routes.dashboardScreen}External",

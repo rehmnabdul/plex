@@ -25,7 +25,7 @@ class MessageStyle {
 
 extension SnackBarUtils on BuildContext {
   ///Use [showMessage] If you are not using [PlexApp], If you are using the [PlexApp] use [showMessage] without context
-  showMessage(
+  String? showMessage(
     String message, {
     String title = "Message",
     Widget? titleWidget,
@@ -40,8 +40,8 @@ extension SnackBarUtils on BuildContext {
     int animationDurationMillis = 300,
     Widget? customIcon,
   }) {
-    if (!mounted) return;
-    toastification.show(
+    if (!mounted) return null;
+    return toastification.show(
       context: this,
       type: type.type,
       style: style.style,
@@ -83,10 +83,10 @@ extension SnackBarUtils on BuildContext {
         onAutoCompleteCompleted: (toastItem) => print('Toast ${toastItem.id} auto complete completed'),
         onDismissed: (toastItem) => print('Toast ${toastItem.id} dismissed'),
       ),
-    );
+    ).id;
   }
 
-  showMessageDelayed(
+  Future<String?> showMessageDelayed(
     String message, {
     int delayMilliseconds = 100,
     String title = "Message",
@@ -101,12 +101,12 @@ extension SnackBarUtils on BuildContext {
     bool showAnimation = false,
     int animationDurationMillis = 300,
     Widget? customIcon,
-  }) {
-    if (!mounted) return;
-    Future.delayed(
+  }) async {
+    if (!mounted) return null;
+    return Future.delayed(
       Duration(milliseconds: delayMilliseconds),
       () {
-        showMessage(
+        return showMessage(
           message,
           title: title,
           titleWidget: titleWidget,
@@ -125,10 +125,9 @@ extension SnackBarUtils on BuildContext {
     );
   }
 
-  showSnackBar(String message) {
-    if (!mounted) return;
-    showMessage(message);
-    return;
+  String? showSnackBar(String message) {
+    if (!mounted) return null;
+    return showMessage(message);
   }
 
   copyToClipboard(String text, {bool showCopiedInfo = true}) {
@@ -139,7 +138,7 @@ extension SnackBarUtils on BuildContext {
 
 extension SnackBarUtilsOnObject on Object {
   ///Use [showMessage] without context if you are using [PlexApp]
-  showMessage(
+  String showMessage(
     String message, {
     String title = "Message",
     Widget? titleWidget,
@@ -154,7 +153,7 @@ extension SnackBarUtilsOnObject on Object {
     int animationDurationMillis = 300,
     Widget? customIcon,
   }) {
-    toastification.show(
+    return toastification.show(
       type: type.type,
       style: style.style,
       autoCloseDuration: autoClose ? Duration(seconds: autoCloseDurationSeconds) : null,
@@ -195,10 +194,10 @@ extension SnackBarUtilsOnObject on Object {
         onAutoCompleteCompleted: (toastItem) => print('Toast ${toastItem.id} auto complete completed'),
         onDismissed: (toastItem) => print('Toast ${toastItem.id} dismissed'),
       ),
-    );
+    ).id;
   }
 
-  showMessageError(
+  String showMessageError(
     String message, {
     String title = "Message",
     Widget? titleWidget,
@@ -212,7 +211,7 @@ extension SnackBarUtilsOnObject on Object {
     int animationDurationMillis = 300,
     Widget? customIcon,
   }) {
-    showMessage(
+    return showMessage(
       message,
       title: title,
       titleWidget: titleWidget,
@@ -229,7 +228,7 @@ extension SnackBarUtilsOnObject on Object {
     );
   }
 
-  showMessageErrorNoAutoClose(
+  String showMessageErrorNoAutoClose(
     String message, {
     String title = "Message",
     Widget? titleWidget,
@@ -241,7 +240,7 @@ extension SnackBarUtilsOnObject on Object {
     int animationDurationMillis = 300,
     Widget? customIcon,
   }) {
-    showMessage(
+    return showMessage(
       message,
       title: title,
       titleWidget: titleWidget,

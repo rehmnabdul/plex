@@ -7,12 +7,19 @@ import 'package:plex/plex_widget.dart';
 import 'package:plex/plex_widgets/loading/plex_loader_v1.dart';
 import 'package:plex/plex_widgets/loading/plex_loader_v2.dart';
 import 'package:plex/plex_widgets/loading/plex_loading_enum.dart';
-import 'package:plex/plex_widgets/plex_card_glass.dart';
+import 'package:plex/plex_widgets/plex_backgrounds/plex_background.dart';
 
 abstract class PlexScreen extends StatefulWidget {
-  const PlexScreen({super.key, this.useScaffold = true});
+  const PlexScreen({
+    super.key,
+    this.useScaffold = true,
+    this.useBackground = false,
+    this.backgroundType = PlexBackgroundType.neoGlass,
+  });
 
   final bool useScaffold;
+  final bool useBackground;
+  final PlexBackgroundType backgroundType;
 }
 
 abstract class PlexState<T extends PlexScreen> extends State<T> {
@@ -65,47 +72,56 @@ abstract class PlexState<T extends PlexScreen> extends State<T> {
 
   @override
   Widget build(BuildContext context) {
-    var bodyWidget = SelectionArea(child: Stack(
-      children: [
-        createWidget(() {
-          if (getNoOfTabs() > 0) {
-            if (getTabBar() == null) {
-              throw Exception("Please override following methods:\n1. getTabBar()\n2. buildBody() must return TabBarView");
-            }
-            var body = buildBody();
-            if (body is! TabBarView) {
-              throw Exception("buildBody() must return TabBarView if getTabBar() > 0");
-            }
-            return DefaultTabController(
-              length: getNoOfTabs(),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  getTabBar()!,
-                  Expanded(child: body),
-                ],
-              ),
-            ).scaleAnim();
-          } else {
-            return buildBody().scaleAnim();
-          }
-        }),
-        PlexWidget(
-          controller: _loadingController,
-          createWidget: (context, data) {
-            if (data == true) {
-              return Container(
-                color: const Color(0x80000000),
-                child: Center(
-                  child: loadingType() == PlexLoadingEnum.version1 ? const PlexLoaderV1() : const PlexLoaderV2(),
+    Widget bodyWidget = SelectionArea(
+      child: Stack(
+        children: [
+          createWidget(() {
+            if (getNoOfTabs() > 0) {
+              if (getTabBar() == null) {
+                throw Exception("Please override following methods:\n1. getTabBar()\n2. buildBody() must return TabBarView");
+              }
+              var body = buildBody();
+              if (body is! TabBarView) {
+                throw Exception("buildBody() must return TabBarView if getTabBar() > 0");
+              }
+              return DefaultTabController(
+                length: getNoOfTabs(),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    getTabBar()!,
+                    Expanded(child: body),
+                  ],
                 ),
-              );
+              ).scaleAnim();
+            } else {
+              return buildBody().scaleAnim();
             }
-            return Container();
-          },
-        )
-      ],
-    ));
+          }),
+          PlexWidget(
+            controller: _loadingController,
+            createWidget: (context, data) {
+              if (data == true) {
+                return Container(
+                  color: const Color(0x80000000),
+                  child: Center(
+                    child: loadingType() == PlexLoadingEnum.version1 ? const PlexLoaderV1() : const PlexLoaderV2(),
+                  ),
+                );
+              }
+              return Container();
+            },
+          )
+        ],
+      ),
+    );
+
+    if (widget.useBackground) {
+      bodyWidget = PlexBackground(
+        type: widget.backgroundType,
+        child: bodyWidget,
+      );
+    }
 
     if (!widget.useScaffold) return bodyWidget;
 
@@ -118,7 +134,7 @@ abstract class PlexState<T extends PlexScreen> extends State<T> {
     );
   }
 
-  AppBar? buildAppBar() {
+  PreferredSizeWidget? buildAppBar() {
     return null;
   }
 

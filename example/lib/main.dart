@@ -14,12 +14,14 @@ import 'package:plex/plex_theme.dart';
 import 'package:plex/plex_user.dart';
 import 'package:plex/plex_widget.dart';
 import 'package:plex/plex_widgets/plex_adv_data_table.dart';
+import 'package:plex/plex_widgets/plex_backgrounds/plex_background.dart';
 import 'package:plex/plex_widgets/plex_data_table.dart';
 import 'package:plex/plex_widgets/plex_data_table_paginated.dart';
 import 'package:plex/plex_widgets/plex_form_field_widgets.dart';
+import 'package:plex/plex_widgets/plex_info_dialog.dart';
 import 'package:plex_app/screens/home_screen.dart';
-import 'package:plex_app/screens/plex_info_sheet_demo_screen.dart';
 import 'package:plex_app/screens/plex_gantt_demo_screen.dart';
+import 'package:plex_app/screens/plex_info_sheet_demo_screen.dart';
 import 'package:plex_app/screens/second_screen.dart';
 
 class Routes {
@@ -151,7 +153,7 @@ class GanttChartDemoPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final chartStart = DateTime(2025, 7, 23, 8); // 8 AM
-    final chartEnd = DateTime(2025, 7, 23, 18);  // 6 PM
+    final chartEnd = DateTime(2025, 7, 23, 18); // 6 PM
 
     final tasks = [
       GantTask(
@@ -341,6 +343,8 @@ void main() async {
       PlexNetworking.instance.allowBadCertificateForHTTPS();
     },
     loginConfig: PlexLoginConfig(
+      useBackground: true,
+      backgroundType: PlexBackgroundType.neoGlass,
       debugUsername: 'DebugUser',
       debugPassword: 'DebugPassword',
       username: "User",
@@ -357,6 +361,8 @@ void main() async {
       },
     ),
     dashboardConfig: PlexDashboardConfig(
+      useBackground: true,
+      backgroundType: PlexBackgroundType.neoGlass,
       disableExpandNavigationRail: false,
       disableNavigationRail: false,
       disableBottomNavigation: false,
@@ -606,6 +612,16 @@ void main() async {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  PlexFormFieldButton(
+                    properties: const PlexFormFieldGeneric.title("Show Dialog"),
+                    buttonType: PlexButtonType.text,
+                    buttonClick: () {
+                      PlexInfoDialog.show(
+                        context: context,
+                      );
+                    },
+                  ),
+
                   const Text("PlexFormFieldInput", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   PlexFormFieldInput(
                     properties: const PlexFormFieldGeneric.title("Text Input Field"),

@@ -7,13 +7,15 @@ import 'package:plex/plex_screens/plex_screen.dart';
 import 'package:plex/plex_sp.dart';
 import 'package:plex/plex_theme.dart';
 import 'package:plex/plex_user.dart';
+import 'package:plex/plex_utils.dart';
 import 'package:plex/plex_utils/plex_dimensions.dart';
-import 'package:plex/plex_utils/plex_messages.dart';
 import 'package:plex/plex_utils/plex_routing.dart';
 import 'package:plex/plex_utils/plex_widgets.dart';
 import 'package:plex/plex_widget.dart';
+import 'package:plex/plex_widgets/plex_backgrounds/plex_background.dart';
+import 'package:plex/plex_widgets/plex_card.dart';
+import 'package:plex/plex_widgets/plex_card_glass.dart';
 import 'package:plex/plex_widgets/plex_form_field_widgets.dart';
-import 'package:plex/plex_widgets/plex_input_widget.dart';
 
 class PlexLoginConfig {
   PlexLoginConfig({
@@ -29,7 +31,12 @@ class PlexLoginConfig {
     this.passwordMinLength,
     this.passwordMaxLength,
     this.createWidget,
+    this.useBackground = false,
+    this.backgroundType = PlexBackgroundType.neoGlass,
   });
+
+  final bool useBackground;
+  final PlexBackgroundType backgroundType;
 
   final String? debugUsername;
   final String? debugPassword;
@@ -48,7 +55,14 @@ class PlexLoginConfig {
 }
 
 class PlexLoginScreen extends PlexScreen {
-  const PlexLoginScreen({super.key, super.useScaffold = true, required this.loginConfig, required this.nextRoute});
+  const PlexLoginScreen({
+    super.key,
+    super.useScaffold,
+    super.useBackground,
+    super.backgroundType,
+    required this.loginConfig,
+    required this.nextRoute,
+  });
 
   final String nextRoute;
   final PlexLoginConfig loginConfig;
@@ -103,6 +117,7 @@ class _PlexLoginScreenState extends PlexState<PlexLoginScreen> {
     if (PlexSp.instance.getString(PlexSp.loggedInUser) != null) {
       return Container();
     }
+
     return Center(
       child: SingleChildScrollView(
         child: Column(
@@ -115,91 +130,98 @@ class _PlexLoginScreenState extends PlexState<PlexLoginScreen> {
                 constraints: const BoxConstraints(
                   maxWidth: 350,
                 ),
-                child: Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(PlexDim.medium),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (widget.loginConfig.additionalWidgetsTop != null) ...{
-                          widget.loginConfig.additionalWidgetsTop!.call(context),
-                        },
-                        SizedBox(
-                          height: 100,
-                          child: PlexApp.app.getLogo(context),
-                        ),
-                        spaceMedium(),
-                        PlexFormFieldInput(
-                          properties: const PlexFormFieldGeneric.title("Username / Email"),
-                          inputHint: "Enter Your Email or Username",
-                          inputController: usernameController,
-                          errorController: usernameErrorController,
-                        ),
-                        PlexFormFieldInput(
-                          properties: const PlexFormFieldGeneric.title("Password"),
-                          inputHint: "Enter Your Password",
-                          inputController: passController,
-                          errorController: passErrorController,
-                          isPassword: true,
-                          maxInputLength: widget.loginConfig.passwordMaxLength,
-                          inputOnSubmit: (value) => _loginAction(),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: PlexDim.medium, right: PlexDim.small),
-                          child: Row(
-                            children: [
-                              const Expanded(child: Text("Remember User")),
-                              spaceMedium(),
-                              PlexWidget<bool>(
-                                controller: rememberUserController,
-                                createWidget: (context, data) {
-                                  return Checkbox(
-                                    value: data,
-                                    onChanged: (value) {
-                                      rememberUserController.setValue(value);
-                                    },
-                                  );
-                                },
-                              )
-                            ],
+                child: createWidget(
+                  () {
+                    var loginWidget = Padding(
+                      padding: const EdgeInsets.all(PlexDim.medium),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (widget.loginConfig.additionalWidgetsTop != null) ...{
+                            widget.loginConfig.additionalWidgetsTop!.call(context),
+                          },
+                          SizedBox(
+                            height: 100,
+                            child: PlexApp.app.getLogo(context),
                           ),
-                        ),
-                        if (widget.loginConfig.additionalWidgetsAboveLoginButton != null) ...{
-                          widget.loginConfig.additionalWidgetsAboveLoginButton!.call(context),
-                        },
-                        PlexFormFieldButton(
-                          properties: PlexFormFieldGeneric(title: "Login", useMargin: false),
-                          buttonIcon: const Icon(Icons.login),
-                          buttonClick: () => _loginAction(),
-                        ),
-                        if (_getRecentLogins().isNotEmpty) ...{
-                          Row(
-                            children: [
-                              spaceMedium(),
-                              const Text("Recent Logins", style: TextStyle(fontWeight: FontWeight.bold)),
-                            ],
+                          spaceMedium(),
+                          PlexFormFieldInput(
+                            properties: const PlexFormFieldGeneric.title("Username / Email"),
+                            inputHint: "Enter Your Email or Username",
+                            inputController: usernameController,
+                            errorController: usernameErrorController,
                           ),
+                          PlexFormFieldInput(
+                            properties: const PlexFormFieldGeneric.title("Password"),
+                            inputHint: "Enter Your Password",
+                            inputController: passController,
+                            errorController: passErrorController,
+                            isPassword: true,
+                            maxInputLength: widget.loginConfig.passwordMaxLength,
+                            inputOnSubmit: (value) => _loginAction(),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: PlexDim.medium, right: PlexDim.small),
+                            child: Row(
+                              children: [
+                                const Expanded(child: Text("Remember User")),
+                                spaceMedium(),
+                                PlexWidget<bool>(
+                                  controller: rememberUserController,
+                                  createWidget: (context, data) {
+                                    return Checkbox(
+                                      value: data,
+                                      onChanged: (value) {
+                                        rememberUserController.setValue(value);
+                                      },
+                                    );
+                                  },
+                                )
+                              ],
+                            ),
+                          ),
+                          if (widget.loginConfig.additionalWidgetsAboveLoginButton != null) ...{
+                            widget.loginConfig.additionalWidgetsAboveLoginButton!.call(context),
+                          },
+                          PlexFormFieldButton(
+                            properties: PlexFormFieldGeneric(title: "Login", useMargin: false),
+                            buttonIcon: const Icon(Icons.login),
+                            buttonClick: () => _loginAction(),
+                          ),
+                          if (_getRecentLogins().isNotEmpty) ...{
+                            Row(
+                              children: [
+                                spaceMedium(),
+                                const Text("Recent Logins", style: TextStyle(fontWeight: FontWeight.bold)),
+                              ],
+                            ),
+                            spaceSmall(),
+                            Wrap(
+                              alignment: WrapAlignment.center,
+                              spacing: PlexDim.small,
+                              runSpacing: PlexDim.small,
+                              children: [
+                                ..._getRecentLogins().map((e) => _getRecentLoginWidget(e)),
+                              ],
+                            ),
+                            spaceSmall(),
+                          },
+                          if (widget.loginConfig.additionalWidgetsBottom != null) ...{
+                            widget.loginConfig.additionalWidgetsBottom!.call(context),
+                          },
                           spaceSmall(),
-                          Wrap(
-                            alignment: WrapAlignment.center,
-                            spacing: PlexDim.small,
-                            runSpacing: PlexDim.small,
-                            children: [
-                              ..._getRecentLogins().map((e) => _getRecentLoginWidget(e)),
-                            ],
-                          ),
-                          spaceSmall(),
-                        },
-                        if (widget.loginConfig.additionalWidgetsBottom != null) ...{
-                          widget.loginConfig.additionalWidgetsBottom!.call(context),
-                        },
-                        spaceSmall(),
-                        if (PlexApp.app.appInfo.versionName != null) ...[
-                          Text("Version: ${PlexApp.app.appInfo.versionName}"),
+                          if (PlexApp.app.appInfo.versionName != null) ...[
+                            Text("Version: ${PlexApp.app.appInfo.versionName}"),
+                          ],
                         ],
-                      ],
-                    ),
-                  ),
+                      ),
+                    );
+
+                    if (widget.useBackground && widget.backgroundType == PlexBackgroundType.neoGlass) {
+                      return PlexCardGlassEffect(child: loginWidget);
+                    }
+                    return PlexCard(child: loginWidget);
+                  },
                 ).scaleAnim(),
               ),
             ),

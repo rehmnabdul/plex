@@ -41,6 +41,8 @@ class PlexInfoSheet {
     VoidCallback? onCancel,
     String okLabel = 'OK',
     String cancelLabel = 'Cancel',
+    PlexButtonType okButtonType = PlexButtonType.elevated,
+    PlexButtonType cancelButtonType = PlexButtonType.text,
     bool isDismissible = true,
     bool enableDrag = true,
     Color? backgroundColor,
@@ -110,7 +112,7 @@ class PlexInfoSheet {
                       Expanded(
                         child: PlexFormFieldButton(
                           properties: PlexFormFieldGeneric.title(cancelLabel),
-                          buttonType: PlexButtonType.text,
+                          buttonType:cancelButtonType,
                           buttonClick: () {
                             Plex.back();
                             if (onCancel != null) onCancel();
@@ -121,7 +123,7 @@ class PlexInfoSheet {
                       ...actions.map((action) => Expanded(
                             child: PlexFormFieldButton(
                               properties: PlexFormFieldGeneric.title(action.label),
-                              buttonType: PlexButtonType.text,
+                              buttonType:action.actionType,
                               buttonClick: () {
                                 Plex.back();
                                 action.onPressed?.call();
@@ -132,7 +134,7 @@ class PlexInfoSheet {
                       Expanded(
                         child: PlexFormFieldButton(
                           properties: PlexFormFieldGeneric.title(okLabel),
-                          buttonType: PlexButtonType.elevated,
+                          buttonType: okButtonType,
                           buttonClick: () {
                             Plex.back();
                             if (onOk != null) onOk();
@@ -157,5 +159,6 @@ enum PlexInfoSheetType { info, error, alert }
 class PlexInfoSheetAction {
   final String label;
   final VoidCallback? onPressed;
-  PlexInfoSheetAction({required this.label, this.onPressed});
+  final PlexButtonType actionType;
+  PlexInfoSheetAction({required this.label, this.onPressed, this.actionType = PlexButtonType.text});
 }

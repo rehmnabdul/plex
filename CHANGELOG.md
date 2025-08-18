@@ -1,8 +1,18 @@
+## 0.9.6
+
+### Updates
+- Set the `useBackground: true` in `PlexLoginConfig` & `PlexDashboardConfig` to create a background 
+- `backgroundType: PlexBackgroundType.neoGlass` will set the type of background you want to set. Currently only support one type of background
+- You can use this in any `PlexScreen` widget in your implementation to use background there.
+- Use `PlexCardGlass` to use glass background card.
+
+### Added
+- `PlexAppBar` has been added in the library to customize view and use it anywhere as a widget.
+
 ## 0.9.5
 
 ### Added
 - Cancellable messages `context.hideMessageById()`
-
 
 ## 0.9.4
 

@@ -108,7 +108,7 @@ class _FormUsageScreenState extends PlexState<FormUsageScreen> {
               child: Text("Plex Card"),
             ),
           ),
-          PlexGlassEffect(
+          PlexCardGlassEffect(
             child: Text("data"),
           ),
           Expanded(

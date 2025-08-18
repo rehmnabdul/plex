@@ -21,9 +21,13 @@ import 'package:plex/plex_utils/plex_pair.dart';
 import 'package:plex/plex_utils/plex_routing.dart';
 import 'package:plex/plex_utils/plex_widgets.dart';
 import 'package:plex/plex_widget.dart';
+import 'package:plex/plex_widgets/plex_app_bar.dart';
 import 'package:plex/plex_widgets/plex_card.dart';
+import 'package:plex/plex_widgets/plex_card_glass.dart';
 import 'package:plex/plex_widgets/plex_navigation_rail.dart';
 import 'package:toastification/toastification.dart';
+
+import 'plex_widgets/plex_backgrounds/plex_background.dart';
 
 part 'plex_screens/plex_dashboard_screen.dart';
 
@@ -363,10 +367,22 @@ class _PlexAppState extends State<PlexApp> {
         ),
         routes: {
           if (widget.useAuthorization) ...{
-            PlexRoutesPaths.loginPath: (_) => PlexLoginScreen(loginConfig: widget.loginConfig!, nextRoute: widget.appInfo.initialRoute),
+            PlexRoutesPaths.loginPath: (_) => PlexLoginScreen(
+                  loginConfig: widget.loginConfig!,
+                  nextRoute: widget.appInfo.initialRoute,
+                  useScaffold: true,
+                  useBackground: widget.loginConfig!.useBackground,
+                  backgroundType: widget.loginConfig!.backgroundType,
+                ),
           },
           if (widget.dashboardConfig != null) ...{
-            PlexRoutesPaths.homePath: (_) => PlexDashboardScreen(handleBrightnessChange, handleMaterialVersionChange),
+            PlexRoutesPaths.homePath: (_) => PlexDashboardScreen(
+                  handleBrightnessChange,
+                  handleMaterialVersionChange,
+                  useScaffold: true,
+                  useBackground: widget.dashboardConfig!.useBackground,
+                  backgroundType: widget.dashboardConfig!.backgroundType,
+                ),
           },
           if (widget.dashboardConfig?.dashboardScreens.where((r) => r.external).isNotEmpty ?? false) ...{
             for (var page in widget.dashboardConfig!.dashboardScreens.where((r) => r.external)) ...{

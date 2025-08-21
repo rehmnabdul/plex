@@ -494,7 +494,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "0.9.6"
+    version: "0.9.8"
   plugin_platform_interface:
     dependency: transitive
     description:
@@ -720,50 +720,50 @@ packages:
     dependency: transitive
     description:
       name: syncfusion_flutter_core
-      sha256: ce02ce65f51db8e29edc9d2225872d927e001bd2b13c2490d176563bbb046fc7
+      sha256: "6b8b8cb5b4647e6a5858d47fceda9b7e5a9a2be57cff28120acb65edbd92a48c"
       url: "https://pub.dev"
     source: hosted
-    version: "30.2.5"
+    version: "30.2.6"
   syncfusion_flutter_datagrid:
     dependency: transitive
     description:
       name: syncfusion_flutter_datagrid
-      sha256: "6132e2a1c6b83967d7d4d01a0d36958e8a603e802e37682439c0dddc903e25a6"
+      sha256: "6f1ae3eed3afeec951faa9341b3b8c57723c17e3e2c1344284ed097a9a3c76da"
       url: "https://pub.dev"
     source: hosted
-    version: "30.2.5"
+    version: "30.2.6"
   syncfusion_flutter_datagrid_export:
     dependency: transitive
     description:
       name: syncfusion_flutter_datagrid_export
-      sha256: "9105976eef0570dff58fc34bedc137df9ded25926c7cb97caedb86c492517990"
+      sha256: "838656bafc5694e1aa7953f215b4f3cb91201005977dcec7182ef66ea9ad161c"
       url: "https://pub.dev"
     source: hosted
-    version: "30.2.5"
+    version: "30.2.6"
   syncfusion_flutter_pdf:
     dependency: transitive
     description:
       name: syncfusion_flutter_pdf
-      sha256: "7954811deb057e15287bd59e3d906fbe75017bfd8a5543cc2b203e9aa0af4870"
+      sha256: f1701c52ea5dd48654d8f4bd55ef72b3207bc17d179a0a3e1d05b8f33b0cd311
       url: "https://pub.dev"
     source: hosted
-    version: "30.2.5"
+    version: "30.2.6"
   syncfusion_flutter_xlsio:
     dependency: transitive
     description:
       name: syncfusion_flutter_xlsio
-      sha256: "9202fa32ff3463621c7d4f5ae700b9be9406eadd683edd5b879a7197aa437660"
+      sha256: "47c7a65f8e4da7816f8741adbd34987091c0a5f5916f7f01121f64ca7d452511"
       url: "https://pub.dev"
     source: hosted
-    version: "30.2.5"
+    version: "30.2.6"
   syncfusion_officecore:
     dependency: transitive
     description:
       name: syncfusion_officecore
-      sha256: "673b22fa4a36b773aa89dbf8b90395a4ea2cfc9040686296da36f0bc5e9394c8"
+      sha256: e442cc22f5e57590e8d2d690cf1a03e060d6363f6fad37262f3c6e79b85e9e2a
       url: "https://pub.dev"
     source: hosted
-    version: "30.2.5"
+    version: "30.2.6"
   synchronized:
     dependency: transitive
     description:

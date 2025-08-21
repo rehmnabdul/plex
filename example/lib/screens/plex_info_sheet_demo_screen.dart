@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:plex/plex_utils/plex_messages.dart';
-import 'package:plex/plex_widgets/plex_info_sheet.dart';
 import 'package:plex/plex_screens/plex_screen.dart';
+import 'package:plex/plex_utils/plex_messages.dart';
 import 'package:plex/plex_widgets/plex_form_field_widgets.dart';
-import 'package:plex/plex_utils/plex_dimensions.dart';
+import 'package:plex/plex_widgets/plex_info_sheet.dart';
 
 class PlexInfoSheetDemoScreen extends PlexScreen {
   const PlexInfoSheetDemoScreen({super.key});
@@ -28,7 +27,10 @@ class _PlexInfoSheetDemoScreenState extends PlexState<PlexInfoSheetDemoScreen> {
       icon: const Icon(Icons.info, color: Colors.blue, size: 48),
       type: PlexInfoSheetType.info,
       showOk: true,
-      onOk: () => context.showSnackBar('OK pressed'),
+      onOk: () async {
+        context.showSnackBar('OK pressed');
+        return true;
+      },
     );
   }
 
@@ -43,8 +45,14 @@ class _PlexInfoSheetDemoScreenState extends PlexState<PlexInfoSheetDemoScreen> {
       okLabel: 'Retry',
       showCancel: true,
       cancelLabel: 'Dismiss',
-      onOk: () => context.showSnackBar('Retry pressed'),
-      onCancel: () => context.showSnackBar('Dismiss pressed'),
+      onOk: () async {
+        context.showSnackBar('Retry pressed');
+        return true;
+      },
+      onCancel: () async {
+        context.showSnackBar('Dismiss pressed');
+        return true;
+      },
     );
   }
 
@@ -59,8 +67,14 @@ class _PlexInfoSheetDemoScreenState extends PlexState<PlexInfoSheetDemoScreen> {
       showCancel: true,
       okLabel: 'Yes',
       cancelLabel: 'No',
-      onOk: () => context.showSnackBar('Yes pressed'),
-      onCancel: () => context.showSnackBar('No pressed'),
+      onOk: () async {
+        context.showSnackBar('Yes pressed');
+        return true;
+      },
+      onCancel: () async {
+        context.showSnackBar('No pressed');
+        return true;
+      },
     );
   }
 
@@ -75,11 +89,17 @@ class _PlexInfoSheetDemoScreenState extends PlexState<PlexInfoSheetDemoScreen> {
       actions: [
         PlexInfoSheetAction(
           label: 'Action 1',
-          onPressed: () => context.showSnackBar('Action 1 pressed'),
+          onPressed: () async {
+            context.showSnackBar('Action 1 pressed');
+            return true;
+          },
         ),
         PlexInfoSheetAction(
           label: 'Action 2',
-          onPressed: () => context.showSnackBar('Action 2 pressed'),
+          onPressed: () async {
+            context.showSnackBar('Action 2 pressed');
+            return true;
+          },
         ),
       ],
     );
@@ -146,4 +166,4 @@ class _PlexInfoSheetDemoScreenState extends PlexState<PlexInfoSheetDemoScreen> {
       ],
     );
   }
-} 
+}

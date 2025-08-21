@@ -1,3 +1,15 @@
+## 0.9.8
+
+### Updates
+- Auto Close `PlexInfoSheetAction` when any action `onPress` button is null
+- Add action `Key, Icon, ButtonStyle, FocusNode` in `PlexInfoSheetAction` for all the actions
+
+## 0.9.7
+
+### Updates
+- Update `PlexInfoSheetAction` on-pressed event to `async`. Return `true` to automatically close the sheet.
+- Use `PlexInfoSheetAction` actions button type by overriding `actionType`, `okButtonType` and `cancelButtonType`
+
 ## 0.9.6
 
 ### Updates

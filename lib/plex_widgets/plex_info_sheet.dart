@@ -37,12 +37,20 @@ class PlexInfoSheet {
     List<PlexInfoSheetAction>? actions,
     bool showOk = true,
     bool showCancel = false,
-    VoidCallback? onOk,
-    VoidCallback? onCancel,
+    OnActionPressed? onOk,
+    OnActionPressed? onCancel,
     String okLabel = 'OK',
     String cancelLabel = 'Cancel',
     PlexButtonType okButtonType = PlexButtonType.elevated,
     PlexButtonType cancelButtonType = PlexButtonType.text,
+    Widget? okButtonIcon,
+    Key? okButtonKey,
+    ButtonStyle? okButtonStyle,
+    FocusNode? okButtonFocusNode,
+    Widget? cancelButtonIcon,
+    Key? cancelButtonKey,
+    ButtonStyle? cancelButtonStyle,
+    FocusNode? cancelButtonFocusNode,
     bool isDismissible = true,
     bool enableDrag = true,
     Color? backgroundColor,
@@ -112,10 +120,14 @@ class PlexInfoSheet {
                       Expanded(
                         child: PlexFormFieldButton(
                           properties: PlexFormFieldGeneric.title(cancelLabel),
-                          buttonType:cancelButtonType,
-                          buttonClick: () {
-                            Plex.back();
-                            if (onCancel != null) onCancel();
+                          buttonType: cancelButtonType,
+                          buttonIcon: cancelButtonIcon,
+                          key: cancelButtonKey,
+                          buttonStyle: cancelButtonStyle,
+                          focusNode: cancelButtonFocusNode,
+                          buttonClick: () async {
+                            if (onCancel == null) Plex.back();
+                            if (await onCancel?.call() == true) Plex.back();
                           },
                         ),
                       ),
@@ -123,10 +135,14 @@ class PlexInfoSheet {
                       ...actions.map((action) => Expanded(
                             child: PlexFormFieldButton(
                               properties: PlexFormFieldGeneric.title(action.label),
-                              buttonType:action.actionType,
-                              buttonClick: () {
-                                Plex.back();
-                                action.onPressed?.call();
+                              buttonType: action.actionType,
+                              buttonIcon: action.icon,
+                              buttonStyle: action.buttonStyle,
+                              focusNode: action.focusNode,
+                              key: action.key,
+                              buttonClick: () async {
+                                if (action.onPressed == null) Plex.back();
+                                if (await action.onPressed!.call() == true) Plex.back();
                               },
                             ),
                           )),
@@ -135,9 +151,13 @@ class PlexInfoSheet {
                         child: PlexFormFieldButton(
                           properties: PlexFormFieldGeneric.title(okLabel),
                           buttonType: okButtonType,
-                          buttonClick: () {
-                            Plex.back();
-                            if (onOk != null) onOk();
+                          buttonIcon: okButtonIcon,
+                          key: okButtonKey,
+                          buttonStyle: okButtonStyle,
+                          focusNode: okButtonFocusNode,
+                          buttonClick: () async {
+                            if (onOk == null) Plex.back();
+                            if (await onOk?.call() == true) Plex.back();
                           },
                         ),
                       ),
@@ -157,8 +177,26 @@ enum PlexInfoSheetType { info, error, alert }
 
 /// Action button for the info sheet
 class PlexInfoSheetAction {
+  final Key? key;
+
   final String label;
-  final VoidCallback? onPressed;
+
+  ///Return True To Close The Sheet Automatically else return false
+  final OnActionPressed? onPressed;
   final PlexButtonType actionType;
-  PlexInfoSheetAction({required this.label, this.onPressed, this.actionType = PlexButtonType.text});
+  final Widget? icon;
+  final ButtonStyle? buttonStyle;
+  final FocusNode? focusNode;
+
+  PlexInfoSheetAction({
+    this.key,
+    required this.label,
+    this.onPressed,
+    this.actionType = PlexButtonType.text,
+    this.icon,
+    this.buttonStyle,
+    this.focusNode,
+  });
 }
+
+typedef OnActionPressed = Future<bool> Function();

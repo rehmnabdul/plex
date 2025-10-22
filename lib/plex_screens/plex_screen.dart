@@ -30,6 +30,7 @@ abstract class PlexState<T extends PlexScreen> extends State<T> {
   var smallScreen = true;
   var mediumScreen = false;
   var largeScreen = false;
+  var extLargeScreen = false;
 
   getArguments<AT>() {
     var args = ModalRoute.of(context)!.settings.arguments as AT;
@@ -158,6 +159,7 @@ abstract class PlexState<T extends PlexScreen> extends State<T> {
     smallScreen = isSmallScreen(context);
     mediumScreen = isMediumScreen(context);
     largeScreen = isLargeScreen(context);
+    extLargeScreen = isExtLargeScreen(context);
   }
 
   Widget buildBody();

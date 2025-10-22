@@ -174,7 +174,7 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
           : null,
       actions: [
         if (PlexApp.app.useAuthorization) ...[
-          if (largeScreen) ...{
+          if (largeScreen || extLargeScreen) ...{
             Center(child: Text(PlexApp.app.getUser()?.getLoggedInFullName().toUpperCase() ?? "N/A")),
             spaceSmall(),
           },
@@ -571,7 +571,7 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
                       child: PlexNavigationRail(
                         topWidgets: PlexApp.app.dashboardConfig!.navigationRailTopWidgets?.call(this, context),
                         bottomWidgets: PlexApp.app.dashboardConfig!.navigationRailBottomWidgets?.call(this, context),
-                        extended: !PlexApp.app.dashboardConfig!.disableExpandNavigationRail && largeScreen,
+                        extended: !PlexApp.app.dashboardConfig!.disableExpandNavigationRail && (largeScreen || extLargeScreen),
                         backgroundColor: Colors.transparent,
                         selectedDestination: navigationSelectedIndex.first,
                         destinations: PlexApp.app.dashboardConfig!._routes,
@@ -636,8 +636,12 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
                   : null,
               actions: [
                 if (PlexApp.app.useAuthorization) ...[
-                  if (largeScreen) ...{
-                    Center(child: Text(PlexApp.app.getUser()?.getLoggedInFullName().toUpperCase() ?? "N/A", style: TextStyle(fontSize: PlexFontSize.normal),)),
+                  if (largeScreen || extLargeScreen) ...{
+                    Center(
+                        child: Text(
+                      PlexApp.app.getUser()?.getLoggedInFullName().toUpperCase() ?? "N/A",
+                      style: TextStyle(fontSize: PlexFontSize.normal),
+                    )),
                     spaceSmall(),
                   },
                   Center(
@@ -654,38 +658,38 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
                           clipBehavior: Clip.hardEdge,
                           child: PlexApp.app.getUser()?.getPictureUrl() != null
                               ? CachedNetworkImage(
-                            imageUrl: PlexApp.app.getUser()!.getPictureUrl()!,
-                            progressIndicatorBuilder: (context, url, downloadProgress) {
-                              return Stack(
-                                children: [
-                                  Center(
+                                  imageUrl: PlexApp.app.getUser()!.getPictureUrl()!,
+                                  progressIndicatorBuilder: (context, url, downloadProgress) {
+                                    return Stack(
+                                      children: [
+                                        Center(
+                                          child: Text(
+                                            PlexApp.app.getUser()?.getInitials().toString() ?? "N/A",
+                                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: PlexFontSize.normal),
+                                          ),
+                                        ),
+                                        Center(
+                                          child: CircularProgressIndicator(
+                                            color: Colors.yellowAccent,
+                                            value: downloadProgress.totalSize == null ? null : downloadProgress.downloaded / downloadProgress.totalSize!,
+                                          ),
+                                        )
+                                      ],
+                                    );
+                                  },
+                                  errorWidget: (context, url, error) => Center(
                                     child: Text(
                                       PlexApp.app.getUser()?.getInitials().toString() ?? "N/A",
                                       style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: PlexFontSize.normal),
                                     ),
                                   ),
-                                  Center(
-                                    child: CircularProgressIndicator(
-                                      color: Colors.yellowAccent,
-                                      value: downloadProgress.totalSize == null ? null : downloadProgress.downloaded / downloadProgress.totalSize!,
-                                    ),
-                                  )
-                                ],
-                              );
-                            },
-                            errorWidget: (context, url, error) => Center(
-                              child: Text(
-                                PlexApp.app.getUser()?.getInitials().toString() ?? "N/A",
-                                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: PlexFontSize.normal),
-                              ),
-                            ),
-                          )
+                                )
                               : Center(
-                            child: Text(
-                              PlexApp.app.getUser()?.getInitials().toString() ?? "N/A",
-                              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: PlexFontSize.normal),
-                            ),
-                          ),
+                                  child: Text(
+                                    PlexApp.app.getUser()?.getInitials().toString() ?? "N/A",
+                                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: PlexFontSize.normal),
+                                  ),
+                                ),
                         ),
                       ),
                     ),

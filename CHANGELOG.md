@@ -1,3 +1,13 @@
+## 1.0.0
+
+### Updates
+- Fix Bug In `DashboardScreen` screen
+
+## 0.9.9
+
+### Updates
+- Add `extLargeScreen` in `PlexScreen` and `isExtLargeScreen(BuildContext context)`
+
 ## 0.9.8
 
 ### Updates

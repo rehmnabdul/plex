@@ -255,7 +255,7 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
             Row(
               children: [
                 Expanded(child: Text(widget.title, style: const TextStyle(fontWeight: FontWeight.bold))),
-                if (isLargeScreen(context)) ...{
+                if (isLargeScreen(context) || isExtLargeScreen(context)) ...{
                   ...?widget.customWidgets?.call(context),
                   if (widget.enableColumnGrouping) ...{
                     space(8),

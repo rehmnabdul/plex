@@ -1,3 +1,8 @@
+## 1.0.1
+
+### Fix
+- Compatibility issue with flutter 3.38.5
+
 ## 1.0.0
 
 ### Updates

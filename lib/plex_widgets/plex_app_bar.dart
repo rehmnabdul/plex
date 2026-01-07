@@ -79,7 +79,7 @@ class PlexAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-    final AppBarTheme appBarTheme = theme.appBarTheme;
+    final AppBarThemeData appBarTheme = theme.appBarTheme;
 
     final Color? effectiveBg = backgroundColor ?? appBarTheme.backgroundColor;
     final Color? effectiveFg = foregroundColor ?? appBarTheme.foregroundColor;

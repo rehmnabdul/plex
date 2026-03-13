@@ -73,10 +73,10 @@ class PlexNetworking {
     try {
       var connectivityResult = await (Connectivity().checkConnectivity());
       if (connectivityResult[0] == ConnectivityResult.mobile || connectivityResult[0] == ConnectivityResult.wifi || connectivityResult[0] == ConnectivityResult.ethernet || connectivityResult[0] == ConnectivityResult.bluetooth || connectivityResult[0] == ConnectivityResult.vpn) {
-            return true;
-          } else {
-            return false;
-          }
+        return true;
+      } else {
+        return false;
+      }
     } catch (e) {
       return true;
     }
@@ -129,10 +129,7 @@ class PlexNetworking {
       var uri = Uri.parse(_isValidUrl(url) ? url : _apiUrl() + url);
       if (kDebugMode) print("Started: ${uri.toString()}");
 
-      var data = await http.get(uri, headers: currentHeaders).timeout(Duration(seconds: 120), onTimeout: () {
-        print("Timeout");
-        return http.Response('Error', 408);
-      });
+      var data = await http.get(uri, headers: currentHeaders);
       var diffInMillis = DateTime.now().difference(startTime).inMilliseconds;
       if (kDebugMode) print("Completed: ${data.statusCode}: ${uri.toString()} in ${diffInMillis}ms");
       if (data.statusCode == 200) {
@@ -349,12 +346,12 @@ class PlexNetworking {
   }
 
   Future<PlexApiResponse> postMultipart2(
-      String url, {
-        Map<String, dynamic>? query,
-        Map<String, String>? headers,
-        required Map<String, String> formData,
-        required Map<String, File> files,
-      }) async {
+    String url, {
+    Map<String, dynamic>? query,
+    Map<String, String>? headers,
+    required Map<String, String> formData,
+    required Map<String, File> files,
+  }) async {
     if (await isNetworkAvailable() == false) {
       return _noNetwork;
     }
@@ -396,7 +393,6 @@ class PlexNetworking {
 
       var streamedResponse = await request.send();
 
-
       var responseBody = await streamedResponse.stream.transform(utf8.decoder).join();
 
       if (kDebugMode) print("Completed: ${streamedResponse.statusCode}: ${responseBody.toString()}");
@@ -404,9 +400,13 @@ class PlexNetworking {
       /// Handle JSON & Text Responses Correctly
       if (streamedResponse.statusCode == 200) {
         try {
-          return PlexSuccess(responseBody); ///  Return JSON if valid
+          return PlexSuccess(responseBody);
+
+          ///  Return JSON if valid
         } catch (e) {
-          return PlexSuccess(responseBody); ///  Otherwise, return as plain text
+          return PlexSuccess(responseBody);
+
+          ///  Otherwise, return as plain text
         }
       } else {
         return PlexError(

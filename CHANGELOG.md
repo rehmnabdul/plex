@@ -1,3 +1,8 @@
+## 1.0.2
+
+### Fix
+- Fix Time Out Issues In `PlexNetworking` -> `Get` Request
+
 ## 1.0.1
 
 ### Fix

@@ -21,6 +21,9 @@ class PlexGetXRouter implements PlexRouter {
         page: () => config.unknownRouteBuilder(Get.context!),
       ),
       routes: config.routes,
+      localizationsDelegates: config.localizationsDelegates,
+      supportedLocales: config.supportedLocales,
+      builder: config.builder,
     );
   }
 

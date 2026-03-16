@@ -5,6 +5,7 @@ import 'package:plex/plex_utils/plex_dimensions.dart';
 import 'package:plex/plex_utils/plex_material.dart';
 import 'package:plex/plex_utils/plex_messages.dart';
 import 'package:plex/plex_utils/plex_printer.dart';
+import 'package:plex/plex_l10n/plex_localization.dart';
 import 'package:plex/plex_widgets/plex_form_field_widgets.dart';
 import 'package:plex/plex_widgets/plex_shimmer.dart';
 
@@ -196,9 +197,9 @@ class _PlexDataTableState extends State<PlexDataTable> {
                   Expanded(
                     child: widget.enableSearch
                         ? PlexFormFieldInput(
-                            properties: PlexFormFieldGeneric(title: "Search...", useMargin: false),
+                            properties: PlexFormFieldGeneric(title: context.plexStrings.tableSearch, useMargin: false),
                             inputController: searchController,
-                            inputHint: "Type here to search whole data...",
+                            inputHint: context.plexStrings.tableSearchHint,
                             inputOnChange: (value) {
                               filterData();
                             },
@@ -219,7 +220,7 @@ class _PlexDataTableState extends State<PlexDataTable> {
                     FilledButton.tonal(
                       onPressed: () async {
                         var path = await PlexPrinter.printExcel(
-                          "Data",
+                          context.plexStrings.tableData,
                           widget.columns,
                           updatedData ?? List.empty(),
                         );
@@ -246,17 +247,24 @@ class _PlexDataTableState extends State<PlexDataTable> {
               sortColumnIndex: sortColumnIndex,
               sortAscending: sortAscending,
               columns: [
-                ...widget.columns.map(
-                  (column) => DataColumn(
-                    numeric: column.isNumber,
-                    label: Text(column.value ?? "N/A"),
-                    tooltip: column.value,
-                    onSort: (columnIndex, ascending) {
-                      sortColumnIndex = columnIndex;
-                      sortAscending = ascending;
-                      sortData(updatedData);
-                    },
-                  ),
+                ...widget.columns.asMap().entries.map(
+                  (entry) {
+                    final column = entry.value;
+                    return DataColumn(
+                      numeric: column.isNumber,
+                      label: Semantics(
+                        header: true,
+                        label: column.value?.toString() ?? '',
+                        child: Text(column.value ?? context.plexStrings.dropdownNoData),
+                      ),
+                      tooltip: column.value,
+                      onSort: (columnIndex, ascending) {
+                        sortColumnIndex = columnIndex;
+                        sortAscending = ascending;
+                        sortData(updatedData);
+                      },
+                    );
+                  },
                 ),
               ],
               rows: [
@@ -283,22 +291,31 @@ class _PlexDataTableState extends State<PlexDataTable> {
                     (row) => DataRow(
                       color: isAlternate++ % 2 == 0 ? widget.alternateColor?.getMaterialState() : null,
                       cells: [
-                        ...row.map(
-                          (data) => DataCell(
-                            data.cell?.child ?? Text(data.value?.toString() ?? "N/A"),
-                            onTap: data.cell?.onTap ??
-                                () {
-                                  if (widget.enableCopy) {
-                                    context.copyToClipboard(data.value?.toString() ?? "N/A");
-                                  }
-                                },
-                            showEditIcon: data.cell?.showEditIcon ?? false,
-                            onDoubleTap: data.cell?.onDoubleTap,
-                            onLongPress: data.cell?.onLongPress,
-                            onTapCancel: data.cell?.onTapCancel,
-                            onTapDown: data.cell?.onTapDown,
-                            placeholder: data.cell?.placeholder ?? false,
-                          ),
+                        ...row.asMap().entries.map(
+                          (entry) {
+                            final i = entry.key;
+                            final data = entry.value;
+                            final columnLabel = widget.columns.length > i ? (widget.columns[i].value?.toString() ?? '') : '';
+                            final cellValue = data.value?.toString() ?? context.plexStrings.dropdownNoData;
+                            return DataCell(
+                              Semantics(
+                                label: columnLabel.isNotEmpty ? '$columnLabel: $cellValue' : cellValue,
+                                child: data.cell?.child ?? Text(cellValue),
+                              ),
+                              onTap: data.cell?.onTap ??
+                                  () {
+                                    if (widget.enableCopy) {
+                                      context.copyToClipboard(data.value?.toString() ?? context.plexStrings.dropdownNoData);
+                                    }
+                                  },
+                              showEditIcon: data.cell?.showEditIcon ?? false,
+                              onDoubleTap: data.cell?.onDoubleTap,
+                              onLongPress: data.cell?.onLongPress,
+                              onTapCancel: data.cell?.onTapCancel,
+                              onTapDown: data.cell?.onTapDown,
+                              placeholder: data.cell?.placeholder ?? false,
+                            );
+                          },
                         )
                       ],
                     ),
@@ -309,7 +326,7 @@ class _PlexDataTableState extends State<PlexDataTable> {
           ),
           if (updatedData != null && updatedData!.isEmpty) ...{
             spaceMedium(),
-            const Text("No Data Available", textAlign: TextAlign.center),
+            Text(context.plexStrings.tableNoData, textAlign: TextAlign.center),
           }
         ],
       ),

@@ -13,6 +13,9 @@ class PlexRouterConfig {
     required this.unknownRouteBuilder,
     required this.routes,
     this.pathOverrides,
+    this.localizationsDelegates,
+    this.supportedLocales = const [Locale('en')],
+    this.builder,
   });
 
   final String title;
@@ -27,6 +30,15 @@ class PlexRouterConfig {
 
   /// For GoRouter: route name -> parameterized path (e.g. "/orders/:id").
   final Map<String, String>? pathOverrides;
+
+  /// Localization delegates for MaterialApp.
+  final Iterable<LocalizationsDelegate<dynamic>>? localizationsDelegates;
+
+  /// Supported locales for the app.
+  final Iterable<Locale> supportedLocales;
+
+  /// Optional builder to wrap the app's navigator (e.g. for accessibility).
+  final Widget Function(BuildContext context, Widget? child)? builder;
 }
 
 /// Abstract router interface. Implementations wrap GetX, GoRouter, or other navigation backends.

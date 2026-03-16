@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:plex/plex_database/plex_database.dart';
 import 'package:plex/plex_utils/plex_dimensions.dart';
 import 'package:plex/plex_widget.dart';
+import 'package:plex/plex_l10n/plex_localization.dart';
 import 'package:plex/plex_widgets/plex_form_field_widgets.dart';
 
 abstract mixin class PlexForm {
@@ -280,7 +281,7 @@ class _PlexFormWidgetState extends State<PlexFormWidget> {
         children: [
           ...getFields(),
           PlexFormFieldButton(
-            properties: PlexFormFieldGeneric.title("Save"),
+            properties: PlexFormFieldGeneric.title(context.plexStrings.formSave),
             buttonClick: () => widget.onSubmit(widget.entity),
             buttonIcon: const Icon(Icons.save),
           ),

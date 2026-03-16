@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:plex/plex_utils/plex_dimensions.dart';
 import 'package:plex/plex_widget.dart';
 import 'package:plex/plex_widgets/plex_form.dart';
+import 'package:plex/plex_l10n/plex_localization.dart';
 import 'package:plex/plex_widgets/plex_form_field_widgets.dart';
 
 /// A single step in a [PlexWizardForm].
@@ -65,20 +66,20 @@ class _PlexWizardFormState extends State<PlexWizardForm> {
               if (_currentStep > 0)
                 OutlinedButton(
                   onPressed: details.onStepCancel,
-                  child: const Text('Back'),
+                  child: Text(context.plexStrings.wizardBack),
                 ),
               if (_currentStep > 0) const SizedBox(width: PlexDim.small),
               FilledButton(
                 onPressed: details.onStepContinue,
                 child: Text(
-                  _currentStep < widget.steps.length - 1 ? 'Next' : 'Submit',
+                  _currentStep < widget.steps.length - 1 ? context.plexStrings.wizardNext : context.plexStrings.wizardSubmit,
                 ),
               ),
               if (widget.onCancel != null && _currentStep == 0) ...[
                 const SizedBox(width: PlexDim.small),
                 TextButton(
                   onPressed: widget.onCancel,
-                  child: const Text('Cancel'),
+                  child: Text(context.plexStrings.dialogCancel),
                 ),
               ],
             ],

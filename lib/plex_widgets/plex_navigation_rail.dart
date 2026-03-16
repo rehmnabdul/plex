@@ -97,7 +97,11 @@ class PlexNavigationRail extends StatelessWidget {
                 var isSelected = route.index == selectedDestination;
                 return Padding(
                   padding: const EdgeInsets.symmetric(vertical: PlexDim.zero, horizontal: PlexDim.small),
-                  child: InkWell(
+                  child: Semantics(
+                    label: route.route!.title,
+                    selected: isSelected,
+                    button: true,
+                    child: InkWell(
                     canRequestFocus: true,
                     hoverColor: PlexTheme.getActiveTheme(context).primaryColor.withOpacity(0.1),
                     splashFactory: InkRipple.splashFactory,
@@ -166,6 +170,7 @@ class PlexNavigationRail extends StatelessWidget {
                         ],
                       ),
                     ),
+                  ),
                   ),
                 );
               },

@@ -15,6 +15,7 @@ import 'package:plex/plex_widget.dart';
 import 'package:plex/plex_widgets/plex_backgrounds/plex_background.dart';
 import 'package:plex/plex_widgets/plex_card.dart';
 import 'package:plex/plex_widgets/plex_card_glass.dart';
+import 'package:plex/plex_l10n/plex_localization.dart';
 import 'package:plex/plex_widgets/plex_form_field_widgets.dart';
 
 class PlexLoginConfig {
@@ -101,11 +102,11 @@ class _PlexLoginScreenState extends PlexState<PlexLoginScreen> {
   _loginAction() async {
     var username = usernameController.text.trim();
     if (username.isEmpty) {
-      usernameErrorController.setValue("Username can't be empty");
+      usernameErrorController.setValue(context.plexStrings.loginUsernameEmpty);
       return;
     }
     if (passController.text.isEmpty) {
-      passErrorController.setValue("Password can't be empty");
+      passErrorController.setValue(context.plexStrings.loginPasswordEmpty);
       return;
     }
 
@@ -146,14 +147,14 @@ class _PlexLoginScreenState extends PlexState<PlexLoginScreen> {
                           ),
                           spaceMedium(),
                           PlexFormFieldInput(
-                            properties: const PlexFormFieldGeneric.title("Username / Email"),
-                            inputHint: "Enter Your Email or Username",
+                            properties: PlexFormFieldGeneric.title(context.plexStrings.loginUsername),
+                            inputHint: context.plexStrings.loginUsernameHint,
                             inputController: usernameController,
                             errorController: usernameErrorController,
                           ),
                           PlexFormFieldInput(
-                            properties: const PlexFormFieldGeneric.title("Password"),
-                            inputHint: "Enter Your Password",
+                            properties: PlexFormFieldGeneric.title(context.plexStrings.loginPassword),
+                            inputHint: context.plexStrings.loginPasswordHint,
                             inputController: passController,
                             errorController: passErrorController,
                             isPassword: true,
@@ -164,7 +165,7 @@ class _PlexLoginScreenState extends PlexState<PlexLoginScreen> {
                             padding: const EdgeInsets.only(left: PlexDim.medium, right: PlexDim.small),
                             child: Row(
                               children: [
-                                const Expanded(child: Text("Remember User")),
+                                Expanded(child: Text(context.plexStrings.loginRememberMe)),
                                 spaceMedium(),
                                 PlexWidget<bool>(
                                   controller: rememberUserController,
@@ -184,7 +185,7 @@ class _PlexLoginScreenState extends PlexState<PlexLoginScreen> {
                             widget.loginConfig.additionalWidgetsAboveLoginButton!.call(context),
                           },
                           PlexFormFieldButton(
-                            properties: PlexFormFieldGeneric(title: "Login", useMargin: false),
+                            properties: PlexFormFieldGeneric(title: context.plexStrings.loginButton, useMargin: false),
                             buttonIcon: const Icon(Icons.login),
                             buttonClick: () => _loginAction(),
                           ),
@@ -192,7 +193,7 @@ class _PlexLoginScreenState extends PlexState<PlexLoginScreen> {
                             Row(
                               children: [
                                 spaceMedium(),
-                                const Text("Recent Logins", style: TextStyle(fontWeight: FontWeight.bold)),
+                                Text(context.plexStrings.loginRecentLogins, style: const TextStyle(fontWeight: FontWeight.bold)),
                               ],
                             ),
                             spaceSmall(),
@@ -201,7 +202,7 @@ class _PlexLoginScreenState extends PlexState<PlexLoginScreen> {
                               spacing: PlexDim.small,
                               runSpacing: PlexDim.small,
                               children: [
-                                ..._getRecentLogins().map((e) => _getRecentLoginWidget(e)),
+                                ..._getRecentLogins().map((e) => _getRecentLoginWidget(context, e)),
                               ],
                             ),
                             spaceSmall(),
@@ -211,7 +212,7 @@ class _PlexLoginScreenState extends PlexState<PlexLoginScreen> {
                           },
                           spaceSmall(),
                           if (PlexApp.app.appInfo.versionName != null) ...[
-                            Text("Version: ${PlexApp.app.appInfo.versionName}"),
+                            Text("${context.plexStrings.versionLabel} ${PlexApp.app.appInfo.versionName}"),
                           ],
                         ],
                       ),
@@ -240,37 +241,38 @@ class _PlexLoginScreenState extends PlexState<PlexLoginScreen> {
     if (result != null) {
       result.save();
       if (rememberUserController.data == true) {
-        rememberUser(result, username, passController.text.toString());
+        rememberUser(context, result, username, passController.text.toString());
       }
       Plex.offAndToNamed(PlexApp.app.dashboardConfig != null ? PlexRoutesPaths.homePath : PlexApp.app.appInfo.initialRoute);
     }
   }
 
-  String getUserProperty(String userData, int location) {
+  String getUserProperty(BuildContext context, String userData, int location) {
     // 0 => UserName
     // 1 => Pass
     // 2 => FullName
     // 3 => Initials
     // 4 => Picture
     var splits = userData.split("|");
-    if (splits.isEmpty) return "N/A";
+    final na = context.plexStrings.dropdownNoData;
+    if (splits.isEmpty) return na;
     if (location == 0) {
-      return splits.length > 0 ? splits[0] : "N/A";
+      return splits.length > 0 ? splits[0] : na;
     } else if (location == 1) {
-      return splits.length > 1 ? splits[1] : "N/A";
+      return splits.length > 1 ? splits[1] : na;
     } else if (location == 2) {
-      return splits.length > 2 ? splits[2] : "N/A";
+      return splits.length > 2 ? splits[2] : na;
     } else if (location == 3) {
-      return splits.length > 3 ? splits[3] : "N/A";
+      return splits.length > 3 ? splits[3] : na;
     } else if (location == 4) {
-      return splits.length > 4 ? splits[4] : "N/A";
+      return splits.length > 4 ? splits[4] : na;
     }
-    return "N/A";
+    return na;
   }
 
-  void rememberUser(PlexUser plexUser, String username, String password) {
+  void rememberUser(BuildContext context, PlexUser plexUser, String username, String password) {
     var rememberedUsers = PlexSp.instance.getList(PlexSp.rememberUsers) ?? List.empty(growable: true);
-    if (rememberedUsers.firstWhereOrNull((e) => getUserProperty(e, 0) == username) == null) {
+    if (rememberedUsers.firstWhereOrNull((e) => getUserProperty(context, e, 0) == username) == null) {
       rememberedUsers.add("$username|$password|${plexUser.getLoggedInFullName()}|${plexUser.getInitials()}|${plexUser.getPictureUrl() ?? ""}");
       if (rememberedUsers.length > 3) {
         rememberedUsers = rememberedUsers.sublist(rememberedUsers.length - 3);
@@ -289,30 +291,30 @@ class _PlexLoginScreenState extends PlexState<PlexLoginScreen> {
     PlexSp.instance.setList(PlexSp.rememberUsers, users);
   }
 
-  _getRecentLoginWidget(String e) {
+  _getRecentLoginWidget(BuildContext context, String e) {
     return Row(children: [
       Center(
         child: SizedBox(
           width: 40,
           height: 40,
           child: Tooltip(
-            message: getUserProperty(e, 2),
+            message: getUserProperty(context, e, 2),
             child: Container(
               decoration: BoxDecoration(
                 color: PlexTheme.getActiveTheme(context).colorScheme.secondary,
                 borderRadius: BorderRadius.circular(20),
               ),
               clipBehavior: Clip.hardEdge,
-              child: getUserProperty(e, 4) != "N/A" && getUserProperty(e, 4) != ""
+              child: getUserProperty(context, e, 4) != context.plexStrings.dropdownNoData && getUserProperty(context, e, 4) != ""
                   ? CachedNetworkImage(
-                      imageUrl: getUserProperty(e, 4),
+                      imageUrl: getUserProperty(context, e, 4),
                       progressIndicatorBuilder: (context, url, downloadProgress) {
                         debugPrint(downloadProgress.progress.toString());
                         return Stack(
                           children: [
                             Center(
                               child: Text(
-                                getUserProperty(e, 3),
+                                getUserProperty(context, e, 3),
                                 style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: PlexFontSize.normal),
                               ),
                             ),
@@ -327,14 +329,14 @@ class _PlexLoginScreenState extends PlexState<PlexLoginScreen> {
                       },
                       errorWidget: (context, url, error) => Center(
                         child: Text(
-                          getUserProperty(e, 3),
+                          getUserProperty(context, e, 3),
                           style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: PlexFontSize.normal),
                         ),
                       ),
                     )
                   : Center(
                       child: Text(
-                        getUserProperty(e, 3),
+                        getUserProperty(context, e, 3),
                         style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: PlexFontSize.smallest),
                       ),
                     ),
@@ -343,13 +345,13 @@ class _PlexLoginScreenState extends PlexState<PlexLoginScreen> {
         ),
       ),
       spaceSmall(),
-      Expanded(child: Text(getUserProperty(e, 0))),
+      Expanded(child: Text(getUserProperty(context, e, 0))),
       FilledButton.tonalIcon(
         onPressed: () {
-          _login(getUserProperty(e, 0), getUserProperty(e, 1));
+          _login(getUserProperty(context, e, 0), getUserProperty(context, e, 1));
         },
         icon: const Icon(Icons.login),
-        label: const Text("Login"),
+        label: Text(context.plexStrings.loginButton),
       ),
       IconButton(
         iconSize: 20,
@@ -373,7 +375,7 @@ class _PlexLoginScreenState extends PlexState<PlexLoginScreen> {
                     },
                   ),
                   TextButton(
-                    child: const Text('Cancel'),
+                    child: Text(context.plexStrings.dialogCancel),
                     onPressed: () {
                       Plex.back();
                     },

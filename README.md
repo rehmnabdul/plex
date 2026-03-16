@@ -1,17 +1,10 @@
 # PLEX: Enterprise-Grade Flutter UI Framework
 
-<table>
-  <tr>
-    <td align="center" valign="top">
-      <img src="https://avatars.githubusercontent.com/u/17247881?v=4" width="120" style="border-radius:50%" alt="Abdur Rahman"/>
-      <br/>
-      <b>Abdur Rahman</b><br/>
-      <a href="https://github.com/rehmnabdul">GitHub</a> |
-      <a href="https://www.linkedin.com/in/rehmnabdul/">LinkedIn</a> |
-      <a href="https://abdurrahman.pk/">Portfolio</a>
-    </td>
-  </tr>
-</table>
+
+|                                                                                                                                                       |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Abdur Rahman** [GitHub](https://github.com/rehmnabdul) | [LinkedIn](https://www.linkedin.com/in/rehmnabdul/) | [Portfolio](https://abdurrahman.pk/) |
+
 
 PLEX is a powerful, open-source UI framework for Flutter, designed to accelerate the development of enterprise applications. With a focus on scalability, maintainability, and developer productivity, PLEX provides a robust foundation, modern UI components, and best practices for building high-quality business apps.
 
@@ -45,6 +38,7 @@ PLEX is a powerful, open-source UI framework for Flutter, designed to accelerate
 - **SignalR Integration**: Native support for real-time communication using Microsoft SignalR.
 - **Persistent Storage**: Easy-to-use local storage (PlexSp, PlexDb/Sembast) for app data and user preferences.
 - **Database Enhancements (v1.8.x)**: Fluent query builder, relations (hasMany/belongsTo), migrations, reactive streams, and optional AES-256 encryption at rest.
+- **Localization & Accessibility (v1.9.x)**: Built-in i18n via `PlexStrings` overridable string catalog, `PlexLocalizationConfig`, `context.plexStrings`, `PlexAccessibilityConfig` (high contrast, large text, reduce motion), and systematic `Semantics` annotations across form fields, tables, navigation, and highlight widgets.
 - **Networking**: Full-featured HTTP client with interceptors, timeouts, cancellation, response caching, and type-safe parsing.
 - **Structured Logging**: `PlexLogger` with configurable levels, release-mode suppression, and optional remote sinks.
 - **Material 2 & 3, Light & Dark Modes**: Effortlessly switch between Material versions and color schemes.
@@ -60,7 +54,9 @@ PLEX offers a comprehensive suite of widgets and utilities for enterprise Flutte
 ### Data Tables
 
 #### `PlexDataTable`
+
 A powerful, customizable data table with sorting, searching, and export features.
+
 ```dart
 PlexDataTable(
   columns: [PlexDataCell.text("ID"), PlexDataCell.text("Name")],
@@ -74,7 +70,9 @@ PlexDataTable(
 ```
 
 #### `PlexAdvDataTable`
+
 A modern, feature-rich data table with advanced export (Excel, PDF) and pagination.
+
 ```dart
 PlexAdvDataTable(
   columns: [PlexDataCell.text("ID"), PlexDataCell.text("Name")],
@@ -88,7 +86,9 @@ PlexAdvDataTable(
 ```
 
 #### `PlexDataTableWithPages`
+
 Paginated data table for large datasets.
+
 ```dart
 PlexDataTableWithPages(
   columns: [PlexDataCell.text("ID"), PlexDataCell.text("Name")],
@@ -97,7 +97,9 @@ PlexDataTableWithPages(
 ```
 
 #### `PlexDataTableUnified` (v1.7.x)
+
 Unified API for list, paginated, and stream-based data sources. Delegates to existing table widgets.
+
 ```dart
 // In-memory list
 PlexDataTableUnified(
@@ -119,24 +121,30 @@ PlexDataTableUnified(
 )
 ```
 
-| PlexTableSource | Description |
-|-----------------|--------------|
-| `PlexTableSource.list(rows)` | In-memory list of rows |
-| `PlexTableSource.paginated(fetchFn)` | Async fetch per page |
-| `PlexTableSource.stream(stream)` | Reactive stream of row lists |
 
-| PlexTableFeatures | Description |
-|-------------------|-------------|
-| `search` | Enable search |
-| `export` | List of `PlexExportFormat` (xlsx, pdf) |
-| `groupBy` | Enable grouping |
-| `editing` | Enable cell editing |
-| `print` | Enable print |
+| PlexTableSource                      | Description                  |
+| ------------------------------------ | ---------------------------- |
+| `PlexTableSource.list(rows)`         | In-memory list of rows       |
+| `PlexTableSource.paginated(fetchFn)` | Async fetch per page         |
+| `PlexTableSource.stream(stream)`     | Reactive stream of row lists |
 
-| PlexExportFormat | Description |
-|------------------|-------------|
+
+
+| PlexTableFeatures | Description                            |
+| ----------------- | -------------------------------------- |
+| `search`          | Enable search                          |
+| `export`          | List of `PlexExportFormat` (xlsx, pdf) |
+| `groupBy`         | Enable grouping                        |
+| `editing`         | Enable cell editing                    |
+| `print`           | Enable print                           |
+
+
+
+| PlexExportFormat        | Description     |
+| ----------------------- | --------------- |
 | `PlexExportFormat.xlsx` | Export to Excel |
-| `PlexExportFormat.pdf` | Export to PDF |
+| `PlexExportFormat.pdf`  | Export to PDF   |
+
 
 ---
 
@@ -145,6 +153,7 @@ PlexDataTableUnified(
 All chart widgets use `syncfusion_flutter_charts` with theme-aware defaults.
 
 #### `PlexBarChart`
+
 Vertical or horizontal bar chart with optional stacking. Built on `syncfusion_flutter_charts`.
 
 ```dart
@@ -159,13 +168,16 @@ PlexBarChart(
 )
 ```
 
-| PlexBarSeries | Description |
-|---------------|-------------|
-| `name` | Series label |
-| `data` | `List<(String, double)>` — (category, value) pairs |
-| `color` | Bar color |
+
+| PlexBarSeries | Description                                        |
+| ------------- | -------------------------------------------------- |
+| `name`        | Series label                                       |
+| `data`        | `List<(String, double)>` — (category, value) pairs |
+| `color`       | Bar color                                          |
+
 
 #### `PlexLineChart`
+
 Line chart with optional area fill. Uses SplineSeries / SplineAreaSeries.
 
 ```dart
@@ -178,12 +190,15 @@ PlexLineChart(
 )
 ```
 
-| PlexLineSeries | Description |
-|----------------|-------------|
-| `name` | Series label |
-| `data` | `List<(DateTime, double)>` — (x, y) pairs |
+
+| PlexLineSeries | Description                               |
+| -------------- | ----------------------------------------- |
+| `name`         | Series label                              |
+| `data`         | `List<(DateTime, double)>` — (x, y) pairs |
+
 
 #### `PlexPieChart` & `PlexDonutChart`
+
 Pie and donut charts for proportional data.
 
 ```dart
@@ -194,13 +209,17 @@ PlexPieChart(
 PlexDonutChart(title: 'Share', data: [...])
 ```
 
-| PlexPieSegment | Description |
-|----------------|-------------|
-| `label` | Segment label |
-| `value` | Numeric value (proportional) |
+
+| PlexPieSegment | Description                  |
+| -------------- | ---------------------------- |
+| `label`        | Segment label                |
+| `value`        | Numeric value (proportional) |
+
 
 #### `PlexSparkline`
+
 Compact inline chart for KPI cards. Uses `CustomPainter` (no Syncfusion dependency).
+
 ```dart
 PlexSparkline(
   data: [10.0, 14.0, 12.0, 18.0, 22.0],
@@ -210,7 +229,9 @@ PlexSparkline(
 ```
 
 #### `PlexChartGant`
+
 Hour-level Gantt chart for task scheduling.
+
 ```dart
 PlexChartGant(
   tasks: [
@@ -224,6 +245,7 @@ PlexChartGant(
 ### Dashboard & KPI (v1.7.x)
 
 #### `PlexDashboardCard`
+
 KPI card with optional trend indicator and sparkline. Uses `PlexCard` internally.
 
 ```dart
@@ -238,18 +260,21 @@ PlexDashboardCard(
 )
 ```
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `title` | `String` | Card title |
-| `value` | `String` | Main value (e.g. KPI) |
-| `subtitle` | `String?` | Optional subtitle |
-| `trend` | `double?` | Positive = green up-arrow, negative = red down-arrow |
-| `icon` | `Widget?` | Leading icon |
-| `chart` | `Widget?` | Typically `PlexSparkline` |
-| `onTap` | `VoidCallback?` | Tap handler |
-| `color` | `Color?` | Optional accent color |
+
+| Parameter  | Type            | Description                                          |
+| ---------- | --------------- | ---------------------------------------------------- |
+| `title`    | `String`        | Card title                                           |
+| `value`    | `String`        | Main value (e.g. KPI)                                |
+| `subtitle` | `String?`       | Optional subtitle                                    |
+| `trend`    | `double?`       | Positive = green up-arrow, negative = red down-arrow |
+| `icon`     | `Widget?`       | Leading icon                                         |
+| `chart`    | `Widget?`       | Typically `PlexSparkline`                            |
+| `onTap`    | `VoidCallback?` | Tap handler                                          |
+| `color`    | `Color?`        | Optional accent color                                |
+
 
 #### `PlexDashboardGrid`
+
 Responsive grid of dashboard cards. Uses `LayoutBuilder` for responsive column count (2 small, 3 medium, 4 large screens).
 
 ```dart
@@ -263,18 +288,21 @@ PlexDashboardGrid(
 )
 ```
 
-| Parameter | Description |
-|-----------|-------------|
-| `cards` | `List<PlexDashboardCard>` |
-| `crossAxisCount` | Optional override (default: responsive) |
-| `crossAxisSpacing` | Horizontal gap (default: 16) |
-| `mainAxisSpacing` | Vertical gap (default: 16) |
+
+| Parameter          | Description                             |
+| ------------------ | --------------------------------------- |
+| `cards`            | `List<PlexDashboardCard>`               |
+| `crossAxisCount`   | Optional override (default: responsive) |
+| `crossAxisSpacing` | Horizontal gap (default: 16)            |
+| `mainAxisSpacing`  | Vertical gap (default: 16)              |
+
 
 ---
 
 ### Timeline & Calendar (v1.7.x)
 
 #### `PlexTimeline`
+
 Vertical timeline with optional alternating layout.
 
 ```dart
@@ -288,16 +316,19 @@ PlexTimeline(
 )
 ```
 
-| PlexTimelineEvent | Description |
-|-------------------|-------------|
-| `title` | Event title |
-| `subtitle` | Optional subtitle |
-| `timestamp` | Optional timestamp string |
-| `icon` | Optional leading icon |
-| `color` | Optional dot/line color |
-| `child` | Optional expanded content |
+
+| PlexTimelineEvent | Description               |
+| ----------------- | ------------------------- |
+| `title`           | Event title               |
+| `subtitle`        | Optional subtitle         |
+| `timestamp`       | Optional timestamp string |
+| `icon`            | Optional leading icon     |
+| `color`           | Optional dot/line color   |
+| `child`           | Optional expanded content |
+
 
 #### `PlexCalendar`
+
 Calendar built on Syncfusion SfCalendar.
 
 ```dart
@@ -312,25 +343,31 @@ PlexCalendar(
 )
 ```
 
-| PlexCalendarEvent | Description |
-|-------------------|-------------|
-| `title` | Event title |
-| `start`, `end` | `DateTime` range |
-| `color` | Optional `Color` |
-| `data` | Optional custom data |
+
+| PlexCalendarEvent | Description          |
+| ----------------- | -------------------- |
+| `title`           | Event title          |
+| `start`, `end`    | `DateTime` range     |
+| `color`           | Optional `Color`     |
+| `data`            | Optional custom data |
+
+
 
 | PlexCalendarView | Description |
-|------------------|-------------|
-| `month` | Month view |
-| `week` | Week view |
-| `day` | Day view |
+| ---------------- | ----------- |
+| `month`          | Month view  |
+| `week`           | Week view   |
+| `day`            | Day view    |
+
 
 ---
 
 ### Rich Text Editor (v1.7.x)
 
 #### `PlexRichTextEditor`
+
 WYSIWYG editor using flutter_quill. Supports Delta JSON and HTML input.
+
 ```dart
 PlexRichTextEditor(
   initialValue: '[{"insert":"Hello\\n"}]',
@@ -342,7 +379,9 @@ PlexRichTextEditor(
 ```
 
 #### `PlexFormFieldRichText`
+
 Form field wrapper for the rich text editor.
+
 ```dart
 PlexFormFieldRichText(
   properties: PlexFormFieldGeneric.title('Description'),
@@ -359,6 +398,7 @@ PlexFormFieldRichText(
 ### Backgrounds (v1.7.x)
 
 #### `PlexBackground`
+
 Decorative background layer. Supports five types:
 
 ```dart
@@ -368,20 +408,24 @@ PlexBackground(
 )
 ```
 
-| PlexBackgroundType | Description |
-|--------------------|-------------|
-| `neoGlass` | Glassmorphic blur effect |
-| `particleField` | Animated drifting particles (canvas-drawn circles) |
-| `gradientMesh` | Animated multi-stop gradient rotation |
-| `geometricTiles` | Tessellation pattern (hexagonal/triangular) |
-| `solidSurface` | Plain color (for accessibility/performance; no animation) |
+
+| PlexBackgroundType | Description                                               |
+| ------------------ | --------------------------------------------------------- |
+| `neoGlass`         | Glassmorphic blur effect                                  |
+| `particleField`    | Animated drifting particles (canvas-drawn circles)        |
+| `gradientMesh`     | Animated multi-stop gradient rotation                     |
+| `geometricTiles`   | Tessellation pattern (hexagonal/triangular)               |
+| `solidSurface`     | Plain color (for accessibility/performance; no animation) |
+
 
 ---
 
 ### Forms & Inputs
 
 #### `PlexFormWidget` & `PlexFormField`
+
 Rapidly build forms from your model classes.
+
 ```dart
 class User with PlexForm {
   String name = '';
@@ -397,6 +441,7 @@ PlexFormWidget<User>(entity: User(), onSubmit: (user) => print(user.name))
 ```
 
 #### Specialized Form Fields
+
 - **Input**: `PlexFormFieldInput`
 - **Date/Time**: `PlexFormFieldDate` — `PlexFormFieldDateType.typeDate`, `typeTime`, `typeDateTime`
 - **Dropdown**: `PlexFormFieldDropdown`
@@ -409,6 +454,7 @@ PlexFormWidget<User>(entity: User(), onSubmit: (user) => print(user.name))
 - **Rich Text** (v1.7.x): `PlexFormFieldRichText` — WYSIWYG editor
 
 Example:
+
 ```dart
 PlexFormFieldInput(
   properties: PlexFormFieldGeneric(title: "Username"),
@@ -427,15 +473,19 @@ PlexFormFieldFile(allowedExtensions: ['pdf', 'doc'], allowMultiple: false, onCha
 PlexFormFieldRichText(properties: PlexFormFieldGeneric.title('Notes'), onChanged: (v) {})
 ```
 
-| Form Field | Key Parameters |
-|------------|----------------|
-| `PlexFormFieldStepper` | `value`, `min`, `max`, `step`, `onChanged` |
-| `PlexFormFieldColor` | `value`, `onChanged` — opens color grid dialog |
-| `PlexFormFieldFile` | `allowedExtensions`, `allowMultiple`, `onChanged` — uses `file_picker` |
-| `PlexFormFieldRichText` | `properties`, `initialValue`, `outputFormat`, `onChanged` |
+
+| Form Field              | Key Parameters                                                         |
+| ----------------------- | ---------------------------------------------------------------------- |
+| `PlexFormFieldStepper`  | `value`, `min`, `max`, `step`, `onChanged`                             |
+| `PlexFormFieldColor`    | `value`, `onChanged` — opens color grid dialog                         |
+| `PlexFormFieldFile`     | `allowedExtensions`, `allowMultiple`, `onChanged` — uses `file_picker` |
+| `PlexFormFieldRichText` | `properties`, `initialValue`, `outputFormat`, `onChanged`              |
+
 
 #### Conditional Fields (v1.7.x) — `showWhen`
+
 Show or hide fields based on form state.
+
 ```dart
 PlexFormField.input(
   title: "Company",
@@ -446,7 +496,9 @@ PlexFormField.input(
 ```
 
 #### PlexValidator (v1.7.x)
+
 Reusable validators for form fields.
+
 ```dart
 import 'package:plex/plex_utils/plex_validator.dart';
 
@@ -470,6 +522,7 @@ final validate = PlexValidator.compose([
 ```
 
 #### PlexWizardForm (v1.7.x)
+
 Multi-step form with Back / Next / Submit. Renders a `Stepper` with validation per step.
 
 ```dart
@@ -483,13 +536,17 @@ PlexWizardForm(
 )
 ```
 
-| PlexWizardStep | Description |
-|----------------|-------------|
-| `title` | Step title |
-| `fields` | `List<PlexFormField>` for this step |
+
+| PlexWizardStep | Description                         |
+| -------------- | ----------------------------------- |
+| `title`        | Step title                          |
+| `fields`       | `List<PlexFormField>` for this step |
+
 
 #### Form State Persistence (v1.7.x)
+
 Auto-save and restore form drafts via `PlexDb`.
+
 ```dart
 PlexFormWidget<User>(
   entity: userForm,
@@ -500,6 +557,7 @@ PlexFormWidget<User>(
 ```
 
 #### `PlexInputWidget` (Legacy)
+
 A flexible input widget supporting text, dropdown, date, and multi-select. (Prefer the new form fields above.)
 
 ---
@@ -507,7 +565,9 @@ A flexible input widget supporting text, dropdown, date, and multi-select. (Pref
 ### Layout & Navigation
 
 #### `PlexNavigationRail`
+
 A customizable navigation rail for side navigation in desktop/tablet layouts.
+
 ```dart
 PlexNavigationRail(
   destinations: [
@@ -520,20 +580,26 @@ PlexNavigationRail(
 ```
 
 #### `PlexCard` & `PlexCardGlass`
+
 Material and glassmorphic card widgets for modern UIs.
+
 ```dart
 PlexCard(child: Text("Standard Card"))
 PlexCardGlass(child: Text("Glass Card"))
 ```
 
 #### `PlexBackground`
+
 Decorative background layer. Supports `neoGlass`, `particleField`, `gradientMesh`, `geometricTiles`, and `solidSurface` (v1.7.x).
+
 ```dart
 PlexBackground(type: PlexBackgroundType.neoGlass, child: content)
 ```
 
 #### `PlexMenu`
+
 Model for menu items with icon and title.
+
 ```dart
 PlexMenu("Dashboard", icon: Icon(Icons.dashboard))
 ```
@@ -629,36 +695,44 @@ Plex.toNamed('/orders', parameters: {'id': '42'});
 
 #### PlexRoute Reference
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `route` | `String` | Route name used for navigation |
-| `path` | `String?` | Parameterized path for GoRouter (e.g. `"/orders/:id"`) |
-| `title` | `String` | Display title |
-| `screen` | `Widget Function(BuildContext, {dynamic data})` | Screen builder |
-| `rule` | `String?` | Permission rule (auto-wraps to `PlexRoleGuard`) |
-| `guards` | `List<PlexRouteGuard>` | Route guards (evaluated before navigation) |
-| `external` | `bool` | If true, pushed onto stack instead of inline in dashboard |
-| `category` | `String` | Groups routes in drawer menu |
+
+| Field      | Type                                            | Description                                               |
+| ---------- | ----------------------------------------------- | --------------------------------------------------------- |
+| `route`    | `String`                                        | Route name used for navigation                            |
+| `path`     | `String?`                                       | Parameterized path for GoRouter (e.g. `"/orders/:id"`)    |
+| `title`    | `String`                                        | Display title                                             |
+| `screen`   | `Widget Function(BuildContext, {dynamic data})` | Screen builder                                            |
+| `rule`     | `String?`                                       | Permission rule (auto-wraps to `PlexRoleGuard`)           |
+| `guards`   | `List<PlexRouteGuard>`                          | Route guards (evaluated before navigation)                |
+| `external` | `bool`                                          | If true, pushed onto stack instead of inline in dashboard |
+| `category` | `String`                                        | Groups routes in drawer menu                              |
+
 
 ---
 
 ### Loading, Feedback & Effects
 
 #### `PlexLoaderV1` / `PlexLoaderV2`
+
 Show loading indicators (two styles).
+
 ```dart
 PlexLoaderV1()
 PlexLoaderV2()
 ```
 
 #### `PlexShimmer`
+
 Show shimmer effect while loading data.
+
 ```dart
 PlexShimmer(child: Container(width: 200, height: 20))
 ```
 
 #### `PlexInfoSheet`
+
 Highly configurable bottom sheet for info, errors, alerts, etc.
+
 ```dart
 PlexInfoSheet.show(
   context,
@@ -668,14 +742,18 @@ PlexInfoSheet.show(
 )
 ```
 
-| PlexInfoSheetType | Description |
-|-------------------|-------------|
-| `info` | Informational |
-| `error` | Error state |
-| `alert` | Warning/alert |
+
+| PlexInfoSheetType | Description   |
+| ----------------- | ------------- |
+| `info`            | Informational |
+| `error`           | Error state   |
+| `alert`           | Warning/alert |
+
 
 #### `PlexSelectionList`
+
 Show a searchable, selectable list in a modal.
+
 ```dart
 showPlexSelectionList(
   context,
@@ -686,9 +764,195 @@ showPlexSelectionList(
 ```
 
 #### `PlexHighlightWidget`
+
 Highlight a widget with animation.
+
 ```dart
 PlexHighlightWidget(child: Text("Highlight Me!"))
+```
+
+---
+
+### Localization & Accessibility (v1.9.x)
+
+PLEX provides built-in i18n support via an overridable string catalog and systematic accessibility annotations.
+
+#### PlexStrings — String Catalog
+
+Subclass `PlexStrings` and override getters to provide custom translations. All user-visible strings in PLEX widgets use `context.plexStrings.X`.
+
+```dart
+import 'package:plex/plex_l10n/plex_strings.dart';
+import 'package:plex/plex_l10n/plex_localization.dart';
+
+// Subclass for Arabic
+class ArabicPlexStrings extends PlexStrings {
+  @override
+  String get loginTitle => 'تسجيل الدخول';
+  @override
+  String get loginUsername => 'اسم المستخدم';
+  @override
+  String get loginButton => 'دخول';
+  // Override only what you need; others fall back to English
+}
+
+// Subclass for French
+class FrenchPlexStrings extends PlexStrings {
+  @override
+  String get loginTitle => 'Connexion';
+  @override
+  String get formSubmit => 'Soumettre';
+}
+```
+
+#### PlexLocalizationConfig — Setup in PlexApp
+
+```dart
+runApp(PlexApp(
+  appInfo: ...,
+  dashboardConfig: ...,
+  localizationConfig: PlexLocalizationConfig(
+    supportedLocales: [Locale('en'), Locale('ar'), Locale('fr')],
+    translationLoader: (locale) {
+      switch (locale.languageCode) {
+        case 'ar': return ArabicPlexStrings();
+        case 'fr': return FrenchPlexStrings();
+        default: return PlexStrings();
+      }
+    },
+  ),
+));
+```
+
+#### context.plexStrings — Usage in Widgets
+
+```dart
+import 'package:plex/plex_l10n/plex_localization.dart';
+
+// In any widget with BuildContext
+Text(context.plexStrings.loginTitle)
+PlexFormFieldGeneric.title(context.plexStrings.loginUsername)
+```
+
+#### PlexAccessibilityConfig — Options
+
+
+| Option         | Description                        |
+| -------------- | ---------------------------------- |
+| `highContrast` | Forces high-contrast `ColorScheme` |
+| `largeText`    | Applies 1.3× text scale factor     |
+| `reduceMotion` | Disables PlexBackground animations |
+
+
+```dart
+runApp(PlexApp(
+  appInfo: ...,
+  accessibilityConfig: PlexAccessibilityConfig(
+    highContrast: true,
+    largeText: true,
+    reduceMotion: false,
+  ),
+));
+```
+
+#### semanticLabel — Form Fields & Highlight Widget
+
+
+| Widget                 | Parameter       | Fallback                   |
+| ---------------------- | --------------- | -------------------------- |
+| `PlexFormFieldGeneric` | `semanticLabel` | `title` when null          |
+| `PlexHighlightWidget`  | `semanticLabel` | `'Notification'` when null |
+
+
+```dart
+PlexFormFieldInput(
+  properties: PlexFormFieldGeneric(
+    title: 'Email',
+    semanticLabel: 'Email address input',
+  ),
+)
+PlexHighlightWidget(
+  enabled: true,
+  semanticLabel: 'Unread messages',
+  child: Icon(Icons.mail),
+)
+```
+
+#### Phase 9 — Complete Setup Example
+
+End-to-end setup for localization and accessibility:
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:plex/plex_package.dart';
+import 'package:plex/plex_l10n/plex_strings.dart';
+import 'package:plex/plex_l10n/plex_localization.dart';
+import 'package:plex/plex_accessibility/plex_accessibility.dart';
+
+// 1. Subclass PlexStrings for your language
+class FrenchPlexStrings extends PlexStrings {
+  @override
+  String get loginTitle => 'Connexion';
+  @override
+  String get loginUsername => 'Nom d\'utilisateur';
+  @override
+  String get loginPassword => 'Mot de passe';
+  @override
+  String get loginButton => 'Se connecter';
+  @override
+  String get formSubmit => 'Soumettre';
+  @override
+  String get wizardBack => 'Retour';
+  @override
+  String get wizardNext => 'Suivant';
+  @override
+  String get wizardSubmit => 'Soumettre';
+  @override
+  String get dialogOk => 'OK';
+  @override
+  String get dialogCancel => 'Annuler';
+}
+
+void main() {
+  runApp(PlexApp(
+    appInfo: PlexAppInfo(
+      title: 'My App',
+      appLogo: Icon(Icons.apps),
+      initialRoute: '/home',
+    ),
+    dashboardConfig: PlexDashboardConfig(
+      dashboardScreens: [
+        PlexRoute(route: '/home', title: 'Home', screen: (ctx) => HomeScreen()),
+      ],
+    ),
+    // 2. Wire localization
+    localizationConfig: PlexLocalizationConfig(
+      supportedLocales: [Locale('en'), Locale('fr')],
+      translationLoader: (locale) {
+        if (locale.languageCode == 'fr') return FrenchPlexStrings();
+        return PlexStrings();
+      },
+    ),
+    // 3. Wire accessibility
+    accessibilityConfig: PlexAccessibilityConfig(
+      highContrast: false,
+      largeText: false,
+      reduceMotion: false,
+    ),
+  ));
+}
+
+// 4. Use context.plexStrings in your widgets
+class HomeScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Text(context.plexStrings.loginTitle),
+      ),
+    );
+  }
+}
 ```
 
 ---
@@ -696,20 +960,25 @@ PlexHighlightWidget(child: Text("Highlight Me!"))
 ### State Management & Reactivity
 
 #### `PlexWidget` & `PlexWidgetController`
+
 A reactive widget that can be updated via a controller, replacing BLoC/provider for simple cases.
+
 ```dart
 final controller = PlexWidgetController();
 PlexWidget(controller: controller, createWidget: (context, data) => Text("Current value: $data"))
 ```
 
 #### `PlexRx` & `PlexRxWidget`
+
 Simple observable/reactive state management.
+
 ```dart
 final count = 0.plexObs;
 Text("Count: ").plexRxWidget(count)
 ```
 
 #### `PlexAsyncAction` & `runAction`
+
 Eliminates boilerplate for async operations with automatic loading and error handling. Use with `PlexViewModel`, `PlexViewViewModel`, or directly on `PlexState` / `PlexViewState`.
 
 ```dart
@@ -737,6 +1006,7 @@ void onRefresh() => runAction(PlexAsyncAction(
 ### Utilities & Helpers
 
 #### Spacing & Dimensions
+
 ```dart
 spaceMini() // Widget with 2px
 spaceSmall() // Widget with 8px
@@ -745,7 +1015,9 @@ PlexDim.large // 32.0
 ```
 
 #### PlexLogger (Structured Logging)
+
 Structured logging with configurable levels. In release builds, `verbose` and `debug` are suppressed by default.
+
 ```dart
 import 'package:plex/plex_utils/plex_logger.dart';
 
@@ -760,13 +1032,15 @@ PlexLogger.e('MyTag', 'Error occurred', error: e, stack: stackTrace);
 PlexLogger.setLevel(PlexLogLevel.info);
 ```
 
-| PlexLogLevel | Description |
-|--------------|-------------|
-| `verbose` | Most verbose |
-| `debug` | Debug messages |
-| `info` | Informational |
-| `warning` | Warnings |
-| `error` | Errors |
+
+| PlexLogLevel | Description    |
+| ------------ | -------------- |
+| `verbose`    | Most verbose   |
+| `debug`      | Debug messages |
+| `info`       | Informational  |
+| `warning`    | Warnings       |
+| `error`      | Errors         |
+
 
 In release builds, `verbose` and `debug` are suppressed by default.
 
@@ -784,6 +1058,7 @@ PlexLogger.removeSink(myLogSink);
 ```
 
 #### Console & Async
+
 ```dart
 console("Debug message")  // Uses PlexLogger internally; prefer PlexLogger for new code
 delay(() => print("Delayed"), delayMillis: 500)
@@ -791,6 +1066,7 @@ runAsync(() => print("Async"))
 ```
 
 #### Platform & Screen Size
+
 ```dart
 isLargeScreen(context)
 isMediumScreen(context)
@@ -798,12 +1074,14 @@ isSmallScreen(context)
 ```
 
 #### Date & String Utilities
+
 ```dart
 DateTime.now().toDDMMMHHmmss()
 "2012-02-27 13:27:00".toDate()
 ```
 
 #### Grouping & Sorting
+
 ```dart
 List<T>.sortAndReturn()
 List<T>.groupBy((item) => key)
@@ -814,7 +1092,9 @@ List<T>.groupBy((item) => key)
 ### Other Widgets
 
 #### `PlexScanner`
+
 Barcode/QR code scanner widget.
+
 ```dart
 PlexScanner()
 ```
@@ -1083,21 +1363,25 @@ final tasks = db.getEntityCollection<Task>('tasks', fromJson: Task.fromJson, toJ
 await tasks.insert(Task(title: 'Buy milk'));
 ```
 
-| PlexDbConfig | Type | Description |
-|--------------|------|-------------|
-| `dbName` | `String` | Database file name |
-| `encrypted` | `bool` | Enable AES-256 encryption at rest (default: `false`) |
 
-| PlexCollection methods | Description |
-|------------------------|-------------|
-| `insert(record)` | Insert a new record (auto-generates `entityId`) |
-| `insertAll(records)` | Bulk insert |
-| `update(record)` | Update by `entityId` |
-| `delete(record)` | Delete by record |
-| `deleteById(id)` | Delete by id |
-| `getById(id)` | Get single record |
-| `getAll()` | Get all records |
-| `find({limit, offset})` | Find with pagination |
+| PlexDbConfig | Type     | Description                                          |
+| ------------ | -------- | ---------------------------------------------------- |
+| `dbName`     | `String` | Database file name                                   |
+| `encrypted`  | `bool`   | Enable AES-256 encryption at rest (default: `false`) |
+
+
+
+| PlexCollection methods  | Description                                     |
+| ----------------------- | ----------------------------------------------- |
+| `insert(record)`        | Insert a new record (auto-generates `entityId`) |
+| `insertAll(records)`    | Bulk insert                                     |
+| `update(record)`        | Update by `entityId`                            |
+| `delete(record)`        | Delete by record                                |
+| `deleteById(id)`        | Delete by id                                    |
+| `getById(id)`           | Get single record                               |
+| `getAll()`              | Get all records                                 |
+| `find({limit, offset})` | Find with pagination                            |
+
 
 #### Database Enhancements (v1.8.x)
 
@@ -1125,28 +1409,32 @@ await orders.query().where('archived').equals(true).deleteAll();
 
 **PlexQuery conditions** — All return `PlexQuery<T>` for chaining:
 
-| Method | Example |
-|--------|---------|
-| `equals(value)` | `where('status').equals('pending')` |
-| `notEquals(value)` | `where('status').notEquals('archived')` |
-| `greaterThan(value)` | `where('total').greaterThan(100)` |
-| `greaterThanOrEquals(value)` | `where('count').greaterThanOrEquals(10)` |
-| `lessThan(value)` | `where('total').lessThan(1000)` |
-| `lessThanOrEquals(value)` | `where('count').lessThanOrEquals(10)` |
+
+| Method                               | Example                                                 |
+| ------------------------------------ | ------------------------------------------------------- |
+| `equals(value)`                      | `where('status').equals('pending')`                     |
+| `notEquals(value)`                   | `where('status').notEquals('archived')`                 |
+| `greaterThan(value)`                 | `where('total').greaterThan(100)`                       |
+| `greaterThanOrEquals(value)`         | `where('count').greaterThanOrEquals(10)`                |
+| `lessThan(value)`                    | `where('total').lessThan(1000)`                         |
+| `lessThanOrEquals(value)`            | `where('count').lessThanOrEquals(10)`                   |
 | `contains(value, {caseInsensitive})` | `where('name').contains('john', caseInsensitive: true)` |
-| `isIn(List values)` | `where('status').isIn(['pending', 'active'])` |
-| `isNull()` | `where('deletedAt').isNull()` |
-| `isNotNull()` | `where('deletedAt').isNotNull()` |
+| `isIn(List values)`                  | `where('status').isIn(['pending', 'active'])`           |
+| `isNull()`                           | `where('deletedAt').isNull()`                           |
+| `isNotNull()`                        | `where('deletedAt').isNotNull()`                        |
+
 
 **PlexQuery terminal methods**:
 
-| Method | Returns | Description |
-|--------|---------|-------------|
-| `get()` | `Future<List<T>>` | Execute and return all matching entities |
-| `first()` | `Future<T?>` | Return first match or null |
-| `count()` | `Future<int>` | Count matching records |
-| `deleteAll()` | `Future<void>` | Delete all matching records |
-| `watch()` | `Stream<List<T>>` | Reactive stream; emits when data changes |
+
+| Method        | Returns           | Description                              |
+| ------------- | ----------------- | ---------------------------------------- |
+| `get()`       | `Future<List<T>>` | Execute and return all matching entities |
+| `first()`     | `Future<T?>`      | Return first match or null               |
+| `count()`     | `Future<int>`     | Count matching records                   |
+| `deleteAll()` | `Future<void>`    | Delete all matching records              |
+| `watch()`     | `Stream<List<T>>` | Reactive stream; emits when data changes |
+
 
 **Migrations** — Versioned schema changes. Migrations run in ascending order on startup. Import: `package:plex/plex_database/plex_migration.dart` (or re-exported from `plex_database.dart`).
 
@@ -1164,10 +1452,12 @@ final db = await PlexDb.initialize(
 );
 ```
 
-| PlexDbMigration | Description |
-|-----------------|-------------|
-| `version` | Integer; migrations run in ascending order |
-| `up(db)` | Async callback; receives `PlexDb` (e.g. `db.getCollection('orders')`) |
+
+| PlexDbMigration | Description                                                           |
+| --------------- | --------------------------------------------------------------------- |
+| `version`       | Integer; migrations run in ascending order                            |
+| `up(db)`        | Async callback; receives `PlexDb` (e.g. `db.getCollection('orders')`) |
+
 
 **Relations** — `hasMany` and `belongsTo`. Import: `package:plex/plex_database/plex_relation.dart`
 
@@ -1179,10 +1469,12 @@ final customer = orderCollection.belongsTo(customerCollection, 'customerId');
 final cust = await customer.loadBelongsTo(order);
 ```
 
-| Relation | Usage | Load method |
-|----------|-------|-------------|
-| `hasMany(related, foreignKey)` | One-to-many (e.g. Order → OrderItems) | `loadHasMany(ownerId)` → `Future<List<R>>` |
-| `belongsTo(related, localForeignKey)` | Many-to-one (e.g. Order → Customer) | `loadBelongsTo(owner)` → `Future<R?>` |
+
+| Relation                              | Usage                                 | Load method                                |
+| ------------------------------------- | ------------------------------------- | ------------------------------------------ |
+| `hasMany(related, foreignKey)`        | One-to-many (e.g. Order → OrderItems) | `loadHasMany(ownerId)` → `Future<List<R>>` |
+| `belongsTo(related, localForeignKey)` | Many-to-one (e.g. Order → Customer)   | `loadBelongsTo(owner)` → `Future<R?>`      |
+
 
 **Reactive Queries** — Streams that emit when data changes:
 
@@ -1267,6 +1559,7 @@ await closeScope('session');
 ```
 
 **When to use scoped DI:**
+
 - Session-scoped services (e.g., per-user session, checkout flow)
 - Screen-scoped services that should be disposed when the screen is popped
 - Feature modules that need isolated dependency graphs
@@ -1373,29 +1666,35 @@ The async builder is invoked once; subsequent calls to `fromPlexAsync` return th
 
 #### API Reference
 
-| Function | Description |
-|----------|-------------|
-| `injectSingleton<T>(instance, {tag})` | Register an immediate singleton |
-| `injectSingletonLazy<T>(builder, {tag})` | Register a lazy singleton (sync builder) |
-| `injectSingletonLazyAsync<T>(builder, {tag})` | Register a lazy singleton (async builder) |
-| `injectFactory<T>(builder, {tag})` | Register a factory (new instance each time) |
-| `injectScoped<T>(builder, {scope, tag})` | Register a scoped lazy singleton |
-| `fromPlex<T>({tag, parm})` | Resolve from global registry |
-| `fromPlexAsync<T>({tag})` | Resolve async lazy singleton |
-| `fromScoped<T>({scope, tag, parm})` | Resolve from scope (fallback to global) |
-| `closeScope(scope)` | Close scope and dispose `PlexDisposable` instances |
 
-| Type / Mixin | Description |
-|--------------|-------------|
-| `PlexDisposable` | Mixin with `Future<void> dispose()` for cleanup on scope close |
+| Function                                      | Description                                        |
+| --------------------------------------------- | -------------------------------------------------- |
+| `injectSingleton<T>(instance, {tag})`         | Register an immediate singleton                    |
+| `injectSingletonLazy<T>(builder, {tag})`      | Register a lazy singleton (sync builder)           |
+| `injectSingletonLazyAsync<T>(builder, {tag})` | Register a lazy singleton (async builder)          |
+| `injectFactory<T>(builder, {tag})`            | Register a factory (new instance each time)        |
+| `injectScoped<T>(builder, {scope, tag})`      | Register a scoped lazy singleton                   |
+| `fromPlex<T>({tag, parm})`                    | Resolve from global registry                       |
+| `fromPlexAsync<T>({tag})`                     | Resolve async lazy singleton                       |
+| `fromScoped<T>({scope, tag, parm})`           | Resolve from scope (fallback to global)            |
+| `closeScope(scope)`                           | Close scope and dispose `PlexDisposable` instances |
+
+
+
+| Type / Mixin                  | Description                                                                               |
+| ----------------------------- | ----------------------------------------------------------------------------------------- |
+| `PlexDisposable`              | Mixin with `Future<void> dispose()` for cleanup on scope close                            |
 | `PlexCircularDependencyError` | Error thrown when a circular dependency is detected; `chain` contains the resolution path |
+
 
 ---
 
 ### Real-Time & Networking
 
 #### `PlexSignalR`
+
 Real-time communication using SignalR.
+
 ```dart
 PlexSignalR.config = PlexSignalRConfig(
   "https://serverurl:port", "hubPath",
@@ -1408,9 +1707,11 @@ await PlexSignalR.instance.start();
 
 ## 📸 Screenshots
 
+
 | Material 3 Light | Material 3 Dark | Material 2 Light | Material 2 Dark |
-|:---:|:---:|:---:|:---:|
-| ![M3 Light](https://raw.githubusercontent.com/rehmnabdul/plex/main/screenshots/img_2.png) | ![M3 Dark](https://raw.githubusercontent.com/rehmnabdul/plex/main/screenshots/img_4.png) | ![M2 Light](https://raw.githubusercontent.com/rehmnabdul/plex/main/screenshots/img_1.png) | ![M2 Dark](https://raw.githubusercontent.com/rehmnabdul/plex/main/screenshots/img_3.png) |
+| ---------------- | --------------- | ---------------- | --------------- |
+| M3 Light         | M3 Dark         | M2 Light         | M2 Dark         |
+
 
 More examples in the `/screenshots` folder.
 
@@ -1418,20 +1719,24 @@ More examples in the `/screenshots` folder.
 
 ## 📦 Import Paths
 
-| Module | Import |
-|--------|--------|
-| Core app | `package:plex/plex_package.dart` |
-| Database | `package:plex/plex_database/plex_database.dart` |
-| Migrations | `package:plex/plex_database/plex_migration.dart` |
-| Relations | `package:plex/plex_database/plex_relation.dart` |
-| Networking | `package:plex/plex_networking/plex_networking.dart`, `plex_api_calls.dart`, `plex_cache.dart`, `plex_interceptor.dart` |
-| DI | `package:plex/plex_di/plex_dependency_injection.dart` |
-| Routing | `package:plex/plex_utils/plex_routing.dart` |
-| Guards | `package:plex/plex_router/plex_route_guard.dart` |
-| GoRouter | `package:plex/plex_router/plex_go_router.dart` |
-| Validator | `package:plex/plex_utils/plex_validator.dart` |
-| Logger | `package:plex/plex_utils/plex_logger.dart` |
-| Storage | `package:plex/plex_sp.dart` |
+
+| Module        | Import                                                                                                                 |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| Core app      | `package:plex/plex_package.dart`                                                                                       |
+| Localization  | `package:plex/plex_l10n/plex_localization.dart`, `package:plex/plex_l10n/plex_strings.dart`                            |
+| Accessibility | `package:plex/plex_accessibility/plex_accessibility.dart`                                                              |
+| Database      | `package:plex/plex_database/plex_database.dart`                                                                        |
+| Migrations    | `package:plex/plex_database/plex_migration.dart`                                                                       |
+| Relations     | `package:plex/plex_database/plex_relation.dart`                                                                        |
+| Networking    | `package:plex/plex_networking/plex_networking.dart`, `plex_api_calls.dart`, `plex_cache.dart`, `plex_interceptor.dart` |
+| DI            | `package:plex/plex_di/plex_dependency_injection.dart`                                                                  |
+| Routing       | `package:plex/plex_utils/plex_routing.dart`                                                                            |
+| Guards        | `package:plex/plex_router/plex_route_guard.dart`                                                                       |
+| GoRouter      | `package:plex/plex_router/plex_go_router.dart`                                                                         |
+| Validator     | `package:plex/plex_utils/plex_validator.dart`                                                                          |
+| Logger        | `package:plex/plex_utils/plex_logger.dart`                                                                             |
+| Storage       | `package:plex/plex_sp.dart`                                                                                            |
+
 
 ---
 
@@ -1450,7 +1755,7 @@ Then run:
 flutter pub get
 ```
 
-**Key dependencies** (included in Plex): `sembast`, `flutter_secure_storage`, `encrypt`, `syncfusion_flutter_*`, `flutter_quill`, `file_picker`, `get`, `go_router`, `connectivity_plus`, `path_provider`, `http`, `toastification`, `intl`, `lottie`, `mobile_scanner`, `signalr_netcore`, and more. See `pubspec.yaml` for the full list.
+**Key dependencies** (included in Plex): `sembast`, `flutter_secure_storage`, `encrypt`, `syncfusion_flutter_`*, `flutter_quill`, `file_picker`, `get`, `go_router`, `connectivity_plus`, `path_provider`, `http`, `toastification`, `intl`, `lottie`, `mobile_scanner`, `signalr_netcore`, and more. See `pubspec.yaml` for the full list.
 
 ---
 
@@ -1470,6 +1775,7 @@ flutter test test/widget/
 ```
 
 **Test structure:**
+
 - `test/unit/` — Unit tests for `PlexSp`, `PlexDI`, `PlexNetworking`, `PlexDb`, `PlexWidgetController`
 - `test/widget/` — Widget tests for `PlexFormFieldInput`, `PlexFormFieldDropdown`
 

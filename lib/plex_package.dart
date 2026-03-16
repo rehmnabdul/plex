@@ -19,6 +19,9 @@ import 'package:plex/plex_utils.dart';
 import 'package:plex/plex_utils/plex_dimensions.dart';
 import 'package:plex/plex_utils/plex_pair.dart';
 import 'package:plex/plex_router/plex_getx_router.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:plex/plex_accessibility/plex_accessibility.dart';
+import 'package:plex/plex_l10n/plex_localization.dart';
 import 'package:plex/plex_router/plex_go_router.dart';
 import 'package:plex/plex_router/plex_route_guard.dart';
 import 'package:plex/plex_router/plex_router.dart';
@@ -149,6 +152,12 @@ class PlexApp extends StatefulWidget {
   ///Experimental GoRouter. When set, used instead of [router].
   final PlexGoRouter? experimentalRouter;
 
+  ///Localization configuration for i18n support.
+  final PlexLocalizationConfig? localizationConfig;
+
+  ///Accessibility configuration (high contrast, large text, reduce motion).
+  final PlexAccessibilityConfig? accessibilityConfig;
+
   ///This is a the app instance to access public variable of app anywhere in the applicaiton.
   static late PlexApp app;
 
@@ -177,6 +186,8 @@ class PlexApp extends StatefulWidget {
     this.scrollBehaviour,
     this.router,
     this.experimentalRouter,
+    this.localizationConfig,
+    this.accessibilityConfig,
   }) {
     if (dashboardConfig == null && pages == null) {
       throw Exception("Either \"DashboardConfig\" or \"Pages\" must not be null and empty");
@@ -403,10 +414,40 @@ class _PlexAppState extends State<PlexApp> {
       }
     }
 
+    final a11y = widget.accessibilityConfig ?? PlexAccessibilityConfig.defaults;
+    final effectiveTheme = a11y.highContrast
+        ? ThemeData.from(colorScheme: ColorScheme.highContrastLight())
+        : PlexTheme.getThemeByBrightness(Brightness.light);
+    final effectiveDarkTheme = a11y.highContrast
+        ? ThemeData.from(colorScheme: ColorScheme.highContrastDark())
+        : PlexTheme.getThemeByBrightness(Brightness.dark);
+
+    final localizationsDelegates = <LocalizationsDelegate<dynamic>>[
+      if (widget.localizationConfig != null)
+        PlexL10nDelegate(widget.localizationConfig!),
+      GlobalMaterialLocalizations.delegate,
+      GlobalWidgetsLocalizations.delegate,
+      GlobalCupertinoLocalizations.delegate,
+    ];
+    final supportedLocales =
+        widget.localizationConfig?.supportedLocales ?? [const Locale('en')];
+
+    Widget builderFn(BuildContext context, Widget? child) {
+      var result = child ?? const SizedBox.shrink();
+      if (a11y.largeText) {
+        result = MediaQuery.withClampedTextScaling(
+          maxScaleFactor: 1.3,
+          child: result,
+        );
+      }
+      result = PlexAccessibilityWidget(config: a11y, child: result);
+      return result;
+    }
+
     final config = PlexRouterConfig(
       title: widget.appInfo.title,
-      theme: PlexTheme.getThemeByBrightness(Brightness.light),
-      darkTheme: PlexTheme.getThemeByBrightness(Brightness.dark),
+      theme: effectiveTheme,
+      darkTheme: effectiveDarkTheme,
       themeMode: themeMode,
       scrollBehavior: widget.scrollBehaviour ?? PlexScrollBehavior(),
       initialRoute: widget.useAuthorization
@@ -419,6 +460,9 @@ class _PlexAppState extends State<PlexApp> {
           widget.unknownRoute?.screen.call(context) ?? const Scaffold(body: Center(child: Text("Page not found: 404"))),
       routes: routes,
       pathOverrides: pathOverrides.isEmpty ? null : pathOverrides,
+      localizationsDelegates: localizationsDelegates,
+      supportedLocales: supportedLocales,
+      builder: builderFn,
     );
 
     final effectiveRouter = widget.experimentalRouter ?? widget.router ?? PlexGetXRouter();

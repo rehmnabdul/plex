@@ -7,6 +7,7 @@ import 'package:plex/plex_utils/plex_date_utils.dart';
 import 'package:plex/plex_utils/plex_dimensions.dart';
 import 'package:plex/plex_utils/plex_messages.dart';
 import 'package:plex/plex_widget.dart';
+import 'package:plex/plex_l10n/plex_localization.dart';
 import 'package:plex/plex_widgets/plex_selection_list.dart';
 
 enum PlexFormFieldDateType {
@@ -25,6 +26,7 @@ enum PlexButtonType {
 
 class PlexFormFieldGeneric {
   final String? title;
+  final String? semanticLabel;
   final bool enabled;
   final String? helperText;
   final bool useMargin;
@@ -33,6 +35,7 @@ class PlexFormFieldGeneric {
 
   const PlexFormFieldGeneric({
     this.title,
+    this.semanticLabel,
     this.enabled = true,
     this.helperText,
     this.useMargin = true,
@@ -42,13 +45,14 @@ class PlexFormFieldGeneric {
 
   const PlexFormFieldGeneric.empty()
       : title = null,
+        semanticLabel = null,
         helperText = null,
         enabled = true,
         useMargin = true,
         cornerRadius = PlexDim.small,
         margin = const EdgeInsets.symmetric(horizontal: PlexDim.medium, vertical: PlexDim.small);
 
-  const PlexFormFieldGeneric.title(this.title)
+  const PlexFormFieldGeneric.title(this.title, {this.semanticLabel})
       : helperText = null,
         enabled = true,
         useMargin = true,
@@ -94,10 +98,13 @@ class PlexFormFieldInput extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final semanticLabel = properties.semanticLabel ?? properties.title ?? '';
     var inputWidget = PlexWidget(
         controller: errorController ?? PlexWidgetController(),
         createWidget: (context, data) {
-          return TextField(
+          return Semantics(
+            label: semanticLabel,
+            child: TextField(
             enabled: properties.enabled,
             controller: inputController,
             keyboardType: inputKeyboardType,
@@ -124,7 +131,8 @@ class PlexFormFieldInput extends StatelessWidget {
               errorText: errorController?.data?.toString(),
               filled: true,
             ),
-          );
+          ),
+        );
         });
 
     if (properties.useMargin) {
@@ -167,7 +175,10 @@ class PlexFormFieldDate extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget inputWidget = Container(
+    final semanticLabel = properties.semanticLabel ?? properties.title ?? '';
+    Widget inputWidget = Semantics(
+      label: semanticLabel,
+      child: Container(
       decoration: BoxDecoration(
         color: PlexTheme.getActiveTheme(context).splashColor,
         border: Border.all(color: errorController?.data != null ? PlexTheme.inputErrorColor : Theme.of(context).colorScheme.outline, width: 1),
@@ -279,7 +290,7 @@ class PlexFormFieldDate extends StatelessWidget {
                               ? (data as DateTime?)?.toTimeString()
                               : type == PlexFormFieldDateType.typeDateTime
                                   ? (data as DateTime?)?.toDateTimeString()
-                                  : "N/A",
+                                  : context.plexStrings.dropdownNoData,
                     ),
                     decoration: InputDecoration(
                       border: InputBorder.none,
@@ -306,6 +317,7 @@ class PlexFormFieldDate extends StatelessWidget {
           ],
         ),
       ),
+    ),
     );
 
     Widget finalWidget;
@@ -356,7 +368,7 @@ class PlexFormFieldDropdown<T> extends StatelessWidget {
       this.dropdownSelectionController,
       this.dropdownCustomOnTap,
       this.searchInputFocusNode,
-      this.noDataText = "N/A",
+      this.noDataText,
       this.initialSelection,
       this.showClearButton = false});
 
@@ -370,7 +382,7 @@ class PlexFormFieldDropdown<T> extends StatelessWidget {
   final Function? dropdownCustomOnTap;
   final PlexWidgetController<T?>? dropdownSelectionController;
   final FocusNode? searchInputFocusNode;
-  final String noDataText;
+  final String? noDataText;
   final bool showClearButton;
   final T? initialSelection;
 
@@ -390,7 +402,10 @@ class PlexFormFieldDropdown<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var inputWidget = InkWell(
+    final semanticLabel = properties.semanticLabel ?? properties.title ?? '';
+    var inputWidget = Semantics(
+      label: semanticLabel,
+      child: InkWell(
       onTap: () {
         if (!properties.enabled) return;
 
@@ -437,7 +452,7 @@ class PlexFormFieldDropdown<T> extends StatelessWidget {
                         if (properties.title != null) ...{
                           Text("${properties.title}", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: PlexDim.small)),
                         },
-                        Text(data != null ? dropdownItemAsString?.call(data) ?? data.toString() : noDataText),
+                        Text(data != null ? dropdownItemAsString?.call(data) ?? data.toString() : (noDataText ?? context.plexStrings.dropdownNoData)),
                       ],
                     );
                   },
@@ -457,6 +472,7 @@ class PlexFormFieldDropdown<T> extends StatelessWidget {
           ),
         ),
       ),
+    ),
     );
 
     if (properties.useMargin) {
@@ -515,7 +531,10 @@ class PlexFormFieldMultiSelect<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var inputWidget = InkWell(
+    final semanticLabel = properties.semanticLabel ?? properties.title ?? '';
+    var inputWidget = Semantics(
+      label: semanticLabel,
+      child: InkWell(
       onTap: () {
         if (!properties.enabled) return;
 
@@ -589,6 +608,7 @@ class PlexFormFieldMultiSelect<T> extends StatelessWidget {
           ),
         ),
       ),
+    ),
     );
 
     if (properties.useMargin) {
@@ -613,7 +633,7 @@ class PlexFormFieldAutoComplete<T> extends StatelessWidget {
     this.dropdownCustomOnTap,
     this.searchInputFocusNode,
     this.autoCompleteItems,
-    this.noDataText = "N/A",
+    this.noDataText,
     this.showBarCode = false,
     this.inputDelay = 1000,
   });
@@ -627,7 +647,7 @@ class PlexFormFieldAutoComplete<T> extends StatelessWidget {
   final FocusNode? searchInputFocusNode;
   final Function(dynamic item)? dropdownItemOnSelect;
   final PlexWidgetController<T?>? dropdownSelectionController;
-  final String noDataText;
+  final String? noDataText;
   final bool showBarCode;
   final double inputDelay;
 
@@ -640,7 +660,10 @@ class PlexFormFieldAutoComplete<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var inputWidget = InkWell(
+    final semanticLabel = properties.semanticLabel ?? properties.title ?? '';
+    var inputWidget = Semantics(
+      label: semanticLabel,
+      child: InkWell(
       onTap: () => onFieldTap(context),
       child: Container(
         decoration: BoxDecoration(
@@ -663,7 +686,7 @@ class PlexFormFieldAutoComplete<T> extends StatelessWidget {
                         if (properties.title != null) ...{
                           Text("${properties.title}", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: PlexDim.small)),
                         },
-                        Text(data != null ? dropdownItemAsString?.call(data) ?? data.toString() : noDataText),
+                        Text(data != null ? dropdownItemAsString?.call(data) ?? data.toString() : (noDataText ?? context.plexStrings.dropdownNoData)),
                       ],
                     );
                   },
@@ -674,6 +697,7 @@ class PlexFormFieldAutoComplete<T> extends StatelessWidget {
           ),
         ),
       ),
+    ),
     );
 
     if (properties.useMargin) {
@@ -733,9 +757,12 @@ class PlexFormFieldStepper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final semanticLabel = properties.semanticLabel ?? properties.title ?? '';
     final current = value ?? 0;
 
-    return Container(
+    return Semantics(
+      label: semanticLabel,
+      child: Container(
       decoration: BoxDecoration(
         border: Border.all(color: Theme.of(context).colorScheme.outline),
         borderRadius: BorderRadius.circular(properties.cornerRadius),
@@ -780,6 +807,7 @@ class PlexFormFieldStepper extends StatelessWidget {
           ],
         ),
       ),
+    ),
     );
   }
 }
@@ -821,13 +849,16 @@ class PlexFormFieldColor extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
+    final semanticLabel = properties.semanticLabel ?? properties.title ?? '';
+    return Semantics(
+      label: semanticLabel,
+      child: InkWell(
       onTap: () {
         if (!properties.enabled) return;
         showDialog(
           context: context,
           builder: (ctx) => AlertDialog(
-            title: Text(properties.title ?? 'Pick a color'),
+            title: Text(properties.title ?? context.plexStrings.colorPickerTitle),
             content: SizedBox(
               width: 300,
               child: Wrap(
@@ -880,6 +911,7 @@ class PlexFormFieldColor extends StatelessWidget {
           ],
         ),
       ),
+    ),
     );
   }
 }
@@ -902,9 +934,12 @@ class PlexFormFieldFile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final semanticLabel = properties.semanticLabel ?? properties.title ?? '';
     final files = value ?? [];
 
-    return InkWell(
+    return Semantics(
+      label: semanticLabel,
+      child: InkWell(
       onTap: () async {
         if (!properties.enabled) return;
         final result = await FilePicker.platform.pickFiles(
@@ -929,7 +964,7 @@ class PlexFormFieldFile extends StatelessWidget {
             Expanded(
               child: Text(
                 files.isEmpty
-                    ? (properties.title ?? 'Pick a file')
+                    ? (properties.title ?? context.plexStrings.filePickerSelect)
                     : files.map((f) => f.name).join(', '),
                 overflow: TextOverflow.ellipsis,
               ),
@@ -937,6 +972,7 @@ class PlexFormFieldFile extends StatelessWidget {
           ],
         ),
       ),
+    ),
     );
   }
 }
@@ -1086,6 +1122,13 @@ class PlexFormFieldButton extends StatelessWidget {
     } else {
       buttonWidget = createIconButton();
     }
+
+    final semanticLabel = properties.semanticLabel ?? properties.title ?? '';
+    buttonWidget = Semantics(
+      label: semanticLabel,
+      button: true,
+      child: buttonWidget,
+    );
 
     // Apply margin if needed
     if (properties.useMargin) {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:plex/plex_utils/plex_dimensions.dart';
 import 'package:plex/plex_utils/plex_routing.dart';
+import 'package:plex/plex_l10n/plex_localization.dart';
 import 'package:plex/plex_widgets/plex_form_field_widgets.dart';
 
 /// A utility class to show a highly configurable dialog for information, errors, alerts, etc.
@@ -38,8 +39,8 @@ class PlexInfoDialog {
     bool showCancel = false,
     VoidCallback? onOk,
     VoidCallback? onCancel,
-    String okLabel = 'OK',
-    String cancelLabel = 'Cancel',
+    String? okLabel,
+    String? cancelLabel,
     PlexButtonType okButtonType = PlexButtonType.elevated,
     PlexButtonType cancelButtonType = PlexButtonType.text,
     bool isDismissible = true,
@@ -130,7 +131,7 @@ class PlexInfoDialog {
                         if (showOk)
                           Expanded(
                             child: PlexFormFieldButton(
-                              properties: PlexFormFieldGeneric.title(okLabel),
+                              properties: PlexFormFieldGeneric.title(okLabel ?? context.plexStrings.dialogOk),
                               buttonType: okButtonType,
                               buttonClick: () {
                                 Plex.back();

@@ -56,6 +56,9 @@ class PlexGoRouter implements PlexRouter {
       debugShowCheckedModeBanner: false,
       scrollBehavior: config.scrollBehavior,
       routerConfig: router,
+      localizationsDelegates: config.localizationsDelegates,
+      supportedLocales: config.supportedLocales,
+      builder: config.builder,
     );
   }
 

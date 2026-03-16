@@ -1,13 +1,21 @@
-import 'package:get/get.dart';
+import 'package:plex/plex_router/plex_getx_router.dart';
+import 'package:plex/plex_router/plex_router.dart';
 
 class Plex {
   Plex._();
+
+  static PlexRouter _router = PlexGetXRouter();
+
+  /// Configure the router. Called by PlexApp on init.
+  static void configure(PlexRouter router) {
+    _router = router;
+  }
 
   static Future<T?>? to<T>(
     dynamic to, {
     dynamic arguments,
   }) {
-    return Get.to(to, arguments: arguments);
+    return _router.to<T>(to, arguments: arguments);
   }
 
   static Future<T?>? toNamed<T>(
@@ -15,7 +23,7 @@ class Plex {
     dynamic arguments,
     Map<String, String>? parameters,
   }) {
-    return Get.toNamed<T>(path, arguments: arguments, parameters: parameters);
+    return _router.toNamed<T>(path, arguments: arguments, parameters: parameters);
   }
 
   static Future<T?>? offAndToNamed<T>(
@@ -23,10 +31,10 @@ class Plex {
     dynamic arguments,
     Map<String, String>? parameters,
   }) {
-    return Get.offAndToNamed<T>(path, arguments: arguments, parameters: parameters);
+    return _router.offAndToNamed<T>(path, arguments: arguments, parameters: parameters);
   }
 
   static void back({dynamic result}) {
-    Get.back(result: result);
+    _router.back(result: result);
   }
 }

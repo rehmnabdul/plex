@@ -1,4 +1,5 @@
 // ignore_for_file: must_be_immutable
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:plex/plex_theme.dart';
@@ -706,6 +707,236 @@ class PlexFormFieldAutoComplete<T> extends StatelessWidget {
       },
       itemWidget: dropdownItemWidget,
       inputDelay: inputDelay,
+    );
+  }
+}
+
+class PlexFormFieldStepper extends StatelessWidget {
+  const PlexFormFieldStepper({
+    super.key,
+    this.properties = const PlexFormFieldGeneric.empty(),
+    this.value,
+    this.min,
+    this.max,
+    this.step = 1,
+    this.onChanged,
+    this.allowDecimal = false,
+  });
+
+  final PlexFormFieldGeneric properties;
+  final num? value;
+  final num? min;
+  final num? max;
+  final num step;
+  final void Function(num value)? onChanged;
+  final bool allowDecimal;
+
+  @override
+  Widget build(BuildContext context) {
+    final current = value ?? 0;
+
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: Theme.of(context).colorScheme.outline),
+        borderRadius: BorderRadius.circular(properties.cornerRadius),
+      ),
+      child: Padding(
+        padding: properties.margin,
+        child: Row(
+          children: [
+            if (properties.title != null) ...[
+              Text(properties.title!, style: Theme.of(context).textTheme.titleSmall),
+              const SizedBox(width: 8),
+            ],
+            IconButton(
+              icon: const Icon(Icons.remove),
+              onPressed: properties.enabled
+                  ? () {
+                      final next = allowDecimal
+                          ? current - step
+                          : (current - step).toInt();
+                      if (min == null || next >= min!) {
+                        onChanged?.call(next);
+                      }
+                    }
+                  : null,
+            ),
+            const SizedBox(width: 8),
+            Text('$current'),
+            const SizedBox(width: 8),
+            IconButton(
+              icon: const Icon(Icons.add),
+              onPressed: properties.enabled
+                  ? () {
+                      final next = allowDecimal
+                          ? current + step
+                          : (current + step).toInt();
+                      if (max == null || next <= max!) {
+                        onChanged?.call(next);
+                      }
+                    }
+                  : null,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class PlexFormFieldColor extends StatelessWidget {
+  const PlexFormFieldColor({
+    super.key,
+    this.properties = const PlexFormFieldGeneric.empty(),
+    this.value,
+    this.onChanged,
+  });
+
+  final PlexFormFieldGeneric properties;
+  final Color? value;
+  final void Function(Color color)? onChanged;
+
+  static const _presetColors = [
+    Colors.red,
+    Colors.pink,
+    Colors.purple,
+    Colors.deepPurple,
+    Colors.indigo,
+    Colors.blue,
+    Colors.lightBlue,
+    Colors.cyan,
+    Colors.teal,
+    Colors.green,
+    Colors.lightGreen,
+    Colors.lime,
+    Colors.yellow,
+    Colors.amber,
+    Colors.orange,
+    Colors.deepOrange,
+    Colors.brown,
+    Colors.grey,
+    Colors.blueGrey,
+    Colors.black,
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () {
+        if (!properties.enabled) return;
+        showDialog(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: Text(properties.title ?? 'Pick a color'),
+            content: SizedBox(
+              width: 300,
+              child: Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  for (final c in _presetColors)
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pop(ctx);
+                        onChanged?.call(c);
+                      },
+                      child: Container(
+                        width: 36,
+                        height: 36,
+                        decoration: BoxDecoration(
+                          color: c,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.grey),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(color: Theme.of(context).colorScheme.outline),
+          borderRadius: BorderRadius.circular(properties.cornerRadius),
+        ),
+        padding: properties.margin,
+        child: Row(
+          children: [
+            if (properties.title != null) ...[
+              Text(properties.title!, style: Theme.of(context).textTheme.titleSmall),
+              const SizedBox(width: 8),
+            ],
+            Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                color: value ?? Colors.grey,
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.grey),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class PlexFormFieldFile extends StatelessWidget {
+  const PlexFormFieldFile({
+    super.key,
+    this.properties = const PlexFormFieldGeneric.empty(),
+    this.value,
+    this.allowedExtensions,
+    this.allowMultiple = false,
+    this.onChanged,
+  });
+
+  final PlexFormFieldGeneric properties;
+  final List<PlatformFile>? value;
+  final List<String>? allowedExtensions;
+  final bool allowMultiple;
+  final void Function(List<PlatformFile> files)? onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final files = value ?? [];
+
+    return InkWell(
+      onTap: () async {
+        if (!properties.enabled) return;
+        final result = await FilePicker.platform.pickFiles(
+          type: allowedExtensions != null ? FileType.custom : FileType.any,
+          allowedExtensions: allowedExtensions,
+          allowMultiple: allowMultiple,
+        );
+        if (result != null && result.files.isNotEmpty) {
+          onChanged?.call(result.files);
+        }
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(color: Theme.of(context).colorScheme.outline),
+          borderRadius: BorderRadius.circular(properties.cornerRadius),
+        ),
+        padding: properties.margin,
+        child: Row(
+          children: [
+            const Icon(Icons.attach_file),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                files.isEmpty
+                    ? (properties.title ?? 'Pick a file')
+                    : files.map((f) => f.name).join(', '),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

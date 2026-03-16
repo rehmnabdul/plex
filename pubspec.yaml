@@ -25,6 +25,7 @@ dependencies:
 
   #Navigation
   get: ^4.6.6
+  go_router: ^14.6.2
 
   # Messages
   toastification: ^2.3.0
@@ -50,6 +51,12 @@ dependencies:
   syncfusion_flutter_datagrid: ^30.2.5
   syncfusion_flutter_datagrid_export: ^30.2.5
 
+  #Charts
+  syncfusion_flutter_charts: ^30.2.5
+
+  #Calendar
+  syncfusion_flutter_calendar: ^30.2.5
+
   #Print Excel File
   syncfusion_flutter_xlsio: ^30.2.5
   file_saver: ^0.2.14
@@ -61,6 +68,8 @@ dependencies:
 
   #Database
   sembast: ^3.8.0+1
+  flutter_secure_storage: ^9.2.2
+  encrypt: ^5.0.3
 
   #Lootie Animation
   lottie: ^3.3.0
@@ -71,8 +80,20 @@ dependencies:
 
   mobile_scanner: ^6.0.7
 
+  #Rich Text Editor
+  flutter_quill: ^11.5.0
+  flutter_quill_delta_from_html: ^1.5.0
+
+  #File Picker
+  file_picker: ^8.1.7
+
 dev_dependencies:
   flutter_lints: ^5.0.0
+  flutter_test:
+    sdk: flutter
+  mocktail: ^1.0.4
+  fake_async: ^1.3.2
+  path_provider_platform_interface: ^2.1.2
 #  build_runner: ^2.4.14
 
 flutter:

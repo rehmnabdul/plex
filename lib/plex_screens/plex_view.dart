@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:plex/plex_utils/plex_logger.dart';
+import 'package:plex/plex_view_model/plex_async_action.dart';
 import 'package:plex/plex_widget.dart';
 import 'package:plex/plex_widgets/loading/plex_loader_v1.dart';
 import 'package:plex/plex_widgets/loading/plex_loader_v2.dart';
@@ -58,5 +60,21 @@ abstract class PlexViewState<T extends PlexView> extends State<T> {
     if (_loadingCount > 0) _loadingCount--;
     if (!mounted) return;
     _loadingController.setValue(_loadingCount > 0);
+  }
+
+  /// Runs an async action with automatic loading/error handling.
+  Future<R?> runAction<R>(PlexAsyncAction<R> action) async {
+    showLoading();
+    try {
+      final result = await action.run();
+      action.onSuccess?.call(result);
+      return result;
+    } catch (e, s) {
+      action.onError?.call(e, s);
+      PlexLogger.e('PlexAsyncAction', e.toString(), error: e, stack: s);
+      return null;
+    } finally {
+      hideLoading();
+    }
   }
 }

@@ -18,6 +18,10 @@ import 'package:plex/plex_user.dart';
 import 'package:plex/plex_utils.dart';
 import 'package:plex/plex_utils/plex_dimensions.dart';
 import 'package:plex/plex_utils/plex_pair.dart';
+import 'package:plex/plex_router/plex_getx_router.dart';
+import 'package:plex/plex_router/plex_go_router.dart';
+import 'package:plex/plex_router/plex_route_guard.dart';
+import 'package:plex/plex_router/plex_router.dart';
 import 'package:plex/plex_utils/plex_routing.dart';
 import 'package:plex/plex_utils/plex_widgets.dart';
 import 'package:plex/plex_widget.dart';
@@ -139,6 +143,12 @@ class PlexApp extends StatefulWidget {
   ///When plex user is logout this method will be called
   final Function()? onLogout;
 
+  ///Optional router. Defaults to [PlexGetXRouter].
+  final PlexRouter? router;
+
+  ///Experimental GoRouter. When set, used instead of [router].
+  final PlexGoRouter? experimentalRouter;
+
   ///This is a the app instance to access public variable of app anywhere in the applicaiton.
   static late PlexApp app;
 
@@ -165,6 +175,8 @@ class PlexApp extends StatefulWidget {
     this.onLogout,
     this.forceMaterial3 = false,
     this.scrollBehaviour,
+    this.router,
+    this.experimentalRouter,
   }) {
     if (dashboardConfig == null && pages == null) {
       throw Exception("Either \"DashboardConfig\" or \"Pages\" must not be null and empty");
@@ -297,6 +309,7 @@ class _PlexAppState extends State<PlexApp> {
   @override
   void initState() {
     super.initState();
+    Plex.configure(widget.experimentalRouter ?? widget.router ?? PlexGetXRouter());
     initializePlex();
   }
 
@@ -347,55 +360,70 @@ class _PlexAppState extends State<PlexApp> {
       );
     }
 
-    return ToastificationWrapper(
-      child: GetMaterialApp(
-        title: widget.appInfo.title,
-        theme: PlexTheme.getThemeByBrightness(Brightness.light),
-        darkTheme: PlexTheme.getThemeByBrightness(Brightness.dark),
-        themeMode: themeMode,
-        debugShowCheckedModeBanner: false,
-        scrollBehavior: widget.scrollBehaviour ?? PlexScrollBehavior(),
-        enableLog: false,
-        initialRoute: widget.useAuthorization
-            ? PlexRoutesPaths.loginPath
-            : widget.dashboardConfig != null
-                ? PlexRoutesPaths.homePath
-                : widget.appInfo.initialRoute,
-        unknownRoute: GetPage(
-          name: widget.unknownRoute?.route ?? "/NotFound",
-          page: () => widget.unknownRoute?.screen.call(context) ?? const Scaffold(body: Center(child: Text("Page not found: 404"))),
-        ),
-        routes: {
-          if (widget.useAuthorization) ...{
-            PlexRoutesPaths.loginPath: (_) => PlexLoginScreen(
-                  loginConfig: widget.loginConfig!,
-                  nextRoute: widget.appInfo.initialRoute,
-                  useScaffold: true,
-                  useBackground: widget.loginConfig!.useBackground,
-                  backgroundType: widget.loginConfig!.backgroundType,
-                ),
-          },
-          if (widget.dashboardConfig != null) ...{
-            PlexRoutesPaths.homePath: (_) => PlexDashboardScreen(
-                  handleBrightnessChange,
-                  handleMaterialVersionChange,
-                  useScaffold: true,
-                  useBackground: widget.dashboardConfig!.useBackground,
-                  backgroundType: widget.dashboardConfig!.backgroundType,
-                ),
-          },
-          if (widget.dashboardConfig?.dashboardScreens.where((r) => r.external).isNotEmpty ?? false) ...{
-            for (var page in widget.dashboardConfig!.dashboardScreens.where((r) => r.external)) ...{
-              page.route: (_) => page.screen.call(context),
-            }
-          },
-          if (widget.pages?.isNotEmpty == true) ...{
-            for (var page in widget.pages!) ...{
-              page.route: (_) => page.screen.call(context),
-            },
-          },
+    final routes = <String, WidgetBuilder>{
+      if (widget.useAuthorization) ...{
+        PlexRoutesPaths.loginPath: (_) => PlexLoginScreen(
+              loginConfig: widget.loginConfig!,
+              nextRoute: widget.appInfo.initialRoute,
+              useScaffold: true,
+              useBackground: widget.loginConfig!.useBackground,
+              backgroundType: widget.loginConfig!.backgroundType,
+            ),
+      },
+      if (widget.dashboardConfig != null) ...{
+        PlexRoutesPaths.homePath: (_) => PlexDashboardScreen(
+              handleBrightnessChange,
+              handleMaterialVersionChange,
+              useScaffold: true,
+              useBackground: widget.dashboardConfig!.useBackground,
+              backgroundType: widget.dashboardConfig!.backgroundType,
+            ),
+      },
+      if (widget.dashboardConfig?.dashboardScreens.where((r) => r.external).isNotEmpty ?? false) ...{
+        for (var page in widget.dashboardConfig!.dashboardScreens.where((r) => r.external)) ...{
+          page.route: (_) => page.screen.call(context),
+        }
+      },
+      if (widget.pages?.isNotEmpty == true) ...{
+        for (var page in widget.pages!) ...{
+          page.route: (_) => page.screen.call(context),
         },
-      ),
+      },
+    };
+
+    final pathOverrides = <String, String>{};
+    if (widget.dashboardConfig?.dashboardScreens != null) {
+      for (final r in widget.dashboardConfig!.dashboardScreens.where((r) => r.path != null)) {
+        pathOverrides[r.route] = r.path!;
+      }
+    }
+    if (widget.pages != null) {
+      for (final r in widget.pages!.where((r) => r.path != null)) {
+        pathOverrides[r.route] = r.path!;
+      }
+    }
+
+    final config = PlexRouterConfig(
+      title: widget.appInfo.title,
+      theme: PlexTheme.getThemeByBrightness(Brightness.light),
+      darkTheme: PlexTheme.getThemeByBrightness(Brightness.dark),
+      themeMode: themeMode,
+      scrollBehavior: widget.scrollBehaviour ?? PlexScrollBehavior(),
+      initialRoute: widget.useAuthorization
+          ? PlexRoutesPaths.loginPath
+          : widget.dashboardConfig != null
+              ? PlexRoutesPaths.homePath
+              : widget.appInfo.initialRoute,
+      unknownRouteName: widget.unknownRoute?.route ?? "/NotFound",
+      unknownRouteBuilder: (_) =>
+          widget.unknownRoute?.screen.call(context) ?? const Scaffold(body: Center(child: Text("Page not found: 404"))),
+      routes: routes,
+      pathOverrides: pathOverrides.isEmpty ? null : pathOverrides,
+    );
+
+    final effectiveRouter = widget.experimentalRouter ?? widget.router ?? PlexGetXRouter();
+    return ToastificationWrapper(
+      child: effectiveRouter.buildApp(config),
     );
   }
 }

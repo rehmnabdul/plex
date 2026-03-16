@@ -1,4 +1,3 @@
-import 'package:plex/plex_database/plex_entity.dart';
 import 'package:sembast/sembast.dart';
 import 'package:sembast/utils/value_utils.dart';
 
@@ -60,14 +59,38 @@ class PlexCollection {
     int? limit,
     int? offset,
   }) async {
-    final recordSnapshot = await _collection.find(_database, finder: Finder(
-      limit: limit,
-      offset: offset
-    ));
+    return findWithFinder(Finder(limit: limit, offset: offset));
+  }
+
+  /// Find records matching the given [finder].
+  Future<List<Map<String, dynamic>>> findWithFinder(Finder finder) async {
+    final recordSnapshot = await _collection.find(_database, finder: finder);
     return recordSnapshot.map((snapshot) {
       var map = cloneMap(snapshot.value as Map<String, dynamic>);
       map[ID_KEY] = snapshot.key as int?;
       return map;
     }).toList();
+  }
+
+  /// Stream of records matching the given [finder]; emits whenever data changes.
+  Stream<List<Map<String, dynamic>>> watchWithFinder(Finder finder) {
+    return _collection
+        .query(finder: finder)
+        .onSnapshots(_database)
+        .map((snapshots) => snapshots.map((snapshot) {
+              var map = cloneMap(snapshot.value as Map<String, dynamic>);
+              map[ID_KEY] = snapshot.key as int?;
+              return Map<String, dynamic>.from(map);
+            }).toList());
+  }
+
+  /// Count records matching the given [finder].
+  Future<int> countWithFinder(Finder finder) async {
+    return _collection.query(finder: finder).count(_database);
+  }
+
+  /// Delete all records matching the given [finder].
+  Future<int> deleteWithFinder(Finder finder) async {
+    return _collection.delete(_database, finder: finder);
   }
 }

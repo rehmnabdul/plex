@@ -1,10 +1,47 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
+import 'package:plex/plex_database/plex_database.dart';
+import 'package:plex/plex_networking/plex_cache.dart';
+import 'package:plex/plex_networking/plex_interceptor.dart';
+import 'package:plex/plex_utils/plex_logger.dart';
+
+/// Token to cancel an in-flight HTTP request.
+class PlexCancelToken {
+  bool _cancelled = false;
+
+  bool get isCancelled => _cancelled;
+
+  void cancel() => _cancelled = true;
+}
+
+/// Sealed hierarchy for network errors. Enables pattern matching.
+sealed class PlexNetworkError<T> extends PlexApiResponse<T> {}
+
+class PlexNetworkTimeout<T> extends PlexNetworkError<T> {}
+
+class PlexNetworkNoConnectivity<T> extends PlexNetworkError<T> {}
+
+class PlexNetworkCancelled<T> extends PlexNetworkError<T> {}
+
+class PlexNetworkServerError<T> extends PlexNetworkError<T> {
+  final int statusCode;
+  final dynamic body;
+
+  PlexNetworkServerError(this.statusCode, this.body);
+}
+
+class PlexNetworkParseError<T> extends PlexNetworkError<T> {
+  final String cause;
+  final dynamic raw;
+
+  PlexNetworkParseError(this.cause, this.raw);
+}
 
 class PlexApiResult {
   final bool success;
@@ -21,6 +58,9 @@ class PlexApiResponse<T> {}
 class PlexSuccess<T> extends PlexApiResponse<T> {
   late dynamic response;
 
+  /// Optional typed response, populated by getTyped/postTyped.
+  T? typedResponse;
+
   PlexSuccess(String? body) {
     if (body == null) response = null;
     try {
@@ -28,6 +68,11 @@ class PlexSuccess<T> extends PlexApiResponse<T> {
     } catch (e) {
       response = body!.toString();
     }
+  }
+
+  /// Creates a typed success with a parsed object.
+  PlexSuccess.typed(T value) : typedResponse = value {
+    response = value;
   }
 }
 
@@ -61,6 +106,60 @@ class PlexNetworking {
 
   String? _basePath;
 
+  /// Default timeout for HTTP requests. Applied when no per-request timeout is provided.
+  Duration defaultTimeout = const Duration(seconds: 30);
+
+  final List<PlexInterceptor> _interceptors = [];
+
+  /// Add an interceptor to the pipeline. Runs in order of addition.
+  void addInterceptor(PlexInterceptor interceptor) => _interceptors.add(interceptor);
+
+  /// Remove an interceptor.
+  void removeInterceptor(PlexInterceptor interceptor) => _interceptors.remove(interceptor);
+
+  PlexCacheLayer? _cacheLayer;
+
+  /// Enable response caching for GET requests.
+  Future<void> enableCache(PlexCacheConfig config, PlexDb db) async {
+    _cacheLayer = PlexCacheLayer(config, db);
+  }
+
+  /// Clear the HTTP cache. If [urlPattern] is provided, only matching entries are cleared.
+  Future<void> clearCache({String? urlPattern}) async {
+    await _cacheLayer?.clear(urlPattern: urlPattern);
+  }
+
+  Future<Map<String, String>> _runRequestInterceptors(String url, Map<String, String> headers) async {
+    var current = headers;
+    for (final interceptor in _interceptors) {
+      current = await interceptor.onRequest(url, current);
+    }
+    return current;
+  }
+
+  Future<PlexApiResponse> _runResponseInterceptors(PlexApiResponse response) async {
+    var current = response;
+    for (final interceptor in _interceptors) {
+      current = await interceptor.onResponse(current);
+    }
+    return current;
+  }
+
+  Future<PlexApiResponse> _runErrorInterceptors(Object error, StackTrace stack) async {
+    PlexApiResponse result = PlexError(400, error.toString());
+    for (final interceptor in _interceptors) {
+      result = await interceptor.onError(error, stack);
+    }
+    return result;
+  }
+
+  PlexRetryInterceptor? get _retryInterceptor {
+    for (final i in _interceptors) {
+      if (i is PlexRetryInterceptor) return i;
+    }
+    return null;
+  }
+
   PlexNetworking._();
 
   ///Call this method to allow bad https certificate and manually verify them.
@@ -82,9 +181,6 @@ class PlexNetworking {
     }
   }
 
-  final _noNetwork = PlexError(5001, 'Network not available');
-  final _connectionFailed = PlexError(5002, 'Network Available But Unable To Connect With Server');
-
   ///Override this callback to always attach headers in the request i.e. UserId, AuthToken etc.
   Future<Map<String, String>> Function()? addHeaders;
 
@@ -96,11 +192,18 @@ class PlexNetworking {
     }
   }
 
-  Future<PlexApiResponse> get(String url, {Map<String, dynamic>? query, Map<String, String>? headers}) async {
+  Future<PlexApiResponse> get(
+    String url, {
+    Map<String, dynamic>? query,
+    Map<String, String>? headers,
+    Duration? timeout,
+    PlexCancelToken? cancelToken,
+  }) async {
     if (await isNetworkAvailable() == false) {
-      return _noNetwork;
+      return PlexNetworkNoConnectivity();
     }
 
+    final baseUrl = url;
     if (query != null && query.isNotEmpty) {
       url += "?";
       query.forEach((key, value) {
@@ -109,50 +212,107 @@ class PlexNetworking {
       url = url.substring(0, url.length - 1);
     }
 
-    var currentHeaders = <String, String>{};
-
-    if (addHeaders != null) {
-      var constHeaders = await addHeaders!.call();
-      currentHeaders.addAll(constHeaders);
+    if (_cacheLayer != null) {
+      final cachedBody = await _cacheLayer!.get(baseUrl, query);
+      if (cachedBody != null) {
+        return _runResponseInterceptors(PlexSuccess(cachedBody));
+      }
     }
 
+    var currentHeaders = <String, String>{};
+    if (addHeaders != null) {
+      currentHeaders.addAll(await addHeaders!());
+    }
     if (headers != null) {
       currentHeaders.addAll(headers);
     }
-
     if (!currentHeaders.containsKey("Content-Type")) {
       currentHeaders["Content-Type"] = "application/json";
     }
+    currentHeaders = await _runRequestInterceptors(url, currentHeaders);
 
-    try {
-      var startTime = DateTime.now();
-      var uri = Uri.parse(_isValidUrl(url) ? url : _apiUrl() + url);
-      if (kDebugMode) print("Started: ${uri.toString()}");
+    final retry = _retryInterceptor;
+    final maxAttempts = retry?.maxAttempts ?? 1;
+    var lastResponse = PlexNetworkNoConnectivity() as PlexApiResponse;
+    final requestTimeout = timeout ?? defaultTimeout;
 
-      var data = await http.get(uri, headers: currentHeaders);
-      var diffInMillis = DateTime.now().difference(startTime).inMilliseconds;
-      if (kDebugMode) print("Completed: ${data.statusCode}: ${uri.toString()} in ${diffInMillis}ms");
-      if (data.statusCode == 200) {
-        return PlexSuccess(data.body);
-      } else {
-        if (data.body.isEmpty) {
-          return PlexError(data.statusCode, data.reasonPhrase ?? data.body);
+    for (var attempt = 0; attempt < maxAttempts; attempt++) {
+      if (cancelToken?.isCancelled == true) {
+        lastResponse = PlexNetworkCancelled();
+        break;
+      }
+      try {
+        var startTime = DateTime.now();
+        var uri = Uri.parse(_isValidUrl(url) ? url : _apiUrl() + url);
+        PlexLogger.d('Networking', 'Started: ${uri.toString()}');
+
+        var data = await http.get(uri, headers: currentHeaders).timeout(requestTimeout);
+        if (cancelToken?.isCancelled == true) {
+          lastResponse = PlexNetworkCancelled();
+          break;
         }
-        return PlexError(data.statusCode, data.body);
+        var diffInMillis = DateTime.now().difference(startTime).inMilliseconds;
+        PlexLogger.d('Networking', 'Completed: ${data.statusCode}: ${uri.toString()} in ${diffInMillis}ms');
+
+        if (data.statusCode == 200) {
+          await _cacheLayer?.put(baseUrl, query, data.body);
+          lastResponse = PlexSuccess(data.body);
+        } else {
+          lastResponse = PlexNetworkServerError(
+            data.statusCode,
+            data.body.isEmpty ? (data.reasonPhrase ?? data.body) : data.body,
+          );
+        }
+
+        final statusCode = lastResponse is PlexNetworkServerError ? lastResponse.statusCode : 0;
+        final shouldRetry = lastResponse is PlexNetworkServerError && retry != null && retry.retryOnStatusCodes.contains(statusCode) && attempt < maxAttempts - 1;
+        if (!shouldRetry) break;
+      } catch (e, stack) {
+        if (e is TimeoutException) {
+          lastResponse = PlexNetworkTimeout();
+        } else if (e is SocketException) {
+          lastResponse = PlexNetworkNoConnectivity();
+        } else {
+          PlexLogger.e('Networking', 'Request failed', error: e);
+          lastResponse = await _runErrorInterceptors(e, stack);
+        }
+        break;
       }
-    } catch (e) {
-      if (e is SocketException) {
-        return _connectionFailed;
-      }
-      if (kDebugMode) print("Error: ${e.toString()}");
-      return PlexError(400, e.toString());
     }
+
+    return _runResponseInterceptors(lastResponse);
   }
 
-  Future<PlexApiResponse> post(String url, {Map<String, dynamic>? query, Map<String, String>? headers, Map<String, dynamic>? formData, dynamic body}) async {
-    if (await isNetworkAvailable() == false) {
-      return _noNetwork;
+  /// GET with type-safe response parsing.
+  Future<PlexApiResponse<T>> getTyped<T>(
+    String url, {
+    required T Function(Map<String, dynamic>) fromJson,
+    Map<String, dynamic>? query,
+    Map<String, String>? headers,
+    Duration? timeout,
+    PlexCancelToken? cancelToken,
+  }) async {
+    final raw = await get(url, query: query, headers: headers, timeout: timeout, cancelToken: cancelToken);
+    if (raw is PlexSuccess) {
+      try {
+        return PlexSuccess<T>.typed(fromJson(raw.response as Map<String, dynamic>));
+      } catch (e) {
+        return PlexNetworkParseError<T>(e.toString(), raw.response);
+      }
     }
+    return raw as PlexApiResponse<T>;
+  }
+
+  Future<PlexApiResponse> post(
+    String url, {
+    Map<String, dynamic>? query,
+    Map<String, String>? headers,
+    Map<String, dynamic>? formData,
+    dynamic body,
+    Duration? timeout,
+    PlexCancelToken? cancelToken,
+  }) async {
+    if (await isNetworkAvailable() == false) return PlexNetworkNoConnectivity();
 
     if (query?.isNotEmpty == true) {
       url += "?";
@@ -163,57 +323,102 @@ class PlexNetworking {
     }
 
     var currentHeaders = <String, String>{};
-
-    if (addHeaders != null) {
-      var constHeaders = await addHeaders!.call();
-      currentHeaders.addAll(constHeaders);
-    }
-
-    if (headers != null) {
-      currentHeaders.addAll(headers);
-    }
-
+    if (addHeaders != null) currentHeaders.addAll(await addHeaders!());
+    if (headers != null) currentHeaders.addAll(headers);
     if (formData == null && !currentHeaders.containsKey("Content-Type")) {
       currentHeaders["Content-Type"] = "application/json";
     }
+    currentHeaders = await _runRequestInterceptors(url, currentHeaders);
 
-    try {
-      var startTime = DateTime.now();
-      var uri = Uri.parse(_isValidUrl(url) ? url : _apiUrl() + url);
-      if (kDebugMode) print("Started: ${uri.toString()}");
+    final retry = _retryInterceptor;
+    final maxAttempts = retry?.maxAttempts ?? 1;
+    PlexApiResponse lastResponse = PlexNetworkNoConnectivity();
+    final requestTimeout = timeout ?? defaultTimeout;
 
-      late http.Response data;
-      if (formData != null) {
-        data = await http.post(uri, headers: currentHeaders, body: formData);
-      } else if (body != null) {
-        data = await http.post(uri, headers: currentHeaders, body: jsonEncode(body));
-      } else {
-        data = await http.post(uri, headers: currentHeaders, body: null);
+    for (var attempt = 0; attempt < maxAttempts; attempt++) {
+      if (cancelToken?.isCancelled == true) {
+        lastResponse = PlexNetworkCancelled();
+        break;
       }
+      try {
+        var startTime = DateTime.now();
+        var uri = Uri.parse(_isValidUrl(url) ? url : _apiUrl() + url);
+        PlexLogger.d('Networking', 'Started: ${uri.toString()}');
 
-      var diffInMillis = DateTime.now().difference(startTime).inMilliseconds;
-      if (kDebugMode) print("Completed: ${data.statusCode}: ${uri.toString()} in ${diffInMillis}ms");
-      if (data.statusCode == 200) {
-        return PlexSuccess(data.body);
-      } else {
-        if (data.body.isEmpty) {
-          return PlexError(data.statusCode, data.reasonPhrase ?? data.body);
+        late http.Response data;
+        if (formData != null) {
+          data = await http.post(uri, headers: currentHeaders, body: formData).timeout(requestTimeout);
+        } else if (body != null) {
+          data = await http.post(uri, headers: currentHeaders, body: jsonEncode(body)).timeout(requestTimeout);
+        } else {
+          data = await http.post(uri, headers: currentHeaders, body: null).timeout(requestTimeout);
         }
-        return PlexError(data.statusCode, data.body);
+        if (cancelToken?.isCancelled == true) {
+          lastResponse = PlexNetworkCancelled();
+          break;
+        }
+
+        var diffInMillis = DateTime.now().difference(startTime).inMilliseconds;
+        PlexLogger.d('Networking', 'Completed: ${data.statusCode}: ${uri.toString()} in ${diffInMillis}ms');
+        if (data.statusCode == 200) {
+          lastResponse = PlexSuccess(data.body);
+        } else {
+          lastResponse = PlexNetworkServerError(
+            data.statusCode,
+            data.body.isEmpty ? (data.reasonPhrase ?? data.body) : data.body,
+          );
+        }
+
+        final statusCode = lastResponse is PlexNetworkServerError ? lastResponse.statusCode : 0;
+        final shouldRetry = lastResponse is PlexNetworkServerError && retry != null && retry.retryOnStatusCodes.contains(statusCode) && attempt < maxAttempts - 1;
+        if (!shouldRetry) break;
+      } catch (e, stack) {
+        if (e is TimeoutException) {
+          lastResponse = PlexNetworkTimeout();
+        } else if (e is SocketException) {
+          lastResponse = PlexNetworkNoConnectivity();
+        } else {
+          PlexLogger.e('Networking', 'Request failed', error: e);
+          lastResponse = await _runErrorInterceptors(e, stack);
+        }
+        break;
       }
-    } catch (e) {
-      if (e is SocketException) {
-        return _connectionFailed;
-      }
-      if (kDebugMode) print("Error: ${e.toString()}");
-      return PlexError(400, e.toString());
     }
+    return _runResponseInterceptors(lastResponse);
   }
 
-  Future<PlexApiResponse> put(String url, {Map<String, dynamic>? query, Map<String, String>? headers, Map<String, dynamic>? formData, dynamic body}) async {
-    if (await isNetworkAvailable() == false) {
-      return _noNetwork;
+  /// POST with type-safe response parsing.
+  Future<PlexApiResponse<T>> postTyped<T>(
+    String url, {
+    required T Function(Map<String, dynamic>) fromJson,
+    Map<String, dynamic>? query,
+    Map<String, String>? headers,
+    Map<String, dynamic>? formData,
+    dynamic body,
+    Duration? timeout,
+    PlexCancelToken? cancelToken,
+  }) async {
+    final raw = await post(url, query: query, headers: headers, formData: formData, body: body, timeout: timeout, cancelToken: cancelToken);
+    if (raw is PlexSuccess) {
+      try {
+        return PlexSuccess<T>.typed(fromJson(raw.response as Map<String, dynamic>));
+      } catch (e) {
+        return PlexNetworkParseError<T>(e.toString(), raw.response);
+      }
     }
+    return raw as PlexApiResponse<T>;
+  }
+
+  Future<PlexApiResponse> put(
+    String url, {
+    Map<String, dynamic>? query,
+    Map<String, String>? headers,
+    Map<String, dynamic>? formData,
+    dynamic body,
+    Duration? timeout,
+    PlexCancelToken? cancelToken,
+  }) async {
+    if (await isNetworkAvailable() == false) return PlexNetworkNoConnectivity();
 
     if (query?.isNotEmpty == true) {
       url += "?";
@@ -224,51 +429,153 @@ class PlexNetworking {
     }
 
     var currentHeaders = <String, String>{};
-
-    if (addHeaders != null) {
-      var constHeaders = await addHeaders!.call();
-      currentHeaders.addAll(constHeaders);
-    }
-
-    if (headers != null) {
-      currentHeaders.addAll(headers);
-    }
-
+    if (addHeaders != null) currentHeaders.addAll(await addHeaders!());
+    if (headers != null) currentHeaders.addAll(headers);
     if (formData == null && !currentHeaders.containsKey("Content-Type")) {
       currentHeaders["Content-Type"] = "application/json";
     }
+    currentHeaders = await _runRequestInterceptors(url, currentHeaders);
 
-    try {
-      var startTime = DateTime.now();
-      var uri = Uri.parse(_isValidUrl(url) ? url : _apiUrl() + url);
-      if (kDebugMode) print("Started: ${uri.toString()}");
+    final retry = _retryInterceptor;
+    final maxAttempts = retry?.maxAttempts ?? 1;
+    PlexApiResponse lastResponse = PlexNetworkNoConnectivity();
+    final requestTimeout = timeout ?? defaultTimeout;
 
-      late http.Response data;
-      if (formData != null) {
-        data = await http.put(uri, headers: currentHeaders, body: formData);
-      } else if (body != null) {
-        data = await http.put(uri, headers: currentHeaders, body: jsonEncode(body));
-      } else {
-        data = await http.put(uri, headers: currentHeaders, body: null);
+    for (var attempt = 0; attempt < maxAttempts; attempt++) {
+      if (cancelToken?.isCancelled == true) {
+        lastResponse = PlexNetworkCancelled();
+        break;
       }
+      try {
+        var startTime = DateTime.now();
+        var uri = Uri.parse(_isValidUrl(url) ? url : _apiUrl() + url);
+        PlexLogger.d('Networking', 'Started: ${uri.toString()}');
 
-      var diffInMillis = DateTime.now().difference(startTime).inMilliseconds;
-      if (kDebugMode) print("Completed: ${data.statusCode}: ${uri.toString()} in ${diffInMillis}ms");
-      if (data.statusCode == 200) {
-        return PlexSuccess(data.body);
-      } else {
-        if (data.body.isEmpty) {
-          return PlexError(data.statusCode, data.reasonPhrase ?? data.body);
+        late http.Response data;
+        if (formData != null) {
+          data = await http.put(uri, headers: currentHeaders, body: formData).timeout(requestTimeout);
+        } else if (body != null) {
+          data = await http.put(uri, headers: currentHeaders, body: jsonEncode(body)).timeout(requestTimeout);
+        } else {
+          data = await http.put(uri, headers: currentHeaders, body: null).timeout(requestTimeout);
         }
-        return PlexError(data.statusCode, data.body);
+        if (cancelToken?.isCancelled == true) {
+          lastResponse = PlexNetworkCancelled();
+          break;
+        }
+
+        var diffInMillis = DateTime.now().difference(startTime).inMilliseconds;
+        PlexLogger.d('Networking', 'Completed: ${data.statusCode}: ${uri.toString()} in ${diffInMillis}ms');
+        if (data.statusCode == 200) {
+          lastResponse = PlexSuccess(data.body);
+        } else {
+          lastResponse = PlexNetworkServerError(
+            data.statusCode,
+            data.body.isEmpty ? (data.reasonPhrase ?? data.body) : data.body,
+          );
+        }
+
+        final statusCode = lastResponse is PlexNetworkServerError ? lastResponse.statusCode : 0;
+        final shouldRetry = lastResponse is PlexNetworkServerError && retry != null && retry.retryOnStatusCodes.contains(statusCode) && attempt < maxAttempts - 1;
+        if (!shouldRetry) break;
+      } catch (e, stack) {
+        if (e is TimeoutException) {
+          lastResponse = PlexNetworkTimeout();
+        } else if (e is SocketException) {
+          lastResponse = PlexNetworkNoConnectivity();
+        } else {
+          PlexLogger.e('Networking', 'Request failed', error: e);
+          lastResponse = await _runErrorInterceptors(e, stack);
+        }
+        break;
       }
-    } catch (e) {
-      if (e is SocketException) {
-        return _connectionFailed;
-      }
-      if (kDebugMode) print("Error: ${e.toString()}");
-      return PlexError(400, e.toString());
     }
+    return _runResponseInterceptors(lastResponse);
+  }
+
+  Future<PlexApiResponse> delete(
+    String url, {
+    Map<String, dynamic>? query,
+    Map<String, String>? headers,
+    dynamic body,
+    Duration? timeout,
+    PlexCancelToken? cancelToken,
+  }) async {
+    if (await isNetworkAvailable() == false) return PlexNetworkNoConnectivity();
+
+    if (query?.isNotEmpty == true) {
+      url += "?";
+      query?.forEach((key, value) {
+        url += "$key=$value&";
+      });
+      url = url.substring(0, url.length - 1);
+    }
+
+    var currentHeaders = <String, String>{};
+    if (addHeaders != null) currentHeaders.addAll(await addHeaders!());
+    if (headers != null) currentHeaders.addAll(headers);
+    if (!currentHeaders.containsKey("Content-Type")) {
+      currentHeaders["Content-Type"] = "application/json";
+    }
+    currentHeaders = await _runRequestInterceptors(url, currentHeaders);
+
+    final retry = _retryInterceptor;
+    final maxAttempts = retry?.maxAttempts ?? 1;
+    PlexApiResponse lastResponse = PlexNetworkNoConnectivity();
+    final requestTimeout = timeout ?? defaultTimeout;
+
+    for (var attempt = 0; attempt < maxAttempts; attempt++) {
+      if (cancelToken?.isCancelled == true) {
+        lastResponse = PlexNetworkCancelled();
+        break;
+      }
+      try {
+        var startTime = DateTime.now();
+        var uri = Uri.parse(_isValidUrl(url) ? url : _apiUrl() + url);
+        PlexLogger.d('Networking', 'DELETE Started: ${uri.toString()}');
+
+        late http.Response data;
+        if (body != null) {
+          data = await http.delete(uri, headers: currentHeaders, body: jsonEncode(body)).timeout(requestTimeout);
+        } else {
+          data = await http.delete(uri, headers: currentHeaders).timeout(requestTimeout);
+        }
+        if (cancelToken?.isCancelled == true) {
+          lastResponse = PlexNetworkCancelled();
+          break;
+        }
+
+        var diffInMillis = DateTime.now().difference(startTime).inMilliseconds;
+        PlexLogger.d('Networking', 'DELETE Completed: ${data.statusCode}: ${uri.toString()} in ${diffInMillis}ms');
+
+        if (data.statusCode >= 200 && data.statusCode < 300) {
+          lastResponse = PlexSuccess(data.body);
+        } else {
+          lastResponse = PlexNetworkServerError(
+            data.statusCode,
+            data.body.isEmpty ? (data.reasonPhrase ?? data.body) : data.body,
+          );
+        }
+
+        final statusCode = lastResponse is PlexNetworkServerError ? lastResponse.statusCode : 0;
+        final shouldRetry = lastResponse is PlexNetworkServerError &&
+            retry != null &&
+            retry.retryOnStatusCodes.contains(statusCode) &&
+            attempt < maxAttempts - 1;
+        if (!shouldRetry) break;
+      } catch (e, stack) {
+        if (e is TimeoutException) {
+          lastResponse = PlexNetworkTimeout();
+        } else if (e is SocketException) {
+          lastResponse = PlexNetworkNoConnectivity();
+        } else {
+          PlexLogger.e('Networking', 'DELETE failed', error: e);
+          lastResponse = await _runErrorInterceptors(e, stack);
+        }
+        break;
+      }
+    }
+    return _runResponseInterceptors(lastResponse);
   }
 
   Future<PlexApiResponse> postMultipart(
@@ -277,10 +584,10 @@ class PlexNetworking {
     Map<String, String>? headers,
     required Map<String, String> formData,
     required Map<String, File> files,
+    Duration? timeout,
+    PlexCancelToken? cancelToken,
   }) async {
-    if (await isNetworkAvailable() == false) {
-      return _noNetwork;
-    }
+    if (await isNetworkAvailable() == false) return PlexNetworkNoConnectivity();
 
     if (query?.isNotEmpty == true) {
       url += "?";
@@ -291,24 +598,20 @@ class PlexNetworking {
     }
 
     var currentHeaders = <String, String>{};
-
-    if (addHeaders != null) {
-      var constHeaders = await addHeaders!.call();
-      currentHeaders.addAll(constHeaders);
-    }
-
-    if (headers != null) {
-      currentHeaders.addAll(headers);
-    }
-
+    if (addHeaders != null) currentHeaders.addAll(await addHeaders!());
+    if (headers != null) currentHeaders.addAll(headers);
     if (!currentHeaders.containsKey("Content-Type")) {
       currentHeaders["Content-Type"] = "application/json";
     }
+    currentHeaders = await _runRequestInterceptors(url, currentHeaders);
+    final requestTimeout = timeout ?? defaultTimeout;
+
+    if (cancelToken?.isCancelled == true) return _runResponseInterceptors(PlexNetworkCancelled());
 
     try {
       var startTime = DateTime.now();
       var uri = Uri.parse(_isValidUrl(url) ? url : _apiUrl() + url);
-      if (kDebugMode) print("Started: ${uri.toString()}");
+      PlexLogger.d('Networking', 'Started: ${uri.toString()}');
 
       var multipartFiles = List<http.MultipartFile>.empty(growable: true);
       var filesKeys = files.keys.toList();
@@ -322,26 +625,32 @@ class PlexNetworking {
       request.fields.addAll(formData);
       request.files.addAll(multipartFiles);
 
-      var data = await request.send();
+      var data = await request.send().timeout(requestTimeout);
+      if (cancelToken?.isCancelled == true) return _runResponseInterceptors(PlexNetworkCancelled());
 
       var diffInMillis = DateTime.now().difference(startTime).inMilliseconds;
-      if (kDebugMode) print("Completed: ${data.statusCode}: ${uri.toString()} in ${diffInMillis}ms");
+      PlexLogger.d('Networking', 'Completed: ${data.statusCode}: ${uri.toString()} in ${diffInMillis}ms');
+      PlexApiResponse lastResponse;
       if (data.statusCode == 200) {
         var responseBody = await data.stream.transform(utf8.decoder).join();
-        return PlexSuccess(responseBody);
+        lastResponse = PlexSuccess(responseBody);
       } else {
         var responseBody = await data.stream.transform(utf8.decoder).join();
-        if (responseBody.isEmpty) {
-          return PlexError(data.statusCode, data.reasonPhrase ?? responseBody);
-        }
-        return PlexError(data.statusCode, responseBody);
+        lastResponse = PlexNetworkServerError(
+          data.statusCode,
+          responseBody.isEmpty ? (data.reasonPhrase ?? responseBody) : responseBody,
+        );
       }
-    } catch (e) {
+      return _runResponseInterceptors(lastResponse);
+    } catch (e, stack) {
+      if (e is TimeoutException) {
+        return _runResponseInterceptors(PlexNetworkTimeout());
+      }
       if (e is SocketException) {
-        return _connectionFailed;
+        return _runResponseInterceptors(PlexNetworkNoConnectivity());
       }
-      if (kDebugMode) print("Error: ${e.toString()}");
-      return PlexError(400, e.toString());
+      PlexLogger.e('Networking', 'Request failed', error: e);
+      return _runResponseInterceptors(await _runErrorInterceptors(e, stack));
     }
   }
 
@@ -351,75 +660,62 @@ class PlexNetworking {
     Map<String, String>? headers,
     required Map<String, String> formData,
     required Map<String, File> files,
+    Duration? timeout,
+    PlexCancelToken? cancelToken,
   }) async {
-    if (await isNetworkAvailable() == false) {
-      return _noNetwork;
-    }
+    if (await isNetworkAvailable() == false) return PlexNetworkNoConnectivity();
 
-    /// Construct query parameters if present
     if (query?.isNotEmpty == true) {
       url += "?${query!.entries.map((e) => "${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value.toString())}").join("&")}";
     }
 
-    /// Prepare headers
     var currentHeaders = <String, String>{};
+    if (addHeaders != null) currentHeaders.addAll(await addHeaders!());
+    if (headers != null) currentHeaders.addAll(headers);
+    PlexLogger.d('Networking', 'Headers: $currentHeaders');
+    currentHeaders = await _runRequestInterceptors(url, currentHeaders);
+    final requestTimeout = timeout ?? defaultTimeout;
 
-    if (addHeaders != null) {
-      var constHeaders = await addHeaders!.call();
-      currentHeaders.addAll(constHeaders);
-    }
-
-    if (headers != null) {
-      currentHeaders.addAll(headers);
-    }
-
-    // ✅ Do not manually set Content-Type for multipart requests
-    if (kDebugMode) print("Headers: $currentHeaders");
+    if (cancelToken?.isCancelled == true) return _runResponseInterceptors(PlexNetworkCancelled());
 
     try {
       var uri = Uri.parse(_isValidUrl(url) ? url : _apiUrl() + url);
-      if (kDebugMode) print("Started: ${uri.toString()}");
+      PlexLogger.d('Networking', 'Started: ${uri.toString()}');
 
-      /// Prepare Multipart Request
       var request = http.MultipartRequest('POST', uri);
       request.headers.addAll(currentHeaders);
       request.fields.addAll(formData);
-
-      /// Attach Files
       for (var entry in files.entries) {
         var multipartFile = await http.MultipartFile.fromPath(entry.key, entry.value.path);
         request.files.add(multipartFile);
       }
 
-      var streamedResponse = await request.send();
+      var streamedResponse = await request.send().timeout(requestTimeout);
+      if (cancelToken?.isCancelled == true) return _runResponseInterceptors(PlexNetworkCancelled());
 
       var responseBody = await streamedResponse.stream.transform(utf8.decoder).join();
 
-      if (kDebugMode) print("Completed: ${streamedResponse.statusCode}: ${responseBody.toString()}");
+      PlexLogger.d('Networking', 'Completed: ${streamedResponse.statusCode}: ${responseBody.toString()}');
 
-      /// Handle JSON & Text Responses Correctly
+      PlexApiResponse lastResponse;
       if (streamedResponse.statusCode == 200) {
-        try {
-          return PlexSuccess(responseBody);
-
-          ///  Return JSON if valid
-        } catch (e) {
-          return PlexSuccess(responseBody);
-
-          ///  Otherwise, return as plain text
-        }
+        lastResponse = PlexSuccess(responseBody);
       } else {
-        return PlexError(
+        lastResponse = PlexNetworkServerError(
           streamedResponse.statusCode,
           responseBody.isEmpty ? streamedResponse.reasonPhrase ?? "Unknown error" : responseBody,
         );
       }
-    } catch (e) {
-      if (e is SocketException) {
-        return _connectionFailed;
+      return _runResponseInterceptors(lastResponse);
+    } catch (e, stack) {
+      if (e is TimeoutException) {
+        return _runResponseInterceptors(PlexNetworkTimeout());
       }
-      if (kDebugMode) print("Error: ${e.toString()}");
-      return PlexError(400, e.toString());
+      if (e is SocketException) {
+        return _runResponseInterceptors(PlexNetworkNoConnectivity());
+      }
+      PlexLogger.e('Networking', 'Request failed', error: e);
+      return _runResponseInterceptors(await _runErrorInterceptors(e, stack));
     }
   }
 
@@ -438,7 +734,7 @@ class PlexNetworking {
   ///[onProgressUpdate.file] will return download file
   Future downloadFile(String url, {required String filename, required Function(int downloaded, double? percentage, File? file) onProgressUpdate}) async {
     if (await isNetworkAvailable() == false) {
-      return _noNetwork;
+      return PlexNetworkNoConnectivity();
     }
 
     var httpClient = http.Client();
@@ -451,12 +747,12 @@ class PlexNetworking {
 
     response.asStream().listen((http.StreamedResponse r) {
       r.stream.listen(cancelOnError: true, (List<int> chunk) {
-        debugPrint('downloadPercentage: ${r.contentLength != null ? (downloaded / r.contentLength! * 100) : downloaded}');
+        PlexLogger.d('Networking', 'downloadPercentage: ${r.contentLength != null ? (downloaded / r.contentLength! * 100) : downloaded}');
         onProgressUpdate(downloaded, r.contentLength != null ? (downloaded / r.contentLength! * 100) : null, null);
         chunks.add(chunk);
         downloaded += chunk.length;
       }, onDone: () async {
-        debugPrint('downloadPercentage: ${r.contentLength != null ? (downloaded / r.contentLength! * 100) : downloaded}');
+        PlexLogger.d('Networking', 'downloadPercentage: ${r.contentLength != null ? (downloaded / r.contentLength! * 100) : downloaded}');
         onProgressUpdate(downloaded, r.contentLength != null ? (downloaded / r.contentLength! * 100) : null, null);
 
         // Save the file

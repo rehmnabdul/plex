@@ -1,8 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:plex/plex_di/plex_dependency_injection.dart';
 import 'package:plex/plex_utils.dart';
+import 'package:plex/plex_utils/plex_logger.dart';
 import 'package:plex/plex_utils/plex_messages.dart';
 import 'package:plex/plex_utils/plex_utils.dart';
 import 'package:plex/plex_utils/plex_widgets.dart';
+import 'package:plex/plex_view_model/plex_async_action.dart';
 import 'package:plex/plex_widget.dart';
 import 'package:plex/plex_widgets/loading/plex_loader_v1.dart';
 import 'package:plex/plex_widgets/loading/plex_loader_v2.dart';
@@ -23,6 +28,10 @@ abstract class PlexScreen extends StatefulWidget {
 }
 
 abstract class PlexState<T extends PlexScreen> extends State<T> {
+  /// Override to return a scope name for this screen.
+  /// If non-null, the scope is closed in dispose.
+  String? get diScope => null;
+
   final GlobalKey<ScaffoldState> key = GlobalKey();
   final _loadingController = PlexWidgetController();
 
@@ -149,6 +158,10 @@ abstract class PlexState<T extends PlexScreen> extends State<T> {
 
   @override
   void dispose() {
+    final scope = diScope;
+    if (scope != null) {
+      unawaited(closeScope(scope));
+    }
     super.dispose();
   }
 
@@ -179,5 +192,21 @@ abstract class PlexState<T extends PlexScreen> extends State<T> {
     if (_loadingCount > 0) _loadingCount--;
     if (!mounted) return;
     _loadingController.setValue(_loadingCount > 0);
+  }
+
+  /// Runs an async action with automatic loading/error handling.
+  Future<R?> runAction<R>(PlexAsyncAction<R> action) async {
+    showLoading();
+    try {
+      final result = await action.run();
+      action.onSuccess?.call(result);
+      return result;
+    } catch (e, s) {
+      action.onError?.call(e, s);
+      PlexLogger.e('PlexAsyncAction', e.toString(), error: e, stack: s);
+      return null;
+    } finally {
+      hideLoading();
+    }
   }
 }

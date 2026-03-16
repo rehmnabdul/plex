@@ -129,20 +129,26 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
     };
     PlexApp.app._isLoadingDelegate = () => isLoading();
     PlexApp.app._notificationDelegate = () => notificationCountController.setValue(PlexApp.app._notifications.length);
-    PlexApp.app.dashboardConfig?._routes = PlexApp.app.dashboardConfig?.dashboardScreens ?? List.empty(growable: true);
-    PlexApp.app.dashboardConfig?._routes = PlexApp.app.dashboardConfig!._routes.where((element) {
-      if (element.rule == null) return true;
-      if (user == null) return true;
-      if ((user!.getLoggedInRules() ?? List.empty()).isEmpty) return false;
-      return user!.getLoggedInRules()!.contains(element.rule);
-    }).toList();
+    PlexApp.app.dashboardConfig?._routes = List.empty(growable: true);
 
-    if (PlexApp.app.dashboardConfig!._routes.isEmpty) {
-      delay(() => PlexApp.app.logout());
-    } else {
-      var index = PlexApp.app.dashboardConfig!._routes.indexWhere((element) => element.route == PlexApp.app.getInitialPath());
-      navigationSelectedIndex = PlexPair.create(index == -1 ? 0 : index, null);
-    }
+    Future(() async {
+      final screens = PlexApp.app.dashboardConfig?.dashboardScreens ?? [];
+      final filtered = <PlexRoute>[];
+      for (final route in screens) {
+        final ctx = PlexRouteContext(path: route.route, currentUser: user);
+        final allowed = await evaluateRouteGuards(route.guards, route.rule, ctx);
+        if (allowed) filtered.add(route);
+      }
+      if (!mounted) return;
+      PlexApp.app.dashboardConfig!._routes = filtered;
+      if (filtered.isEmpty) {
+        delay(() => PlexApp.app.logout());
+      } else {
+        var index = filtered.indexWhere((element) => element.route == PlexApp.app.getInitialPath());
+        navigationSelectedIndex = PlexPair.create(index == -1 ? 0 : index, null);
+      }
+      setState(() {});
+    });
 
     PlexApp.app.dashboardConfig?.onNavigation = (index, data) {
       setState(() {

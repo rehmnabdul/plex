@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:plex/plex_utils/plex_logger.dart';
 import 'package:signalr_netcore/hub_connection.dart';
 import 'package:signalr_netcore/hub_connection_builder.dart';
 
@@ -54,7 +54,7 @@ class PlexSignalR {
       config.onConnecting?.call(error);
     });
     _hubConnection.onreconnected(({connectionId}) {
-      debugPrint("Connected: $connectionId");
+      PlexLogger.i('SignalR', 'Connected: $connectionId');
     });
     _hubConnection.onclose(({error}) {
       config.onClose?.call(error);
@@ -70,7 +70,7 @@ class PlexSignalR {
     try {
       await _hubConnection.start();
     } catch (e) {
-      debugPrint("Connecting...\n$e");
+      PlexLogger.w('SignalR', 'Connecting...', error: e);
       await Future.delayed(Duration(milliseconds: 5000));
       start();
     }

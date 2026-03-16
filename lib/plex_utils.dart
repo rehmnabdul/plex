@@ -1,9 +1,10 @@
 import 'package:flutter/foundation.dart';
+import 'package:plex/plex_utils/plex_logger.dart';
 
-console(String message, {bool printInRelease = false}) {
+/// Legacy console helper. Prefer [PlexLogger] for new code.
+void console(String message, {bool printInRelease = false}) {
   if (kDebugMode || printInRelease) {
-    // ignore: avoid_print
-    print("Console: \t\t\t\t$message");
+    PlexLogger.d('Console', message);
   }
 }
 

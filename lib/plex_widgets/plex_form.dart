@@ -1,9 +1,9 @@
 // ignore_for_file: constant_identifier_names
 import 'package:flutter/material.dart';
+import 'package:plex/plex_database/plex_database.dart';
 import 'package:plex/plex_utils/plex_dimensions.dart';
 import 'package:plex/plex_widget.dart';
 import 'package:plex/plex_widgets/plex_form_field_widgets.dart';
-import 'package:plex/plex_widgets/plex_input_widget.dart';
 
 abstract mixin class PlexForm {
   List<PlexFormField> getFields(State<StatefulWidget> context);
@@ -20,6 +20,7 @@ class PlexFormField {
 
   String title;
   dynamic initialValue;
+  bool Function(dynamic formState)? showWhen;
   List<dynamic>? initialSelection;
   late Type type;
   bool isPassword = false;
@@ -45,6 +46,7 @@ class PlexFormField {
     this.inputAction,
     this.isPassword = false,
     this.initialValue,
+    this.showWhen,
   }) {
     fieldType = TYPE_INPUT;
   }
@@ -60,6 +62,7 @@ class PlexFormField {
     this.dropdownWidget,
     this.dropdownLeadingWidget,
     this.initialValue,
+    this.showWhen,
   }) {
     if (items == null && itemsAsync == null) {
       throw Exception("Items must be initialized or async item function must be initialized");
@@ -78,6 +81,7 @@ class PlexFormField {
     this.itemsAsync,
     this.dropdownWidget,
     this.dropdownLeadingWidget,
+    this.showWhen,
   }) {
     if (items == null && itemsAsync == null) {
       throw Exception("Items must be initialized or async item function must be initialized");
@@ -88,43 +92,101 @@ class PlexFormField {
   PlexFormField.dateTime({
     required this.title,
     required this.onChange,
+    this.showWhen,
   }) {
     fieldType = TYPE_DATETIME;
   }
 }
 
 class PlexFormWidget<T> extends StatefulWidget {
-  const PlexFormWidget({super.key, required this.entity, required this.onSubmit});
+  const PlexFormWidget({
+    super.key,
+    required this.entity,
+    required this.onSubmit,
+    this.persistenceKey,
+    this.db,
+  });
 
   final PlexForm entity;
   final void Function(T entity) onSubmit;
+  final String? persistenceKey;
+  final PlexDb? db;
 
   @override
   State<PlexFormWidget> createState() => _PlexFormWidgetState();
 }
 
 class _PlexFormWidgetState extends State<PlexFormWidget> {
+  Map<String, dynamic>? _restoredState;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.persistenceKey != null && widget.db != null) {
+      _loadDraft();
+    }
+  }
+
+  Future<void> _loadDraft() async {
+    final key = 'form_draft:${widget.persistenceKey}';
+    final data = await widget.db!.getFromCache(key);
+    if (data != null && mounted) {
+      for (var field in widget.entity.getFields(this)) {
+        if (data.containsKey(field.title)) {
+          field.onChange(data[field.title]);
+        }
+      }
+      setState(() => _restoredState = data);
+    }
+  }
+
+  Future<void> _saveDraft(Map<String, dynamic> state) async {
+    if (widget.persistenceKey == null || widget.db == null) return;
+    final key = 'form_draft:${widget.persistenceKey}';
+    await widget.db!.putInCache(key, state);
+  }
+
+  void _onFieldChange(String title, dynamic value) {
+    if (widget.persistenceKey != null && widget.db != null) {
+      final state = Map<String, dynamic>.from(_restoredState ?? {});
+      state[title] = value;
+      _restoredState = state;
+      _saveDraft(state);
+    }
+  }
+
   List<Widget> getFields() {
+    final formState = widget.entity;
     var fields = [
-      for (var value in widget.entity.getFields(this)) ...{
-        if (value.fieldType == PlexFormField.TYPE_INPUT) ...{
+      for (var value in widget.entity.getFields(this))
+        if (value.showWhen != null && !value.showWhen!(formState))
+          const SizedBox.shrink()
+        else ...[
+          if (value.fieldType == PlexFormField.TYPE_INPUT) ...{
           if (value.type == String) ...{
             PlexFormFieldInput(
               properties: PlexFormFieldGeneric(title: value.title.toUpperCase(), enabled: value.editable),
               isPassword: value.isPassword,
               inputKeyboardType: value.inputType ?? TextInputType.text,
               inputAction: value.inputAction,
-              inputController: TextEditingController(text: value.initialValue?.toString()),
-              inputOnChange: (v) => value.onChange(v.toString()),
+              inputController: TextEditingController(text: (_restoredState?[value.title] ?? value.initialValue)?.toString()),
+              inputOnChange: (v) {
+                value.onChange(v.toString());
+                _onFieldChange(value.title, v.toString());
+              },
             ),
           },
           if (value.type == int) ...{
             PlexFormFieldInput(
               properties: PlexFormFieldGeneric(title: value.title.toUpperCase(), enabled: value.editable),
               inputKeyboardType: value.inputType ?? const TextInputType.numberWithOptions(decimal: false, signed: false),
-              inputOnChange: (v) => value.onChange(int.tryParse(v)),
+              inputOnChange: (v) {
+                final parsed = int.tryParse(v);
+                value.onChange(parsed);
+                _onFieldChange(value.title, parsed);
+              },
               inputAction: value.inputAction,
-              inputController: TextEditingController(text: value.initialValue?.toString()),
+              inputController: TextEditingController(text: (_restoredState?[value.title] ?? value.initialValue)?.toString()),
               isPassword: value.isPassword,
             ),
           },
@@ -133,8 +195,11 @@ class _PlexFormWidgetState extends State<PlexFormWidget> {
               properties: PlexFormFieldGeneric(title: value.title.toUpperCase(), enabled: value.editable),
               inputKeyboardType: value.inputType ?? const TextInputType.numberWithOptions(decimal: true, signed: false),
               inputAction: value.inputAction,
-              inputOnChange: (v) => value.onChange(v),
-              inputController: TextEditingController(text: value.initialValue?.toString()),
+              inputOnChange: (v) {
+                value.onChange(v);
+                _onFieldChange(value.title, v);
+              },
+              inputController: TextEditingController(text: (_restoredState?[value.title] ?? value.initialValue)?.toString()),
               isPassword: value.isPassword,
             ),
           },
@@ -200,7 +265,7 @@ class _PlexFormWidgetState extends State<PlexFormWidget> {
             },
           ),
         }
-      }
+        ]
     ];
     return fields;
   }

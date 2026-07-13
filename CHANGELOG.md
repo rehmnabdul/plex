@@ -1,3 +1,9 @@
+## 1.0.3
+
+### Updates
+- `PlexScanner` now supports web (mobile and desktop browser camera)
+- Hide torch toggle on web where flash is unavailable
+
 ## 1.0.2
 
 ### Fix

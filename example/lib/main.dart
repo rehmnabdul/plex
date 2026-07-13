@@ -22,6 +22,7 @@ import 'package:plex/plex_widgets/plex_info_dialog.dart';
 import 'package:plex_app/screens/home_screen.dart';
 import 'package:plex_app/screens/plex_gantt_demo_screen.dart';
 import 'package:plex_app/screens/plex_info_sheet_demo_screen.dart';
+import 'package:plex_app/screens/plex_scanner_demo_screen.dart';
 import 'package:plex_app/screens/second_screen.dart';
 
 class Routes {
@@ -31,6 +32,7 @@ class Routes {
   static const getxExampleScreen = "/getx-example";
   static const infoSheetDemoScreen = "/info-sheet-demo";
   static const ganttDemoScreen = "/gantt-demo";
+  static const scannerDemoScreen = "/scanner-demo";
 }
 
 class AppUser extends PlexUser {
@@ -929,6 +931,15 @@ void main() async {
           logo: const Icon(Icons.info_outline),
           selectedLogo: const Icon(Icons.info),
           screen: (context, {data}) => const PlexInfoSheetDemoScreen(),
+        ),
+        PlexRoute(
+          route: Routes.scannerDemoScreen,
+          category: "Scanner",
+          title: "Mobile Scanner Demo",
+          shortTitle: "Scanner",
+          logo: const Icon(Icons.qr_code_scanner_outlined),
+          selectedLogo: const Icon(Icons.qr_code_scanner),
+          screen: (context, {data}) => const PlexScannerDemoScreen(),
         ),
       ],
       enableNotifications: true,

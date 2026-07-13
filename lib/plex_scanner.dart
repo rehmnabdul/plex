@@ -32,7 +32,7 @@ class _PlexScannerState extends State<PlexScanner> {
         child: Stack(
           alignment: Alignment.center,
           children: [
-            if (GetPlatform.isMobile) ...{
+            if (GetPlatform.isMobile || GetPlatform.isWeb) ...{
               MobileScanner(
                 controller: cameraController,
                 onDetect: (capture) {
@@ -102,26 +102,27 @@ class _PlexScannerState extends State<PlexScanner> {
                 ),
               ),
             ),
-            Positioned(
-              bottom: 50.0,
-              child: ToggleButtons(
-                isSelected: _isSelected,
-                onPressed: (int index) async {
-                  if (!_isSelected[index]) {
-                    await cameraController.toggleTorch();
-                  }
-                  setState(() {
-                    for (int i = 0; i < _isSelected.length; i++) {
-                      _isSelected[i] = i == index;
+            if (!GetPlatform.isWeb)
+              Positioned(
+                bottom: 50.0,
+                child: ToggleButtons(
+                  isSelected: _isSelected,
+                  onPressed: (int index) async {
+                    if (!_isSelected[index]) {
+                      await cameraController.toggleTorch();
                     }
-                  });
-                },
-                children: const [
-                  Icon(Icons.flash_off),
-                  Icon(Icons.flash_on),
-                ],
+                    setState(() {
+                      for (int i = 0; i < _isSelected.length; i++) {
+                        _isSelected[i] = i == index;
+                      }
+                    });
+                  },
+                  children: const [
+                    Icon(Icons.flash_off),
+                    Icon(Icons.flash_on),
+                  ],
+                ),
               ),
-            ),
           ],
         ),
       ),

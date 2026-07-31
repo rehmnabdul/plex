@@ -25,6 +25,7 @@ PLEX is a powerful, open-source UI framework for Flutter, designed to accelerate
 - **Dependency Injection**: Simple, tag-based DI for managing app-wide and feature-specific dependencies.
 - **User Management**: Integrated login screens, session handling, and user models.
 - **SignalR Integration**: Native support for real-time communication using Microsoft SignalR.
+- **Networking Utilities**: Built-in HTTP client with `PlexNetworking` / `PlexCalls` for JSON APIs, file downloads to disk, and in-memory binary downloads.
 - **Persistent Storage**: Easy-to-use local storage utilities for app data and user preferences.
 - **Material 2 & 3, Light & Dark Modes**: Effortlessly switch between Material versions and color schemes.
 - **Code Generation**: Annotation-based model enhancements (e.g., `copy()`, `asString()` methods).
@@ -263,6 +264,57 @@ PlexScanner()
 ---
 
 ### Real-Time & Networking
+
+#### `PlexNetworking` & `PlexCalls`
+HTTP utilities for API calls, file downloads, and binary responses.
+
+**JSON GET/POST** via `PlexCalls`:
+```dart
+PlexCalls.instance.setBaseUrl('https://api.example.com');
+PlexCalls.instance.setHeadersCallback(() async => {'Authorization': 'Bearer token'});
+
+final result = await PlexCalls.instance.get(
+  '/api/users',
+  queryParams: {'page': 1},
+);
+if (result.success) {
+  final data = result.data; // decoded JSON or string
+}
+```
+
+**Download file to app documents directory** (with progress callback):
+```dart
+PlexNetworking.instance.downloadFile(
+  '/api/files/report.pdf',
+  filename: 'report.pdf',
+  onProgressUpdate: (downloaded, percentage, file) {
+    if (file != null) {
+      // download complete — file saved under app documents
+    }
+  },
+);
+```
+
+**Download binary content into memory** (e.g. PDF, Excel, images) without writing to disk:
+```dart
+import 'dart:typed_data';
+
+final result = await PlexCalls.instance.downloadBytes(
+  '/api/v1/DigitalMta/GetMtaFromHms',
+  queryParams: {
+    'batchNo': batchNo,
+    'yearCode': yearCode,
+    'update': false,
+  },
+);
+
+if (result.success) {
+  final bytes = result.data as Uint8List;
+  // use bytes directly — display, parse, or open in memory
+}
+```
+
+Use `PlexNetworking.instance.downloadBytes(...)` directly if you prefer `PlexSuccess` / `PlexError` instead of `PlexApiResult`.
 
 #### `PlexSignalR`
 Real-time communication using SignalR.

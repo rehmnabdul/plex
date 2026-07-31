@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
@@ -28,6 +29,10 @@ class PlexSuccess<T> extends PlexApiResponse<T> {
     } catch (e) {
       response = body!.toString();
     }
+  }
+
+  PlexSuccess.bytes(Uint8List bytes) {
+    response = bytes;
   }
 }
 
@@ -413,6 +418,63 @@ class PlexNetworking {
           streamedResponse.statusCode,
           responseBody.isEmpty ? streamedResponse.reasonPhrase ?? "Unknown error" : responseBody,
         );
+      }
+    } catch (e) {
+      if (e is SocketException) {
+        return _connectionFailed;
+      }
+      if (kDebugMode) print("Error: ${e.toString()}");
+      return PlexError(400, e.toString());
+    }
+  }
+
+  /// Downloads binary content from [url] and returns it in memory as [Uint8List].
+  ///
+  /// Mirrors [get] for URL/query/headers handling but uses [http.Response.bodyBytes]
+  /// instead of decoding the response as JSON or text.
+  Future<PlexApiResponse> downloadBytes(
+    String url, {
+    Map<String, dynamic>? query,
+    Map<String, String>? headers,
+  }) async {
+    if (await isNetworkAvailable() == false) {
+      return _noNetwork;
+    }
+
+    if (query != null && query.isNotEmpty) {
+      url += "?";
+      query.forEach((key, value) {
+        url += "$key=$value&";
+      });
+      url = url.substring(0, url.length - 1);
+    }
+
+    var currentHeaders = <String, String>{};
+
+    if (addHeaders != null) {
+      var constHeaders = await addHeaders!.call();
+      currentHeaders.addAll(constHeaders);
+    }
+
+    if (headers != null) {
+      currentHeaders.addAll(headers);
+    }
+
+    try {
+      var startTime = DateTime.now();
+      var uri = Uri.parse(_isValidUrl(url) ? url : _apiUrl() + url);
+      if (kDebugMode) print("Started: ${uri.toString()}");
+
+      var data = await http.get(uri, headers: currentHeaders);
+      var diffInMillis = DateTime.now().difference(startTime).inMilliseconds;
+      if (kDebugMode) print("Completed: ${data.statusCode}: ${uri.toString()} in ${diffInMillis}ms");
+      if (data.statusCode == 200) {
+        return PlexSuccess.bytes(data.bodyBytes);
+      } else {
+        if (data.body.isEmpty) {
+          return PlexError(data.statusCode, data.reasonPhrase ?? data.body);
+        }
+        return PlexError(data.statusCode, data.body);
       }
     } catch (e) {
       if (e is SocketException) {

@@ -226,6 +226,27 @@ class PlexCalls {
     return _handleResponse(response);
   }
 
+  /// Downloads binary content from the specified URL into memory.
+  ///
+  /// [endpoint] - The API endpoint or full URL
+  /// [queryParams] - Optional query parameters to append to the URL
+  /// [headers] - Optional headers to include in the request
+  ///
+  /// Returns a [Future<PlexApiResult>] with [PlexApiResult.data] as [Uint8List] on success
+  Future<PlexApiResult> downloadBytes(
+    String endpoint, {
+    Map<String, dynamic>? queryParams,
+    Map<String, String>? headers,
+  }) async {
+    final response = await PlexNetworking.instance.downloadBytes(
+      endpoint,
+      query: queryParams,
+      headers: headers,
+    );
+
+    return _handleResponse(response);
+  }
+
   /// Downloads a file from the specified URL
   ///
   /// [url] - The URL from which to download the file

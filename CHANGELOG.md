@@ -1,3 +1,9 @@
+## 1.0.4
+
+### New
+- Add `downloadBytes` in `PlexNetworking` and `PlexCalls` to download binary content into memory as `Uint8List` (no disk write)
+- Add `PlexSuccess.bytes` constructor for raw byte responses without JSON decoding
+
 ## 1.0.3
 
 ### Updates

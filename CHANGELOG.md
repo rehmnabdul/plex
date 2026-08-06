@@ -1,3 +1,11 @@
+## 1.0.5
+
+### Updates
+- `PlexNetworking` now treats all HTTP 2xx responses as success (previously only `200`)
+- `PlexSuccess` now includes the HTTP status code from the response
+- `PlexCalls` returns the actual HTTP status code in `PlexApiResult.code` on success
+- Empty API response body (`""`) is returned as `null` instead of being parsed
+
 ## 1.0.4
 
 ### New

@@ -20,18 +20,22 @@ class PlexApiResult {
 class PlexApiResponse<T> {}
 
 class PlexSuccess<T> extends PlexApiResponse<T> {
+  late int code;
   late dynamic response;
 
-  PlexSuccess(String? body) {
-    if (body == null) response = null;
-    try {
-      response = jsonDecode(body!);
-    } catch (e) {
-      response = body!.toString();
+  PlexSuccess(String? body, this.code) {
+    if (body == null || body == "") {
+      response = null;
+    } else {
+      try {
+        response = jsonDecode(body!);
+      } catch (e) {
+        response = body!.toString();
+      }
     }
   }
 
-  PlexSuccess.bytes(Uint8List bytes) {
+  PlexSuccess.bytes(Uint8List bytes, this.code) {
     response = bytes;
   }
 }
@@ -137,8 +141,8 @@ class PlexNetworking {
       var data = await http.get(uri, headers: currentHeaders);
       var diffInMillis = DateTime.now().difference(startTime).inMilliseconds;
       if (kDebugMode) print("Completed: ${data.statusCode}: ${uri.toString()} in ${diffInMillis}ms");
-      if (data.statusCode == 200) {
-        return PlexSuccess(data.body);
+      if (data.statusCode.toString().startsWith("2")) {
+        return PlexSuccess(data.body, data.statusCode);
       } else {
         if (data.body.isEmpty) {
           return PlexError(data.statusCode, data.reasonPhrase ?? data.body);
@@ -198,8 +202,8 @@ class PlexNetworking {
 
       var diffInMillis = DateTime.now().difference(startTime).inMilliseconds;
       if (kDebugMode) print("Completed: ${data.statusCode}: ${uri.toString()} in ${diffInMillis}ms");
-      if (data.statusCode == 200) {
-        return PlexSuccess(data.body);
+      if (data.statusCode.toString().startsWith("2")) {
+        return PlexSuccess(data.body, data.statusCode);
       } else {
         if (data.body.isEmpty) {
           return PlexError(data.statusCode, data.reasonPhrase ?? data.body);
@@ -259,8 +263,8 @@ class PlexNetworking {
 
       var diffInMillis = DateTime.now().difference(startTime).inMilliseconds;
       if (kDebugMode) print("Completed: ${data.statusCode}: ${uri.toString()} in ${diffInMillis}ms");
-      if (data.statusCode == 200) {
-        return PlexSuccess(data.body);
+      if (data.statusCode.toString().startsWith("2")) {
+        return PlexSuccess(data.body, data.statusCode);
       } else {
         if (data.body.isEmpty) {
           return PlexError(data.statusCode, data.reasonPhrase ?? data.body);
@@ -331,9 +335,9 @@ class PlexNetworking {
 
       var diffInMillis = DateTime.now().difference(startTime).inMilliseconds;
       if (kDebugMode) print("Completed: ${data.statusCode}: ${uri.toString()} in ${diffInMillis}ms");
-      if (data.statusCode == 200) {
+      if (data.statusCode.toString().startsWith("2")) {
         var responseBody = await data.stream.transform(utf8.decoder).join();
-        return PlexSuccess(responseBody);
+        return PlexSuccess(responseBody, data.statusCode);
       } else {
         var responseBody = await data.stream.transform(utf8.decoder).join();
         if (responseBody.isEmpty) {
@@ -378,7 +382,7 @@ class PlexNetworking {
       currentHeaders.addAll(headers);
     }
 
-    // ✅ Do not manually set Content-Type for multipart requests
+// ✅ Do not manually set Content-Type for multipart requests
     if (kDebugMode) print("Headers: $currentHeaders");
 
     try {
@@ -403,13 +407,13 @@ class PlexNetworking {
       if (kDebugMode) print("Completed: ${streamedResponse.statusCode}: ${responseBody.toString()}");
 
       /// Handle JSON & Text Responses Correctly
-      if (streamedResponse.statusCode == 200) {
+      if (streamedResponse.statusCode.toString().startsWith("2")) {
         try {
-          return PlexSuccess(responseBody);
+          return PlexSuccess(responseBody, streamedResponse.statusCode);
 
           ///  Return JSON if valid
         } catch (e) {
-          return PlexSuccess(responseBody);
+          return PlexSuccess(responseBody, streamedResponse.statusCode);
 
           ///  Otherwise, return as plain text
         }
@@ -468,8 +472,8 @@ class PlexNetworking {
       var data = await http.get(uri, headers: currentHeaders);
       var diffInMillis = DateTime.now().difference(startTime).inMilliseconds;
       if (kDebugMode) print("Completed: ${data.statusCode}: ${uri.toString()} in ${diffInMillis}ms");
-      if (data.statusCode == 200) {
-        return PlexSuccess.bytes(data.bodyBytes);
+      if (data.statusCode.toString().startsWith("2")) {
+        return PlexSuccess.bytes(data.bodyBytes, data.statusCode);
       } else {
         if (data.body.isEmpty) {
           return PlexError(data.statusCode, data.reasonPhrase ?? data.body);
@@ -521,7 +525,7 @@ class PlexNetworking {
         debugPrint('downloadPercentage: ${r.contentLength != null ? (downloaded / r.contentLength! * 100) : downloaded}');
         onProgressUpdate(downloaded, r.contentLength != null ? (downloaded / r.contentLength! * 100) : null, null);
 
-        // Save the file
+// Save the file
         File file = File('$dir/$filename');
         final Uint8List bytes = Uint8List(downloaded);
         int offset = 0;

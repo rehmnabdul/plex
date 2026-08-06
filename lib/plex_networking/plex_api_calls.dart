@@ -261,7 +261,7 @@ class PlexCalls {
   /// Helper method to process the response from PlexNetworking
   PlexApiResult _handleResponse(PlexApiResponse response) {
     if (response is PlexSuccess) {
-      return PlexApiResult(true, 200, 'Success', response.response);
+      return PlexApiResult(true, response.code, 'Success', response.response);
     } else if (response is PlexError) {
       return PlexApiResult(false, response.code, response.message, null);
     } else {

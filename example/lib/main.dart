@@ -111,7 +111,10 @@ initializeDb() async {
   testMapDb() async {
     var usersRefMap = db.getCollection("Users");
 
-    var maps = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((a) => UserEntity.init(email: "ab$a@gmail.com", userName: "ab$a").toJson()).toList();
+    var maps = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        .map((a) =>
+            UserEntity.init(email: "ab$a@gmail.com", userName: "ab$a").toJson())
+        .toList();
     await usersRefMap.insertAll(maps);
 
     var usersMap = await usersRefMap.getAll();
@@ -133,7 +136,9 @@ initializeDb() async {
       fromJson: (m) => UserEntity.fromJson(m),
     );
 
-    var maps = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((a) => UserEntity.init(email: "ab$a@gmail.com", userName: "ab$a")).toList();
+    var maps = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        .map((a) => UserEntity.init(email: "ab$a@gmail.com", userName: "ab$a"))
+        .toList();
     await usersRefMap.insertAll(maps);
 
     var usersMap = await usersRefMap.getAll();
@@ -215,7 +220,8 @@ void main() async {
           PlexDataCell.custom(
             "Second Company Pvt. Ltd",
             const DataCell(
-              Text("Second Company Pvt. Ltd", style: TextStyle(color: Colors.green)),
+              Text("Second Company Pvt. Ltd",
+                  style: TextStyle(color: Colors.green)),
             ),
           )
         ],
@@ -229,7 +235,8 @@ void main() async {
           PlexDataCell.custom(
             "First Company Pvt. Ltd",
             const DataCell(
-              Text("First Company Pvt. Ltd", style: TextStyle(color: Colors.brown)),
+              Text("First Company Pvt. Ltd",
+                  style: TextStyle(color: Colors.brown)),
             ),
           ),
         ],
@@ -243,7 +250,8 @@ void main() async {
           PlexDataCell.custom(
             "Second Company Pvt. Ltd",
             const DataCell(
-              Text("Second Company Pvt. Ltd", style: TextStyle(color: Colors.green)),
+              Text("Second Company Pvt. Ltd",
+                  style: TextStyle(color: Colors.green)),
             ),
           )
         ],
@@ -258,10 +266,18 @@ void main() async {
           PlexDataTableValueCell.text("First", "First $a"),
           PlexDataTableValueCell.text("Last", "Last $a"),
           PlexDataTableValueCell.text("EmpCode", "EMP$a"),
-          PlexDataTableValueCell.text("Designation", "Engineer ${Random().nextInt(10) + 1}"),
-          PlexDataTableValueCell.text("Grade", "Scale ${Random().nextInt(5) + 1}"),
+          PlexDataTableValueCell.text(
+              "Designation", "Engineer ${Random().nextInt(10) + 1}"),
+          PlexDataTableValueCell.text(
+              "Grade", "Scale ${Random().nextInt(5) + 1}"),
           // PlexDataTableValueCell.text("Company", "Company Name is Long jhghggjgjggjgjhj $a"),
-          PlexDataTableValueCell.custom("Company", "Long ", Container(color: Colors.redAccent, child: const Text("Long Long Long Long Long Long Long Long Long Long"))),
+          PlexDataTableValueCell.custom(
+              "Company",
+              "Long ",
+              Container(
+                  color: Colors.redAccent,
+                  child: const Text(
+                      "Long Long Long Long Long Long Long Long Long Long"))),
           PlexDataTableValueCell.text("1", "1 - $a"),
           PlexDataTableValueCell.text("2", "2 - $a"),
           PlexDataTableValueCell.text("3", "3 - $a"),
@@ -285,7 +301,8 @@ void main() async {
   // );
 
   ///Dependency Injection
-  injectSingleton(MyUser("firstName", "lastName", 20, DateTime.now(), true, "object", [1, 2, 3]));
+  injectSingleton(MyUser(
+      "firstName", "lastName", 20, DateTime.now(), true, "object", [1, 2, 3]));
 
   ///Get Injected Objects
   var user = fromPlex<MyUser>();
@@ -354,7 +371,8 @@ void main() async {
       passwordMaxLength: 15,
       additionalWidgetsTop: (context) => const Text("Login Screen"),
       additionalWidgetsBottom: (context) => const Text("Login Screen End"),
-      additionalWidgetsAboveLoginButton: (context) => const Text("Middle Widgets"),
+      additionalWidgetsAboveLoginButton: (context) =>
+          const Text("Middle Widgets"),
       onLogin: (context, email, password) async {
         return AppUser.init(userName: "Abdur Rahman", email: "ar@mail.com");
       },
@@ -437,7 +455,8 @@ void main() async {
                   getTableData();
                 },
                 headerTextStyle: const TextStyle(fontWeight: FontWeight.bold),
-                headerBackground: PlexTheme.getActiveTheme(context).primaryColor,
+                headerBackground:
+                    PlexTheme.getActiveTheme(context).primaryColor,
                 border: TableBorder.all(color: Colors.black12),
                 columns: [
                   PlexDataCell.text("Id"),
@@ -511,7 +530,12 @@ void main() async {
             );
           },
         ),
-        PlexRoute(route: "newPath2", title: "New Screen 2", screen: (context, {data}) => const Text("New Screen 2"), logo: SizedBox(width: 26, height: 26, child: Image.asset("assets/app.png"))),
+        PlexRoute(
+            route: "newPath2",
+            title: "New Screen 2",
+            screen: (context, {data}) => const Text("New Screen 2"),
+            logo: SizedBox(
+                width: 26, height: 26, child: Image.asset("assets/app.png"))),
         PlexRoute(
           route: "/paginated-table",
           category: "Paginated Tables",
@@ -538,7 +562,8 @@ void main() async {
           logo: const Icon(Icons.table_chart_outlined),
           selectedLogo: const Icon(Icons.table_chart),
           screen: (context, {data}) {
-            var gridController = PlexWidgetController(data: getAdvanceTableData());
+            var gridController =
+                PlexWidgetController(data: getAdvanceTableData());
             var controller = TextEditingController();
             return PlexAdvanceDataTable(
               title: "Advance Data Table",
@@ -550,7 +575,8 @@ void main() async {
                 PlexDataTableHeaderCell.text("EmpCode"),
                 PlexDataTableHeaderCell.text("Designation"),
                 PlexDataTableHeaderCell.text("Grade"),
-                PlexDataTableHeaderCell.text("Company", showOrderByControl: false, showFilterControl: false),
+                PlexDataTableHeaderCell.text("Company",
+                    showOrderByControl: false, showFilterControl: false),
                 PlexDataTableHeaderCell.text("1"),
                 PlexDataTableHeaderCell.text("2"),
                 PlexDataTableHeaderCell.text("3"),
@@ -565,13 +591,18 @@ void main() async {
               controller: gridController,
               cellEditingWidget: (row, column) {
                 if ([0, 1, 2].contains(column)) {
-                  controller.text = (gridController.data as List<List<PlexDataTableValueCell>>)[row][column].value.toString();
+                  controller.text = (gridController.data
+                          as List<List<PlexDataTableValueCell>>)[row][column]
+                      .value
+                      .toString();
                   return TextField(controller: controller);
                 }
               },
               cellEditingSubmit: (row, column) async {
-                var cell = (gridController.data as List<List<PlexDataTableValueCell>>)[row][column];
-                (gridController.data as List<List<PlexDataTableValueCell>>)[row][column] = cell.clone(newValue: controller.text);
+                var cell = (gridController.data
+                    as List<List<PlexDataTableValueCell>>)[row][column];
+                (gridController.data as List<List<PlexDataTableValueCell>>)[row]
+                    [column] = cell.clone(newValue: controller.text);
               },
             );
           },
@@ -600,13 +631,16 @@ void main() async {
           selectedLogo: const Icon(Icons.panorama_photosphere_select),
           screen: (context, {data}) {
             // Controllers for stateful widgets
-            final textEditingController = TextEditingController(text: "Initial Text");
-            final errorController = PlexWidgetController(data: "This is an error message");
+            final textEditingController =
+                TextEditingController(text: "Initial Text");
+            final errorController =
+                PlexWidgetController(data: "This is an error message");
             final dateController = PlexWidgetController<DateTime?>();
             final timeController = PlexWidgetController<DateTime?>();
             final dateTimeController = PlexWidgetController<DateTime?>();
             final dropdownController = PlexWidgetController<String?>();
-            final multiSelectController = PlexWidgetController<List<String>?>(data: ['Option 2']);
+            final multiSelectController =
+                PlexWidgetController<List<String>?>(data: ['Option 2']);
             final autoCompleteController = PlexWidgetController<String?>();
 
             return SingleChildScrollView(
@@ -624,9 +658,12 @@ void main() async {
                     },
                   ),
 
-                  const Text("PlexFormFieldInput", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  const Text("PlexFormFieldInput",
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   PlexFormFieldInput(
-                    properties: const PlexFormFieldGeneric.title("Text Input Field"),
+                    properties:
+                        const PlexFormFieldGeneric.title("Text Input Field"),
                     inputHint: "Enter some text",
                     inputController: textEditingController,
                     inputOnChange: (value) {
@@ -634,7 +671,8 @@ void main() async {
                     },
                   ),
                   PlexFormFieldInput(
-                    properties: const PlexFormFieldGeneric.title("Password Field"),
+                    properties:
+                        const PlexFormFieldGeneric.title("Password Field"),
                     inputHint: "Enter your password",
                     isPassword: true,
                     maxInputLength: 20,
@@ -643,7 +681,8 @@ void main() async {
                     },
                   ),
                   PlexFormFieldInput(
-                    properties: const PlexFormFieldGeneric.title("Numeric Input"),
+                    properties:
+                        const PlexFormFieldGeneric.title("Numeric Input"),
                     inputHint: "Enter a number",
                     inputKeyboardType: TextInputType.number,
                     inputOnChange: (value) {
@@ -651,7 +690,8 @@ void main() async {
                     },
                   ),
                   PlexFormFieldInput(
-                    properties: const PlexFormFieldGeneric.title("Input with Prefix/Suffix Icons"),
+                    properties: const PlexFormFieldGeneric.title(
+                        "Input with Prefix/Suffix Icons"),
                     prefixIcon: const Icon(Icons.person),
                     suffixIcon: const Icon(Icons.info_outline),
                     inputOnChange: (value) {
@@ -659,16 +699,20 @@ void main() async {
                     },
                   ),
                   PlexFormFieldInput(
-                    properties: const PlexFormFieldGeneric(title: "Disabled Input Field", enabled: false),
+                    properties: const PlexFormFieldGeneric(
+                        title: "Disabled Input Field", enabled: false),
                     inputHint: "This field is disabled",
                   ),
                   PlexFormFieldInput(
-                    properties: const PlexFormFieldGeneric.title("Input with Error"),
+                    properties:
+                        const PlexFormFieldGeneric.title("Input with Error"),
                     errorController: errorController,
                     inputHint: "This field has an error",
                   ),
                   const SizedBox(height: 16),
-                  const Text("PlexFormFieldDate", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  const Text("PlexFormFieldDate",
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   PlexFormFieldDate(
                     type: PlexFormFieldDateType.typeDate,
                     properties: const PlexFormFieldGeneric.title("Date Picker"),
@@ -676,7 +720,8 @@ void main() async {
                     onSelect: (item) {
                       print("Date Selected: $item");
                     },
-                    minDatetime: DateTime.now().subtract(const Duration(days: 30)),
+                    minDatetime:
+                        DateTime.now().subtract(const Duration(days: 30)),
                     maxDatetime: DateTime.now().add(const Duration(days: 30)),
                   ),
                   PlexFormFieldDate(
@@ -689,17 +734,26 @@ void main() async {
                   ),
                   PlexFormFieldDate(
                     type: PlexFormFieldDateType.typeDateTime,
-                    properties: const PlexFormFieldGeneric.title("Date & Time Picker"),
+                    properties:
+                        const PlexFormFieldGeneric.title("Date & Time Picker"),
                     selectionController: dateTimeController,
                     onSelect: (item) {
                       print("DateTime Selected: $item");
                     },
                   ),
                   const SizedBox(height: 16),
-                  const Text("PlexFormFieldDropdown", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  const Text("PlexFormFieldDropdown",
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   PlexFormFieldDropdown<String>(
-                    properties: const PlexFormFieldGeneric.title("Dropdown Select"),
-                    dropdownItems: const ["Option 1", "Option 2", "Option 3", "Another Option with a long name"],
+                    properties:
+                        const PlexFormFieldGeneric.title("Dropdown Select"),
+                    dropdownItems: const [
+                      "Option 1",
+                      "Option 2",
+                      "Option 3",
+                      "Another Option with a long name"
+                    ],
                     dropdownSelectionController: dropdownController,
                     initialSelection: "Option 1",
                     dropdownItemAsString: (item) => item.toUpperCase(),
@@ -709,10 +763,18 @@ void main() async {
                     showClearButton: true,
                   ),
                   const SizedBox(height: 16),
-                  const Text("PlexFormFieldMultiSelect", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  const Text("PlexFormFieldMultiSelect",
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   PlexFormFieldMultiSelect<String>(
-                    properties: const PlexFormFieldGeneric.title("Multi-Select Dropdown"),
-                    dropdownItems: const ["Option A", "Option B", "Option C", "Option D"],
+                    properties: const PlexFormFieldGeneric.title(
+                        "Multi-Select Dropdown"),
+                    dropdownItems: const [
+                      "Option A",
+                      "Option B",
+                      "Option C",
+                      "Option D"
+                    ],
                     multiSelectionController: multiSelectController,
                     // multiInitialSelection: ['Option B'], // Controller takes precedence
                     dropdownItemAsString: (item) => "Item: $item",
@@ -721,16 +783,28 @@ void main() async {
                     },
                   ),
                   const SizedBox(height: 16),
-                  const Text("PlexFormFieldAutoComplete", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  const Text("PlexFormFieldAutoComplete",
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   PlexFormFieldAutoComplete<String>(
-                    properties: const PlexFormFieldGeneric.title("Auto Complete Search"),
+                    properties: const PlexFormFieldGeneric.title(
+                        "Auto Complete Search"),
                     dropdownSelectionController: autoCompleteController,
                     autoCompleteItems: (query) async {
                       await Future.delayed(const Duration(milliseconds: 500));
                       if (query.isEmpty) {
-                        return ["Apple", "Banana", "Cherry", "Date", "Elderberry"];
+                        return [
+                          "Apple",
+                          "Banana",
+                          "Cherry",
+                          "Date",
+                          "Elderberry"
+                        ];
                       }
-                      return ["Apple", "Banana", "Cherry", "Date", "Elderberry"].where((item) => item.toLowerCase().contains(query.toLowerCase())).toList();
+                      return ["Apple", "Banana", "Cherry", "Date", "Elderberry"]
+                          .where((item) =>
+                              item.toLowerCase().contains(query.toLowerCase()))
+                          .toList();
                     },
                     dropdownItemAsString: (item) => item,
                     dropdownItemOnSelect: (item) {
@@ -741,93 +815,114 @@ void main() async {
                     showBarCode: true,
                   ),
                   const SizedBox(height: 16),
-                  const Text("PlexFormFieldButton", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  const Text("PlexFormFieldButton",
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   PlexFormFieldButton(
-                    properties: const PlexFormFieldGeneric.title("Elevated Button"),
+                    properties:
+                        const PlexFormFieldGeneric.title("Elevated Button"),
                     buttonClick: () {
                       print("Elevated Button Clicked!");
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Elevated Button Clicked!")));
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                          content: Text("Elevated Button Clicked!")));
                     },
                   ),
                   PlexFormFieldButton(
-                    properties: const PlexFormFieldGeneric.title("Button with Icon"),
+                    properties:
+                        const PlexFormFieldGeneric.title("Button with Icon"),
                     buttonIcon: const Icon(Icons.send),
                     buttonClick: () {
                       print("Icon Button Clicked!");
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Icon Button Clicked!")));
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                          content: Text("Icon Button Clicked!")));
                     },
                   ),
                   const SizedBox(height: 16),
-                  const Text("PlexFormFieldButton", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  const Text("PlexFormFieldButton",
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   // Elevated Button (default)
                   PlexFormFieldButton(
-                    properties: const PlexFormFieldGeneric.title("Unified Elevated Button"),
+                    properties: const PlexFormFieldGeneric.title(
+                        "Unified Elevated Button"),
                     buttonType: PlexButtonType.elevated,
                     buttonClick: () {
                       print("Unified Elevated Button Clicked!");
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Unified Elevated Button Clicked!")),
+                        const SnackBar(
+                            content: Text("Unified Elevated Button Clicked!")),
                       );
                     },
                   ),
 
                   // Text Button
                   PlexFormFieldButton(
-                    properties: const PlexFormFieldGeneric.title("Unified Text Button"),
+                    properties:
+                        const PlexFormFieldGeneric.title("Unified Text Button"),
                     buttonType: PlexButtonType.text,
                     buttonClick: () {
                       print("Unified Text Button Clicked!");
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Unified Text Button Clicked!")),
+                        const SnackBar(
+                            content: Text("Unified Text Button Clicked!")),
                       );
                     },
                   ),
 
                   // Outlined Button
                   PlexFormFieldButton(
-                    properties: const PlexFormFieldGeneric.title("Unified Outlined Button"),
+                    properties: const PlexFormFieldGeneric.title(
+                        "Unified Outlined Button"),
                     buttonType: PlexButtonType.outlined,
                     buttonClick: () {
                       print("Unified Outlined Button Clicked!");
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Unified Outlined Button Clicked!")),
+                        const SnackBar(
+                            content: Text("Unified Outlined Button Clicked!")),
                       );
                     },
                   ),
 
                   // Filled Button
                   PlexFormFieldButton(
-                    properties: const PlexFormFieldGeneric.title("Unified Filled Button"),
+                    properties: const PlexFormFieldGeneric.title(
+                        "Unified Filled Button"),
                     buttonType: PlexButtonType.filled,
                     buttonClick: () {
                       print("Unified Filled Button Clicked!");
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Unified Filled Button Clicked!")),
+                        const SnackBar(
+                            content: Text("Unified Filled Button Clicked!")),
                       );
                     },
                   ),
 
                   // Filled Tonal Button
                   PlexFormFieldButton(
-                    properties: const PlexFormFieldGeneric.title("Unified Filled Tonal Button"),
+                    properties: const PlexFormFieldGeneric.title(
+                        "Unified Filled Tonal Button"),
                     buttonType: PlexButtonType.filledTonal,
                     buttonClick: () {
                       print("Unified Filled Tonal Button Clicked!");
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Unified Filled Tonal Button Clicked!")),
+                        const SnackBar(
+                            content:
+                                Text("Unified Filled Tonal Button Clicked!")),
                       );
                     },
                   ),
 
                   // Button with Icon
                   PlexFormFieldButton(
-                    properties: const PlexFormFieldGeneric.title("Unified Button with Icon"),
+                    properties: const PlexFormFieldGeneric.title(
+                        "Unified Button with Icon"),
                     buttonType: PlexButtonType.elevated,
                     buttonIcon: const Icon(Icons.add),
                     buttonClick: () {
                       print("Unified Button with Icon Clicked!");
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Unified Button with Icon Clicked!")),
+                        const SnackBar(
+                            content: Text("Unified Button with Icon Clicked!")),
                       );
                     },
                   ),
@@ -839,7 +934,8 @@ void main() async {
                     buttonClick: () {
                       print("Icon-only Button Clicked!");
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Icon-only Button Clicked!")),
+                        const SnackBar(
+                            content: Text("Icon-only Button Clicked!")),
                       );
                     },
                   ),
@@ -860,60 +956,73 @@ void main() async {
 
                   // Text button with icon
                   PlexFormFieldButton(
-                    properties: const PlexFormFieldGeneric.title("Text Button with Icon"),
+                    properties: const PlexFormFieldGeneric.title(
+                        "Text Button with Icon"),
                     buttonType: PlexButtonType.text,
                     buttonIcon: const Icon(Icons.info),
                     buttonClick: () {
                       print("Text Button with Icon Clicked!");
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Text Button with Icon Clicked!")),
+                        const SnackBar(
+                            content: Text("Text Button with Icon Clicked!")),
                       );
                     },
                   ),
 
                   // Outlined button with icon
                   PlexFormFieldButton(
-                    properties: const PlexFormFieldGeneric.title("Outlined Button with Icon"),
+                    properties: const PlexFormFieldGeneric.title(
+                        "Outlined Button with Icon"),
                     buttonType: PlexButtonType.outlined,
                     buttonIcon: const Icon(Icons.edit),
                     buttonClick: () {
                       print("Outlined Button with Icon Clicked!");
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Outlined Button with Icon Clicked!")),
+                        const SnackBar(
+                            content:
+                                Text("Outlined Button with Icon Clicked!")),
                       );
                     },
                   ),
 
                   // Filled Tonal button with icon
                   PlexFormFieldButton(
-                    properties: const PlexFormFieldGeneric.title("Filled Tonal with Icon"),
+                    properties: const PlexFormFieldGeneric.title(
+                        "Filled Tonal with Icon"),
                     buttonType: PlexButtonType.filledTonal,
                     buttonIcon: const Icon(Icons.search),
                     buttonClick: () {
                       print("Filled Tonal Button with Icon Clicked!");
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Filled Tonal Button with Icon Clicked!")),
+                        const SnackBar(
+                            content:
+                                Text("Filled Tonal Button with Icon Clicked!")),
                       );
                     },
                   ),
 
                   // Button with custom style
                   PlexFormFieldButton(
-                    properties: const PlexFormFieldGeneric.title("Custom Styled Button"),
+                    properties: const PlexFormFieldGeneric.title(
+                        "Custom Styled Button"),
                     buttonType: PlexButtonType.elevated,
                     buttonIcon: const Icon(Icons.star),
                     buttonStyle: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all<Color>(Colors.amber),
-                      foregroundColor: MaterialStateProperty.all<Color>(Colors.black),
+                      backgroundColor:
+                          MaterialStateProperty.all<Color>(Colors.amber),
+                      foregroundColor:
+                          MaterialStateProperty.all<Color>(Colors.black),
                       elevation: MaterialStateProperty.all<double>(8.0),
                       padding: MaterialStateProperty.all<EdgeInsets>(
-                        const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                        const EdgeInsets.symmetric(
+                            horizontal: 32, vertical: 16),
                       ),
                     ),
                     buttonClick: () {
                       print("Custom Styled Button Clicked!");
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Custom Styled Button Clicked!")),
+                        const SnackBar(
+                            content: Text("Custom Styled Button Clicked!")),
                       );
                     },
                   ),

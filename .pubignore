@@ -1,3 +1,49 @@
-linux/flutter/ephemeral/.plugin_symlinks/file_saver/*
-linux/flutter/ephemeral/.plugin_symlinks/path_provider_linux/*
-linux/flutter/ephemeral/.plugin_symlinks/shared_preferences_linux/*
+# If this file exists at the package root, dart pub publish uses it INSTEAD of
+# the root .gitignore. Copy gitignore rules here, then add publish-only excludes.
+
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.buildlog/
+.history
+.svn/
+migrate_working_dir/
+
+# IntelliJ / IDE
+*.iml
+*.ipr
+*.iws
+.idea/
+.vscode/
+.cursor/
+
+# Flutter / Dart / Pub
+/pubspec.lock
+**/doc/api/
+.dart_tool/
+.packages
+build/
+coverage/
+*.db
+
+# Leftover Flutter tooling at package root (this is a library, not an app)
+/android/
+/ios/
+/linux/
+/macos/
+/windows/
+
+# Design system baseline — tracked in git, never ship on pub.dev
+Interloop Design/
+/Interloop Design/
+Interloop Design/**
+
+# Local / tooling extras
+readme_original.md
+licenses.json
+qodana.yaml
+tests/

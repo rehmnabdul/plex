@@ -1,3 +1,7 @@
+## 2.0.1-beta.3
+
+Exclude `Interloop Design/` from the published pub.dev archive via `.pubignore`. The folder stays in git; it is omitted from the package tarball so the upload is no longer ~33MB of design-system files.
+
 ## 2.0.1-beta.2
 
 Next prerelease after pub.dev `2.0.1-beta.1`. This is a prerelease; stable will be **2.0.1** after the beta series.

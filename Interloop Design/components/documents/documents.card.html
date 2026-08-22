@@ -1,0 +1,184 @@
+<!-- @dsCard group="Components" viewport="900x1260" name="ReportDocument — invoice & report" subtitle="Printable sheet: masthead, parties, line items, totals, sign-off · same skeleton, two document types" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>
+  body{margin:0;font-family:var(--font-sans);background:var(--surface-page)}
+  a{color:var(--text-link)}a:hover{color:var(--il-blue-800)}
+  .switch{display:flex;gap:2px;padding:3px;background:var(--il-grayblue-100);border-radius:var(--radius-pill)}
+  .switch button{height:30px;padding:0 14px;font:inherit;font-size:var(--fs-sm);font-weight:var(--weight-semibold);color:var(--text-secondary);background:transparent;border:0;border-radius:var(--radius-pill);cursor:pointer}
+  .switch button[aria-pressed="true"]{background:var(--surface-card);color:var(--text-primary);box-shadow:var(--shadow-xs)}
+  @media print{.switch{display:none}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { ReportDocument } = window.ILPDesignSystem_7d03df;
+const usd = (n) => '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const LOGO = <img src="../../assets/interloop-logo.svg" alt="Interloop" />;
+const ISSUER = { name: 'Interloop Limited', lines: ['7-KM Khurrianwala–Jaranwala Road', 'Faisalabad 37610, Pakistan', 'NTN 1234567-8 · sales@interloop.com.pk'] };
+
+const invoiceItems = [
+  { id: 1, section: 'Hosiery — Autumn programme', desc: 'Combed cotton crew sock, 200N', note: 'Style NDS-4471 · Colour: Charcoal / Ecru · Pack of 3', qty: 84000, rate: 2.15 },
+  { id: 2, section: 'Hosiery — Autumn programme', desc: 'Merino blend hiking sock, cushioned', note: 'Style NDS-4512 · Colour: Slate', qty: 26500, rate: 4.80 },
+  { id: 3, section: 'Denim — Core replenishment', desc: '12.5 oz selvedge denim, rigid', note: 'Article DN-2208 · 58" · Indigo rope-dyed', qty: 18200, rate: 6.35 },
+  { id: 4, section: 'Denim — Core replenishment', desc: 'Garment wash & finishing service', note: 'Stone + enzyme, 3 cycles', qty: 18200, rate: 1.10 },
+].map((r) => ({ ...r, amount: r.qty * r.rate }));
+
+const sub = invoiceItems.reduce((s, r) => s + r.amount, 0);
+const freight = 6400, insurance = 1850;
+
+const INVOICE = {
+  kind: 'Commercial Invoice',
+  number: 'ILP-INV-24817',
+  status: { label: 'Approved', tone: 'success' },
+  logo: LOGO,
+  issuer: ISSUER,
+  meta: [
+    { label: 'Issue date', value: '02 Aug 2026' },
+    { label: 'Due date', value: '01 Sep 2026', hint: 'Net 30 · due in 30 days' },
+    { label: 'Sales order', value: 'SO-10482' },
+    { label: 'Incoterm', value: 'FOB Karachi' },
+    { label: 'Currency', value: 'USD' },
+  ],
+  parties: [
+    { label: 'Issued to', name: 'Nordstrom Inc.', address: '1617 Sixth Avenue\nSeattle, WA 98101\nUnited States',
+      rows: [{ label: 'Buyer', value: 'K. Whitfield' }, { label: 'PO', value: 'NRD-88-2261' }] },
+    { label: 'Ship to', name: 'Nordstrom DC — Ontario', address: '3400 E Airport Drive\nOntario, CA 91761\nUnited States',
+      rows: [{ label: 'Vessel', value: 'MSC Kalina / 632W' }, { label: 'ETD', value: '11 Aug 2026' }] },
+    { label: 'Issued by', name: 'Interloop Limited — Export', address: 'Plant 4, Faisalabad\nPakistan',
+      rows: [{ label: 'Contact', value: 'B. Raza' }, { label: 'STRN', value: '17-00-8801-004-55' }] },
+  ],
+  columns: [
+    { key: 'desc', header: 'Description', width: '46%' },
+    { key: 'qty', header: 'Quantity', type: 'number', format: (v) => v.toLocaleString('en-US') + ' pcs' },
+    { key: 'rate', header: 'Unit rate', type: 'number', format: usd },
+    { key: 'amount', header: 'Amount', type: 'number', format: usd },
+  ],
+  items: invoiceItems,
+  groupBy: 'section',
+  summary: [
+    { label: 'Subtotal', value: usd(sub) },
+    { label: 'Freight (FOB Karachi)', value: usd(freight) },
+    { label: 'Marine insurance', value: usd(insurance) },
+    { label: 'Sales tax (0% — export)', value: usd(0), rule: true },
+  ],
+  total: { label: 'Total due', value: usd(sub + freight + insurance), note: 'Payable in USD by 01 Sep 2026' },
+  notes: [
+    { title: 'Terms', body: 'Payment by irrevocable L/C at sight, confirmed through Habib Bank Limited. Title passes on loading. Claims must be raised within 15 days of receipt at the destination DC.' },
+    { title: 'Declaration', body: 'We certify this invoice to be true and correct, and that the goods are of Pakistani origin, manufactured under Interloop’s audited social and environmental compliance programme.' },
+  ],
+  blocks: [
+    { title: 'Payment details', rows: [
+      { label: 'Bank', value: 'Habib Bank Limited' }, { label: 'IBAN', value: 'PK36HABB0000123456789012' },
+      { label: 'SWIFT', value: 'HABBPKKA' }, { label: 'Terms', value: 'L/C at sight' } ] },
+    { title: 'Shipment', rows: [
+      { label: 'Cartons', value: '1,284' }, { label: 'Gross weight', value: '18,940 kg' },
+      { label: 'Container', value: '2 × 40′ HC' }, { label: 'Port of loading', value: 'Karachi (PKKHI)' } ] },
+    { title: 'Compliance', rows: [
+      { label: 'Origin', value: 'Pakistan' }, { label: 'HS code', value: '6115.9500' },
+      { label: 'GOTS', value: 'CU-8841-2026' }, { label: 'Audit', value: 'Sedex 4-Pillar, Mar 2026' } ] },
+  ],
+  signatures: [
+    { role: 'Prepared by · Export Finance', name: 'Bilal Raza', date: '02 Aug 2026', mark: 'B. Raza' },
+    { role: 'Approved by · Head of Commercial', name: 'Imran Sheikh', date: '02 Aug 2026', mark: 'I. Sheikh' },
+    { role: 'Received by · Buyer', name: '' },
+  ],
+  footerNote: <>Interloop Limited · Registered in Pakistan · <b>interloop.com.pk</b></>,
+  footerRight: 'Page 1 of 1 · ILP-INV-24817',
+};
+
+const reportItems = [
+  { id: 1, section: 'Visual — appearance', point: 'Shade band vs. approved swatch', spec: 'Grade 4 min', found: 'Grade 4–5', result: 'Pass' },
+  { id: 2, section: 'Visual — appearance', point: 'Skewness / bowing', spec: '≤ 2.0%', found: '3.4%', result: 'Fail', note: 'Left selvedge, rolls 12–14. Stenter overfeed suspected.' },
+  { id: 3, section: 'Visual — appearance', point: 'Contamination', spec: 'Nil', found: 'Nil', result: 'Pass' },
+  { id: 4, section: 'Measurement — POM', spec: '± 1.0 cm', point: 'Leg opening (size 32)', found: '+0.4 cm', result: 'Pass' },
+  { id: 5, section: 'Measurement — POM', spec: '± 1.5 cm', point: 'Inseam (size 32)', found: '−0.6 cm', result: 'Pass' },
+  { id: 6, section: 'Performance', point: 'Colour fastness to washing', spec: 'Grade 4', found: 'Grade 4', result: 'Pass' },
+  { id: 7, section: 'Performance', point: 'Tensile strength (warp)', spec: '≥ 400 N', found: '438 N', result: 'Pass' },
+  { id: 8, section: 'Performance', point: 'Needle detection', spec: '100% pass', found: '100%', result: 'Pass' },
+];
+
+const REPORT = {
+  kind: 'Final Inspection Report',
+  number: 'INSP-77219',
+  status: { label: 'Conditional pass', tone: 'warning' },
+  logo: LOGO,
+  issuer: ISSUER,
+  meta: [
+    { label: 'Inspection date', value: '01 Aug 2026' },
+    { label: 'Lot', value: 'ILP-10482', hint: '18,200 m · Denim' },
+    { label: 'Standard', value: 'AQL 2.5 / 4.0', hint: 'ISO 2859-1, level II' },
+    { label: 'Sample size', value: '200' },
+    { label: 'Inspector', value: 'U. Tariq' },
+  ],
+  parties: [
+    { label: 'Inspected for', name: 'Nordstrom Inc.', address: 'Quality Assurance\nSeattle, WA, United States',
+      rows: [{ label: 'PO', value: 'NRD-88-2261' }, { label: 'Article', value: 'DN-2208' }] },
+    { label: 'Inspected at', name: 'Interloop Denim — Plant 4', address: 'Faisalabad II, Pakistan',
+      rows: [{ label: 'Line', value: 'Finishing 2' }, { label: 'Shift', value: 'A' }] },
+  ],
+  columns: [
+    { key: 'point', header: 'Check point', width: '42%' },
+    { key: 'spec', header: 'Specification' },
+    { key: 'found', header: 'Observed', type: 'number' },
+    { key: 'result', header: 'Result', align: 'center',
+      render: (v) => <b style={{ color: v === 'Pass' ? 'var(--il-earth-ink)' : 'var(--il-red-ink)' }}>{v.toUpperCase()}</b> },
+  ],
+  items: reportItems,
+  groupBy: 'section',
+  summary: [
+    { label: 'Checks performed', value: '8' },
+    { label: 'Major defects (limit 10)', value: '1' },
+    { label: 'Minor defects (limit 14)', value: '4', rule: true },
+  ],
+  total: { label: 'Quality index', value: '94.1', note: 'Below the 96.0 release threshold' },
+  notes: [
+    { title: 'Verdict', body: 'Lot is released on condition that rolls 12–14 are re-finished and re-presented for a partial re-inspection before the 11 Aug vessel cut-off. All other check points meet specification.' },
+    { title: 'Method', body: 'Single sampling plan, general inspection level II, per ISO 2859-1. Fabric graded on the 4-point system under D65 lighting at 90 cm. Measurements taken at 20 °C / 65% RH after 24 h conditioning.' },
+  ],
+  blocks: [
+    { title: 'Defect breakdown', rows: [
+      { label: 'Skewness', value: '38 pts' }, { label: 'Slub / neps', value: '14 pts' },
+      { label: 'Crease mark', value: '9 pts' }, { label: 'Points per 100 m²', value: '18.4' } ] },
+    { title: 'Follow-up', rows: [
+      { label: 'CAPA', value: 'CAPA-338' }, { label: 'Owner', value: 'S. Iqbal' },
+      { label: 'Re-inspection', value: '08 Aug 2026' }, { label: 'Evidence', value: '6 photos attached' } ] },
+  ],
+  signatures: [
+    { role: 'Inspected by · QA Inspector', name: 'Usman Tariq', date: '01 Aug 2026', mark: 'U. Tariq' },
+    { role: 'Verified by · Quality Manager', name: 'Ayesha Khan', date: '02 Aug 2026', mark: 'A. Khan' },
+    { role: 'Buyer acceptance', name: '' },
+  ],
+  footerNote: <>Report issued under Interloop QMS · <b>SOP-QMS-014</b> rev. 6</>,
+  footerRight: 'Page 1 of 1 · INSP-77219',
+};
+
+function Demo() {
+  const [doc, setDoc] = React.useState('invoice');
+  const data = doc === 'invoice' ? INVOICE : REPORT;
+  return (
+    <ReportDocument
+      key={doc}
+      {...data}
+      toolbarTitle={doc === 'invoice' ? 'Invoice ILP-INV-24817' : 'Inspection report INSP-77219'}
+      actions={
+        <div className="switch">
+          <button type="button" aria-pressed={doc === 'invoice'} onClick={() => setDoc('invoice')}>Commercial invoice</button>
+          <button type="button" aria-pressed={doc === 'report'} onClick={() => setDoc('report')}>Inspection report</button>
+        </div>
+      }
+    />
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<Demo />);
+</script>
+</body>
+</html>

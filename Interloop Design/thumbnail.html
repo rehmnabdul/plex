@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="styles.css">
+<style>
+  html,body{margin:0;padding:0}
+  .tile{display:flex;width:1280px;height:854px;overflow:hidden}
+  .mark{flex:1;display:grid;place-items:center;background:var(--il-grayblue-700);padding:0 60px}
+  .mark img{width:100%;max-width:720px;height:auto;display:block}
+  .strip{display:flex;flex-direction:column;width:320px}
+  .strip div{flex:1}
+</style>
+</head>
+<body>
+<div class="tile">
+  <div class="mark"><img src="assets/interloop-logo-white.svg" alt="Interloop"></div>
+  <div class="strip">
+    <div style="background:var(--il-earth)"></div>
+    <div style="background:var(--il-sun)"></div>
+    <div style="background:var(--il-water)"></div>
+    <div style="background:var(--il-blue-500)"></div>
+  </div>
+</div>
+</body>
+</html>

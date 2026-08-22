@@ -1,0 +1,139 @@
+<!-- @dsCard group="Widgets" viewport="1280x1560" name="Calendar — scheduling" subtitle="Month · week time grid with now line · day · agenda · one event list, four questions" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>
+  body{margin:0;padding:24px;font-family:var(--font-sans);background:var(--surface-page);color:var(--text-primary)}
+  a{color:var(--text-link)}a:hover{color:var(--il-blue-800)}
+  .wrap{max-width:1200px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+  .two{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:22px;align-items:start}
+  .note{display:flex;gap:14px;align-items:baseline;margin:0;font-size:var(--fs-xs);color:var(--text-muted);line-height:1.6}
+  .note b{color:var(--text-secondary);font-weight:var(--weight-bold);letter-spacing:.05em;text-transform:uppercase;white-space:nowrap}
+  .picked{padding:12px 14px;background:var(--il-blue-50);border:1px solid var(--il-blue-200);border-radius:var(--radius-md);font-size:var(--fs-sm);color:var(--il-blue-800)}
+  .picked b{font-weight:var(--weight-bold)}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { Calendar, Widget, Button, Badge } = window.ILPDesignSystem_7d03df;
+
+const TODAY = new Date('2026-08-04T11:20:00');
+const at = (dayOffset, h, m = 0) => {
+  const d = new Date(TODAY);
+  d.setDate(d.getDate() + dayOffset);
+  d.setHours(h, m, 0, 0);
+  return d;
+};
+
+const EVENTS = [
+  { id: 'e1', title: 'FRI · ILP-10482', start: at(0, 7, 30), end: at(0, 10, 0), tone: 'warning', meta: 'Denim · 18,200 m · U. Tariq' },
+  { id: 'e2', title: 'DUPRO · ILP-10455', start: at(0, 10, 30), end: at(0, 12, 0), meta: 'Hosiery · Line 4' },
+  { id: 'e3', title: 'Vendor audit · Loop Industries', start: at(0, 13, 0), end: at(0, 16, 0), tone: 'neutral', meta: 'Sedex 4-pillar · H. Malik' },
+  { id: 'e4', title: 'Shift handover', start: at(0, 15, 0), end: at(0, 15, 30), tone: 'neutral' },
+  { id: 'e5', title: 'Re-inspection · rolls 12–14', start: at(1, 8, 0), end: at(1, 9, 30), tone: 'danger', meta: 'After re-finishing' },
+  { id: 'e6', title: 'Container loading · ILP-10361', start: at(1, 11, 0), end: at(1, 14, 0), meta: 'Bay 2' },
+  { id: 'e7', title: 'Quality review', start: at(1, 16, 0), end: at(1, 17, 0), tone: 'neutral', meta: 'Weekly · all divisions' },
+  { id: 'e8', title: 'FRI · ILP-10390', start: at(2, 9, 0), end: at(2, 11, 30), tone: 'success', meta: 'Passed at 98.2', done: true },
+  { id: 'e9', title: 'Lab dip approval', start: at(2, 14, 0), end: at(2, 15, 0) },
+  { id: 'e10', title: 'CAPA-338 effectiveness check', start: at(3, 9, 0), end: at(3, 10, 0), tone: 'warning' },
+  { id: 'e11', title: 'Inline · ILP-10501', start: at(3, 11, 0), end: at(3, 13, 0) },
+  { id: 'e12', title: 'Cargo ready · ILP-10361', start: at(4, 8, 0), allDay: true, tone: 'success' },
+  { id: 'e13', title: 'Top testing · third-party lab', start: at(4, 10, 0), end: at(4, 12, 30), tone: 'neutral' },
+  { id: 'e14', title: 'FRI · ILP-10530', start: at(5, 8, 30), end: at(5, 11, 0) },
+  { id: 'e15', title: 'Plant walk-through', start: at(7, 7, 0), end: at(7, 9, 0), tone: 'neutral' },
+  { id: 'e16', title: 'DUPRO · ILP-10488', start: at(8, 9, 0), end: at(8, 11, 0) },
+  { id: 'e17', title: 'Vendor audit · Crescent', start: at(9, 9, 0), end: at(9, 13, 0), tone: 'neutral' },
+  { id: 'e18', title: 'FRI · ILP-10455', start: at(10, 8, 0), end: at(10, 10, 30), tone: 'warning' },
+  { id: 'e19', title: 'Shipment cut-off', start: at(11, 12, 0), allDay: true, tone: 'danger' },
+  { id: 'e20', title: 'Monthly quality board', start: at(14, 10, 0), end: at(14, 12, 0), tone: 'neutral' },
+  { id: 'e21', title: 'Inline · ILP-10530', start: at(-2, 9, 0), end: at(-2, 11, 0), tone: 'success', done: true },
+  { id: 'e22', title: 'FRI · ILP-10402', start: at(-1, 8, 0), end: at(-1, 10, 0), tone: 'success', done: true },
+  { id: 'e23', title: 'Sample review', start: at(-1, 14, 0), end: at(-1, 15, 0), tone: 'neutral', done: true },
+  { id: 'e24', title: 'Line 4 maintenance', start: at(-1, 16, 0), end: at(-1, 18, 0), tone: 'neutral', done: true },
+];
+
+function Demo() {
+  const [items, setItems] = React.useState(EVENTS);
+  const [picked, setPicked] = React.useState(null);
+  const reschedule = (e, start, end) => setItems((list) => list.map((x) => (x.id === e.id ? { ...x, start, end: end || x.end } : x)));
+  const [slot, setSlot] = React.useState(null);
+  const fmt = (d) => d.toLocaleString('en-GB', { weekday: 'short', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+
+  return (
+    <div className="wrap">
+      <p className="note">
+        <b>Read it</b>
+        <span>
+          The week grid is the operating view — the red line is now, 11:20 on Tue 4 Aug. Click an empty hour to book
+          into it; click an event to open it. Completed work is struck through. Switch to Month for planning,
+          Agenda for “what’s next”. <b style={{ textTransform: 'none', letterSpacing: 0 }}>Drag any block</b> to another hour or day, drag its bottom edge to change the duration, and click it for the detail card.
+        </span>
+      </p>
+
+      <Calendar
+        events={items}
+        view="week"
+        editable
+        onEventDrop={reschedule}
+        onEventResize={reschedule}
+        onEventEdit={(e) => setPicked({ ...e, title: 'Editing · ' + e.title })}
+        onEventDelete={(e) => setItems((l) => l.filter((x) => x.id !== e.id))}
+        today={TODAY}
+        date={TODAY}
+        dayStart={6}
+        dayEnd={19}
+        height={700}
+        onEventClick={(e) => { setPicked(e); setSlot(null); }}
+        onSelectSlot={(d) => { setSlot(d); setPicked(null); }}
+        actions={<Badge variant="warning" dot>3 due today</Badge>}
+      />
+
+      {(picked || slot) && (
+        <div className="picked">
+          {picked
+            ? <>Opened <b>{picked.title}</b>{picked.meta ? ` — ${picked.meta}` : ''}</>
+            : <>New inspection at <b>{fmt(slot)}</b> — the slot click is only wired when creating is real.</>}
+        </div>
+      )}
+
+      <div className="two">
+        <Calendar
+          events={items}
+          view="month"
+          editable
+          onEventDrop={reschedule}
+          views={['month']}
+          today={TODAY}
+          date={TODAY}
+          maxPerDay={2}
+          height={620}
+          onEventClick={(e) => setPicked(e)}
+        />
+
+        <Widget title="What’s next" subtitle="Two weeks ahead" rule flush>
+          <Calendar
+            events={items}
+            view="agenda"
+            views={['agenda']}
+            today={TODAY}
+            date={TODAY}
+            height={560}
+            onEventClick={(e) => setPicked(e)}
+            style={{ border: 0, borderRadius: 0, boxShadow: 'none' }}
+          />
+        </Widget>
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<Demo />);
+</script>
+</body>
+</html>

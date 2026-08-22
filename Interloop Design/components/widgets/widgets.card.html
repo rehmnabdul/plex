@@ -1,0 +1,220 @@
+<!-- @dsCard group="Widgets" viewport="1280x2260" name="Statistics, lists & tables" subtitle="StatGrid · ProgressRing · six list variants · MiniTable · a mixed panel" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>
+  body{margin:0;padding:24px;font-family:var(--font-sans);background:var(--surface-page);color:var(--text-primary)}
+  a{color:var(--text-link)}a:hover{color:var(--il-blue-800)}
+  .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:20px;max-width:1200px;margin:0 auto}
+  .c3{grid-column:span 3}.c4{grid-column:span 4}.c5{grid-column:span 5}.c6{grid-column:span 6}.c7{grid-column:span 7}.c8{grid-column:span 8}.c12{grid-column:span 12}
+  .rings{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;place-items:center;padding:4px 0 6px}
+  .sechd{display:flex;align-items:baseline;gap:10px;margin:0 0 12px}
+  .sechd h2{margin:0;font-size:var(--fs-base);font-weight:var(--weight-bold);letter-spacing:-0.01em}
+  .sechd p{margin:0;font-size:var(--fs-xs);color:var(--text-muted)}
+  .sechd .picked{margin-left:auto;font-size:var(--fs-xs);font-weight:var(--weight-semibold);color:var(--text-brand)}
+  .legend{margin-top:14px;padding-top:14px;border-top:1px solid var(--border-subtle)}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { Widget, Chart, CHART_COLORS, DataList, StatTile, StatGrid, ProgressRing,
+        MiniTable, TableStatus, TableIdentity, TableBar } = window.ILPDesignSystem_7d03df;
+
+const Ic = (d) => (p) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}>
+    {d.map((x, i) => <path key={i} d={x} />)}
+  </svg>
+);
+const IcBox = Ic(['M21 8 12 3 3 8v8l9 5 9-5V8Z','m3 8 9 5 9-5','M12 13v8']);
+const IcCheck = Ic(['M20.5 12a8.5 8.5 0 1 1-8.5-8.5','m8.5 12 2.5 2.5L21 4.5']);
+const IcAlert = Ic(['M12 4.5 2.5 20h19L12 4.5Z','M12 10v4.5','M12 17.6v.1']);
+const IcTruck = Ic(['M3 7h11v9H3z','M14 10h4l3 3v3h-7','M7.5 19a1.8 1.8 0 1 0 0-3.6 1.8 1.8 0 0 0 0 3.6Z','M17.5 19a1.8 1.8 0 1 0 0-3.6 1.8 1.8 0 0 0 0 3.6Z']);
+const IcLayers = Ic(['m12 3 9 5-9 5-9-5 9-5Z','m3 13 9 5 9-5','m3 17 9 5 9-5']);
+const IcUser = Ic(['M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z','M4.5 20a7.5 7.5 0 0 1 15 0']);
+
+const spark = [92, 88, 96, 91, 99, 94, 103, 108];
+const money = (v) => '$' + v.toLocaleString('en-US');
+
+const VENDORS = [
+  { id: 1, name: 'Loop Industries', city: 'Faisalabad', lots: 412, score: 96, defects: 1.2, status: 'Approved' },
+  { id: 2, name: 'Crescent Textiles', city: 'Lahore', lots: 288, score: 88, defects: 2.1, status: 'Approved' },
+  { id: 3, name: 'Sapphire Mills', city: 'Sheikhupura', lots: 196, score: 74, defects: 3.4, status: 'Watch' },
+  { id: 4, name: 'Nishat Knits', city: 'Faisalabad', lots: 164, score: 91, defects: 1.6, status: 'Approved' },
+  { id: 5, name: 'Kohinoor Weaving', city: 'Rawalpindi', lots: 88, score: 58, defects: 5.2, status: 'Suspended' },
+];
+const TONE = { Approved: 'success', Watch: 'warning', Suspended: 'danger' };
+
+const ORDERS = [
+  { id: 'ILP-10482', client: 'Nordstrom', units: 84000, value: 180600, ship: '20 Oct', status: 'In production' },
+  { id: 'ILP-10455', client: 'Target', units: 26500, value: 127200, ship: '12 Oct', status: 'Shipped' },
+  { id: 'ILP-10390', client: 'Uniqlo', units: 18200, value: 115570, ship: '08 Oct', status: 'QC hold' },
+  { id: 'ILP-10361', client: 'Adidas', units: 44000, value: 96800, ship: '30 Sep', status: 'Shipped' },
+];
+const OTONE = { Shipped: 'success', 'QC hold': 'warning', 'In production': 'info', Delayed: 'danger' };
+
+function Demo() {
+  const [picked, setPicked] = React.useState(null);
+  const [tasks, setTasks] = React.useState([
+    { id: 't1', title: 'Close CAPA-338 root cause', subtitle: 'Due today · Sana Iqbal', done: false },
+    { id: 't2', title: 'Approve FRI for ILP-10455', subtitle: 'Due today · Ayesha Khan', done: true },
+    { id: 't3', title: 'Re-inspect rolls 12–14', subtitle: 'Due 08 Aug · Usman Tariq', done: false },
+    { id: 't4', title: 'Upload Sedex audit report', subtitle: 'Due 11 Aug · Hina Malik', done: false },
+  ]);
+  const toggle = (item) => setTasks((t) => t.map((x) => (x.id === item.id ? { ...x, done: !x.done } : x)));
+
+  return (
+    <div className="grid">
+      {/* ---- statistics strip ---- */}
+      <div className="c12">
+        <div className="sechd">
+          <h2>Key metrics</h2>
+          <p>Week 32 · click a tile to drill in</p>
+          {picked && <span className="picked">Opened: {picked}</span>}
+        </div>
+        <StatGrid>
+          <StatTile onClick={() => setPicked('Open orders')} label="Open orders" value="1,284" delta="+4.2%" direction="up" hint="vs. last month" stripe="brand" icon={<IcBox />} />
+          <StatTile onClick={() => setPicked('Units in production')} label="Units in production" value="4.82" unit="M" delta="+11.8%" direction="up" hint="across 4 plants" spark={spark} stripe="brand" icon={<IcLayers />} />
+          <StatTile onClick={() => setPicked('Quality index')} label="Quality index" value="97.4" delta="+0.6" direction="up" hint="target 96.0" stripe="success" icon={<IcCheck />} iconTone="success" />
+          <StatTile onClick={() => setPicked('Defect rate')} label="Defect rate" value="1.94" unit="%" delta="+0.21" direction="up" invert hint="limit 2.5%" stripe="warning" icon={<IcAlert />} iconTone="warning" />
+          <StatTile onClick={() => setPicked('On-time delivery')} label="On-time delivery" value="94.1" unit="%" progress={94.1} progressColor="var(--il-earth)" hint="42 of 45 lots" stripe="success" icon={<IcTruck />} iconTone="success" />
+        </StatGrid>
+      </div>
+
+      {/* ---- toned tiles + rings ---- */}
+      <div className="c3">
+        <StatTile card tone="accent" onClick={() => setPicked('Shipments this week')} label="Shipments this week" value="128" delta="+16" direction="up" hint="8 ahead of plan" icon={<IcTruck />} />
+      </div>
+      <div className="c3">
+        <StatTile card tone="brand" onClick={() => setPicked('Inspections queued')} label="Inspections queued" value="46" hint="12 due today" icon={<IcCheck />} />
+      </div>
+      <div className="c6">
+        <Widget title="Capacity & scores" subtitle="Week 32" rule>
+          <div className="rings">
+            <ProgressRing value={78} label="Capacity" caption="Faisalabad II" />
+            <ProgressRing value={94.1} label="FTT" caption="First time through" color="var(--il-sun)" />
+            <ProgressRing value={4.2} max={5} display="4.2" label="Vendor" caption="Average score" color="var(--il-earth)" />
+          </div>
+        </Widget>
+      </div>
+
+      {/* ---- lists ---- */}
+      <div className="c4">
+        <Widget title="Top clients" subtitle="By open order value" rule flush
+          footer={<a href="#all" style={{ marginLeft: 'auto' }}>View all clients</a>}>
+          <DataList
+            variant="ranked" inset
+            items={[
+              { title: 'Nordstrom', subtitle: '18 open orders', value: money(482900), delta: '+4.2%' },
+              { title: 'Target', subtitle: '14 open orders', value: money(361400), delta: '+8.1%' },
+              { title: 'Uniqlo', subtitle: '12 open orders', value: money(318200), delta: '-1.8%' },
+              { title: 'Adidas', subtitle: '9 open orders', value: money(244600), delta: '+2.4%' },
+              { title: 'H&M', subtitle: '7 open orders', value: money(198300), delta: '-0.6%' },
+            ]}
+          />
+        </Widget>
+      </div>
+
+      <div className="c4">
+        <Widget title="Inspectors on shift" subtitle="Faisalabad II · shift A" rule flush
+          footer={<><span>6 on shift</span><a href="#roster" style={{ marginLeft: 'auto' }}>Roster</a></>}>
+          <DataList
+            variant="people" inset
+            items={[
+              { title: 'Usman Tariq', subtitle: 'Finishing 2', value: '14', meta: 'lots today', tag: 'Lead', tagTone: 'info' },
+              { title: 'Sana Iqbal', subtitle: 'Denim line 4', value: '11', meta: 'lots today' },
+              { title: 'Hina Malik', subtitle: 'Vendor audit', value: '3', meta: 'audits today' },
+              { title: 'Zain Abbas', subtitle: 'Packing', value: '9', meta: 'lots today' },
+            ]}
+          />
+        </Widget>
+      </div>
+
+      <div className="c4">
+        <Widget title="My tasks" subtitle={`${tasks.filter((t) => !t.done).length} open`} rule flush>
+          <DataList variant="check" inset items={tasks} onToggle={toggle} />
+        </Widget>
+      </div>
+
+      {/* ---- mixed: chart + legend list ---- */}
+      <div className="c5">
+        <Widget title="Defect Pareto" subtitle="Top causes, rolling 30 days" rule
+          footer={<span>Top three causes account for 71% of all points</span>}>
+          <Chart
+            type="donut" thickness={24} centerValue="1,842" centerLabel="Defect points"
+            categories={['Skewness', 'Slub / neps', 'Crease mark', 'Shade band', 'Other']}
+            series={[{ name: 'Points', data: [612, 428, 268, 198, 336], colors: CHART_COLORS }]}
+            height={190}
+          />
+          <div className="legend">
+            <DataList
+              variant="swatch" compact
+              items={[
+                { title: 'Skewness', value: '612', meta: '33%', color: CHART_COLORS[0] },
+                { title: 'Slub / neps', value: '428', meta: '23%', color: CHART_COLORS[1] },
+                { title: 'Crease mark', value: '268', meta: '15%', color: CHART_COLORS[2] },
+                { title: 'Shade band', value: '198', meta: '11%', color: CHART_COLORS[3] },
+                { title: 'Other', value: '336', meta: '18%', color: CHART_COLORS[4] },
+              ]}
+            />
+          </div>
+        </Widget>
+      </div>
+
+      {/* ---- tables ---- */}
+      <div className="c7">
+        <Widget title="Vendor scorecard" subtitle="Ranked by quality score" rule flush
+          footer={<><span>Updated 2 h ago</span><a href="#vendors" style={{ marginLeft: 'auto' }}>Open scorecard</a></>}>
+          <MiniTable
+            rows={VENDORS}
+            totals={{ name: 'All vendors', lots: '1,148', defects: '2.3%' }}
+            columns={[
+              { key: 'name', header: 'Vendor', render: (v, r) => <TableIdentity name={v} meta={r.city} /> },
+              { key: 'lots', header: 'Lots', numeric: true, format: (v) => v.toLocaleString('en-US') },
+              { key: 'defects', header: 'Defect %', numeric: true, format: (v) => v.toFixed(1) + '%' },
+              { key: 'score', header: 'Score', numeric: true, width: 150,
+                render: (v) => <TableBar value={v} color={v >= 90 ? 'var(--il-earth)' : v >= 70 ? 'var(--il-sun)' : 'var(--il-red)'} /> },
+              { key: 'status', header: 'Status', render: (v) => <TableStatus tone={TONE[v]}>{v}</TableStatus> },
+            ]}
+          />
+        </Widget>
+      </div>
+
+      <div className="c12">
+        <Widget title="Orders shipping this month" subtitle="Compact table with a status column" rule flush>
+          <MiniTable
+            compact zebra rows={ORDERS}
+            columns={[
+              { key: 'id', header: 'Order', strong: true },
+              { key: 'client', header: 'Client', render: (v) => <TableIdentity name={v} showAvatar={false} /> },
+              { key: 'units', header: 'Units', numeric: true, format: (v) => v.toLocaleString('en-US') },
+              { key: 'value', header: 'Value', numeric: true, format: money },
+              { key: 'ship', header: 'Ship date', muted: true },
+              { key: 'status', header: 'Status', render: (v) => <TableStatus tone={OTONE[v]}>{v}</TableStatus> },
+            ]}
+            totals={{ id: 'Total', units: '172,700', value: money(520170) }}
+          />
+        </Widget>
+      </div>
+
+      {/* ---- states ---- */}
+      <div className="c6">
+        <Widget title="Loading state" subtitle="Skeleton lines, same frame" rule loading />
+      </div>
+      <div className="c6">
+        <Widget title="Empty state" subtitle="Say what is missing, not just that it is" rule
+          empty emptyTitle="No inspections logged" emptyMessage="Inspections appear here as soon as the shift starts scanning." />
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<Demo />);
+</script>
+</body>
+</html>

@@ -1,0 +1,36 @@
+<!-- @dsCard group="Brand" viewport="700x180" name="Loop motif & pattern" subtitle="The interlocking blue loops, repeated as brand texture" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  body { margin: 0; padding: 0; background: var(--surface-card); }
+  .wrap { display:grid; grid-template-columns: 1.4fr 1fr; height: 180px; }
+  .cap { position:relative; }
+  .cap span { position:absolute; left:14px; bottom:12px; font-family: var(--font-mono); font-size: 10px; padding: 3px 7px; border-radius: var(--radius-sm); background: rgba(255,255,255,.9); color: var(--text-secondary); }
+  /* Tiled field of the blue loop circles */
+  .pat-blue {
+    background-color: var(--il-blue-50);
+    background-image: url('../assets/interloop-mark.svg');
+    background-size: 64px;
+    background-repeat: space;
+  }
+  /* Larger single motif, blue circles on white */
+  .pat-hero {
+    background-color: var(--surface-card);
+    background-image: url('../assets/interloop-mark.svg');
+    background-position: center;
+    background-size: 120px;
+    background-repeat: no-repeat;
+    border-left: 1px solid var(--border-subtle);
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="pat-blue cap"><span>blue loops · tiled texture</span></div>
+    <div class="pat-hero cap"><span>insignia</span></div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!-- @dsCard group="Components" viewport="700x340" name="Core — buttons, badges, avatars" subtitle="Button · IconButton · Badge · Avatar" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/lucide@0.456.0/dist/umd/lucide.min.js"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>
+  body { margin: 0; padding: 22px 24px; font-family: var(--font-sans); background: var(--surface-card); }
+  .row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
+  .row:last-child { margin-bottom: 0; }
+  .lbl { width: 78px; flex: none; font-size: var(--fs-xs); font-weight: var(--weight-bold); text-transform: uppercase; letter-spacing: var(--tracking-wide); color: var(--text-muted); }
+  hr { border: 0; border-top: 1px solid var(--border-subtle); margin: 18px 0; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+  const { Button, IconButton, Badge, Avatar } = window.ILPDesignSystem_7d03df;
+  const Ic = ({ n }) => <i data-lucide={n}></i>;
+  function Demo() {
+    return (
+      <div>
+        <div className="row">
+          <span className="lbl">Button</span>
+          <Button variant="primary">Primary</Button>
+          <Button variant="ink">Ink</Button>
+          <Button variant="secondary">Secondary</Button>
+          <Button variant="ghost">Ghost</Button>
+          <Button variant="danger" leadingIcon={<Ic n="trash-2" />}>Delete</Button>
+        </div>
+        <div className="row">
+          <span className="lbl">Sizes</span>
+          <Button size="sm">Small</Button>
+          <Button size="md">Medium</Button>
+          <Button size="lg" leadingIcon={<Ic n="plus" />}>New report</Button>
+          <Button loading>Saving</Button>
+        </div>
+        <hr />
+        <div className="row">
+          <span className="lbl">Icon</span>
+          <IconButton variant="solid" label="Add"><Ic n="plus" /></IconButton>
+          <IconButton variant="outline" label="Filter"><Ic n="sliders-horizontal" /></IconButton>
+          <IconButton label="Search"><Ic n="search" /></IconButton>
+          <IconButton label="More"><Ic n="more-horizontal" /></IconButton>
+        </div>
+        <div className="row">
+          <span className="lbl">Badge</span>
+          <Badge color="success" dot>Active</Badge>
+          <Badge color="warning">Due in 1 week</Badge>
+          <Badge color="info" appearance="solid">New</Badge>
+          <Badge color="danger" appearance="soft">Overdue</Badge>
+          <Badge color="neutral" appearance="outline">Draft</Badge>
+        </div>
+        <div className="row">
+          <span className="lbl">Avatar</span>
+          <Avatar name="Kaiya Septimus" status="online" />
+          <Avatar name="Davis Kenter" />
+          <Avatar name="Jocelyn Geidt" status="busy" />
+          <Avatar name="Carla Bator" square />
+          <Avatar name="Craig Vetrovs" size={48} status="away" />
+        </div>
+      </div>
+    );
+  }
+  ReactDOM.createRoot(document.getElementById('root')).render(<Demo />);
+  setTimeout(() => window.lucide && window.lucide.createIcons(), 60);
+</script>
+</body>
+</html>

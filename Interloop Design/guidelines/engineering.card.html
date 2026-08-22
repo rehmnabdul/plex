@@ -1,0 +1,154 @@
+<!-- @dsCard group="Engineering" viewport="1280x900" name="Engineering target — ABP React" subtitle="Vite · TanStack · shadcn/ui on Radix + Tailwind · the API contract and what is ported" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  body{margin:0;padding:28px;font-family:var(--font-sans);background:var(--surface-page);color:var(--text-primary)}
+  a{color:var(--text-link);text-decoration:none}a:hover{color:var(--il-blue-800)}
+  .wrap{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:repeat(12,1fr);gap:20px}
+  .c5{grid-column:span 5}.c7{grid-column:span 7}.c6{grid-column:span 6}.c12{grid-column:span 12}
+  h1{margin:0 0 4px;font-size:var(--fs-2xl);font-weight:var(--weight-black);letter-spacing:-0.02em}
+  .lede{margin:0 0 6px;font-size:var(--fs-base);line-height:1.6;color:var(--text-secondary);max-width:78ch;text-wrap:pretty}
+  .lede b{color:var(--text-primary);font-weight:var(--weight-bold)}
+  .card{background:var(--surface-card);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);overflow:hidden}
+  .card h2{margin:0;padding:15px 20px 13px;font-size:var(--fs-base);font-weight:var(--weight-bold);border-bottom:1px solid var(--border-subtle)}
+  .card .b{padding:6px 20px 18px}
+  table{width:100%;border-collapse:collapse}
+  th{padding:9px 20px;text-align:left;font-size:10px;font-weight:var(--weight-bold);letter-spacing:.07em;text-transform:uppercase;color:var(--text-muted);background:var(--il-grayblue-50);border-bottom:1px solid var(--border-subtle)}
+  td{padding:10px 20px;font-size:var(--fs-sm);line-height:1.45;border-bottom:1px solid var(--border-subtle);vertical-align:top}
+  tr:last-child td{border-bottom:0}
+  td b{font-weight:var(--weight-bold)}
+  code{font-family:var(--font-mono);font-size:12px;background:var(--il-grayblue-50);border:1px solid var(--border-subtle);border-radius:4px;padding:1px 5px;white-space:nowrap}
+  .arrow{color:var(--text-disabled);padding:0 4px}
+  ol{margin:0;padding:0 0 0 20px;display:flex;flex-direction:column;gap:9px}
+  li{font-size:var(--fs-sm);line-height:1.55;color:var(--text-secondary)}
+  li b{color:var(--text-primary)}
+  .chips{display:flex;flex-wrap:wrap;gap:7px;padding:14px 20px 18px}
+  .chip{display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 11px;font-size:var(--fs-xs);font-weight:var(--weight-semibold);border-radius:var(--radius-pill);background:var(--il-earth-soft);color:var(--il-earth-ink)}
+  .chip--todo{background:var(--il-sun-soft);color:var(--il-sun-ink)}
+  .chip::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+  .note{display:flex;gap:11px;padding:14px 18px;margin:0 20px 18px;background:var(--il-blue-100);border-radius:var(--radius-md);font-size:var(--fs-sm);line-height:1.55;color:var(--il-blue-800)}
+  .note b{font-weight:var(--weight-bold)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="c12">
+    <h1>Engineering target — ABP React (Modern template)</h1>
+    <p class="lede">
+      The consuming application is the React SPA of an <b>ABP.IO Modern-template solution</b>, not a themed admin
+      template. Shipped components follow the <b>shadcn/ui</b> API restyled with Interloop tokens; new variants
+      extend shadcn's set rather than renaming it.
+      <a href="https://abp.io/docs/10.4/framework/ui/react">abp.io/docs · framework/ui/react</a>
+    </p>
+  </div>
+
+  <div class="c5">
+    <div class="card">
+      <h2>The stack</h2>
+      <table>
+        <tbody>
+          <tr><td><b>Build</b></td><td>Vite</td></tr>
+          <tr><td><b>UI</b></td><td>React + TypeScript (strict)</td></tr>
+          <tr><td><b>Routing</b></td><td>TanStack Router</td></tr>
+          <tr><td><b>Server state</b></td><td>TanStack Query</td></tr>
+          <tr><td><b>Components</b></td><td>shadcn/ui on Radix UI + Tailwind CSS</td></tr>
+          <tr><td><b>Tables</b></td><td>TanStack Table + Virtual</td></tr>
+          <tr><td><b>Forms</b></td><td>React Hook Form + Zod</td></tr>
+          <tr><td><b>HTTP</b></td><td>Axios — one shared instance</td></tr>
+          <tr><td><b>Localization</b></td><td>i18next, ABP resource keys</td></tr>
+          <tr><td><b>Auth</b></td><td>OIDC Authorization Code + PKCE</td></tr>
+          <tr><td><b>Testing</b></td><td>Vitest + Testing Library</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="c7">
+    <div class="card">
+      <h2>Two surfaces, one system</h2>
+      <table>
+        <thead><tr><th>Surface</th><th>What it is</th><th>API</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><code>components/</code></td>
+            <td>Design source of truth — specimens, states, usage prompts</td>
+            <td>House JSX API</td>
+          </tr>
+          <tr>
+            <td><code>_react/src/</code></td>
+            <td>What engineering ships</td>
+            <td><b>shadcn/ui API</b>, Interloop tokens</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="note">
+        <span>
+          <b>Tokens are the contract.</b> <code>globals.css</code> maps Interloop's <code>--il-*</code> ramps onto
+          shadcn's own variable names, so <code>npx shadcn add &lt;component&gt;</code> arrives already wearing
+          Interloop's clothes — no manual restyling, no drift.
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <div class="c6">
+    <div class="card">
+      <h2>Where the APIs differ</h2>
+      <table>
+        <thead><tr><th>This project</th><th>Shipped</th></tr></thead>
+        <tbody>
+          <tr><td><code>Badge color="success"</code></td><td><code>Badge variant="success"</code></td></tr>
+          <tr><td><code>Button variant="primary"</code></td><td><code>Button variant="default"</code></td></tr>
+          <tr><td><code>Alert variant="danger"</code></td><td><code>Alert variant="destructive"</code></td></tr>
+          <tr><td><code>ProgressBar</code></td><td><code>Progress</code> (Radix)</td></tr>
+          <tr><td><code>DataGrid rows=</code></td><td><code>DataGrid data=</code> + <code>ColumnDef</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="c6">
+    <div class="card">
+      <h2>Rules for new components</h2>
+      <div class="b" style="padding-top:16px">
+        <ol>
+          <li><b>Check shadcn/ui first.</b> If a primitive exists there, adopt its API and restyle it — never invent a parallel one.</li>
+          <li><b>Extend, don't substitute.</b> <code>ink</code>, <code>success</code>, <code>warning</code> are additions to shadcn's variants.</li>
+          <li><b>Radix underneath</b> anything with interaction semantics — menus, dialogs, tabs, selects.</li>
+          <li><b>Tokens, never literals.</b> A hex in a component is a bug.</li>
+          <li><b>Ship the pair.</b> Done means the specimen and the TSX agree, with Vitest coverage.</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+
+  <div class="c12">
+    <div class="card">
+      <h2>Ported to <code>_react/</code></h2>
+      <div class="chips">
+        <span class="chip">Logo</span><span class="chip">Button</span><span class="chip">IconButton</span>
+        <span class="chip">Badge</span><span class="chip">Avatar</span><span class="chip">Card</span>
+        <span class="chip">StatCard</span><span class="chip">Input</span><span class="chip">Select</span>
+        <span class="chip">Checkbox</span><span class="chip">Switch</span><span class="chip">Alert</span>
+        <span class="chip">Progress</span><span class="chip">Tabs</span><span class="chip">SidebarNav</span>
+        <span class="chip">Separator</span><span class="chip">Skeleton</span><span class="chip">Popover</span>
+        <span class="chip">DropdownMenu</span><span class="chip">DataGrid</span><span class="chip">ActivityFeed</span>
+        <span class="chip">ReportDocument</span><span class="chip">Orders + Order detail screens</span>
+      </div>
+      <h2 style="border-top:1px solid var(--border-subtle)">Design-only — specimen here, no TSX yet</h2>
+      <div class="chips">
+        <span class="chip chip--todo">Wizard</span><span class="chip chip--todo">SheetGrid</span>
+        <span class="chip chip--todo">Widget</span><span class="chip chip--todo">Chart</span>
+        <span class="chip chip--todo">DataList</span><span class="chip chip--todo">StatTile · StatGrid · ProgressRing</span>
+        <span class="chip chip--todo">MiniTable</span><span class="chip chip--todo">PhoneFrame</span>
+        <span class="chip chip--todo">MobileShell family</span><span class="chip chip--todo">MobileList · MobileCard</span>
+        <span class="chip chip--todo">TallyPad family</span>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

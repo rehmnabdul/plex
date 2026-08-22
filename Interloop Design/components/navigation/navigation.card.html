@@ -1,0 +1,223 @@
+<!-- @dsCard group="Components" viewport="1280x900" name="Navigation — Tabs & Sidebar" subtitle="ARIA keyboard tabs · line/pill/enclosed/vertical · overflow scrolling · nested sidebar, rail & filter" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>
+  body{margin:0;padding:24px;font-family:var(--font-sans);background:var(--surface-page);color:var(--text-primary)}
+  a{color:var(--text-link)}a:hover{color:var(--il-blue-800)}
+  .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:20px;max-width:1200px;margin:0 auto}
+  .c4{grid-column:span 4}.c5{grid-column:span 5}.c7{grid-column:span 7}.c8{grid-column:span 8}.c12{grid-column:span 12}
+  .card{background:var(--surface-card);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);overflow:hidden}
+  .card>h2{margin:0;padding:14px 18px 12px;font-size:var(--fs-sm);font-weight:var(--weight-bold);border-bottom:1px solid var(--border-subtle)}
+  .card>h2 em{font-style:normal;font-weight:var(--weight-regular);color:var(--text-muted)}
+  .b{padding:18px}
+  .panel{padding:16px 2px 2px;font-size:var(--fs-sm);color:var(--text-secondary);line-height:1.6}
+  .kbd{display:inline-block;padding:1px 6px;font-family:var(--font-mono);font-size:11px;color:var(--text-secondary);background:var(--il-grayblue-50);border:1px solid var(--border-default);border-bottom-width:2px;border-radius:4px}
+  .shell{display:flex;height:520px;border:1px solid var(--border-subtle);border-radius:var(--radius-lg);overflow:hidden;background:var(--surface-card)}
+  .shell__main{flex:1;min-width:0;padding:22px;background:var(--surface-page)}
+  .crumb{font-size:var(--fs-xs);color:var(--text-muted);margin-bottom:6px}
+  .crumb b{color:var(--text-secondary);font-weight:var(--weight-semibold)}
+  .h1{margin:0 0 14px;font-size:var(--fs-xl);font-weight:var(--weight-black);letter-spacing:-0.02em}
+  .userblk{display:flex;align-items:center;gap:10px;padding:6px}
+  .userblk .av{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--il-air);color:#fff;font-size:13px;font-weight:var(--weight-bold);flex:none}
+  .userblk .m{min-width:0}
+  .userblk .n{display:block;font-size:var(--fs-sm);font-weight:var(--weight-bold);color:#fff}
+  .userblk .e{display:block;font-size:var(--fs-xs);color:rgba(255,255,255,.5);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { Tabs, TabPanel, SidebarNav, Badge } = window.ILPDesignSystem_7d03df;
+
+const I = (d) => (p) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}>
+    {d.map((x, i) => <path key={i} d={x} />)}
+  </svg>
+);
+const IcHome = I(['m3 10 9-7 9 7v10H3z', 'M9 20v-6h6v6']);
+const IcBox = I(['M21 8 12 3 3 8v8l9 5 9-5V8Z', 'm3 8 9 5 9-5', 'M12 13v8']);
+const IcCheck = I(['M20.5 12a8.5 8.5 0 1 1-8.5-8.5', 'm8.5 12 2.5 2.5L21 4.5']);
+const IcAlert = I(['M12 4.5 2.5 20h19L12 4.5Z', 'M12 10v4.5', 'M12 17.6v.1']);
+const IcUsers = I(['M9 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z', 'M2 20a7 7 0 0 1 14 0', 'M16 4.5a4 4 0 0 1 0 7.5', 'M18 13.5a7 7 0 0 1 4 6.5']);
+const IcChart = I(['M4 20V10', 'M10 20V4', 'M16 20v-7', 'M22 20H2']);
+const IcCog = I(['M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4Z', 'M19.4 14.6a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-2.7 1.1V21a2 2 0 1 1-4 0v-.1a1.6 1.6 0 0 0-2.8-1.1l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1A1.6 1.6 0 0 0 3.5 14H3a2 2 0 1 1 0-4h.1a1.6 1.6 0 0 0 1.1-2.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1A1.6 1.6 0 0 0 10 3.5V3a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 2.7 1.1l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0 1.1 2.7h.4a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1Z']);
+
+const SECTIONS = [
+  { title: 'Operations', items: [
+    { key: 'dashboard', label: 'Dashboard', icon: <IcHome /> },
+    { key: 'orders', label: 'Orders', icon: <IcBox />, badge: 12, children: [
+      { key: 'orders.open', label: 'Open orders' },
+      { key: 'orders.hold', label: 'On hold', badge: 3, badgeTone: 'danger' },
+      { key: 'orders.shipped', label: 'Shipped' },
+      { key: 'orders.archive', label: 'Archive' },
+    ] },
+    { key: 'planning', label: 'Planning', icon: <IcChart /> },
+  ] },
+  { title: 'Quality', rule: true, items: [
+    { key: 'inspections', label: 'Inspections', icon: <IcCheck />, badge: 46, children: [
+      { key: 'insp.today', label: 'Due today', badge: 12 },
+      { key: 'insp.mine', label: 'Assigned to me' },
+      { key: 'insp.all', label: 'All inspections' },
+    ] },
+    { key: 'capa', label: 'CAPA', icon: <IcAlert />, badge: 9, badgeTone: 'danger' },
+    { key: 'audits', label: 'Vendor audits', icon: <IcUsers /> },
+  ] },
+  { title: 'System', rule: true, items: [
+    { key: 'settings', label: 'Settings', icon: <IcCog />, children: [
+      { key: 'settings.users', label: 'Users & roles' },
+      { key: 'settings.divisions', label: 'Divisions' },
+      { key: 'settings.integrations', label: 'Integrations', badge: 'New', badgeTone: 'soft' },
+    ] },
+  ] },
+];
+
+const MANY = ['Overview','Purchase order','Product information','Stakeholders','Production status','Milestones','Inspections','Documents','Costing','Shipments','Audit trail','Comments']
+  .map((l, i) => ({ value: 'v' + i, label: l }));
+
+function Demo() {
+  const [route, setRoute] = React.useState('insp.today');
+  const [collapsed, setCollapsed] = React.useState(false);
+  const [t1, setT1] = React.useState('info');
+  const [t2, setT2] = React.useState('item');
+  const [t3, setT3] = React.useState('v0');
+  const [t4, setT4] = React.useState('general');
+  const [t5, setT5] = React.useState('open');
+
+  return (
+    <div className="grid">
+      <div className="c12">
+        <div className="card">
+          <h2>Application shell — nested navigation, collapsible rail, filter <em>· click a parent to disclose; collapse and hover for flyouts</em></h2>
+          <div className="b" style={{ padding: 18 }}>
+            <div className="shell">
+              <SidebarNav
+                sections={SECTIONS}
+                activeKey={route}
+                onSelect={setRoute}
+                collapsed={collapsed}
+                onToggleCollapse={() => setCollapsed((c) => !c)}
+                filterable
+                footer={
+                  collapsed ? null : (
+                    <div className="userblk">
+                      <span className="av">AK</span>
+                      <span className="m">
+                        <span className="n">Ayesha Khan</span>
+                        <span className="e">a.khan@interloop.com.pk</span>
+                      </span>
+                    </div>
+                  )
+                }
+              />
+              <div className="shell__main">
+                <div className="crumb">Quality / <b>Inspections</b></div>
+                <h1 className="h1">{route}</h1>
+                <Tabs
+                  tabs={[
+                    { value: 'open', label: 'Due today', count: 12 },
+                    { value: 'mine', label: 'Assigned to me', count: 4 },
+                    { value: 'flag', label: 'Flagged', dot: 'danger' },
+                    { value: 'done', label: 'Completed' },
+                  ]}
+                  value={t5} onChange={setT5} idPrefix="insp"
+                />
+                <TabPanel value="open" active={t5} idPrefix="insp" className="panel">
+                  Twelve inspections are due before the shift ends. The sidebar keeps <b>Inspections</b> open because the
+                  active route lives inside it — a user’s location is never hidden in a collapsed parent.
+                </TabPanel>
+                <TabPanel value="mine" active={t5} idPrefix="insp" className="panel">Four inspections assigned to you.</TabPanel>
+                <TabPanel value="flag" active={t5} idPrefix="insp" className="panel">The dot means “something in here needs you” — a count would imply a quantity worth reading.</TabPanel>
+                <TabPanel value="done" active={t5} idPrefix="insp" className="panel">Completed today.</TabPanel>
+                <p style={{ marginTop: 22, fontSize: 'var(--fs-xs)', color: 'var(--text-muted)', lineHeight: 1.7 }}>
+                  Focus the tab strip and use <span className="kbd">←</span> <span className="kbd">→</span> to move,
+                  <span className="kbd">Home</span> / <span className="kbd">End</span> for the ends. One
+                  <span className="kbd">Tab</span> press enters the strip, one more leaves it.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="c7">
+        <div className="card">
+          <h2>Line <em>· measured sliding indicator, counts, attention dot, disabled</em></h2>
+          <div className="b">
+            <Tabs
+              tabs={[
+                { value: 'info', label: 'Order information' },
+                { value: 'people', label: 'Stakeholders', count: 6 },
+                { value: 'prod', label: 'Production status', dot: 'warning' },
+                { value: 'audit', label: 'Audit trail', disabled: true },
+              ]}
+              value={t1} onChange={setT1} idPrefix="line"
+            />
+            <TabPanel value="info" active={t1} idPrefix="line" className="panel">Purchase order facts.</TabPanel>
+            <TabPanel value="people" active={t1} idPrefix="line" className="panel">Six people are attached to this order.</TabPanel>
+            <TabPanel value="prod" active={t1} idPrefix="line" className="panel">Stage-by-stage completion. The amber dot flags a stage behind plan.</TabPanel>
+          </div>
+        </div>
+      </div>
+
+      <div className="c5">
+        <div className="card">
+          <h2>Pill &amp; enclosed <em>· switching a view vs. sectioning a page</em></h2>
+          <div className="b" style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+            <Tabs
+              variant="pill" size="sm"
+              tabs={[{ value: 'item', label: 'Item level' }, { value: 'po', label: 'PO level' }]}
+              value={t2} onChange={setT2} idPrefix="lvl"
+            />
+            <Tabs
+              variant="enclosed"
+              tabs={[{ value: 'general', label: 'General' }, { value: 'limits', label: 'Limits', count: 3 }, { value: 'alerts', label: 'Alerts' }]}
+              value={t4} onChange={setT4} idPrefix="enc"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="c8">
+        <div className="card">
+          <h2>Overflow <em>· twelve tabs, one row — scrolls with fades and step buttons, never wraps</em></h2>
+          <div className="b">
+            <Tabs tabs={MANY} value={t3} onChange={setT3} idPrefix="many" />
+          </div>
+        </div>
+      </div>
+
+      <div className="c4">
+        <div className="card">
+          <h2>Vertical <em>· settings-style</em></h2>
+          <div className="b" style={{ display: 'flex', gap: 18 }}>
+            <Tabs
+              orientation="vertical" size="sm"
+              tabs={[
+                { value: 'general', label: 'General' },
+                { value: 'limits', label: 'AQL limits', count: 3 },
+                { value: 'alerts', label: 'Alerts', dot: true },
+                { value: 'api', label: 'Integrations' },
+              ]}
+              value={t4} onChange={setT4} idPrefix="vert"
+            />
+            <div className="panel" style={{ paddingTop: 6 }}>
+              <Badge color="info">{t4}</Badge>
+              <p style={{ marginTop: 10 }}>Arrow <span className="kbd">↑</span> <span className="kbd">↓</span> moves through a vertical strip.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<Demo />);
+</script>
+</body>
+</html>

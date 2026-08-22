@@ -1,0 +1,179 @@
+<!-- @dsCard group="Mobile" viewport="1280x1500" name="Tablet — 11-inch console" subtitle="Landscape split view · side rail · portrait walk-around · supervisor tier, not a stretched phone" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>
+  body{margin:0;padding:26px;font-family:var(--font-sans);background:var(--surface-page);color:var(--text-primary)}
+  a{color:var(--text-link)}a:hover{color:var(--il-blue-800)}
+  .rail{display:flex;gap:28px;justify-content:center;align-items:flex-start;flex-wrap:wrap;max-width:1230px;margin:0 auto}
+  .facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:16px 20px;padding:16px 18px;background:var(--il-grayblue-50);border-radius:var(--radius-md);margin-bottom:18px}
+  .facts dt{font-size:10px;font-weight:var(--weight-bold);letter-spacing:.07em;text-transform:uppercase;color:var(--text-muted)}
+  .facts dd{margin:4px 0 0;font-size:var(--fs-lg);font-weight:var(--weight-bold);font-variant-numeric:tabular-nums}
+  .lbl{margin:0 0 10px;font-size:11px;font-weight:var(--weight-bold);letter-spacing:.08em;text-transform:uppercase;color:var(--text-secondary)}
+  .two{display:grid;grid-template-columns:1fr 320px;gap:22px;align-items:start}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { TabletFrame, TabletRail, TabletToolbar, SplitView, SplitDetailBody,
+        MobileList, MobileButton, MobileSegmented, TallyPad, PhotoCapture, SyncStatus,
+        Logo, MiniTable, TableStatus, TableBar } = window.ILPDesignSystem_7d03df;
+
+const I = (d) => (p) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}>
+    {d.map((x, i) => <path key={i} d={x} />)}
+  </svg>
+);
+const IcHome = I(['m3 10 9-7 9 7v10H3z','M9 20v-6h6v6']);
+const IcList = I(['M8 6h13','M8 12h13','M8 18h13','M3.5 6h.01','M3.5 12h.01','M3.5 18h.01']);
+const IcCheck = I(['M20.5 12a8.5 8.5 0 1 1-8.5-8.5','m8.5 12 2.5 2.5L21 4.5']);
+const IcChart = I(['M4 20V10','M10 20V4','M16 20v-7','M22 20H2']);
+const IcUser = I(['M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z','M4.5 20a7.5 7.5 0 0 1 15 0']);
+
+const NAV = [
+  { key: 'home', label: 'Today', icon: <IcHome /> },
+  { key: 'queue', label: 'Queue', icon: <IcList />, badge: 12 },
+  { key: 'verdicts', label: 'Verdicts', icon: <IcCheck /> },
+  { key: 'reports', label: 'Reports', icon: <IcChart /> },
+];
+
+const QUEUE = [
+  { id: 'ILP-10482', title: 'ILP-10482', subtitle: 'Final random · Denim · Nordstrom', stripe: 'warning', status: 'Due 2 h', statusTone: 'warning', meta: [{ label: '18,200 m' }, { label: 'AQL 2.5' }] },
+  { id: 'ILP-10455', title: 'ILP-10455', subtitle: 'DUPRO · Hosiery · Target', stripe: 'info', meta: [{ label: '15:30' }, { label: 'Line 4' }] },
+  { id: 'ILP-10390', title: 'ILP-10390', subtitle: 'Re-inspection · rolls 12–14', stripe: 'danger', status: 'Failed', statusTone: 'danger', meta: [{ label: '16:15' }] },
+  { id: 'ILP-10361', title: 'ILP-10361', subtitle: 'Container loading · Apparel', stripe: 'neutral', meta: [{ label: '17:00' }, { label: 'Bay 2' }] },
+  { id: 'AUD-1042', title: 'AUD-1042', subtitle: 'Vendor audit · Loop Industries', stripe: 'info', meta: [{ label: 'Tomorrow' }] },
+];
+
+const DEFECTS = [
+  { key: 'skew', label: 'Skewness', severity: 'Major' },
+  { key: 'slub', label: 'Slub / neps', severity: 'Minor' },
+  { key: 'crease', label: 'Crease mark', severity: 'Minor' },
+  { key: 'needle', label: 'Needle line', severity: 'Critical' },
+];
+
+const ROLLS = [
+  { id: 12, points: 18, verdict: 'Pass' }, { id: 13, points: 24, verdict: 'Pass' },
+  { id: 14, points: 41, verdict: 'Rework' }, { id: 15, points: 12, verdict: 'Pass' },
+];
+const VTONE = { Pass: 'success', Rework: 'warning', Reject: 'danger' };
+
+function Landscape() {
+  const [nav, setNav] = React.useState('queue');
+  const [sel, setSel] = React.useState('ILP-10482');
+  const [collapsed, setCollapsed] = React.useState(false);
+  const [counts, setCounts] = React.useState({ skew: 3, slub: 1, crease: 0, needle: 0 });
+  const [verdict, setVerdict] = React.useState('hold');
+
+  return (
+    <TabletFrame orientation="landscape" scale={0.62} caption="11″ landscape · docked at the line station"
+      captionNote="Side rail + split view — the list never leaves the screen">
+      <TabletRail items={NAV} value={nav} onChange={setNav}
+        header={<Logo variant="mark" tone="white" height={26} />}
+        footer={<span style={{ display: 'grid', placeItems: 'center', width: 38, height: 38, borderRadius: '50%', background: 'var(--il-air)', color: '#fff', fontSize: 13, fontWeight: 700 }}>AK</span>} />
+      <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
+        <TabletToolbar
+          title={sel} subtitle="Denim · roll 14 of 22 · Faisalabad II"
+          onToggleMaster={() => setCollapsed((c) => !c)}
+          actions={<>
+            <div style={{ width: 300 }}>
+              <MobileSegmented value={verdict} onChange={setVerdict}
+                options={[{ value: 'pass', label: 'Pass', kind: 'pass' }, { value: 'hold', label: 'Hold', kind: 'hold' }, { value: 'fail', label: 'Fail', kind: 'fail' }]} />
+            </div>
+            <div style={{ width: 168 }}><MobileButton>Submit verdict</MobileButton></div>
+          </>} />
+        <SyncStatus state="offline" pending={3} />
+        <SplitView
+          masterTitle="Today's queue" masterSubtitle="12 due · 5 shown" masterWidth={360} masterHidden={collapsed}
+          master={<MobileList items={QUEUE.map((q) => ({ ...q, status: q.id === sel ? 'Open' : q.status, statusTone: q.id === sel ? 'info' : q.statusTone }))} onItemClick={(it) => setSel(it.id)} />}
+          detail={
+            <SplitDetailBody>
+              <dl className="facts">
+                <div><dt>Lot quantity</dt><dd>18,200</dd></div>
+                <div><dt>Sample size</dt><dd>200</dd></div>
+                <div><dt>Major / limit</dt><dd>4 / 10</dd></div>
+                <div><dt>Defect points</dt><dd>95</dd></div>
+                <div><dt>Quality index</dt><dd>94.1</dd></div>
+              </dl>
+              <div className="two">
+                <div>
+                  <p className="lbl">Defects · roll 14</p>
+                  <TallyPad items={DEFECTS} values={counts} criticalAt={5} onChange={(k, v, all) => setCounts(all)} />
+                  <p className="lbl" style={{ marginTop: 20 }}>Rolls checked</p>
+                  <div style={{ border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
+                    <MiniTable
+                      rows={ROLLS} compact
+                      columns={[
+                        { key: 'id', header: 'Roll', strong: true, format: (v) => 'Roll ' + v },
+                        { key: 'points', header: 'Points', numeric: true, width: 150, render: (v) => <TableBar value={Math.min(100, v * 2)} label={String(v)} color={v > 30 ? 'var(--il-red)' : 'var(--il-earth)'} /> },
+                        { key: 'verdict', header: 'Verdict', render: (v) => <TableStatus tone={VTONE[v]}>{v}</TableStatus> },
+                      ]}
+                    />
+                  </div>
+                </div>
+                <div>
+                  <p className="lbl">Evidence · 2 of 4</p>
+                  <PhotoCapture slots={4} photos={[{ id: 1 }, { id: 2 }]} onRemove={() => {}} />
+                  <p className="lbl" style={{ marginTop: 20 }}>Notes</p>
+                  <p style={{ margin: 0, fontSize: 14, lineHeight: 1.6, color: 'var(--text-secondary)' }}>
+                    Bowing on the left selvedge, rolls 12–14. Stenter overfeed suspected — holding the pallet until finishing confirms the setting.
+                  </p>
+                </div>
+              </div>
+            </SplitDetailBody>
+          }
+        />
+      </div>
+    </TabletFrame>
+  );
+}
+
+function Portrait() {
+  const [nav, setNav] = React.useState('queue');
+  return (
+    <TabletFrame orientation="portrait" scale={0.42} caption="11″ portrait · walk-around"
+      captionNote="Master collapsed, wide rail, one job at a time">
+      <TabletRail wide items={NAV} value={nav} onChange={setNav} header={<Logo tone="white" height={22} />} />
+      <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
+        <TabletToolbar title="Today's queue" subtitle="12 inspections due · Faisalabad II"
+          actions={<div style={{ width: 150 }}><MobileButton variant="secondary">Filter</MobileButton></div>} />
+        <SyncStatus state="synced" />
+        <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', background: 'var(--surface-card)' }}>
+          <MobileList density="comfortable" items={QUEUE} onItemClick={() => {}} />
+        </div>
+      </div>
+    </TabletFrame>
+  );
+}
+
+function EmptyState() {
+  return (
+    <TabletFrame orientation="portrait" scale={0.42} caption="Nothing selected"
+      captionNote="The split's resting state — say what to pick">
+      <TabletRail items={NAV} value="verdicts" onChange={() => {}} header={<Logo variant="mark" tone="white" height={24} />} />
+      <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
+        <TabletToolbar title="Verdicts" subtitle="Awaiting sign-off" />
+        <SplitView
+          masterTitle="Awaiting you" masterSubtitle="3 lots" masterWidth={300}
+          master={<MobileList items={QUEUE.slice(0, 3)} onItemClick={() => {}} />}
+          emptyTitle="No lot selected"
+          emptyMessage="Choose a lot from the list to review its defects and record a verdict."
+        />
+      </div>
+    </TabletFrame>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <div className="rail"><Landscape /><Portrait /><EmptyState /></div>
+);
+</script>
+</body>
+</html>

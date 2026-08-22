@@ -1,0 +1,22 @@
+<!-- @dsCard group="Type" viewport="700x210" name="Font families & weights" subtitle="The four roles + the Segoe UI fallback" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  body { margin: 0; padding: 22px 24px; background: var(--surface-card); }
+  .row { display:flex; align-items:baseline; gap: 16px; padding: 10px 0; border-bottom: 1px solid var(--border-subtle); }
+  .row:last-child { border-bottom: 0; }
+  .role { width: 120px; flex: none; font-size: var(--fs-xs); font-weight: var(--weight-bold); color: var(--text-brand); text-transform: uppercase; letter-spacing: var(--tracking-wide); }
+  .spec { font-size: var(--fs-2xl); color: var(--text-primary); }
+  .note { margin-left:auto; font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); }
+</style>
+</head>
+<body>
+  <div class="row"><span class="role">Primary</span><span class="spec" style="font-family:var(--font-sans);font-weight:800">Mulish Black</span><span class="note">↔ Avenir Black</span></div>
+  <div class="row"><span class="role">Body</span><span class="spec" style="font-family:var(--font-sans);font-weight:500">Mulish Medium</span><span class="note">↔ Avenir Medium</span></div>
+  <div class="row"><span class="role">Emphasis</span><span class="spec" style="font-family:var(--font-emphasis);font-weight:700;font-style:italic">Montserrat Bold Italic</span><span class="note">↔ Brandon Grotesque</span></div>
+  <div class="row"><span class="role">Documents</span><span class="spec" style="font-family:var(--font-serif)">Libre Baskerville</span><span class="note">↔ Baskerville MT</span></div>
+</body>
+</html>

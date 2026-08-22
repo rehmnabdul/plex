@@ -1,0 +1,141 @@
+<!-- @dsCard group="Engineering" viewport="1280x1320" name="Component conventions" subtitle="One name per concept — props, densities, tones, focus, icons, states" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  body{margin:0;padding:28px;font-family:var(--font-sans);background:var(--surface-page);color:var(--text-primary)}
+  .wrap{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:repeat(12,1fr);gap:20px}
+  .c4{grid-column:span 4}.c5{grid-column:span 5}.c6{grid-column:span 6}.c7{grid-column:span 7}.c8{grid-column:span 8}.c12{grid-column:span 12}
+  h1{margin:0 0 4px;font-size:var(--fs-2xl);font-weight:var(--weight-black);letter-spacing:-0.02em}
+  .lede{margin:0;font-size:var(--fs-base);line-height:1.6;color:var(--text-secondary);max-width:80ch;text-wrap:pretty}
+  .lede b{color:var(--text-primary);font-weight:var(--weight-bold)}
+  .card{background:var(--surface-card);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);overflow:hidden;height:100%}
+  .card h2{margin:0;padding:15px 20px 13px;font-size:var(--fs-base);font-weight:var(--weight-bold);border-bottom:1px solid var(--border-subtle)}
+  table{width:100%;border-collapse:collapse}
+  th{padding:9px 20px;text-align:left;font-size:10px;font-weight:var(--weight-bold);letter-spacing:.07em;text-transform:uppercase;color:var(--text-muted);background:var(--il-grayblue-50);border-bottom:1px solid var(--border-subtle)}
+  td{padding:10px 20px;font-size:var(--fs-sm);line-height:1.5;border-bottom:1px solid var(--border-subtle);vertical-align:top}
+  tr:last-child td{border-bottom:0}
+  code{font-family:var(--font-mono);font-size:12px;background:var(--il-grayblue-50);border:1px solid var(--border-subtle);border-radius:4px;padding:1px 5px;white-space:nowrap}
+  .ok{color:var(--il-earth-ink);font-weight:var(--weight-bold)}
+  .no{color:var(--il-red-ink);font-weight:var(--weight-bold);text-decoration:line-through;text-decoration-thickness:1px}
+  ul{margin:0;padding:16px 20px 18px 38px;display:flex;flex-direction:column;gap:9px}
+  li{font-size:var(--fs-sm);line-height:1.55;color:var(--text-secondary)}
+  li b{color:var(--text-primary)}
+  .swatches{display:flex;gap:0;padding:16px 20px 20px}
+  .sw{flex:1;text-align:center}
+  .sw i{display:block;height:38px;border-radius:var(--radius-sm);margin-bottom:7px}
+  .sw span{font-size:var(--fs-xs);font-weight:var(--weight-bold)}
+  .sw em{display:block;font-style:normal;font-size:10px;color:var(--text-muted);margin-top:2px}
+  .strokes{display:flex;gap:26px;padding:18px 20px 20px;align-items:flex-end}
+  .strokes div{text-align:center}
+  .strokes svg{width:34px;height:34px;color:var(--text-primary)}
+  .strokes span{display:block;margin-top:6px;font-size:var(--fs-xs);font-weight:var(--weight-bold)}
+  .strokes em{display:block;font-style:normal;font-size:10px;color:var(--text-muted)}
+  a{color:var(--text-link)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="c12">
+    <h1>Component conventions</h1>
+    <p class="lede">
+      One name per concept. When two components spell the same idea differently, every consumer has to learn both —
+      so the canon below is enforced across the system. Where a prop was renamed, <b>the old name still works</b>
+      as a deprecated alias; nothing in flight breaks.
+    </p>
+  </div>
+
+  <div class="c7">
+    <div class="card">
+      <h2>Prop vocabulary</h2>
+      <table>
+        <thead><tr><th style="width:28%">Concept</th><th>Prop</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td>Visual style of the whole component</td><td><code class="ok">variant</code></td><td>Button, Alert, Badge, DataList, Tabs, Logo</td></tr>
+          <tr><td>Semantic colour of a <i>part</i></td><td><code class="ok">tone</code></td><td><code>iconTone</code>, <code>statusTone</code>, <code>badgeTone</code>, <code>stripe</code></td></tr>
+          <tr><td>Physical scale</td><td><code class="ok">size</code></td><td><code>sm</code> · <code>md</code> · <code>lg</code> (+ <code>icon</code> where it applies)</td></tr>
+          <tr><td>Row spacing</td><td><code class="ok">density</code></td><td><code>compact</code> · <code>default</code> · <code>comfortable</code> · <code>glove</code> (mobile)</td></tr>
+          <tr><td>Deprecated spellings</td><td><span class="no">color</span> <span class="no">dense</span> <span class="no">compact</span></td><td>Still accepted; prefer <code>variant</code> / <code>density</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="c5">
+    <div class="card">
+      <h2>Semantic scale</h2>
+      <div class="swatches">
+        <div class="sw"><i style="background:var(--il-grayblue-100)"></i><span>neutral</span><em>no signal</em></div>
+        <div class="sw"><i style="background:var(--il-blue-100)"></i><span>info</span><em>in progress</em></div>
+        <div class="sw"><i style="background:var(--il-earth-soft)"></i><span>success</span><em>passed</em></div>
+        <div class="sw"><i style="background:var(--il-sun-soft)"></i><span>warning</span><em>needs a look</em></div>
+        <div class="sw"><i style="background:var(--il-red-soft)"></i><span>danger</span><em>blocked</em></div>
+      </div>
+      <table>
+        <tbody>
+          <tr><td>Five tones, in this order, everywhere. The shipped React layer maps <code>danger</code> to shadcn's <code>destructive</code> — that rename is the one place the two surfaces differ on purpose.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="c4">
+    <div class="card">
+      <h2>Icon stroke</h2>
+      <div class="strokes">
+        <div>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8 12 3 3 8v8l9 5 9-5V8Z"></path><path d="m3 8 9 5 9-5"></path></svg>
+          <span>2.0</span><em>16–24px icons</em>
+        </div>
+        <div>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"></path></svg>
+          <span>2.4</span><em>glyphs under 14px</em>
+        </div>
+      </div>
+      <table><tbody><tr><td>Two weights, no others. Chart marks are not icons and set their own stroke.</td></tr></tbody></table>
+    </div>
+  </div>
+
+  <div class="c4">
+    <div class="card">
+      <h2>Focus</h2>
+      <ul>
+        <li>Every element you can click or key into carries <code>:focus-visible</code> with <code>var(--ring)</code> — a 3px Just&nbsp;Blue glow, never a hard outline. Table rows, which cannot paint a shadow under <code>border-collapse</code>, use a tinted row with a hairline instead.</li>
+        <li><b>Focus-visible, not focus</b> — a mouse click should not leave a ring behind. Text fields are the exception: <code>Input</code> and <code>Select</code> ring on plain <code>:focus</code>, because an active field must look active however you got there.</li>
+        <li>Touch targets still need it: an operator with a keyboard-equipped tablet gets the same affordance.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="c4">
+    <div class="card">
+      <h2>Every collection has three states</h2>
+      <ul>
+        <li><b>Loading</b> — skeletons in the shape of the content, never a spinner over a blank panel.</li>
+        <li><b>Empty</b> — say what is missing and how it arrives, not just "no data".</li>
+        <li><b>Populated.</b></li>
+        <li>Grids, feeds, widgets and tables all implement the set. A component that can be empty and isn't handling it is unfinished.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="c12">
+    <div class="card">
+      <h2>Structural rules</h2>
+      <table>
+        <thead><tr><th style="width:22%">Rule</th><th>Why</th></tr></thead>
+        <tbody>
+          <tr><td><b>Stacked labels are block</b></td><td>A title and subtitle rendered as sibling <code>&lt;span&gt;</code>s inherit <code>display:inline</code> and run together on one line — margins silently do nothing. Set <code>display:block</code>, or use flex column.</td></tr>
+          <tr><td><b>Width floors go on the root</b></td><td>A <code>min-width</code> on an inner list lets the flex root shrink while the content spills over its neighbour. Constrain the element the parent is sizing.</td></tr>
+          <tr><td><b>Scroll containers need <code>min-height:0</code></b></td><td>A flex child defaults to <code>min-height:auto</code>, so a tall body grows past the container and pushes the footer out of view instead of scrolling.</td></tr>
+          <tr><td><b>Tokens, never literals</b></td><td>A hex in a component is a bug. If a value is missing from the token set, add the token.</td></tr>
+          <tr><td><b>Shell owns the frame</b></td><td>Charts, lists, stats and tables never draw their own card — <code>Widget</code> does, so panels stay interchangeable.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+</body>
+</html>

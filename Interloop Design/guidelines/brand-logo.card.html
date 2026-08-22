@@ -1,0 +1,20 @@
+<!-- @dsCard group="Brand" viewport="700x220" name="Logo lockups" subtitle="Official Interloop wordmark — original colors & inverse" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  body { margin: 0; padding: 20px; background: var(--surface-card); display:grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .panel { display:flex; align-items:center; justify-content:center; border-radius: var(--radius-lg); padding: 36px 28px; border: 1px solid var(--border-subtle); position: relative; }
+  .panel img { height: 30px; width: auto; }
+  .dark { background: var(--il-grayblue-700); border-color: transparent; }
+  .tag { position:absolute; top:8px; left:10px; font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); }
+  .dark .tag { color: rgba(255,255,255,.6); }
+</style>
+</head>
+<body>
+  <div class="panel"><span class="tag">original colors</span><img src="../assets/interloop-logo.svg" alt="Interloop"></div>
+  <div class="panel dark"><span class="tag">inverse</span><img src="../assets/interloop-logo-white.svg" alt="Interloop"></div>
+</body>
+</html>

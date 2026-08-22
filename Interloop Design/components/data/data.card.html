@@ -1,0 +1,137 @@
+<!-- @dsCard group="Components" viewport="1240x760" name="DataGrid — enterprise table" subtitle="Grouping · column filters · show/hide · pinning · virtualised rows · server-side paging" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>
+  body{margin:0;padding:20px;font-family:var(--font-sans);background:var(--surface-page)}
+  .note{display:flex;gap:16px;align-items:baseline;margin:0 0 12px;font-size:var(--fs-xs);color:var(--text-muted)}
+  .note b{color:var(--text-secondary);font-weight:var(--weight-bold);letter-spacing:.05em;text-transform:uppercase}
+  a{color:var(--text-link)}a:hover{color:var(--il-blue-800)}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { DataGrid, Badge, Avatar, Button } = window.ILPDesignSystem_7d03df;
+
+/* ---- a fake dataset + a fake server ---- */
+const CLIENTS = ['Nordstrom','Uniqlo','Adidas','Puma','H&M','Target','Decathlon','Zara','Levi\u2019s','Muji'];
+const DIVISIONS = ['Hosiery','Denim','Apparel','Activewear','Yarns'];
+const STATUS = ['In production','QC hold','Shipped','Planned','Delayed'];
+const PLANTS = ['Faisalabad I','Faisalabad II','Lahore','Sialkot'];
+const OWNERS = ['Ayesha Khan','Bilal Raza','Sana Iqbal','Usman Tariq','Hina Malik','Zain Abbas'];
+const rnd = (s) => { let x = s * 16807 % 2147483647; return () => (x = x * 16807 % 2147483647) / 2147483647; };
+const r = rnd(7);
+const DB = Array.from({ length: 4820 }, (_, i) => {
+  const units = Math.round(2000 + r() * 88000);
+  const d = new Date(2026, 0, 1 + Math.floor(r() * 210));
+  return {
+    id: 'ILP-' + (10240 + i),
+    client: CLIENTS[Math.floor(r() * CLIENTS.length)],
+    division: DIVISIONS[Math.floor(r() * DIVISIONS.length)],
+    plant: PLANTS[Math.floor(r() * PLANTS.length)],
+    status: STATUS[Math.floor(r() * STATUS.length)],
+    units,
+    value: Math.round(units * (1.8 + r() * 4.2)),
+    defects: +(r() * 3.4).toFixed(2),
+    owner: OWNERS[Math.floor(r() * OWNERS.length)],
+    ship: d,
+  };
+});
+
+const num = (v) => v.toLocaleString('en-US');
+const money = (v) => '$' + v.toLocaleString('en-US');
+const OP = (q, n) => { const m = String(q).match(/^(>=|<=|>|<|=)?\s*(-?[\d.]+)$/); if (!m) return true; const t = +m[2];
+  return m[1] === '>' ? n > t : m[1] === '<' ? n < t : m[1] === '>=' ? n >= t : m[1] === '<=' ? n <= t : n === t; };
+
+/** Stands in for GET /api/orders?page=…&sort=…&filter=… */
+function fetchOrders(q) {
+  return new Promise((resolve) => {
+    let out = DB;
+    const s = q.search.trim().toLowerCase();
+    if (s) out = out.filter((o) => (o.id + o.client + o.division + o.owner + o.status).toLowerCase().includes(s));
+    for (const [k, v] of Object.entries(q.filters)) {
+      if (v === '' || v == null) continue;
+      out = out.filter((o) => (typeof o[k] === 'number' ? OP(v, o[k]) : String(o[k]).toLowerCase().includes(String(v).toLowerCase())));
+    }
+    if (q.sort) {
+      const dir = q.sort.dir === 'asc' ? 1 : -1;
+      out = [...out].sort((a, b) => {
+        const x = a[q.sort.key], y = b[q.sort.key];
+        return dir * (typeof x === 'number' || x instanceof Date ? x - y : String(x).localeCompare(String(y)));
+      });
+    }
+    const total = out.length;
+    const start = (q.page - 1) * q.pageSize;
+    setTimeout(() => resolve({ items: out.slice(start, start + q.pageSize), total }), 260 + Math.random() * 220);
+  });
+}
+
+const tone = { 'Shipped': 'success', 'QC hold': 'warning', 'Delayed': 'danger', 'In production': 'info', 'Planned': 'neutral' };
+
+const columns = [
+  { key: 'id', header: 'Order', width: 120, pinned: 'left', groupable: false },
+  { key: 'client', header: 'Client', width: 190, groupable: true, filter: 'text',
+    render: (v) => <><Avatar name={v} size={22} /><span>{v}</span></> },
+  { key: 'division', header: 'Division', width: 130, groupable: true, filter: 'select', filterOptions: DIVISIONS },
+  { key: 'plant', header: 'Plant', width: 140, groupable: true, filter: 'select', filterOptions: PLANTS },
+  { key: 'status', header: 'Status', width: 148, groupable: true, filter: 'select', filterOptions: STATUS,
+    render: (v) => <Badge color={tone[v]} dot>{v}</Badge> },
+  { key: 'units', header: 'Units', type: 'number', width: 110, aggregate: 'sum', format: num },
+  { key: 'value', header: 'Order value', type: 'number', width: 140, aggregate: 'sum', format: money },
+  { key: 'defects', header: 'Defect %', type: 'number', width: 110, aggregate: 'avg',
+    format: (v) => v.toFixed(2) + '%',
+    render: (v) => <span style={{ color: v > 2.5 ? 'var(--status-danger-ink)' : 'var(--text-primary)', fontWeight: v > 2.5 ? 700 : 400 }}>{v.toFixed(2)}%</span> },
+  { key: 'owner', header: 'Merchandiser', width: 170, groupable: true, filter: 'text' },
+  { key: 'ship', header: 'Ship date', width: 130, hidden: true, format: (d) => d.toISOString().slice(0, 10) },
+];
+
+function Demo() {
+  const [state, setState] = React.useState({ rows: [], total: 0, loading: true });
+  const seq = React.useRef(0);
+  const onRequest = React.useCallback(async (q) => {
+    const n = ++seq.current;
+    setState((s) => ({ ...s, loading: true }));
+    const res = await fetchOrders(q);
+    if (n === seq.current) setState({ rows: res.items, total: res.total, loading: false });
+  }, []);
+  const [sel, setSel] = React.useState([]);
+
+  return (
+    <>
+      <p className="note">
+        <b>Server-side</b>
+        <span>Every sort, filter, page and search round-trips through a mock API over 4,820 orders — the grid renders only what comes back. Try <b style={{textTransform:'none',letterSpacing:0}}>&gt;50000</b> in the Units filter, group by Division, or hide columns.</span>
+      </p>
+      <DataGrid
+        mode="server"
+        columns={columns}
+        rows={state.rows}
+        totalRows={state.total}
+        loading={state.loading}
+        onRequest={onRequest}
+        onSelectionChange={setSel}
+        rowKey="id"
+        title="Production orders"
+        subtitle="Live from the planning system"
+        selectable
+        showExport
+        showFilterRow
+        defaultSort={{ key: 'value', dir: 'desc' }}
+        pageSize={50}
+        height={640}
+        actions={<Button size="sm" variant="primary">New order</Button>}
+      />
+    </>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<Demo />);
+</script>
+</body>
+</html>

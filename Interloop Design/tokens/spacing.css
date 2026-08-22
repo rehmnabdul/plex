@@ -1,0 +1,63 @@
+/* ============================================================
+   INTERLOOP — SPACING, RADIUS, ELEVATION, MOTION TOKENS
+   4px base grid. Soft, modern admin-surface elevation.
+   ============================================================ */
+
+:root {
+  /* ---- Spacing scale (4px base) ---- */
+  --space-0:  0;
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-7:  32px;
+  --space-8:  40px;
+  --space-9:  48px;
+  --space-10: 64px;
+  --space-11: 80px;
+  --space-12: 96px;
+
+  /* ---- Corner radii ---- */
+  --radius-xs:   4px;
+  --radius-sm:   6px;
+  --radius-md:   8px;    /* buttons, inputs */
+  --radius-lg:   12px;   /* cards */
+  --radius-xl:   16px;   /* large panels */
+  --radius-2xl:  24px;
+  --radius-pill: 999px;  /* badges, avatars, pills */
+
+  /* ---- Elevation — soft, low-contrast, cool-tinted shadows ---- */
+  --shadow-xs: 0 1px 2px rgba(51, 59, 74, 0.06);
+  --shadow-sm: 0 1px 3px rgba(51, 59, 74, 0.08), 0 1px 2px rgba(51, 59, 74, 0.04);
+  --shadow-md: 0 4px 12px rgba(51, 59, 74, 0.08), 0 2px 4px rgba(51, 59, 74, 0.04);
+  --shadow-lg: 0 12px 28px rgba(51, 59, 74, 0.12), 0 4px 8px rgba(51, 59, 74, 0.06);
+  --shadow-xl: 0 24px 48px rgba(51, 59, 74, 0.16);
+  /* Focus / brand glow */
+  --shadow-brand: 0 6px 18px rgba(48, 168, 224, 0.30);
+
+  /* ---- Layout constants ---- */
+  --sidebar-width: 264px;
+  --sidebar-width-collapsed: 76px;
+  --topbar-height: 64px;
+  --container-max: 1320px;
+
+  /* ---- Motion ---- */
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1); /* @kind other */
+  --ease-out:      cubic-bezier(0.0, 0, 0.2, 1); /* @kind other */
+  --ease-in:       cubic-bezier(0.4, 0, 1, 1); /* @kind other */
+  --dur-fast:   120ms; /* @kind other */
+  --dur-normal: 200ms; /* @kind other */
+  --dur-slow:   320ms; /* @kind other */
+
+  /* ---- z-index ---- */
+  --z-base: 1; /* @kind other */
+  --z-sticky: 100; /* @kind other */
+  --z-sidebar: 200; /* @kind other */
+  --z-topbar: 300; /* @kind other */
+  --z-dropdown: 800; /* @kind other */
+  --z-overlay: 900; /* @kind other */
+  --z-modal: 1000; /* @kind other */
+  --z-toast: 1100; /* @kind other */
+}

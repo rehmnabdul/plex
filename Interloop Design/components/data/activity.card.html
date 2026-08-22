@@ -1,0 +1,155 @@
+<!-- @dsCard group="Components" viewport="1240x900" name="ActivityFeed — timeline & profile" subtitle="Date-grouped audit trail · filter tabs · comments, status changes, files, metrics" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>
+  body{margin:0;padding:24px;font-family:var(--font-sans);background:var(--surface-page);color:var(--text-primary)}
+  a{color:var(--text-link);text-decoration:none}a:hover{color:var(--il-blue-800)}
+  .page{display:grid;grid-template-columns:308px minmax(0,1fr);gap:24px;align-items:start;max-width:1180px;margin:0 auto}
+  .panel{background:var(--surface-card);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm)}
+  .prof{padding:24px 22px;text-align:center}
+  .prof h2{margin:14px 0 2px;font-family:var(--font-sans);font-size:var(--fs-xl);font-weight:var(--weight-bold);letter-spacing:-0.015em}
+  .prof .handle{font-size:var(--fs-sm);color:var(--text-muted)}
+  .prof .role{margin-top:10px;font-size:var(--fs-sm);font-weight:var(--weight-semibold);color:var(--text-secondary)}
+  .prof .loc{margin-top:2px;font-size:var(--fs-sm);color:var(--text-muted)}
+  .prof .btns{display:flex;gap:8px;margin-top:18px}
+  .prof .btns>*{flex:1}
+  .meta{border-top:1px solid var(--border-subtle);padding:18px 22px;display:flex;flex-direction:column;gap:16px}
+  .meta dt{font-size:var(--fs-xs);font-weight:var(--weight-bold);letter-spacing:.07em;text-transform:uppercase;color:var(--text-muted);margin-bottom:3px}
+  .meta dd{margin:0;font-size:var(--fs-sm);font-weight:var(--weight-semibold)}
+  .kpis{display:grid;grid-template-columns:1fr 1fr 1fr;border-top:1px solid var(--border-subtle)}
+  .kpis div{padding:15px 6px;text-align:center;border-right:1px solid var(--border-subtle)}
+  .kpis div:last-child{border-right:0}
+  .kpis b{display:block;font-family:var(--font-sans);font-size:var(--fs-lg);font-weight:var(--weight-bold);font-variant-numeric:tabular-nums}
+  .kpis span{font-size:10px;font-weight:var(--weight-bold);letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted)}
+  .feedcard{padding:22px 24px 8px}
+  .crumb{display:flex;gap:8px;align-items:center;margin:0 0 16px;font-size:var(--fs-xs);color:var(--text-muted)}
+  .crumb b{color:var(--text-secondary);font-weight:var(--weight-semibold)}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { ActivityFeed, Avatar, Badge, Button } = window.ILPDesignSystem_7d03df;
+
+const NOW = new Date('2026-08-02T14:20:00');
+const t = (dayOffset, hh, mm) => { const d = new Date(NOW); d.setDate(d.getDate() - dayOffset); d.setHours(hh, mm, 0, 0); return d; };
+
+const ITEMS = [
+  { id: 'a1', type: 'flag', actor: { name: 'Sana Iqbal', role: 'QA Lead' },
+    action: 'raised a defect on lot', target: 'ILP-10482', targetHref: '#', time: t(0, 13, 55),
+    body: 'Third roll in the lot shows the same bowing on the left selvedge. Holding the pallet until Denim finishing confirms the stenter setting.',
+    tags: ['Skewness', 'AQL 2.5', 'Major'],
+    actions: [{ id: 'capa', label: 'Open CAPA', primary: true }, { id: 'assign', label: 'Assign' }] },
+
+  { id: 'a2', type: 'status', actor: { name: 'Bilal Raza', role: 'Merchandiser' },
+    action: 'moved', target: 'CAPA-338', targetHref: '#', time: t(0, 12, 10),
+    from: 'Containment', to: 'Root cause', toTone: 'info' },
+
+  { id: 'a3', type: 'approval', actor: { name: 'Ayesha Khan', role: 'Quality Manager' },
+    action: 'approved the final inspection for', target: 'ILP-10455', targetHref: '#', time: t(0, 10, 42),
+    stats: [
+      { label: 'Sample size', value: '200' },
+      { label: 'Major / Minor', value: '1 / 4' },
+      { label: 'Quality index', value: '98.2', trend: 'up' },
+      { label: 'Verdict', value: 'PASS', trend: 'up' },
+    ] },
+
+  { id: 'a4', type: 'upload', actor: { name: 'Usman Tariq', role: 'Inspector' },
+    action: 'attached evidence to', target: 'INSP-77219', targetHref: '#', time: t(0, 9, 5),
+    attachments: [
+      { name: 'roll-14-selvedge.jpg', size: '2.4 MB' },
+      { name: 'roll-14-back.jpg', size: '1.9 MB' },
+      { name: '4-point-worksheet.pdf', size: '318 KB' },
+    ] },
+
+  { id: 'a5', type: 'alert', action: 'Defect rate for', target: 'Denim — Faisalabad II',
+    time: t(1, 18, 30), tone: 'danger',
+    body: 'Rolling 7-day defect rate crossed the 2.5% control limit for the second consecutive shift.',
+    actions: [{ id: 'chart', label: 'View control chart' }] },
+
+  { id: 'a6', type: 'comment', actor: { name: 'Hina Malik', role: 'Vendor QA' },
+    action: 'commented on', target: 'AUD-1042', targetHref: '#', time: t(1, 16, 12),
+    body: 'Supplier accepted findings 3 and 5. They dispute finding 7 — needle-detection log was captured on the paper register that day. Requesting a re-check next visit.' },
+
+  { id: 'a7', type: 'rejected', actor: { name: 'Ayesha Khan', role: 'Quality Manager' },
+    action: 'rejected the pre-final for', target: 'ILP-10390', targetHref: '#', time: t(1, 11, 28),
+    from: 'Pending review', to: 'Rework', toTone: 'danger' },
+
+  { id: 'a8', type: 'mention', actor: { name: 'Zain Abbas', role: 'Planner' },
+    action: 'mentioned you in', target: 'ILP-10501', targetHref: '#', time: t(1, 9, 47),
+    body: '@ayesha can we pull the AQL level to II for this buyer? Their last three lots came back clean.' },
+
+  { id: 'a9', type: 'schedule', actor: { name: 'Planning bot' },
+    action: 'scheduled 14 inspections for', target: 'week 32', time: t(2, 7, 0),
+    tags: ['Hosiery ×6', 'Denim ×5', 'Apparel ×3'] },
+
+  { id: 'a10', type: 'system', action: 'Sync completed with', target: 'HMS Oracle', time: t(2, 5, 30),
+    stats: [{ label: 'Records', value: '18,402' }, { label: 'Conflicts', value: '0' }, { label: 'Duration', value: '4m 11s' }] },
+];
+
+const TABS = [
+  { id: 'all', label: 'All', count: ITEMS.length },
+  { id: 'quality', label: 'Quality', types: ['flag', 'alert', 'approval', 'rejected'] },
+  { id: 'people', label: 'People', types: ['comment', 'mention'] },
+  { id: 'files', label: 'Files', types: ['upload'] },
+];
+
+function Page() {
+  const [loading, setLoading] = React.useState(false);
+  const [more, setMore] = React.useState(true);
+  return (
+    <div className="page">
+      <aside className="panel">
+        <div className="prof">
+          <Avatar name="Ayesha Khan" size={84} status="online" />
+          <h2>Ayesha Khan</h2>
+          <div className="handle">@ayesha.khan</div>
+          <div className="role">Quality Manager · Denim Division</div>
+          <div className="loc">Faisalabad, Pakistan</div>
+          <div style={{ marginTop: 12 }}><Badge color="success" dot>On shift</Badge></div>
+          <div className="btns">
+            <Button size="sm" variant="primary">Message</Button>
+            <Button size="sm" variant="secondary">Follow</Button>
+          </div>
+        </div>
+        <div className="kpis">
+          <div><b>412</b><span>Inspections</span></div>
+          <div><b>97.4</b><span>Quality idx</span></div>
+          <div><b>9</b><span>Open CAPA</span></div>
+        </div>
+        <dl className="meta">
+          <div><dt>Reports to</dt><dd>Imran Sheikh, Head of Quality</dd></div>
+          <div><dt>Plants</dt><dd>Faisalabad II · Lahore</dd></div>
+          <div><dt>Certifications</dt><dd>ISO 9001 Lead Auditor · Six Sigma GB</dd></div>
+          <div><dt>Joined</dt><dd>16 Jan 2020</dd></div>
+        </dl>
+      </aside>
+
+      <main className="panel feedcard">
+        <p className="crumb"><b>Quality</b> / People / <b>Ayesha Khan</b></p>
+        <ActivityFeed
+          title="Activity"
+          tabs={TABS}
+          items={ITEMS}
+          now={NOW}
+          maxHeight={720}
+          hasMore={more}
+          loading={loading}
+          onLoadMore={() => { setLoading(true); setTimeout(() => { setLoading(false); setMore(false); }, 900); }}
+          onItemAction={(id, item) => console.log('action', id, item.id)}
+        />
+      </main>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<Page />);
+</script>
+</body>
+</html>

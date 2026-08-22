@@ -1,0 +1,206 @@
+<!-- @dsCard group="Components" viewport="1280x860" name="Wizard — horizontal & vertical" subtitle="Numbered step rail · option cards · per-step validation · same steps, one prop" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>
+  body{margin:0;padding:24px;font-family:var(--font-sans);background:var(--surface-page);color:var(--text-primary)}
+  a{color:var(--text-link)}a:hover{color:var(--il-blue-800)}
+  .top{display:flex;align-items:center;gap:14px;max-width:1200px;margin:0 auto 16px}
+  .top h1{margin:0;font-size:var(--fs-lg);font-weight:var(--weight-bold);letter-spacing:-0.01em;margin-right:auto}
+  .switch{display:flex;gap:2px;padding:3px;background:var(--il-grayblue-100);border-radius:var(--radius-pill)}
+  .switch button{height:30px;padding:0 16px;font:inherit;font-size:var(--fs-sm);font-weight:var(--weight-semibold);color:var(--text-secondary);background:transparent;border:0;border-radius:var(--radius-pill);cursor:pointer}
+  .switch button[aria-pressed="true"]{background:var(--surface-card);color:var(--text-primary);box-shadow:var(--shadow-xs)}
+  .wrap{max-width:1200px;margin:0 auto}
+  .fields{display:grid;grid-template-columns:1fr 1fr;gap:18px 20px;max-width:620px}
+  .fields .wide{grid-column:1/-1}
+  .lbl{display:block;margin-bottom:8px;font-size:var(--fs-xs);font-weight:var(--weight-bold);letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted)}
+  .hint{margin:8px 0 0;font-size:var(--fs-xs);color:var(--text-muted)}
+  .stack{display:flex;flex-direction:column;gap:12px}
+  .review{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:24px 32px;padding:24px 28px;background:var(--il-grayblue-50);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);text-align:left}
+  .review dt{font-size:10px;font-weight:var(--weight-bold);letter-spacing:.07em;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px}
+  .review dd{margin:0;font-size:var(--fs-base);font-weight:var(--weight-bold);line-height:1.35}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { Wizard, WizardStepHeader, WizardOptions, WizardOptionCard, WizardDone,
+        Input, Select, Checkbox, Switch, Alert, Badge } = window.ILPDesignSystem_7d03df;
+
+const Ic = (d) => (p) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" {...p}>
+    {d.map((x, i) => <path key={i} d={x} />)}
+  </svg>
+);
+const IcInline = Ic(['M3 12h4l2.5-7 5 14L17 12h4']);
+const IcFinal = Ic(['M20.5 12a8.5 8.5 0 1 1-8.5-8.5', 'm8.5 12 2.5 2.5L21 4.5']);
+const IcContainer = Ic(['M3 7h18v10H3z', 'M7 7v10', 'M11 7v10', 'M15 7v10']);
+
+const STEPS = [
+  { key: 'type', title: 'Inspection type', subtitle: 'What is being checked' },
+  { key: 'scope', title: 'Scope & sampling', subtitle: 'Lot size, AQL and level' },
+  { key: 'standard', title: 'Defect standard', subtitle: 'Grading rules to apply' },
+  { key: 'assign', title: 'Assignment', subtitle: 'Inspector, plant and date', optional: true },
+  { key: 'review', title: 'Review', subtitle: 'Confirm and schedule' },
+];
+
+const TYPES = [
+  { id: 'inline', icon: <IcInline />, title: 'Inline / DUPRO', desc: 'During production, at 20–80% completion. Catches process drift early.' },
+  { id: 'final', icon: <IcFinal />, title: 'Final random (FRI)', desc: 'After 100% production and 80% packing. The gate before shipment.' },
+  { id: 'container', icon: <IcContainer />, title: 'Container loading', desc: 'At the loading bay. Verifies quantity, carton condition and seal.' },
+];
+
+const STANDARDS = [
+  { id: 'aql', title: 'AQL 2.5 / 4.0 — ISO 2859-1', desc: 'General inspection level II. Major 2.5, minor 4.0. The Interloop default for apparel and hosiery.' },
+  { id: 'fourpoint', title: '4-point fabric grading', desc: 'Points per 100 m². Rolls above 20 points are rejected. Used for denim and greige fabric.' },
+  { id: 'custom', title: 'Customer-specific standard', desc: 'Buyer supplies the defect classification and limits. Requires an uploaded specification.' },
+];
+
+function Demo() {
+  const [orientation, setOrientation] = React.useState('horizontal');
+  const [step, setStep] = React.useState(0);
+  const [type, setType] = React.useState('final');
+  const [level, setLevel] = React.useState('II');
+  const [standard, setStandard] = React.useState('aql');
+  const [lot, setLot] = React.useState('18,200');
+  const [done, setDone] = React.useState(false);
+
+  const panels = [
+    <div key="type">
+      <WizardStepHeader
+        title="Choose inspection type"
+        description="This sets the sampling stage and which milestones the plan can close. If you are unsure, see the"
+        helpLabel="inspection matrix."
+      />
+      <WizardOptions>
+        {TYPES.map((t) => (
+          <WizardOptionCard
+            key={t.id} icon={t.icon} title={t.title} description={t.desc}
+            selected={type === t.id} onClick={() => setType(t.id)}
+          />
+        ))}
+      </WizardOptions>
+    </div>,
+
+    <div key="scope">
+      <WizardStepHeader
+        title="Scope & sampling"
+        description="Sample size is derived from the lot quantity and inspection level per ISO 2859-1. Override only with QA approval —"
+        helpLabel="sampling policy."
+      />
+      <div className="fields">
+        <div className="wide">
+          <span className="lbl">Inspection level</span>
+          <div className="ilp-wzseg">
+            {['I', 'II', 'III', 'S-3'].map((l) => (
+              <button key={l} type="button" aria-pressed={level === l} onClick={() => setLevel(l)}>{l}</button>
+            ))}
+          </div>
+          <p className="hint">Level II is standard. Use S-3 for destructive or slow tests, III when a vendor is on watch.</p>
+        </div>
+        <Input label="Lot quantity (pcs)" value={lot} onChange={(e) => setLot(e.target.value)} required />
+        <Select label="AQL — major / minor" options={['2.5 / 4.0', '1.5 / 2.5', '4.0 / 6.5']} defaultValue="2.5 / 4.0" />
+        <Input label="Derived sample size" value={level === 'III' ? '315' : level === 'I' ? '125' : '200'} readOnly />
+        <Select label="Sampling plan" options={['Single', 'Double', 'Tightened']} defaultValue="Single" />
+        <div className="wide stack">
+          <Switch label="Escalate to tightened inspection after two failed lots" defaultChecked />
+          <Switch label="Require photo evidence for every major defect" defaultChecked />
+        </div>
+      </div>
+    </div>,
+
+    <div key="standard">
+      <WizardStepHeader
+        title="Defect standard"
+        description="The grading rules the inspector will score against. Changing this after the first inspection invalidates trend data —"
+        helpLabel="see why."
+      />
+      <WizardOptions layout="list">
+        {STANDARDS.map((s) => (
+          <WizardOptionCard
+            key={s.id} title={s.title} description={s.desc}
+            selected={standard === s.id} onClick={() => setStandard(s.id)}
+          />
+        ))}
+      </WizardOptions>
+      {standard === 'custom' && (
+        <div style={{ marginTop: 16 }}>
+          <Alert variant="warning" title="Specification required">
+            Upload the buyer’s defect classification before this plan can be activated.
+          </Alert>
+        </div>
+      )}
+    </div>,
+
+    <div key="assign">
+      <WizardStepHeader
+        title="Assignment"
+        description="Leave blank to let the planning queue assign an inspector on the scheduled date."
+      />
+      <div className="fields">
+        <Select label="Plant" options={['Faisalabad I', 'Faisalabad II', 'Lahore', 'Sialkot']} defaultValue="Faisalabad II" />
+        <Select label="Inspector" placeholder="Auto-assign" options={['Usman Tariq', 'Sana Iqbal', 'Hina Malik']} />
+        <Input label="Scheduled date" type="date" defaultValue="2026-08-08" />
+        <Input label="Shift" defaultValue="A — 07:00 to 15:00" />
+        <div className="wide stack">
+          <Checkbox label="Notify the merchandiser when the verdict is posted" defaultChecked />
+          <Checkbox label="Notify the brand contact on a fail verdict" defaultChecked />
+          <Checkbox label="Add to the weekly quality review agenda" />
+        </div>
+      </div>
+    </div>,
+
+    <div key="review">
+      <WizardDone
+        title="Inspection plan ready"
+        description="Review the summary and schedule it. The plan appears on the inspector’s queue and closes the FRI milestone on the order’s T&A."
+      >
+        <dl className="review">
+          <div><dt>Type</dt><dd>{TYPES.find((t) => t.id === type).title}</dd></div>
+          <div><dt>Lot</dt><dd>{lot} pcs</dd></div>
+          <div><dt>Level / AQL</dt><dd>{level} · 2.5 / 4.0</dd></div>
+          <div><dt>Standard</dt><dd>{STANDARDS.find((s) => s.id === standard).title.split(' — ')[0]}</dd></div>
+          <div><dt>Plant</dt><dd>Faisalabad II</dd></div>
+          <div><dt>Scheduled</dt><dd>08 Aug 2026</dd></div>
+        </dl>
+        {done && <div style={{ marginTop: 20, display: 'flex', justifyContent: 'center' }}><Badge color="success" dot>Scheduled as INSP-77220</Badge></div>}
+      </WizardDone>
+    </div>,
+  ];
+
+  return (
+    <>
+      <div className="top">
+        <h1>New inspection plan · ILP-10482</h1>
+        <div className="switch">
+          <button type="button" aria-pressed={orientation === 'horizontal'} onClick={() => setOrientation('horizontal')}>Horizontal</button>
+          <button type="button" aria-pressed={orientation === 'vertical'} onClick={() => setOrientation('vertical')}>Vertical</button>
+        </div>
+      </div>
+      <div className="wrap">
+        <Wizard
+          steps={STEPS}
+          orientation={orientation}
+          current={step}
+          onStepChange={(i) => { setStep(i); setDone(false); }}
+          onFinish={() => setDone(true)}
+          finishLabel={done ? 'Scheduled' : 'Schedule inspection'}
+          backLabel="Return"
+          height={orientation === 'vertical' ? 640 : 620}
+        >
+          {panels}
+        </Wizard>
+      </div>
+    </>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<Demo />);
+</script>
+</body>
+</html>

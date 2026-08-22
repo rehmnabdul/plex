@@ -1,0 +1,24 @@
+<!-- @dsCard group="Colors" viewport="700x190" name="Primary colors" subtitle="Gray Blue, Just Blue, Pure White — the brand anchors" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  body { margin: 0; padding: 20px; background: var(--surface-card); font-family: var(--font-sans); }
+  .row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .sw { border-radius: var(--radius-lg); overflow: hidden; border: 1px solid var(--border-subtle); }
+  .chip { height: 86px; }
+  .meta { padding: 10px 12px; }
+  .name { font-weight: var(--weight-bold); font-size: var(--fs-sm); color: var(--text-primary); }
+  .hex { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--text-muted); text-transform: uppercase; }
+</style>
+</head>
+<body>
+  <div class="row">
+    <div class="sw"><div class="chip" style="background:var(--il-grayblue)"></div><div class="meta"><div class="name">Gray Blue</div><div class="hex">#333B4A</div></div></div>
+    <div class="sw"><div class="chip" style="background:var(--il-blue)"></div><div class="meta"><div class="name">Just Blue</div><div class="hex">#30A8E0</div></div></div>
+    <div class="sw"><div class="chip" style="background:var(--il-white)"></div><div class="meta"><div class="name">Pure White</div><div class="hex">#FFFFFF</div></div></div>
+  </div>
+</body>
+</html>

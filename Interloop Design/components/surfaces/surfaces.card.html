@@ -1,0 +1,42 @@
+<!-- @dsCard group="Components" viewport="700x340" name="Surfaces — Card & StatCard" subtitle="Panels and dashboard KPI tiles" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/lucide@0.456.0/dist/umd/lucide.min.js"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>
+  body { margin: 0; padding: 24px; font-family: var(--font-sans); background: var(--surface-page); }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 18px; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+  const { Card, StatCard, Button, Badge, IconButton } = window.ILPDesignSystem_7d03df;
+  const Ic = ({ n }) => <i data-lucide={n}></i>;
+  function Demo() {
+    return (
+      <div>
+        <div className="stats">
+          <StatCard label="Earnings" value="$3,000.00" delta="+$1,210.50" trend="up" note="vs last month" icon={<Ic n="wallet" />} iconTone="blue" />
+          <StatCard label="Balance" value="$2,940.00" delta="-$1,210.50" trend="down" icon={<Ic n="credit-card" />} iconTone="sun" />
+          <StatCard label="Revenue" value="$4,965.00" delta="+$210.50" trend="up" icon={<Ic n="trending-up" />} iconTone="earth" />
+        </div>
+        <Card title="Active Users" subtitle="6 online now"
+              actions={<><Badge color="success" dot>Live</Badge><IconButton label="More"><Ic n="more-horizontal" /></IconButton></>}
+              footer={<Button variant="ghost" size="sm" trailingIcon={<Ic n="arrow-right" />}>View all users</Button>}>
+          <p style={{margin:0,color:'var(--text-secondary)'}}>Card content sits here — tables, charts, lists or any panel body. The footer hosts a quiet secondary action.</p>
+        </Card>
+      </div>
+    );
+  }
+  ReactDOM.createRoot(document.getElementById('root')).render(<Demo />);
+  setTimeout(() => window.lucide && window.lucide.createIcons(), 60);
+</script>
+</body>
+</html>

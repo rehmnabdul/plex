@@ -1,0 +1,38 @@
+<!-- @dsCard group="Components" viewport="700x220" name="Logo" subtitle="Lockup · mark · inverse · mono" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>
+  body { margin: 0; padding: 0; font-family: var(--font-sans); }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+  .cell { padding: 28px 30px; display: flex; align-items: center; gap: 14px; border: 1px solid var(--border-subtle); }
+  .dark { background: var(--il-grayblue-700); }
+  .lab { position:absolute; top:8px; left:10px; font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); }
+  .cell { position: relative; }
+  .dark .lab { color: rgba(255,255,255,.6); }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+  const { Logo } = window.ILPDesignSystem_7d03df;
+  function Demo() {
+    return (
+      <div className="grid">
+        <div className="cell"><span className="lab">full · color</span><Logo size={30} /></div>
+        <div className="cell dark"><span className="lab">inverse</span><Logo size={30} tone="inverse" /></div>
+        <div className="cell"><span className="lab">mark</span><Logo variant="mark" size={40} /></div>
+        <div className="cell"><span className="lab">mono</span><Logo tone="mono" size={30} style={{ color: 'var(--il-grayblue-500)' }} /></div>
+      </div>
+    );
+  }
+  ReactDOM.createRoot(document.getElementById('root')).render(<Demo />);
+</script>
+</body>
+</html>

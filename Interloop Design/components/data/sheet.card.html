@@ -1,0 +1,116 @@
+<!-- @dsCard group="Components" viewport="1280x780" name="SheetGrid — spreadsheet editor" subtitle="Typed cell editors · frozen columns · keyboard nav · copy/paste · fill · undo · validation" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>
+  body{margin:0;padding:24px;font-family:var(--font-sans);background:var(--surface-page);color:var(--text-primary)}
+  a{color:var(--text-link)}a:hover{color:var(--il-blue-800)}
+  .wrap{max-width:1200px;margin:0 auto}
+  .note{display:flex;gap:14px;align-items:baseline;margin:0 0 14px;font-size:var(--fs-xs);color:var(--text-muted)}
+  .note b{color:var(--text-secondary);font-weight:var(--weight-bold);letter-spacing:.05em;text-transform:uppercase;white-space:nowrap}
+  kbd{display:inline-block;padding:1px 5px;font-family:var(--font-mono);font-size:10px;color:var(--text-secondary);background:var(--surface-card);border:1px solid var(--border-default);border-bottom-width:2px;border-radius:4px}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { SheetGrid } = window.ILPDesignSystem_7d03df;
+
+const STYLES = ['PID-3G679W', 'PID-4H210K', 'PID-2B884M', 'PID-7C155Q'];
+const COLORS = ['Multicolored', 'Charcoal / Ecru', 'Black', 'Heather grey', 'Navy / White', 'Oatmeal'];
+const STATUS = ['Planned', 'In production', 'QC hold', 'Shipped', 'Delayed'];
+const OWNERS = ['Usman Tariq', 'Sana Iqbal', 'Hina Malik', 'Zain Abbas'];
+
+const rnd = (s) => { let x = s * 16807 % 2147483647; return () => (x = x * 16807 % 2147483647) / 2147483647; };
+const r = rnd(11);
+const ROWS = Array.from({ length: 42 }, (_, i) => {
+  const qty = Math.round(240 + r() * 4800) * 2;
+  const defects = +(r() * 3.6).toFixed(2);
+  return {
+    id: 'ILP-' + (10400 + i),
+    item: '040-13-' + String(1 + i * 7).padStart(4, '0'),
+    style: STYLES[Math.floor(r() * STYLES.length)],
+    color: COLORS[Math.floor(r() * COLORS.length)],
+    size: ['6-12', '10-13'][Math.floor(r() * 2)],
+    qty,
+    casePack: 24,
+    cartons: Math.round(qty / 24),
+    rate: +(1.8 + r() * 5).toFixed(2),
+    defects,
+    ship: new Date(2026, 8 + Math.floor(r() * 2), 1 + Math.floor(r() * 27)).toISOString().slice(0, 10),
+    checked: i % 3 === 0 ? '2026-08-01T09:30' : '',
+    status: STATUS[Math.floor(r() * STATUS.length)],
+    owner: OWNERS[Math.floor(r() * OWNERS.length)],
+    approved: r() > 0.6,
+  };
+});
+
+const COLUMNS = [
+  { key: 'item', header: 'Item ID', width: 128, readOnly: true },
+  { key: 'style', header: 'Style', width: 132, required: true },
+  { key: 'color', header: 'Colour', width: 150 },
+  { key: 'size', header: 'Size', width: 84, type: 'select', options: ['6-12', '10-13', 'One size'] },
+  { key: 'qty', header: 'Order qty', width: 116, type: 'number', min: 0, required: true },
+  { key: 'casePack', header: 'Case pack', width: 108, type: 'number', min: 1, max: 48 },
+  { key: 'cartons', header: 'Cartons', width: 100, type: 'number', readOnly: true },
+  { key: 'rate', header: 'Unit rate', width: 118, type: 'currency' },
+  { key: 'defects', header: 'Defect %', width: 112, type: 'percent', max: 100,
+    validate: (v) => (v > 2.5 ? 'Above the 2.5% control limit' : true) },
+  { key: 'ship', header: 'Ship date', width: 136, type: 'date' },
+  { key: 'checked', header: 'Last checked', width: 176, type: 'datetime' },
+  { key: 'status', header: 'Status', width: 156, type: 'select', options: STATUS,
+    tones: { Shipped: 'success', 'QC hold': 'warning', Delayed: 'danger', 'In production': 'info' } },
+  { key: 'owner', header: 'Inspector', width: 152, type: 'select', options: OWNERS },
+  { key: 'approved', header: 'Approved', width: 104, type: 'checkbox' },
+];
+
+function Demo() {
+  const [rows, setRows] = React.useState(ROWS);
+
+  // Derived columns recalculate on every edit — that is why `cartons` is read-only.
+  const handleChange = (next, change) => {
+    const recalculated = next.map((row) => ({
+      ...row,
+      cartons: row.qty && row.casePack ? Math.round(row.qty / row.casePack) : row.cartons,
+    }));
+    setRows(recalculated);
+    if (change.column) console.log('edited', change);
+  };
+
+  return (
+    <div className="wrap">
+      <p className="note">
+        <b>Try it</b>
+        <span>
+          Click a cell and type. <kbd>Enter</kbd> or double-click to edit · <kbd>Tab</kbd> to move right ·
+          <kbd>Shift</kbd>+arrows to select a range · <kbd>Ctrl</kbd>+<kbd>C</kbd> / <kbd>V</kbd> to copy and paste from Excel ·
+          <kbd>Delete</kbd> to clear · <kbd>Ctrl</kbd>+<kbd>Z</kbd> to undo · drag the blue handle to fill down.
+          Cartons recalculate from qty ÷ case pack. Defect % above 2.5 flags the cell.
+        </span>
+      </p>
+      <SheetGrid
+        title="Order line editor · ILP-10482"
+        columns={COLUMNS}
+        rows={rows}
+        onChange={handleChange}
+        freeze={2}
+        height={620}
+        showColumnLetters
+        allowAddRows
+        allowDeleteRows
+        newRow={(i) => ({ item: '040-13-' + String(9000 + i).padStart(4, '0'), casePack: 24, status: 'Planned', approved: false })}
+        totals={{ qty: 'sum', cartons: 'sum', defects: 'avg', item: () => 'Total' }}
+      />
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<Demo />);
+</script>
+</body>
+</html>

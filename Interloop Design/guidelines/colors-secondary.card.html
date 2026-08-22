@@ -1,0 +1,52 @@
+<!-- @dsCard group="Colors" viewport="700x230" name="Secondary 'elements' palette" subtitle="Earth · Water · Air · Sun — gradient, flat & soft wash" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  body { margin: 0; padding: 20px; background: var(--surface-card); font-family: var(--font-sans); }
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  .col .name { font-weight: var(--weight-bold); font-size: var(--fs-sm); color: var(--text-primary); margin-bottom: 8px; }
+  .bar { display:flex; flex-direction:column; border-radius: var(--radius-md); overflow:hidden; border:1px solid var(--border-subtle); }
+  .seg { height: 34px; display:flex; align-items:center; padding:0 10px; font-family: var(--font-mono); font-size: 10px; }
+  .tag { font-family: var(--font-sans); font-size: 10px; font-weight: var(--weight-semibold); opacity:.65; margin-left:auto; }
+</style>
+</head>
+<body>
+  <div class="grid">
+    <div class="col">
+      <div class="name">Earth</div>
+      <div class="bar">
+        <div class="seg" style="background:var(--il-earth);color:#3f5410">#AED250<span class="tag">grad</span></div>
+        <div class="seg" style="background:var(--il-earth-flat);color:#3f5410">#C6DB72<span class="tag">flat</span></div>
+        <div class="seg" style="background:var(--il-earth-soft);color:var(--il-earth-ink)">#F1F7DC<span class="tag">soft</span></div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="name">Water</div>
+      <div class="bar">
+        <div class="seg" style="background:var(--il-water);color:#0c5a7a">#66C8F2<span class="tag">grad</span></div>
+        <div class="seg" style="background:var(--il-water-flat);color:#0c5a7a">#7FD3F1<span class="tag">flat</span></div>
+        <div class="seg" style="background:var(--il-water-soft);color:var(--il-blue-700)">#E6F6FD<span class="tag">soft</span></div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="name">Air</div>
+      <div class="bar">
+        <div class="seg" style="background:var(--il-air);color:#244f4f">#6DB7B7<span class="tag">grad</span></div>
+        <div class="seg" style="background:var(--il-air-flat);color:#244f4f">#6DB7B7<span class="tag">flat</span></div>
+        <div class="seg" style="background:var(--il-air-soft);color:var(--il-air-ink)">#E4F1F1<span class="tag">soft</span></div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="name">Sun</div>
+      <div class="bar">
+        <div class="seg" style="background:var(--il-sun);color:#8a4216">#F9A571<span class="tag">grad</span></div>
+        <div class="seg" style="background:var(--il-sun-flat);color:#8a4216">#F6B997<span class="tag">flat</span></div>
+        <div class="seg" style="background:var(--il-sun-soft);color:var(--il-sun-ink)">#FDEEE3<span class="tag">soft</span></div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

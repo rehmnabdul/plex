@@ -1,0 +1,185 @@
+<!-- @dsCard group="Mobile" viewport="1280x1000" name="Mobile — shop-floor screens" subtitle="Sized for gloves and daylight · offline-first · three real screens built from the kit" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>
+  body{margin:0;padding:26px;font-family:var(--font-sans);background:var(--surface-page);color:var(--text-primary)}
+  a{color:var(--text-link)}a:hover{color:var(--il-blue-800)}
+  .rail{display:flex;gap:30px;justify-content:center;align-items:flex-start;flex-wrap:wrap;max-width:1220px;margin:0 auto}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { PhoneFrame, MobileAppBar, MobileAction, MobileScreen, MobileSectionLabel,
+        MobileTabBar, MobileSheet, MobileButton, MobileList, MobileCard,
+        TallyPad, MobileStepper, MobileSegmented, SyncStatus, PhotoCapture } = window.ILPDesignSystem_7d03df;
+
+const I = (d, w = 2) => (p) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={w} strokeLinecap="round" strokeLinejoin="round" {...p}>
+    {d.map((x, i) => <path key={i} d={x} />)}
+  </svg>
+);
+const IcHome = I(['m3 10 9-7 9 7v10H3z', 'M9 20v-6h6v6']);
+const IcList = I(['M8 6h13', 'M8 12h13', 'M8 18h13', 'M3.5 6h.01', 'M3.5 12h.01', 'M3.5 18h.01'], 2.4);
+const IcChart = I(['M4 20V10', 'M10 20V4', 'M16 20v-7', 'M22 20H2']);
+const IcUser = I(['M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z', 'M4.5 20a7.5 7.5 0 0 1 15 0']);
+const IcPlus = I(['M12 5v14', 'M5 12h14'], 2.6);
+const IcInfo = I(['M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z', 'M12 11v5', 'M12 7.6v.1']);
+const IcFilter = I(['M3 5h18l-7 8v6l-4 2v-8L3 5Z']);
+const IcBox = I(['M21 8 12 3 3 8v8l9 5 9-5V8Z', 'm3 8 9 5 9-5', 'M12 13v8']);
+const IcAlert = I(['M12 4.5 2.5 20h19L12 4.5Z', 'M12 10v4.5', 'M12 17.6v.1']);
+const IcCheck = I(['M20.5 12a8.5 8.5 0 1 1-8.5-8.5', 'm8.5 12 2.5 2.5L21 4.5']);
+
+const TABS = [
+  { key: 'home', label: 'Today', icon: <IcHome /> },
+  { key: 'queue', label: 'Queue', icon: <IcList />, badge: 12 },
+  { key: 'reports', label: 'Reports', icon: <IcChart /> },
+  { key: 'me', label: 'Me', icon: <IcUser /> },
+];
+
+const DEFECTS = [
+  { key: 'skew', label: 'Skewness', severity: 'Major' },
+  { key: 'slub', label: 'Slub / neps', severity: 'Minor' },
+  { key: 'crease', label: 'Crease mark', severity: 'Minor' },
+  { key: 'shade', label: 'Shade band', severity: 'Major' },
+  { key: 'needle', label: 'Needle line', severity: 'Critical' },
+  { key: 'oil', label: 'Oil stain', severity: 'Major' },
+];
+
+/* ---------- screen 1: the queue ---------- */
+function QueueScreen() {
+  const [tab, setTab] = React.useState('queue');
+  return (
+    <PhoneFrame caption="Inspection queue" captionNote="Browse · MobileList at glove density">
+      <MobileAppBar
+        title="My queue" subtitle="Faisalabad II · shift A"
+        actions={<><MobileAction icon={<IcFilter />} label="Filter" /><MobileAction icon={<IcInfo />} label="Help" badge={2} /></>}
+      />
+      <SyncStatus state="offline" pending={3} />
+      <MobileScreen>
+        <div style={{ padding: '12px 12px 0' }}>
+          <MobileCard
+            eyebrow="Next up · due 14:00"
+            title="ILP-10482"
+            subtitle="Final random inspection · Denim · Nordstrom"
+            stripe="warning" status="Due 2 h" statusTone="warning"
+            facts={[{ label: 'Lot', value: '18,200' }, { label: 'Sample', value: '200' }, { label: 'AQL', value: '2.5 / 4.0' }]}
+            actions={<><MobileButton variant="secondary">Details</MobileButton><MobileButton>Start</MobileButton></>}
+          />
+        </div>
+        <MobileSectionLabel>Later today · 4</MobileSectionLabel>
+        <MobileList
+          density="glove"
+          onItemClick={() => {}}
+          items={[
+            { id: 'a', title: 'ILP-10455', subtitle: 'DUPRO · Hosiery · Target', stripe: 'info',
+              meta: [{ label: '15:30' }, { label: 'Line 4' }], value: '84k', valueLabel: 'units' },
+            { id: 'b', title: 'ILP-10390', subtitle: 'Re-inspection · rolls 12–14', stripe: 'danger',
+              status: 'Failed', statusTone: 'danger', meta: [{ label: '16:15' }], value: '3', valueLabel: 'defects' },
+            { id: 'c', title: 'ILP-10361', subtitle: 'Container loading · Apparel', stripe: 'neutral',
+              meta: [{ label: '17:00' }, { label: 'Bay 2' }], value: '44k', valueLabel: 'units' },
+            { id: 'd', title: 'AUD-1042', subtitle: 'Vendor audit · Loop Industries', stripe: 'info',
+              meta: [{ label: 'Tomorrow' }], value: '8', valueLabel: 'findings' },
+          ]}
+        />
+      </MobileScreen>
+      <MobileTabBar tabs={TABS} value={tab} onChange={setTab} fab={<IcPlus />} fabLabel="New inspection" />
+    </PhoneFrame>
+  );
+}
+
+/* ---------- screen 2: defect capture ---------- */
+function CaptureScreen() {
+  const [counts, setCounts] = React.useState({ skew: 3, slub: 1, needle: 0, crease: 0, shade: 0, oil: 0 });
+  const [roll, setRoll] = React.useState(14);
+  const total = Object.values(counts).reduce((a, b) => a + b, 0);
+  return (
+    <PhoneFrame caption="Defect capture" captionNote="Enter · TallyPad, stepper, photo slots">
+      <MobileAppBar
+        title="ILP-10482" subtitle={`Roll ${roll} of 22 · Denim`} onBack={() => {}}
+        actions={<MobileAction icon={<IcInfo />} label="Lot details" />}
+      />
+      <SyncStatus state="syncing" pending={1} />
+      <MobileScreen padded>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
+          <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-secondary)', flex: 1 }}>Roll number</span>
+          <div style={{ width: 168 }}><MobileStepper value={roll} min={1} max={22} onChange={setRoll} label="Roll number" /></div>
+        </div>
+        <TallyPad items={DEFECTS} values={counts} criticalAt={5}
+          onChange={(k, v, all) => setCounts(all)} />
+        <div style={{ marginTop: 16 }}>
+          <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--text-secondary)', marginBottom: 8 }}>
+            Evidence · 2 of 4
+          </div>
+          <PhotoCapture slots={4} photos={[{ id: 1 }, { id: 2 }]} onRemove={() => {}} />
+        </div>
+        <div style={{ marginTop: 18, padding: '13px 14px', background: total > 4 ? 'var(--il-red-soft)' : 'var(--il-earth-soft)',
+          borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', gap: 10 }}>
+          {total > 4 ? <IcAlert style={{ width: 20, height: 20, color: 'var(--il-red-ink)' }} /> : <IcCheck style={{ width: 20, height: 20, color: 'var(--il-earth-ink)' }} />}
+          <span style={{ fontSize: 13, fontWeight: 600, color: total > 4 ? 'var(--il-red-ink)' : 'var(--il-earth-ink)' }}>
+            {total} defect point{total === 1 ? '' : 's'} · limit 10 major
+          </span>
+        </div>
+        <div style={{ marginTop: 16 }}><MobileButton size="lg">Save and next roll</MobileButton></div>
+      </MobileScreen>
+    </PhoneFrame>
+  );
+}
+
+/* ---------- screen 3: verdict sheet ---------- */
+function VerdictScreen() {
+  const [verdict, setVerdict] = React.useState('hold');
+  const [tab, setTab] = React.useState('queue');
+  return (
+    <PhoneFrame caption="Sign-off" captionNote="Decide · bottom sheet, segmented verdict">
+      <MobileAppBar title="ILP-10482" subtitle="22 of 22 rolls checked" onBack={() => {}} />
+      <SyncStatus state="synced" />
+      <MobileScreen>
+        <MobileList
+          items={[
+            { id: 1, title: 'Sample size', value: '200', icon: <IcBox />, tone: 'neutral' },
+            { id: 2, title: 'Major defects', subtitle: 'Limit 10', value: '11', valueLabel: 'over limit', icon: <IcAlert />, tone: 'danger', stripe: 'danger' },
+            { id: 3, title: 'Minor defects', subtitle: 'Limit 14', value: '6', icon: <IcAlert />, tone: 'warning' },
+            { id: 4, title: 'Quality index', value: '94.1', valueLabel: 'target 96.0', icon: <IcChart />, tone: 'warning' },
+          ]}
+          showChevron={false}
+        />
+      </MobileScreen>
+      <MobileTabBar tabs={TABS} value={tab} onChange={setTab} />
+      <MobileSheet
+        title="Record the verdict"
+        subtitle="Major defects are over the AQL limit"
+        onClose={() => {}}
+        footer={<><MobileButton variant="secondary">Cancel</MobileButton><MobileButton variant={verdict === 'fail' ? 'danger' : 'primary'}>Submit</MobileButton></>}
+      >
+        <MobileSegmented
+          value={verdict} onChange={setVerdict}
+          options={[
+            { value: 'pass', label: 'Pass', kind: 'pass' },
+            { value: 'hold', label: 'Hold', kind: 'hold' },
+            { value: 'fail', label: 'Fail', kind: 'fail' },
+          ]}
+        />
+        <p style={{ margin: '14px 0 4px', fontSize: 13, lineHeight: 1.55, color: 'var(--text-secondary)' }}>
+          A hold verdict routes the lot to re-finishing and opens a CAPA against the responsible line.
+          The merchandiser and the brand contact are notified.
+        </p>
+      </MobileSheet>
+    </PhoneFrame>
+  );
+}
+
+function Demo() {
+  return <div className="rail"><QueueScreen /><CaptureScreen /><VerdictScreen /></div>;
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<Demo />);
+</script>
+</body>
+</html>

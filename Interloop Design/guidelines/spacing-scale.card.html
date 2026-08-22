@@ -1,0 +1,25 @@
+<!-- @dsCard group="Spacing" viewport="700x200" name="Spacing scale" subtitle="4px base grid · space-1 → space-10" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  body { margin: 0; padding: 22px 24px; background: var(--surface-card); }
+  .row { display:flex; align-items:center; gap: 14px; margin-bottom: 9px; }
+  .tok { width: 92px; font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--text-secondary); }
+  .px { width: 42px; font-size: var(--fs-xs); color: var(--text-muted); text-align:right; }
+  .bar { height: 14px; background: var(--il-blue-400); border-radius: var(--radius-xs); }
+</style>
+</head>
+<body>
+  <div class="row"><span class="tok">--space-1</span><span class="px">4</span><span class="bar" style="width:4px"></span></div>
+  <div class="row"><span class="tok">--space-2</span><span class="px">8</span><span class="bar" style="width:8px"></span></div>
+  <div class="row"><span class="tok">--space-3</span><span class="px">12</span><span class="bar" style="width:12px"></span></div>
+  <div class="row"><span class="tok">--space-4</span><span class="px">16</span><span class="bar" style="width:16px"></span></div>
+  <div class="row"><span class="tok">--space-6</span><span class="px">24</span><span class="bar" style="width:24px"></span></div>
+  <div class="row"><span class="tok">--space-7</span><span class="px">32</span><span class="bar" style="width:32px"></span></div>
+  <div class="row"><span class="tok">--space-9</span><span class="px">48</span><span class="bar" style="width:48px"></span></div>
+  <div class="row"><span class="tok">--space-10</span><span class="px">64</span><span class="bar" style="width:64px"></span></div>
+</body>
+</html>

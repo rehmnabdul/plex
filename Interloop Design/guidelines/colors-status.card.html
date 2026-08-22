@@ -1,0 +1,24 @@
+<!-- @dsCard group="Colors" viewport="700x170" name="Status colors" subtitle="Mapped to the brand secondary palette (danger red derived)" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  body { margin: 0; padding: 20px; background: var(--surface-card); font-family: var(--font-sans); }
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  .chip { display:flex; align-items:center; gap:10px; padding: 12px; border-radius: var(--radius-md); }
+  .dot { width: 14px; height: 14px; border-radius: var(--radius-pill); flex: none; }
+  .lab { font-weight: var(--weight-bold); font-size: var(--fs-sm); }
+  .sub { font-size: 10px; font-family: var(--font-mono); opacity: .7; }
+</style>
+</head>
+<body>
+  <div class="grid">
+    <div class="chip" style="background:var(--status-success-soft)"><span class="dot" style="background:var(--status-success)"></span><div><div class="lab" style="color:var(--status-success-ink)">Success</div><div class="sub" style="color:var(--status-success-ink)">Earth</div></div></div>
+    <div class="chip" style="background:var(--status-info-soft)"><span class="dot" style="background:var(--status-info)"></span><div><div class="lab" style="color:var(--status-info-ink)">Info</div><div class="sub" style="color:var(--status-info-ink)">Just Blue</div></div></div>
+    <div class="chip" style="background:var(--status-warning-soft)"><span class="dot" style="background:var(--status-warning)"></span><div><div class="lab" style="color:var(--status-warning-ink)">Warning</div><div class="sub" style="color:var(--status-warning-ink)">Sun</div></div></div>
+    <div class="chip" style="background:var(--status-danger-soft)"><span class="dot" style="background:var(--status-danger)"></span><div><div class="lab" style="color:var(--status-danger-ink)">Danger</div><div class="sub" style="color:var(--status-danger-ink)">derived</div></div></div>
+  </div>
+</body>
+</html>

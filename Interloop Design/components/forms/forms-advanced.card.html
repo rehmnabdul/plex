@@ -1,0 +1,192 @@
+<!-- @dsCard group="Components" viewport="1280x1080" name="Forms — enterprise controls" subtitle="Combobox · multi-select · tags · date, datetime, time, range · lookup grid · range slider · split button" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>
+  body{margin:0;padding:26px;font-family:var(--font-sans);background:var(--surface-page);color:var(--text-primary)}
+  a{color:var(--text-link)}a:hover{color:var(--il-blue-800)}
+  .wrap{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(12,1fr);gap:22px}
+  .c4{grid-column:span 4}.c6{grid-column:span 6}.c8{grid-column:span 8}.c12{grid-column:span 12}
+  .card{background:var(--surface-card);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);overflow:visible}
+  .card>h2{margin:0;padding:15px 20px 13px;font-size:var(--fs-sm);font-weight:var(--weight-bold);border-bottom:1px solid var(--border-subtle)}
+  .card>h2 em{font-style:normal;font-weight:var(--weight-regular);color:var(--text-muted)}
+  .b{padding:20px;display:flex;flex-direction:column;gap:20px}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  .out{margin:0;padding:12px 14px;background:var(--il-grayblue-50);border-radius:var(--radius-md);font-family:var(--font-mono);font-size:11px;line-height:1.7;color:var(--text-secondary);white-space:pre-wrap;word-break:break-word}
+  .out b{color:var(--text-primary)}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { Combobox, MultiSelect, TagInput, DateField, DateRangeField,
+        LookupField, RangeSlider, SplitButton, Input, Select, Checkbox, Switch } = window.ILPDesignSystem_7d03df;
+
+const I = (d) => (p) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}>{d.map((x, i) => <path key={i} d={x} />)}</svg>
+);
+const IcSave = I(['M5 4h11l3 3v13H5z','M8 4v6h7V4','M8 20v-6h8v6']);
+const IcCopy = I(['M9 9h11v11H9z','M5 15V4h11']);
+const IcTrash = I(['M4 7h16','M9 7V4h6v3','M6 7l1 13h10l1-13']);
+
+const VENDORS = [
+  { value: 'loop', label: 'Loop Industries', meta: '412 lots · score 96', city: 'Faisalabad' },
+  { value: 'nishat', label: 'Nishat Knits', meta: '164 lots · score 91', city: 'Faisalabad' },
+  { value: 'crescent', label: 'Crescent Textiles', meta: '288 lots · score 88', city: 'Lahore' },
+  { value: 'kohinoor', label: 'Kohinoor Weaving', meta: 'Suspended', city: 'Rawalpindi', disabled: true },
+  { value: 'sapphire', label: 'Sapphire Mills', meta: '196 lots · score 74', city: 'Sheikhupura' },
+];
+const DIVISIONS = ['Hosiery', 'Denim', 'Apparel', 'Activewear', 'Yarns'];
+const DEFECT_TAGS = ['Skewness', 'Slub / neps', 'Crease mark', 'Shade band', 'Needle line', 'Oil stain'];
+
+const rnd = (s) => { let x = s * 16807 % 2147483647; return () => (x = x * 16807 % 2147483647) / 2147483647; };
+const r = rnd(5);
+const CLIENTS = ['Nordstrom', 'Uniqlo', 'Adidas', 'Target', 'H&M', 'Puma', 'Zara'];
+const ORDERS = Array.from({ length: 240 }, (_, i) => ({
+  id: 'ILP-' + (10400 + i),
+  client: CLIENTS[Math.floor(r() * CLIENTS.length)],
+  division: DIVISIONS[Math.floor(r() * DIVISIONS.length)],
+  units: Math.round(2000 + r() * 60000),
+  ship: new Date(2026, 8 + Math.floor(r() * 2), 1 + Math.floor(r() * 27)).toISOString().slice(0, 10),
+}));
+
+function Demo() {
+  const [vendor, setVendor] = React.useState('loop');
+  const [divs, setDivs] = React.useState(['Denim', 'Hosiery']);
+  const [tags, setTags] = React.useState(['Skewness', 'AQL 2.5']);
+  const [ship, setShip] = React.useState('2026-10-20');
+  const [checked, setChecked] = React.useState(null);
+  const [shift, setShift] = React.useState('07:00');
+  const [range, setRange] = React.useState({ start: '2026-07-01', end: '2026-08-04' });
+  const [order, setOrder] = React.useState(ORDERS[0]);
+  const [lot, setLot] = React.useState([4000, 42000]);
+  const [defect, setDefect] = React.useState([0, 25]);
+  const [last, setLast] = React.useState('—');
+
+  return (
+    <div className="wrap">
+      <div className="c6">
+        <div className="card">
+          <h2>Searching &amp; choosing <em>· type to filter, arrows to move, Enter to pick</em></h2>
+          <div className="b">
+            <Combobox
+              label="Vendor" required options={VENDORS} value={vendor} onChange={setVendor}
+              groupBy="city" hint="Grouped by city · Kohinoor is suspended and cannot be picked"
+            />
+            <MultiSelect
+              label="Divisions in scope" options={DIVISIONS} value={divs} onChange={setDivs}
+              maxChips={2} hint="Chips collapse past two — the field never grows the form"
+            />
+            <TagInput
+              label="Defect tags" value={tags} onChange={setTags} suggestions={DEFECT_TAGS} max={8}
+              validate={(t) => t.length <= 24 || 'Keep tags under 24 characters'}
+              hint="Enter or comma commits · paste a comma-separated list · Backspace removes the last"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="c6">
+        <div className="card">
+          <h2>Dates &amp; time <em>· weekends dimmed, today ringed, out-of-range disabled</em></h2>
+          <div className="b">
+            <div className="row">
+              <DateField label="Ship date" required value={ship} onChange={setShip} min="2026-08-01" />
+              <DateField label="Shift start" mode="time" value={shift} onChange={setShift} />
+            </div>
+            <DateField
+              label="Last checked" mode="datetime" value={checked} onChange={setChecked}
+              placeholder="Not yet inspected" hint="Date and time in one field, committed together"
+            />
+            <DateRangeField
+              label="Reporting period" value={range} onChange={setRange} align="right"
+              hint="Two months, presets, and the range previews as you hover the end date"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="c6">
+        <div className="card">
+          <h2>Lookup <em>· 240 records — a dropdown would be useless</em></h2>
+          <div className="b">
+            <LookupField
+              label="Order" required value={order} onChange={setOrder}
+              displayKey="id" metaKey="client" title="Select an order"
+              subtitle="Search by order number, client or division"
+              rows={ORDERS}
+              columns={[
+                { key: 'id', header: 'Order', width: '20%' },
+                { key: 'client', header: 'Client' },
+                { key: 'division', header: 'Division' },
+                { key: 'units', header: 'Units', numeric: true, render: (v) => v.toLocaleString('en-US') },
+                { key: 'ship', header: 'Ship date' },
+              ]}
+              hint="Click selects · double-click or Enter confirms · Cancel really cancels"
+            />
+            <p className="out">
+              selected: <b>{order ? `${order.id} · ${order.client} · ${order.units.toLocaleString('en-US')} units` : 'null'}</b>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="c6">
+        <div className="card">
+          <h2>Ranges &amp; actions</h2>
+          <div className="b">
+            <RangeSlider label="Lot size" value={lot} onChange={setLot} min={0} max={90000} step={500} unit=" pcs" />
+            <RangeSlider
+              label="Defect points" value={defect} onChange={setDefect} min={0} max={100} step={1}
+              format={(v) => v + ' pts'} hint="Bounded filters only — never for a value that must be exact"
+            />
+            <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
+              <SplitButton
+                label="Save" icon={<IcSave />} onClick={() => setLast('Save')}
+                items={[
+                  { label: 'Save and new', icon: <IcCopy />, onSelect: () => setLast('Save and new') },
+                  { label: 'Save and close', onSelect: () => setLast('Save and close') },
+                  { separator: true },
+                  { label: 'Discard changes', icon: <IcTrash />, danger: true, onSelect: () => setLast('Discard') },
+                ]}
+              />
+              <SplitButton
+                label="Export" variant="secondary" onClick={() => setLast('Export CSV')}
+                items={[
+                  { label: 'Export as CSV', onSelect: () => setLast('Export CSV') },
+                  { label: 'Export as Excel', onSelect: () => setLast('Export Excel') },
+                  { label: 'Send to printer', disabled: true },
+                ]}
+              />
+              <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--text-muted)' }}>Last action: <b style={{ color: 'var(--text-primary)' }}>{last}</b></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="c12">
+        <div className="card">
+          <h2>The picker decision <em>· the whole rule in one line each</em></h2>
+          <div className="b" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(210px,1fr))', gap: 20 }}>
+            <Select label="2–7, all visible" options={DIVISIONS} defaultValue="Denim" />
+            <Combobox label="8–200, one answer" options={VENDORS} value={vendor} onChange={setVendor} />
+            <MultiSelect label="8–200, several" options={DIVISIONS} value={divs} onChange={setDivs} maxChips={1} />
+            <LookupField label="Thousands, one record" value={order} onChange={setOrder} displayKey="id" metaKey="client"
+              rows={ORDERS} columns={[{ key: 'id', header: 'Order' }, { key: 'client', header: 'Client' }]} />
+            <TagInput label="Open set" value={tags} onChange={setTags} suggestions={DEFECT_TAGS} />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<Demo />);
+</script>
+</body>
+</html>

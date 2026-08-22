@@ -1,0 +1,28 @@
+<!-- @dsCard group="Colors" viewport="700x150" name="Just Blue ramp" subtitle="Primary accent — derived 50→800 from the #30A8E0 anchor" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  body { margin: 0; padding: 20px; background: var(--surface-card); font-family: var(--font-sans); }
+  .ramp { display: grid; grid-template-columns: repeat(9, 1fr); gap: 6px; }
+  .c { height: 64px; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); }
+  .l { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); text-align: center; margin-top: 6px; }
+  .l b { display:block; color: var(--text-secondary); font-family: var(--font-sans); font-weight: var(--weight-semibold); }
+</style>
+</head>
+<body>
+  <div class="ramp">
+    <div><div class="c" style="background:var(--il-blue-50)"></div><div class="l"><b>50</b></div></div>
+    <div><div class="c" style="background:var(--il-blue-100)"></div><div class="l"><b>100</b></div></div>
+    <div><div class="c" style="background:var(--il-blue-200)"></div><div class="l"><b>200</b></div></div>
+    <div><div class="c" style="background:var(--il-blue-300)"></div><div class="l"><b>300</b></div></div>
+    <div><div class="c" style="background:var(--il-blue-400)"></div><div class="l"><b>400</b></div></div>
+    <div><div class="c" style="background:var(--il-blue-500)"></div><div class="l"><b>500</b></div></div>
+    <div><div class="c" style="background:var(--il-blue-600)"></div><div class="l"><b>600</b></div></div>
+    <div><div class="c" style="background:var(--il-blue-700)"></div><div class="l"><b>700</b></div></div>
+    <div><div class="c" style="background:var(--il-blue-800)"></div><div class="l"><b>800</b></div></div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,218 @@
+<!-- @dsCard group="Widgets" viewport="1280x1360" name="Charts — analytics marks" subtitle="Reference lines · dual axis · bullet · heatmap · small multiples · sorted ranking · scatter" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>
+  body{margin:0;padding:24px;font-family:var(--font-sans);background:var(--surface-page);color:var(--text-primary)}
+  a{color:var(--text-link)}a:hover{color:var(--il-blue-800)}
+  .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:20px;max-width:1200px;margin:0 auto}
+  .c4{grid-column:span 4}.c5{grid-column:span 5}.c6{grid-column:span 6}.c7{grid-column:span 7}.c8{grid-column:span 8}.c12{grid-column:span 12}
+  .seg{display:flex;gap:2px;padding:3px;background:var(--il-grayblue-100);border-radius:var(--radius-pill)}
+  .seg button{height:24px;padding:0 11px;font:inherit;font-size:var(--fs-xs);font-weight:var(--weight-semibold);color:var(--text-secondary);background:transparent;border:0;border-radius:var(--radius-pill);cursor:pointer}
+  .seg button[aria-pressed="true"]{background:var(--surface-card);color:var(--text-primary);box-shadow:var(--shadow-xs)}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { Widget, Chart, CHART_COLORS } = window.ILPDesignSystem_7d03df;
+
+const WEEKS = ['W26','W27','W28','W29','W30','W31','W32','W33'];
+const MONTHS = ['Mar','Apr','May','Jun','Jul','Aug'];
+const PLANTS = ['Faisalabad I','Faisalabad II','Lahore','Sialkot'];
+const DIVISIONS = ['Hosiery','Denim','Apparel','Activewear','Yarns'];
+const pctFmt = (v) => v.toFixed(1) + '%';
+const kFmt = (v) => v >= 1000 ? (v / 1000).toFixed(1) + 'M' : v + 'k';
+
+function Demo() {
+  const [range, setRange] = React.useState('8w');
+  const cut = range === '4w' ? 4 : 8;
+  return (
+    <div className="grid">
+      {/* reference lines + bands — the enterprise staple */}
+      <div className="c8">
+        <Widget
+          title="Defect rate against control limits" subtitle="Rolling weekly, all plants" rule
+          actions={<div className="seg">{['4w','8w'].map((r) => (
+            <button key={r} type="button" aria-pressed={range === r} onClick={() => setRange(r)}>{r}</button>
+          ))}</div>}
+          footer={<><span>Two consecutive breaches trigger tightened inspection</span><a href="#spc" style={{marginLeft:'auto'}}>Open control chart</a></>}
+        >
+          <Chart
+            type="line" categories={WEEKS.slice(-cut)} valueFormat={pctFmt}
+            yTitle="Defect rate" xTitle="Week"
+            showLegend legendPosition="right" legendTitle="Division"
+            series={[
+              { name: 'Denim', data: [1.9, 2.2, 2.7, 2.4, 2.9, 3.1, 2.6, 2.3].slice(-cut), color: 'var(--il-red)' },
+              { name: 'Hosiery', data: [1.4, 1.2, 1.5, 1.1, 1.3, 1.0, 1.2, 0.9].slice(-cut) },
+              { name: 'Apparel', data: [1.8, 1.9, 1.6, 2.0, 1.7, 1.9, 1.5, 1.6].slice(-cut), color: 'var(--il-air)' },
+            ]}
+            reference={[
+              { value: 2.5, label: 'Control limit', color: 'var(--il-red)' },
+              { value: 0.8, to: 1.6, label: 'Target band', color: 'var(--il-earth)' },
+            ]}
+            height={258}
+          />
+        </Widget>
+      </div>
+
+      {/* bullet — actual vs target */}
+      <div className="c4">
+        <Widget title="Plant performance" subtitle="Quality index vs. target" rule>
+          <Chart
+            type="bullet" categories={PLANTS} valueFormat={(v) => v.toFixed(1)}
+            series={[
+              { name: 'Actual', data: [98.2, 94.1, 97.0, 95.4] },
+              { name: 'Target', data: [96, 96, 96, 96] },
+            ]}
+            height={228}
+          />
+          <p style={{margin:'8px 0 0',fontSize:'var(--fs-xs)',color:'var(--text-muted)'}}>
+            Bar is actual, the dark tick is target, bands are poor / fair / good.
+          </p>
+        </Widget>
+      </div>
+
+      {/* dual axis combo */}
+      <div className="c7">
+        <Widget title="Volume vs. defect rate" subtitle="Do they move together?" rule>
+          <Chart
+            type="combo" categories={MONTHS}
+            valueFormat={kFmt} rightFormat={pctFmt}
+            yTitle="Units shipped" y2Title="Defect rate" showLegend
+            series={[
+              { name: 'Units shipped', data: [620, 704, 588, 812, 766, 890], mark: 'bar' },
+              { name: 'Defect rate', data: [1.6, 1.8, 1.4, 2.3, 2.1, 1.9], mark: 'line', axis: 'right', color: 'var(--il-red)' },
+            ]}
+            height={244}
+          />
+        </Widget>
+      </div>
+
+      {/* sorted ranking */}
+      <div className="c5">
+        <Widget title="Defect points by cause" subtitle="Ranked, rolling 30 days" rule>
+          <Chart
+            type="hbar" sort="desc" showLabels
+            categories={['Skewness','Slub / neps','Crease mark','Shade band','Needle line','Oil stain']}
+            series={[{ name: 'Points', data: [612, 428, 268, 198, 164, 96], color: 'var(--il-blue-500)' }]}
+            reference={[{ value: 300, label: 'Escalation', color: 'var(--il-sun)' }]}
+            height={244} valueFormat={(v) => v.toLocaleString('en-US')}
+          />
+        </Widget>
+      </div>
+
+      {/* heatmap */}
+      <div className="c7">
+        <Widget title="Defect rate by plant and week" subtitle="Highlight table" rule>
+          <Chart
+            type="heatmap" categories={WEEKS} rowLabels={PLANTS} valueFormat={(v) => v.toFixed(1)}
+            series={[{ name: 'Defect %', matrix: [
+              [1.2, 1.4, 1.1, 1.6, 1.3, 1.0, 1.2, 0.9],
+              [2.2, 2.7, 2.4, 2.9, 3.1, 2.6, 2.3, 2.1],
+              [1.8, 1.6, 2.0, 1.7, 1.9, 1.5, 1.6, 1.4],
+              [0.9, 1.1, 0.8, 1.0, 1.2, 0.9, 0.7, 0.8],
+            ] }]}
+            height={196}
+          />
+        </Widget>
+      </div>
+
+      {/* 100% stacked */}
+      <div className="c5">
+        <Widget title="Verdict mix" subtitle="Share of lots per plant" rule>
+          <Chart
+            type="bar" stacked percentStack showLegend showLabels
+            categories={PLANTS} valueFormat={(v) => Math.round(v) + '%'}
+            series={[
+              { name: 'Pass', data: [412, 380, 296, 188], color: 'var(--il-earth)' },
+              { name: 'Rework', data: [64, 92, 48, 31], color: 'var(--il-sun)' },
+              { name: 'Reject', data: [12, 28, 9, 6], color: 'var(--il-red)' },
+            ]}
+            height={220}
+          />
+        </Widget>
+      </div>
+
+      {/* small multiples */}
+      <div className="c8">
+        <Widget title="Quality index by division" subtitle="Small multiples · shared scale · W26–W33" rule>
+          <Chart
+            type="trellis" categories={WEEKS} valueFormat={(v) => v.toFixed(1)}
+            panels={[
+              { title: 'Hosiery', data: [96.2, 96.8, 97.1, 97.4, 97.9, 98.0, 98.2, 98.4] },
+              { title: 'Denim', data: [95.1, 94.6, 94.2, 93.8, 93.1, 93.6, 94.1, 94.4] },
+              { title: 'Apparel', data: [96.9, 97.1, 96.6, 97.2, 97.0, 97.4, 97.6, 97.5] },
+              { title: 'Activewear', data: [95.8, 96.1, 96.4, 96.2, 96.8, 97.0, 97.1, 97.3] },
+              { title: 'Yarns', data: [98.1, 98.0, 98.3, 98.2, 98.5, 98.6, 98.4, 98.7] },
+              { title: 'All divisions', data: [96.4, 96.5, 96.5, 96.6, 96.7, 96.9, 97.1, 97.3], color: 'var(--il-grayblue-500)' },
+            ]}
+            height={240} trellisColumns={3}
+          />
+        </Widget>
+      </div>
+
+      {/* scatter */}
+      <div className="c4">
+        <Widget title="Lot size vs. defect rate" subtitle="Is bigger worse?" rule>
+          <Chart
+            type="scatter" categories={['2k','8k','14k','20k','26k','32k','38k','44k','50k','56k']}
+            valueFormat={pctFmt} yTitle="Defect rate" xTitle="Lot size"
+            series={[{ name: 'Lots', data: [0.9, 1.2, 1.1, 1.8, 1.6, 2.1, 2.4, 2.2, 2.9, 3.2] }]}
+            reference={[{ value: 2.5, label: 'Limit', color: 'var(--il-red)' }]}
+            height={228}
+          />
+        </Widget>
+      </div>
+
+      {/* composition + gauge */}
+      <div className="c5">
+        <Widget title="Open lots by division" subtitle="Composition" rule>
+          <Chart
+            type="donut" thickness={26} centerValue="4,820" centerLabel="Open lots"
+            categories={DIVISIONS} showLegend legendPosition="right" legendTitle="Division"
+            series={[{ name: 'Lots', data: [1832, 1253, 916, 530, 289], colors: CHART_COLORS }]}
+            height={216} valueFormat={(v) => v.toLocaleString('en-US')}
+          />
+        </Widget>
+      </div>
+
+      <div className="c3" style={{gridColumn:'span 3'}}>
+        <Widget title="First-time-through" subtitle="Against a 96% target" rule>
+          <Chart
+            type="radial" value={94.1} max={100} thickness={18} label="FTT"
+            valueFormat={(v) => v.toFixed(1) + '%'}
+            series={[{ name: 'FTT', data: [], color: 'var(--il-sun)' }]}
+            reference={[{ value: 96 }]}
+            height={206}
+          />
+          <p style={{margin:'2px 0 0',textAlign:'center',fontSize:'var(--fs-xs)',color:'var(--text-muted)'}}>
+            Tick marks the 96% target · 1.9 points short
+          </p>
+        </Widget>
+      </div>
+
+      <div className="c4">
+        <Widget title="Booked order value" subtitle="With labels, no gridlines" rule>
+          <Chart
+            type="bar" categories={MONTHS} showLabels showGrid={false}
+            valueFormat={(v) => '$' + v.toFixed(1) + 'M'}
+            series={[{ name: 'Booked', data: [4.2, 5.1, 4.6, 6.3, 5.8, 6.9] }]}
+            reference={[{ value: 5.5, label: 'Plan', color: 'var(--il-grayblue-500)' }]}
+            height={206}
+          />
+        </Widget>
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<Demo />);
+</script>
+</body>
+</html>

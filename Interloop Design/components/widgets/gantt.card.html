@@ -1,0 +1,104 @@
+<!-- @dsCard group="Widgets" viewport="1280x1180" name="GanttChart — schedule & T&A" subtitle="Roll-up phases · dependencies · baselines · milestones · critical path · today marker" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>
+  body{margin:0;padding:24px;font-family:var(--font-sans);background:var(--surface-page);color:var(--text-primary)}
+  a{color:var(--text-link)}a:hover{color:var(--il-blue-800)}
+  .wrap{max-width:1200px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+  .note{display:flex;gap:14px;align-items:baseline;margin:0;font-size:var(--fs-xs);color:var(--text-muted);line-height:1.6}
+  .note b{color:var(--text-secondary);font-weight:var(--weight-bold);letter-spacing:.05em;text-transform:uppercase;white-space:nowrap}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { GanttChart, Widget, Badge } = window.ILPDesignSystem_7d03df;
+
+/* Time & action plan for order ILP-10482, as it actually stands on 4 Aug. */
+const TA = [
+  { id: 'p1', name: 'Materials' },
+  { id: 'yarn', parentId: 'p1', name: 'Yarn arrival', meta: 'Loop Spinning', start: '2026-05-05', end: '2026-05-12', status: 'done', progress: 100, baselineStart: '2026-05-01', baselineEnd: '2026-05-08', owner: 'Z. Abbas' },
+  { id: 'trims', parentId: 'p1', name: 'Trims & accessories', meta: 'PO 8757222', start: '2026-05-14', end: '2026-05-22', status: 'done', progress: 100, dependsOn: ['yarn'], baselineStart: '2026-05-10', baselineEnd: '2026-05-18' },
+  { id: 'lab', parentId: 'p1', name: 'Lab dip approval', start: '2026-05-25', milestone: true, status: 'done' },
+
+  { id: 'p2', name: 'Production' },
+  { id: 'knit', parentId: 'p2', name: 'Knitting', meta: 'Line 4 · 18,200 m', start: '2026-06-01', end: '2026-06-28', status: 'done', progress: 100, dependsOn: ['trims'], critical: true, label: 'Knitting', baselineStart: '2026-05-28', baselineEnd: '2026-06-24' },
+  { id: 'asm', parentId: 'p2', name: 'Assembly', meta: 'Completed late', start: '2026-07-04', end: '2026-07-26', status: 'late', progress: 100, dependsOn: ['knit'], critical: true, label: 'Assembly', baselineStart: '2026-07-01', baselineEnd: '2026-07-19' },
+  { id: 'fin', parentId: 'p2', name: 'Finishing', meta: 'Plating & painting', start: '2026-07-28', end: '2026-08-14', status: 'active', progress: 46, dependsOn: ['asm'], critical: true, label: 'Finishing', baselineStart: '2026-07-24', baselineEnd: '2026-08-07' },
+  { id: 'dupro', parentId: 'p2', name: 'DUPRO pass', start: '2026-08-08', milestone: true, status: 'risk' },
+
+  { id: 'p3', name: 'Quality & dispatch' },
+  { id: 'pack', parentId: 'p3', name: 'Packing', start: '2026-08-18', end: '2026-09-02', status: 'planned', progress: 0, dependsOn: ['fin'], critical: true, baselineStart: '2026-08-30', baselineEnd: '2026-09-01' },
+  { id: 'top', parentId: 'p3', name: 'Top testing', meta: 'Third-party lab', start: '2026-09-04', end: '2026-09-14', status: 'planned', dependsOn: ['pack'] },
+  { id: 'fri', parentId: 'p3', name: 'FRI pass', start: '2026-10-19', milestone: true, status: 'planned', critical: true },
+  { id: 'book', parentId: 'p3', name: 'Shipment booking', meta: 'From integration', start: '2026-09-28', end: '2026-10-10', status: 'planned', dependsOn: ['top'] },
+  { id: 'cargo', parentId: 'p3', name: 'Cargo ready', start: '2026-10-20', milestone: true, status: 'planned', critical: true },
+];
+
+/* Week-level plant load — a different question, so a different zoom. */
+const LOAD = [
+  { id: 'l1', name: 'Faisalabad II · Denim' },
+  { id: 'a', parentId: 'l1', name: 'ILP-10482', meta: 'Nordstrom', start: '2026-07-28', end: '2026-08-14', status: 'active', progress: 46, label: 'ILP-10482' },
+  { id: 'b', parentId: 'l1', name: 'ILP-10501', meta: 'Target', start: '2026-08-10', end: '2026-08-26', status: 'planned', dependsOn: ['a'], label: 'ILP-10501' },
+  { id: 'c', parentId: 'l1', name: 'ILP-10530', meta: 'Uniqlo', start: '2026-08-24', end: '2026-09-06', status: 'planned', dependsOn: ['b'] },
+  { id: 'l2', name: 'Lahore · Apparel' },
+  { id: 'd', parentId: 'l2', name: 'ILP-10455', meta: 'Target', start: '2026-07-30', end: '2026-08-12', status: 'risk', progress: 71, label: 'ILP-10455' },
+  { id: 'e', parentId: 'l2', name: 'ILP-10488', meta: 'H&M', start: '2026-08-13', end: '2026-08-30', status: 'planned', dependsOn: ['d'] },
+];
+
+function Demo() {
+  const [picked, setPicked] = React.useState(null);
+  return (
+    <div className="wrap">
+      <p className="note">
+        <b>Read it</b>
+        <span>
+          Grey bars under the coloured ones are the original baseline — Assembly finished a week late and pushed
+          Finishing with it, which is why the chain is red. The diamond on 8 Aug is a gate at risk. Switch the zoom
+          to ask a different question: <b style={{textTransform:'none',letterSpacing:0}}>Day</b> for this week's floor plan,
+          <b style={{textTransform:'none',letterSpacing:0}}>Month</b> for the season.
+          {picked && <> · Selected: <b style={{textTransform:'none',letterSpacing:0,color:'var(--text-brand)'}}>{picked}</b></>}
+        </span>
+      </p>
+
+      <GanttChart
+        title="Time &amp; action · ILP-10482"
+        subtitle="Denim · Nordstrom · ship window 20–25 Oct 2026"
+        tasks={TA}
+        today="2026-08-04"
+        scale="week"
+        height={620}
+        taskPaneWidth={320}
+        onTaskClick={(t) => setPicked(t.name)}
+        actions={<Badge variant="warning" dot>7 days behind baseline</Badge>}
+      />
+
+      <Widget title="Plant load" subtitle="Committed orders by line, week 31 onward" rule flush>
+        <GanttChart
+          tasks={LOAD}
+          today="2026-08-04"
+          scale="week"
+          scales={['week', 'month']}
+          height={340}
+          taskPaneWidth={260}
+          showBaseline={false}
+          showToolbar={false}
+          showLegend={false}
+          className="ilp-gt--embedded"
+          style={{ border: 0, borderRadius: 0, boxShadow: 'none' }}
+        />
+      </Widget>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<Demo />);
+</script>
+</body>
+</html>

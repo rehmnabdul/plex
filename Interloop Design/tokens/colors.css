@@ -1,0 +1,117 @@
+/* ============================================================
+   INTERLOOP — COLOR TOKENS
+   Source of truth: Interloop Brand Guidelines 2023 (Section A05).
+   Primary: Gray Blue #333B4A · Just Blue #30A8E0 · Pure White #FFFFFF
+   Secondary "elements" palette: Earth · Water · Air · Sun
+   Ramps + the danger red are DERIVED harmonically (oklch) — not in the
+   printed manual. They are flagged in readme.md > VISUAL FOUNDATIONS.
+   ============================================================ */
+
+:root {
+  /* ---- Brand anchors (exact manual values) ---- */
+  --il-grayblue: #333b4a;     /* Gray Blue — primary ink / corporate */
+  --il-blue:     #30a8e0;     /* Just Blue — primary accent */
+  --il-white:    #ffffff;     /* Pure White */
+
+  /* ---- Gray Blue ramp (corporate neutral) ---- */
+  --il-grayblue-950: #181d25;
+  --il-grayblue-900: #20262f;
+  --il-grayblue-800: #2a323f;
+  --il-grayblue-700: #333b4a;  /* = brand anchor */
+  --il-grayblue-600: #444e60;
+  --il-grayblue-500: #5a6577;
+  --il-grayblue-400: #828b9b;
+  --il-grayblue-300: #aeb4c0;
+  --il-grayblue-200: #d4d8df;
+  --il-grayblue-100: #e9ebef;
+  --il-grayblue-50:  #f4f5f8;
+
+  /* ---- Just Blue ramp (primary accent) ---- */
+  --il-blue-800: #15689a;
+  --il-blue-700: #1c7db0;
+  --il-blue-600: #2492c8;
+  --il-blue-500: #30a8e0;  /* = brand anchor */
+  --il-blue-400: #5fbee9;
+  --il-blue-300: #8fd2f0;
+  --il-blue-200: #bfe6f7;
+  --il-blue-100: #e4f4fb;
+  --il-blue-50:  #f3fafd;
+
+  /* ---- Secondary "elements" palette ---- */
+  /* Gradient/primary tints (Section A05, page 18) */
+  --il-earth: #aed250;   /* green */
+  --il-water: #66c8f2;   /* light blue */
+  --il-air:   #6db7b7;   /* teal */
+  --il-sun:   #f9a571;   /* warm peach */
+  /* Flat variants (page 19) — for solid fills & text highlights */
+  --il-earth-flat: #c6db72;
+  --il-water-flat: #7fd3f1;
+  --il-air-flat:   #6db7b7;
+  --il-sun-flat:   #f6b997;
+  /* Soft washes (derived) for surfaces / badges */
+  --il-earth-soft: #f1f7dc;
+  --il-water-soft: #e6f6fd;
+  --il-air-soft:   #e4f1f1;
+  --il-sun-soft:   #fdeee3;
+  /* Deeper readable text-on-light versions (derived) */
+  --il-earth-ink: #5f7a16;
+  --il-air-ink:   #2f6f6f;
+  --il-sun-ink:   #c2632a;
+
+  /* ---- Danger red (DERIVED — not in brand manual; admin UIs need it) ---- */
+  --il-red:      #e2574c;
+  --il-red-600:  #cf4339;
+  --il-red-soft: #fdecea;
+  --il-red-ink:  #b23129;
+
+  /* =========================================================
+     SEMANTIC ALIASES — reference these in components, not raw ramps
+     ========================================================= */
+
+  /* Surfaces */
+  --surface-page:    var(--il-grayblue-50);
+  --surface-card:    var(--il-white);
+  --surface-sunken:  var(--il-grayblue-100);
+  --surface-hover:   var(--il-grayblue-50);
+  --surface-inverse: var(--il-grayblue-700);
+  --surface-brand:   var(--il-blue-500);
+
+  /* Text */
+  --text-primary:   var(--il-grayblue-700);
+  --text-secondary: var(--il-grayblue-500);
+  --text-muted:     var(--il-grayblue-400);
+  --text-disabled:  var(--il-grayblue-300);
+  --text-inverse:   var(--il-white);
+  --text-link:      var(--il-blue-600);
+  --text-brand:     var(--il-blue-600);
+
+  /* Brand actions */
+  --brand-primary:        var(--il-blue-500);
+  --brand-primary-hover:  var(--il-blue-600);
+  --brand-primary-active: var(--il-blue-700);
+  --brand-ink:            var(--il-grayblue-700);
+  --brand-ink-hover:      var(--il-grayblue-800);
+
+  /* Borders & dividers */
+  --border-subtle:  var(--il-grayblue-100);
+  --border-default: var(--il-grayblue-200);
+  --border-strong:  var(--il-grayblue-300);
+  --border-focus:   var(--il-blue-500);
+
+  /* Status (mapped to brand secondary palette) */
+  --status-success:      var(--il-earth);
+  --status-success-soft: var(--il-earth-soft);
+  --status-success-ink:  var(--il-earth-ink);
+  --status-info:         var(--il-blue-500);
+  --status-info-soft:    var(--il-blue-100);
+  --status-info-ink:     var(--il-blue-700);
+  --status-warning:      var(--il-sun);
+  --status-warning-soft: var(--il-sun-soft);
+  --status-warning-ink:  var(--il-sun-ink);
+  --status-danger:       var(--il-red);
+  --status-danger-soft:  var(--il-red-soft);
+  --status-danger-ink:   var(--il-red-ink);
+
+  /* Focus ring */
+  --ring: 0 0 0 3px color-mix(in srgb, var(--il-blue-500) 35%, transparent);
+}

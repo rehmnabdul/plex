@@ -1,3 +1,11 @@
+## 2.0.1-beta.4
+
+### Phase 1 — buttons, badge, avatar
+- Restyle `PlexFormFieldButton` with Phase 0 tokens (`PlexThemeData` colors, `PlexRadius`, size padding). Existing constructors and `PlexButtonType` values are unchanged
+- Add `PlexButtonType.ink` and `PlexButtonType.danger` at the end of the enum
+- Optional `size`, `loading`, `expanded`, and `buttonTrailingIcon` on `PlexFormFieldButton` (defaults match previous idle / unlabeled / intrinsic-width behavior)
+- New widgets: `PlexIconButton`, `PlexBadge`, `PlexAvatar` (theme/brand colors, no org branding)
+
 ## 2.0.1-beta.3
 
 Exclude `Interloop Design/` from the published pub.dev archive via `.pubignore`. The folder stays in git; it is omitted from the package tarball so the upload is no longer ~33MB of design-system files.

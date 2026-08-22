@@ -17,7 +17,10 @@ import 'package:plex/plex_widgets/plex_adv_data_table.dart';
 import 'package:plex/plex_widgets/plex_backgrounds/plex_background.dart';
 import 'package:plex/plex_widgets/plex_data_table.dart';
 import 'package:plex/plex_widgets/plex_data_table_paginated.dart';
+import 'package:plex/plex_widgets/plex_avatar.dart';
+import 'package:plex/plex_widgets/plex_badge.dart';
 import 'package:plex/plex_widgets/plex_form_field_widgets.dart';
+import 'package:plex/plex_widgets/plex_icon_button.dart';
 import 'package:plex/plex_widgets/plex_info_dialog.dart';
 import 'package:plex_app/screens/home_screen.dart';
 import 'package:plex_app/screens/plex_gantt_demo_screen.dart';
@@ -1025,6 +1028,95 @@ void main() async {
                             content: Text("Custom Styled Button Clicked!")),
                       );
                     },
+                  ),
+
+                  const SizedBox(height: 16),
+                  const Text("PlexIconButton / PlexBadge / PlexAvatar",
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      PlexFormFieldButton(
+                        properties: const PlexFormFieldGeneric(
+                          title: "Ink",
+                          useMargin: false,
+                        ),
+                        buttonType: PlexButtonType.ink,
+                        buttonClick: () {},
+                      ),
+                      PlexFormFieldButton(
+                        properties: const PlexFormFieldGeneric(
+                          title: "Danger",
+                          useMargin: false,
+                        ),
+                        buttonType: PlexButtonType.danger,
+                        buttonClick: () {},
+                      ),
+                      PlexFormFieldButton(
+                        properties: const PlexFormFieldGeneric(
+                          title: "Loading",
+                          useMargin: false,
+                        ),
+                        loading: true,
+                        buttonClick: () {},
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      PlexIconButton(
+                        icon: const Icon(Icons.more_vert),
+                        label: "More",
+                        onPressed: () {},
+                      ),
+                      PlexIconButton(
+                        icon: const Icon(Icons.add),
+                        variant: PlexIconButtonVariant.solid,
+                        label: "Add",
+                        onPressed: () {},
+                      ),
+                      PlexIconButton(
+                        icon: const Icon(Icons.filter_list),
+                        variant: PlexIconButtonVariant.outline,
+                        label: "Filter",
+                        onPressed: () {},
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  const Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      PlexBadge(label: "Neutral"),
+                      PlexBadge(
+                          label: "Info", tone: PlexBadgeTone.info, dot: true),
+                      PlexBadge(label: "Success", tone: PlexBadgeTone.success),
+                      PlexBadge(
+                          label: "Warning",
+                          tone: PlexBadgeTone.warning,
+                          appearance: PlexBadgeAppearance.outline),
+                      PlexBadge(
+                          label: "Danger",
+                          tone: PlexBadgeTone.danger,
+                          appearance: PlexBadgeAppearance.solid),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  const Row(
+                    children: [
+                      PlexAvatar(name: "Ada Lovelace"),
+                      SizedBox(width: 8),
+                      PlexAvatar(
+                        name: "Grace Hopper",
+                        size: 32,
+                        square: true,
+                        status: PlexAvatarStatus.online,
+                      ),
+                    ],
                   ),
 
                   const SizedBox(height: 32), // Extra space at the bottom

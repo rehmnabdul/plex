@@ -20,6 +20,15 @@ enum PlexButtonType {
   outlined,
   filled,
   filledTonal,
+  ink,
+  danger,
+}
+
+/// Visual size for [PlexFormFieldButton]. Defaults to [md] (Material ~40px).
+enum PlexButtonSize {
+  sm,
+  md,
+  lg,
 }
 
 class PlexFormFieldGeneric {
@@ -715,20 +724,26 @@ class PlexFormFieldButton extends StatelessWidget {
   ///
   /// The [properties] parameter provides basic configuration like title, margins, etc.
   /// The [buttonType] parameter determines which style of button to render.
+  /// [size], [loading], [expanded], and [buttonTrailingIcon] are additive; defaults
+  /// match the previous unlabeled / idle / intrinsic-width behavior.
   const PlexFormFieldButton({
     super.key,
     this.properties = const PlexFormFieldGeneric.empty(),
     this.buttonType = PlexButtonType.elevated,
     this.focusNode,
     this.buttonIcon,
+    this.buttonTrailingIcon,
     this.buttonClick,
     this.buttonStyle,
+    this.size = PlexButtonSize.md,
+    this.loading = false,
+    this.expanded = false,
   });
 
   /// Basic properties for the button
   final PlexFormFieldGeneric properties;
 
-  /// Type of button to display (elevated, text, outlined, filled, filledTonal)
+  /// Type of button to display (elevated, text, outlined, filled, filledTonal, ink, danger)
   final PlexButtonType buttonType;
 
   /// Optional focus node for the button
@@ -737,126 +752,213 @@ class PlexFormFieldButton extends StatelessWidget {
   /// Optional icon to display within the button
   final Widget? buttonIcon;
 
+  /// Optional trailing icon (ignored while [loading]).
+  final Widget? buttonTrailingIcon;
+
   /// Callback function when the button is clicked
   final Function()? buttonClick;
 
   /// Optional custom style for the button
   final ButtonStyle? buttonStyle;
 
+  /// Visual size. Defaults to [PlexButtonSize.md] (~40px).
+  final PlexButtonSize size;
+
+  /// When true, shows a spinner and disables [onPressed].
+  final bool loading;
+
+  /// When true, stretches to the maximum incoming width.
+  final bool expanded;
+
   /// Determines if this is an icon-only button
   bool isIconButton() {
     return buttonIcon != null && properties.title == null;
   }
 
-  @override
-  Widget build(BuildContext context) {
-    // Default style with elevation
-    final defaultStyle = ButtonStyle(
-      elevation: WidgetStateProperty.resolveWith(
-            (states) {
-          return states.contains(WidgetState.disabled) ? 0 : PlexDim.small;
-        },
+  VoidCallback? _onPressed() {
+    if (!properties.enabled || loading) return null;
+    return () => buttonClick?.call();
+  }
+
+  double _heightFor(PlexButtonSize size) {
+    switch (size) {
+      case PlexButtonSize.sm:
+        return PlexDim.large;
+      case PlexButtonSize.md:
+        return PlexDim.largePlus;
+      case PlexButtonSize.lg:
+        return PlexDim.extraLargeMinus;
+    }
+  }
+
+  double _fontSizeFor(PlexButtonSize size) {
+    switch (size) {
+      case PlexButtonSize.sm:
+        return PlexFontSize.caption;
+      case PlexButtonSize.md:
+        return PlexFontSize.body;
+      case PlexButtonSize.lg:
+        return PlexFontSize.large;
+    }
+  }
+
+  EdgeInsetsGeometry _padding() {
+    if (isIconButton()) return EdgeInsets.zero;
+    switch (size) {
+      case PlexButtonSize.sm:
+        return const EdgeInsets.symmetric(horizontal: PlexDim.smallMedium);
+      case PlexButtonSize.md:
+        return const EdgeInsets.symmetric(horizontal: 18);
+      case PlexButtonSize.lg:
+        return const EdgeInsets.symmetric(horizontal: PlexDim.largeMinus);
+    }
+  }
+
+  ButtonStyle _resolveStyle(BuildContext context) {
+    final PlexThemeData plex = PlexThemeData.of(context);
+    final PlexColorTokens colors = plex.colors;
+    final double height = _heightFor(size);
+
+    ButtonStyle style = ButtonStyle(
+      minimumSize: WidgetStatePropertyAll<Size>(
+        Size(
+          expanded ? double.infinity : (isIconButton() ? height : 0),
+          height,
+        ),
+      ),
+      padding: WidgetStatePropertyAll<EdgeInsetsGeometry>(_padding()),
+      shape: WidgetStatePropertyAll<OutlinedBorder>(
+        RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(properties.cornerRadius),
+        ),
+      ),
+      textStyle: WidgetStatePropertyAll<TextStyle>(
+        TextStyle(
+          fontWeight: FontWeight.w700,
+          fontSize: _fontSizeFor(size),
+          fontFamily: plex.fontFamily,
+        ),
       ),
     );
 
-    // Create the appropriate button based on buttonType
-    Widget buttonWidget;
-
-    // Using a function to create the button when it has only text (no icon)
-    Widget createTextOnlyButton() {
-      switch (buttonType) {
-        case PlexButtonType.elevated:
-          return ElevatedButton(
-            focusNode: focusNode,
-            style: buttonStyle ?? defaultStyle,
-            onPressed: properties.enabled ? () => buttonClick?.call() : null,
-            child: Text(properties.title ?? ""),
-          );
-        case PlexButtonType.text:
-          return TextButton(
-            focusNode: focusNode,
-            style: buttonStyle,
-            onPressed: properties.enabled ? () => buttonClick?.call() : null,
-            child: Text(properties.title ?? ""),
-          );
-        case PlexButtonType.outlined:
-          return OutlinedButton(
-            focusNode: focusNode,
-            style: buttonStyle,
-            onPressed: properties.enabled ? () => buttonClick?.call() : null,
-            child: Text(properties.title ?? ""),
-          );
-        case PlexButtonType.filled:
-          return FilledButton(
-            focusNode: focusNode,
-            style: buttonStyle,
-            onPressed: properties.enabled ? () => buttonClick?.call() : null,
-            child: Text(properties.title ?? ""),
-          );
-        case PlexButtonType.filledTonal:
-          return FilledButton.tonal(
-            focusNode: focusNode,
-            style: buttonStyle,
-            onPressed: properties.enabled ? () => buttonClick?.call() : null,
-            child: Text(properties.title ?? ""),
-          );
-      }
+    switch (buttonType) {
+      case PlexButtonType.ink:
+        style = style.copyWith(
+          backgroundColor: WidgetStatePropertyAll<Color>(colors.brandInk),
+          foregroundColor: WidgetStatePropertyAll<Color>(colors.textInverse),
+        );
+        break;
+      case PlexButtonType.danger:
+        style = style.copyWith(
+          backgroundColor: WidgetStatePropertyAll<Color>(colors.statusDanger),
+          foregroundColor: WidgetStatePropertyAll<Color>(colors.textInverse),
+        );
+        break;
+      case PlexButtonType.elevated:
+        style = style.copyWith(
+          elevation: WidgetStateProperty.resolveWith<double>((states) {
+            return states.contains(WidgetState.disabled) ? 0 : PlexElevation.sm;
+          }),
+        );
+        break;
+      case PlexButtonType.text:
+      case PlexButtonType.outlined:
+      case PlexButtonType.filled:
+      case PlexButtonType.filledTonal:
+        break;
     }
 
-    // Using a function to create the button when it has an icon
-    Widget createIconButton() {
-      switch (buttonType) {
-        case PlexButtonType.elevated:
-          return ElevatedButton.icon(
-            focusNode: focusNode,
-            style: buttonStyle ?? defaultStyle,
-            onPressed: properties.enabled ? () => buttonClick?.call() : null,
-            icon: isIconButton() ? null : buttonIcon!,
-            label: properties.title != null ? Text(properties.title ?? "") : buttonIcon!,
-          );
-        case PlexButtonType.text:
-          return TextButton.icon(
-            focusNode: focusNode,
-            style: buttonStyle,
-            onPressed: properties.enabled ? () => buttonClick?.call() : null,
-            icon: isIconButton() ? null : buttonIcon!,
-            label: properties.title != null ? Text(properties.title ?? "") : buttonIcon!,
-          );
-        case PlexButtonType.outlined:
-          return OutlinedButton.icon(
-            focusNode: focusNode,
-            style: buttonStyle,
-            onPressed: properties.enabled ? () => buttonClick?.call() : null,
-            icon: isIconButton() ? null : buttonIcon!,
-            label: properties.title != null ? Text(properties.title ?? "") : buttonIcon!,
-          );
-        case PlexButtonType.filled:
-          return FilledButton.icon(
-            focusNode: focusNode,
-            style: buttonStyle,
-            onPressed: properties.enabled ? () => buttonClick?.call() : null,
-            icon: isIconButton() ? null : buttonIcon!,
-            label: properties.title != null ? Text(properties.title ?? "") : buttonIcon!,
-          );
-        case PlexButtonType.filledTonal:
-          return FilledButton.tonalIcon(
-            focusNode: focusNode,
-            style: buttonStyle,
-            onPressed: properties.enabled ? () => buttonClick?.call() : null,
-            icon: isIconButton() ? null : buttonIcon!,
-            label: properties.title != null ? Text(properties.title ?? "") : buttonIcon!,
-          );
-      }
+    if (buttonStyle != null) {
+      style = style.merge(buttonStyle);
+    }
+    return style;
+  }
+
+  Widget _buildChild() {
+    final bool iconOnly = isIconButton();
+    final List<Widget> parts = <Widget>[];
+    if (loading) {
+      parts.add(const _PlexButtonSpinner());
+    } else if (buttonIcon != null && !iconOnly) {
+      parts.add(buttonIcon!);
+    }
+    if (properties.title != null) {
+      parts.add(Text(properties.title!));
+    } else if (iconOnly && !loading) {
+      parts.add(buttonIcon!);
+    }
+    if (!loading && buttonTrailingIcon != null) {
+      parts.add(buttonTrailingIcon!);
+    }
+    if (parts.isEmpty) {
+      return const SizedBox.shrink();
+    }
+    if (parts.length == 1) return parts.first;
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        for (int i = 0; i < parts.length; i++) ...[
+          if (i > 0) const SizedBox(width: PlexDim.small),
+          parts[i],
+        ],
+      ],
+    );
+  }
+
+  Widget _buildButton(BuildContext context) {
+    final ButtonStyle style = _resolveStyle(context);
+    final VoidCallback? onPressed = _onPressed();
+    final Widget child = _buildChild();
+
+    switch (buttonType) {
+      case PlexButtonType.elevated:
+        return ElevatedButton(
+          focusNode: focusNode,
+          style: style,
+          onPressed: onPressed,
+          child: child,
+        );
+      case PlexButtonType.text:
+        return TextButton(
+          focusNode: focusNode,
+          style: style,
+          onPressed: onPressed,
+          child: child,
+        );
+      case PlexButtonType.outlined:
+        return OutlinedButton(
+          focusNode: focusNode,
+          style: style,
+          onPressed: onPressed,
+          child: child,
+        );
+      case PlexButtonType.filled:
+      case PlexButtonType.ink:
+      case PlexButtonType.danger:
+        return FilledButton(
+          focusNode: focusNode,
+          style: style,
+          onPressed: onPressed,
+          child: child,
+        );
+      case PlexButtonType.filledTonal:
+        return FilledButton.tonal(
+          focusNode: focusNode,
+          style: style,
+          onPressed: onPressed,
+          child: child,
+        );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    Widget buttonWidget = _buildButton(context);
+
+    if (expanded) {
+      buttonWidget = SizedBox(width: double.infinity, child: buttonWidget);
     }
 
-    // Decide if we're creating a button with or without an icon
-    if (buttonIcon == null) {
-      buttonWidget = createTextOnlyButton();
-    } else {
-      buttonWidget = createIconButton();
-    }
-
-    // Apply margin if needed
     if (properties.useMargin) {
       return Padding(
         padding: properties.margin,
@@ -865,5 +967,19 @@ class PlexFormFieldButton extends StatelessWidget {
     }
 
     return buttonWidget;
+  }
+}
+
+class _PlexButtonSpinner extends StatelessWidget {
+  const _PlexButtonSpinner();
+
+  @override
+  Widget build(BuildContext context) {
+    final Color? color = DefaultTextStyle.of(context).style.color;
+    return SizedBox(
+      width: 15,
+      height: 15,
+      child: CircularProgressIndicator(strokeWidth: 2, color: color),
+    );
   }
 }

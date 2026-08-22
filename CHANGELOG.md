@@ -1,3 +1,14 @@
+## 2.0.1-beta.2
+
+Next prerelease after pub.dev `2.0.1-beta.1`. This is a prerelease; stable will be **2.0.1** after the beta series.
+
+### Unreleased — Phase 0 design tokens
+- Additive color / spacing / type / shape tokens and `PlexThemeData` ThemeExtension on the existing `PlexTheme` path
+- Optional `PlexBrandConfig` on `PlexApp` (brand colors, fontFamily, density). Logos stay on `PlexAppInfo`
+- Theme is always Material 3; `forceMaterial3`, `showMaterialSwitch`, and `UseMaterial3` prefs are deprecated no-ops
+- Default seed is generic blue-gray `#607D8B` (was `#007AD7`). Package font default remains Roboto
+- `inputBackgroundColor` now reads a surface token instead of the error red
+
 ## 1.0.5
 
 ### Updates

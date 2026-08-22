@@ -37,6 +37,9 @@ class PlexDashboardConfig {
   final bool showAnimationSwitch;
   final bool showThemeSwitch;
   final bool showBrightnessSwitch;
+
+  /// Deprecated no-op. Theme is always Material 3; this flag no longer switches M2/M3.
+  @Deprecated('Material 2 is no longer supported. Theme is always Material 3. This flag is ignored.')
   final bool showMaterialSwitch;
 
   final bool useBackground;

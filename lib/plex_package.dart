@@ -1,4 +1,4 @@
-// ignore_for_file: must_be_immutable, use_build_context_synchronously
+// ignore_for_file: must_be_immutable, use_build_context_synchronously, deprecated_member_use_from_same_package
 
 library plex;
 
@@ -28,6 +28,8 @@ import 'package:plex/plex_widgets/plex_navigation_rail.dart';
 import 'package:toastification/toastification.dart';
 
 import 'plex_widgets/plex_backgrounds/plex_background.dart';
+
+export 'plex_theme/plex_brand_config.dart';
 
 part 'plex_screens/plex_dashboard_screen.dart';
 
@@ -97,7 +99,11 @@ class PlexApp extends StatefulWidget {
   final Color themeFromColor;
   var imageColorScheme = const ColorScheme.light();
 
-  ///[forceMaterial3] will force app theme to use material3
+  /// Optional brand color / type / density overrides. Logos stay on [PlexAppInfo].
+  final PlexBrandConfig? brandConfig;
+
+  /// Deprecated no-op. Theme is always Material 3.
+  @Deprecated('Material 2 is no longer supported. Theme is always Material 3. This flag is ignored.')
   final bool forceMaterial3;
 
   ///[scrollBehaviour] will force app to use provided scroll behaviour
@@ -154,7 +160,7 @@ class PlexApp extends StatefulWidget {
     required this.appInfo,
     this.dashboardConfig,
     this.pages,
-    this.themeFromColor = const Color(0xFF007AD7),
+    this.themeFromColor = PlexTheme.defaultSeedColor,
     this.themeFromImage,
     this.unknownRoute,
     this.useAuthorization = false,
@@ -164,6 +170,7 @@ class PlexApp extends StatefulWidget {
     this.onInitializationComplete,
     this.onLogout,
     this.forceMaterial3 = false,
+    this.brandConfig,
     this.scrollBehaviour,
   }) {
     if (dashboardConfig == null && pages == null) {
@@ -182,7 +189,7 @@ class PlexApp extends StatefulWidget {
       throw Exception("\"loginConfig\" should be unimplemented");
     }
 
-    if (PlexTheme.appTheme == null && themeFromColor.value != const Color(0xFF007AD7).value && themeFromImage != null) {
+    if (PlexTheme.appTheme == null && themeFromColor != PlexTheme.defaultSeedColor && themeFromImage != null) {
       throw Exception("Use either \"themeFromColor\" or \"themeFromImage\"");
     }
 
@@ -309,7 +316,9 @@ class _PlexAppState extends State<PlexApp> {
           widget.imageColorScheme = await ColorScheme.fromImageProvider(provider: widget.themeFromImage!);
         }
         useMaterial3 = widget.forceMaterial3 ? widget.forceMaterial3 : PlexTheme.isMaterial3();
-        if (widget.forceMaterial3) PlexTheme.setMaterial3(true);
+        if (widget.forceMaterial3) {
+          PlexTheme.setMaterial3(true);
+        }
         themeMode = PlexTheme.isDarkMode(context) ? ThemeMode.dark : ThemeMode.light;
         widget.onInitializationComplete?.call();
         setState(() {

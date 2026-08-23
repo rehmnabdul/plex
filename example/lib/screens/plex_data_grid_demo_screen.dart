@@ -21,7 +21,7 @@ class _DemoEmployee {
   final String status;
 }
 
-/// Phase 5a/5b demo. Prefer this over the deprecated PlexAdvanceDataTable wrapper.
+/// PlexDataGrid demo. This is the table engine; PlexAdvanceDataTable is a deprecated wrapper.
 class PlexDataGridDemoScreen extends StatelessWidget {
   const PlexDataGridDemoScreen({super.key});
 
@@ -55,7 +55,7 @@ class PlexDataGridDemoScreen extends StatelessWidget {
       padding: const EdgeInsets.all(PlexDim.medium),
       child: PlexDataGrid<_DemoEmployee>(
         title: 'Employees',
-        subtitle: 'PlexDataGrid — client-side sort, search, selection, pages',
+        subtitle: 'Table engine — client-side sort, search, selection, pages',
         selectionMode: PlexDataGridSelectionMode.multiple,
         pageSize: 10,
         rowId: (_DemoEmployee row) => row.id,

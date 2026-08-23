@@ -1,9 +1,25 @@
+## 2.0.1-beta.8
+
+### Phase 5c — Syncfusion DataGrid removal
+- Remove `syncfusion_flutter_datagrid` and `syncfusion_flutter_datagrid_export`. Excel export still uses `syncfusion_flutter_xlsio` via `PlexPrinter.printExcel`
+- PDF export is Plex-owned: `PlexPrinter.printPdf` / `PlexPrinter.buildTablePdf` (no hidden `SfDataGrid`)
+- `PlexDataTableValueCell` is a Plex type; it no longer extends Syncfusion `DataGridCell`
+- `customGroupingSummary` now takes `List<PlexDataTableValueCell>` rows (not Syncfusion `DataGridRow`)
+- `CustomColumnSizer` is a deprecated no-op so historic call sites still compile
+
+### Docs and example
+- README, CHANGELOG, and example README pin `2.0.1-beta.8` and document the 2.x beta UI revamp plus migration
+- Example copy: `PlexDataGrid` is the table engine; `PlexAdvanceDataTable` is the deprecated wrapper; PDF export is Plex-owned
+
+### UI revamp so far
+Phases 0–5c of the 2.0.1 beta line: design tokens, restyled buttons/forms/surfaces, split login, `PlexDataGrid`, AdvanceDataTable wrapper, then Syncfusion grid removal. See README **What changed (2.0.1 betas)** / **Migration**.
+
 ## 2.0.1-beta.7
 
 ### Phase 5b — `PlexAdvanceDataTable` wrapper
 - `PlexAdvanceDataTable` is now a deprecated compatibility wrapper around `PlexDataGrid`; existing header/cell constructors still compile
 - Visible grid, sort, search, selection, and pagination run on `PlexDataGrid` (token-themed, not Syncfusion UI)
-- Excel export uses `PlexPrinter.printExcel`; PDF export still uses a hidden Syncfusion `SfDataGrid` because `exportToPdfDocument` requires `SfDataGridState`
+- Excel export uses `PlexPrinter.printExcel`; PDF export in this release still used a hidden Syncfusion `SfDataGrid` (replaced by `PlexPrinter.printPdf` in 2.0.1-beta.8)
 - Column grouping, frozen panes, and cell editing remain on the constructor so call sites compile; they are not mapped onto `PlexDataGrid`
 - New tables should use `PlexDataGrid` directly
 

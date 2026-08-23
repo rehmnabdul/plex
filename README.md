@@ -55,7 +55,7 @@ PlexDataTable(
 ```
 
 #### `PlexAdvanceDataTable`
-Deprecated compatibility wrapper around `PlexDataGrid`. Existing header/cell constructors still compile. Prefer `PlexDataGrid` for new tables. Excel export uses `PlexPrinter`; PDF export still uses a hidden Syncfusion `SfDataGrid`. Grouping, freeze, and cell editing are not mapped.
+Deprecated compatibility wrapper around `PlexDataGrid`. Existing header/cell constructors still compile. Prefer `PlexDataGrid` for new tables — it is the table engine. Excel and PDF export use `PlexPrinter`. Grouping, freeze, and cell editing are not mapped.
 ```dart
 PlexAdvanceDataTable(
   title: "Employees",
@@ -351,6 +351,14 @@ List<T>.sortAndReturn()
 List<T>.groupBy((item) => key)
 ```
 
+#### `PlexPrinter`
+Excel still uses Syncfusion xlsio. PDF is Plex-owned (no Syncfusion DataGrid).
+```dart
+await PlexPrinter.printExcel(title, columns, rows);
+await PlexPrinter.printPdf(title, columns, rows);
+final bytes = PlexPrinter.buildTablePdf(title, columns, rows);
+```
+
 ---
 
 ### Other Widgets
@@ -446,7 +454,7 @@ Add PLEX to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  plex: 2.0.1-beta.7
+  plex: 2.0.1-beta.8
 ```
 
 Then run:
@@ -455,7 +463,7 @@ Then run:
 flutter pub get
 ```
 
-The example app under `/example` is a full visual QA of Phases 0–5b (theme, buttons, forms, feedback, tabs, data grid) plus restyled feature demos. Run it with:
+The example app under `/example` is a full visual QA of Phases 0–5c (theme, buttons, forms, feedback, tabs, `PlexDataGrid`) plus restyled feature demos. Run it with:
 
 ```sh
 cd example
@@ -600,16 +608,46 @@ PlexFormFieldButton(
 )
 ```
 
-See **Widgets & Components** below for IconButton, Badge, Avatar, Alert, ProgressBar, Card slots, Tabs, and DataGrid.
+See **Widgets & Components** for IconButton, Badge, Avatar, Alert, ProgressBar, Card slots, Tabs, DataGrid, and printer.
 
-### Migration notes
+### What changed (2.0.1 betas) / Migration
 
-- **Constructors**: no required-argument changes for existing widgets.
-- **`brandConfig`**: optional on `PlexApp`. Omit it to keep seed-only theming.
-- **Login**: split layout is the new default. Pass `PlexLoginLayout.centered` to keep the old card.
-- **Default seed**: `#607D8B` (`PlexTheme.defaultSeedColor`). Override with `themeFromColor` or `PlexBrandConfig.brandPrimary`.
-- **Material 2**: removed. M2 flags are no-ops.
-- **`PlexDataGrid`**: prefer for new tables. `PlexAdvanceDataTable` is a deprecated wrapper; keep `PlexDataTable` where you already use it.
+This 2.x beta line started after pub.dev `2.0.1-beta.1`. Pin **2.0.1-beta.8**. Stable **2.0.1** follows the beta series.
+
+Shipped: **beta.2** Phase 0 tokens · **beta.3** `.pubignore` for Interloop Design · **beta.4** Phase 1 · **beta.5** Phases 2–4 · **beta.6** `PlexDataGrid` + example redesign · **beta.7** `PlexAdvanceDataTable` wrapper · **beta.8** Phase 5c (Syncfusion grid removal) + this docs pass.
+
+**Constructors are mostly additive.** Existing required arguments did not change. New optional fields default to previous behavior.
+
+#### Behavior and breaking changes
+
+- **Always Material 3.** `PlexApp.forceMaterial3`, `PlexDashboardConfig.showMaterialSwitch`, and `PlexTheme.setMaterial3` still compile but are no-ops. Prefs key `UseMaterial3` is ignored.
+- **Default seed** is generic Material Blue Grey 500 `#607D8B` (`PlexTheme.defaultSeedColor`). It was `#007AD7`. Override with `themeFromColor` or `PlexBrandConfig.brandPrimary`.
+- **Login default** is `PlexLoginLayout.split` (brand panel + form). Pass `PlexLoginLayout.centered` to keep the historic single card. Optional copy: `brandHeadline`, `brandSubtitle`, `brandFooter`, `formTitle`, `formHint`.
+- **Glass is opt-in.** Default chrome is flat. Set `useBackground: true` on login/dashboard, or wrap with `PlexCardGlassEffect`.
+- **Tables:** prefer `PlexDataGrid` for new work. `PlexAdvanceDataTable` is `@Deprecated('Use PlexDataGrid')` and wraps the grid. Keep `PlexDataTable` / `PlexDataTableWithPages` where you already use them.
+- **Phase 5c (2.0.1-beta.8) type and dependency breaks:**
+  - Package no longer depends on `syncfusion_flutter_datagrid` or `syncfusion_flutter_datagrid_export`.
+  - `PlexDataTableValueCell` no longer extends Syncfusion `DataGridCell`. Public fields still match the historic constructor (`columnName`, `value`, `numberField`, custom widget).
+  - `customGroupingSummary` is now `(String columnName, List<PlexDataTableValueCell> row, List<List<PlexDataTableValueCell>> rows)?` — not Syncfusion `DataGridRow`.
+  - PDF export uses `PlexPrinter.printPdf` / `buildTablePdf` (Plex-owned table PDF). Excel still uses `syncfusion_flutter_xlsio` via `PlexPrinter.printExcel`.
+  - `CustomColumnSizer` is a deprecated no-op (column sizing is handled by `PlexDataGrid`).
+  - Grouping, freeze, and cell editing still compile on `PlexAdvanceDataTable` but are not mapped onto `PlexDataGrid`.
+- **Interloop Design** stays in git as a reference folder. It is **not** in the published package (`.pubignore`). Do not treat it as a runtime dependency.
+
+#### Additive by phase
+
+| Phase | Release | What landed |
+| --- | --- | --- |
+| **0** | beta.2 | `PlexThemeData` ThemeExtension, optional `PlexBrandConfig` on `PlexApp` (brand colors, `fontFamily`, `PlexDensity`). Logos stay on `PlexAppInfo`. Tokens; always M3. |
+| **1** | beta.4 | Restyled `PlexFormFieldButton`; `PlexButtonType.ink` / `danger`; optional `size` (`PlexButtonSize`), `loading`, `expanded`, `buttonTrailingIcon`. New `PlexIconButton`, `PlexBadge`, `PlexAvatar`. |
+| **2** | beta.5 | Token-wired `PlexFormFieldInput`, date, dropdown, multi-select, autocomplete. New `PlexFormFieldCheckbox`, `PlexFormFieldSwitch`. |
+| **3** | beta.5 | Optional `PlexCard` slots (`title`, `subtitle`, `actions`, `footer`, `hover`, `flush`). New `PlexAlert`, `PlexProgressBar`, `PlexSkeleton`. Token-tinted dialogs/sheets/toasts. |
+| **4** | beta.5 | Split login default; `PlexAppBar` 64px (`PlexLayout.topbarHeight`); rail 90/260 (`PlexLayout.railCollapsed` / `railExpanded`). New `PlexTabs` / `PlexTabPanel`. |
+| **5a** | beta.6 | `PlexDataGrid` — client-side sort, search, selection (`none` / `single` / `multiple`), pagination, density. |
+| **5b** | beta.7 | `PlexAdvanceDataTable` deprecated wrapper around `PlexDataGrid`; old `PlexDataTableHeaderCell` / `PlexDataTableValueCell` API. |
+| **5c** | beta.8 | Remove Syncfusion DataGrid packages; Plex-owned PDF; cell type and grouping-callback breaks above. |
+
+`brandConfig` is optional on `PlexApp`. Omit it to keep seed-only theming.
 
 ---
 

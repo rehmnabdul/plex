@@ -297,7 +297,7 @@ void main() async {
           category: "Design system",
           title: "Plex Data Grid",
           shortTitle: "Data Grid",
-          tag: "5a",
+          tag: "grid",
           logo: const Icon(Icons.grid_on_outlined),
           selectedLogo: const Icon(Icons.grid_on),
           screen: (context, {data}) => const PlexDataGridDemoScreen(),

@@ -72,7 +72,7 @@ class HomeOverviewScreen extends StatelessWidget {
           variant: PlexAlertVariant.info,
           title: "Design system demo",
           message:
-              "Use the Design system category to QA Phases 1–5a. Existing feature screens are restyled but keep their original purpose.",
+              "Use the Design system category to QA the 2.0.1 UI revamp. PlexDataGrid is the table engine; PlexAdvanceDataTable is a deprecated wrapper. PDF export is Plex-owned (PlexPrinter). Existing feature screens are restyled but keep their original purpose.",
         ),
         const SizedBox(height: PlexDim.medium),
         const ExampleSectionTitle(
@@ -115,7 +115,7 @@ class HomeOverviewScreen extends StatelessWidget {
             ),
             _ShortcutCard(
               title: "Data grid",
-              subtitle: "Phase 5a PlexDataGrid",
+              subtitle: "PlexDataGrid — sort, search, pages",
               icon: Icons.grid_on_outlined,
               route: Routes.dataGridScreen,
             ),

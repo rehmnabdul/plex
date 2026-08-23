@@ -8,8 +8,6 @@ import 'package:plex/plex_utils/plex_printer.dart';
 import 'package:plex/plex_widget.dart';
 import 'package:plex/plex_widgets/plex_advance_data_table_adapter.dart';
 import 'package:plex/plex_widgets/plex_data_grid.dart';
-import 'package:syncfusion_flutter_datagrid/datagrid.dart';
-import 'package:syncfusion_flutter_datagrid_export/export.dart';
 
 enum WidthMode {
   none,
@@ -73,55 +71,39 @@ class PlexDataTableHeaderCell {
       this.widthMode = WidthMode.auto,
       this.showOrderByControl = true,
       this.showFilterControl = true});
-
-  ColumnWidthMode _getWidthMode() {
-    switch (widthMode) {
-      case WidthMode.none:
-        return ColumnWidthMode.none;
-      case WidthMode.fitByColumnName:
-        return ColumnWidthMode.fitByColumnName;
-      case WidthMode.fitByCellValue:
-        return ColumnWidthMode.fitByCellValue;
-      case WidthMode.lastColumnFill:
-        return ColumnWidthMode.lastColumnFill;
-      case WidthMode.fill:
-        return ColumnWidthMode.fill;
-      default:
-        return ColumnWidthMode.auto;
-    }
-  }
 }
 
-class PlexDataTableValueCell extends DataGridCell {
+/// Cell model for [PlexAdvanceDataTable].
+///
+/// Public fields match the historic constructor shape (`columnName`, `value`,
+/// `numberField`, custom widget). This type no longer extends Syncfusion
+/// `DataGridCell`.
+class PlexDataTableValueCell {
+  final String columnName;
+  final dynamic value;
   late final bool isNumber;
   late final bool isWidget;
   late final String? cellValue;
 
   ///[value] is required as it is text only cell
-  PlexDataTableValueCell.text(String columnName, value,
+  PlexDataTableValueCell.text(this.columnName, this.value,
       {bool numberField = false})
-      : super(
-          columnName: columnName,
-          value: value,
-        ) {
-    value ??= "";
+      : isWidget = false,
+        cellValue = null {
     isNumber = numberField || value is int || value is double;
-    isWidget = false;
   }
 
   ///For custom design and handling of cell use this constructor.
   ///[value] is optional
   ///[cell] is required for custom cell
   PlexDataTableValueCell.custom(
-    String columnName,
+    this.columnName,
     String textValue,
     Widget widget, {
     bool numberField = false,
-  }) : super(
-            columnName: columnName,
-            value: PlexComparableWidget(widget, textValue)) {
-    cellValue = textValue;
-    isWidget = true;
+  })  : value = PlexComparableWidget(widget, textValue),
+        cellValue = textValue,
+        isWidget = true {
     isNumber = numberField || value is int || value is double;
   }
 
@@ -131,7 +113,7 @@ class PlexDataTableValueCell extends DataGridCell {
           numberField: isNumber);
     } else {
       return PlexDataTableValueCell.custom(
-          columnName, newValue ?? cellValue, value,
+          columnName, (newValue ?? cellValue).toString(), value as Widget,
           numberField: isNumber);
     }
   }
@@ -140,10 +122,9 @@ class PlexDataTableValueCell extends DataGridCell {
 /// Deprecated compatibility wrapper around [PlexDataGrid].
 ///
 /// Existing constructor parameters and [PlexDataTableHeaderCell] /
-/// [PlexDataTableValueCell] models are unchanged. The visible grid is
-/// [PlexDataGrid]. Excel export uses [PlexPrinter.printExcel]. PDF export
-/// still uses a hidden Syncfusion [SfDataGrid] because
-/// `exportToPdfDocument` requires [SfDataGridState].
+/// [PlexDataTableValueCell] models still compile. The visible grid is
+/// [PlexDataGrid]. Excel export uses [PlexPrinter.printExcel]. PDF export uses
+/// [PlexPrinter.printPdf] (a Plex-owned table PDF, not Syncfusion).
 ///
 /// Column grouping, frozen panes, and cell editing are still accepted on the
 /// constructor so call sites compile; they are not mapped onto [PlexDataGrid].
@@ -200,9 +181,13 @@ class PlexAdvanceDataTable extends StatefulWidget {
   final bool autoExpandGroups;
   final String? groupSummaryFormat;
   final String Function(String summary)? groupSummary;
-  final String Function(
-      String columnName, DataGridRow row, List<DataGridRow> rows)?
-      customGroupingSummary;
+
+  /// Unused. Column grouping is not mapped onto [PlexDataGrid].
+  ///
+  /// The previous Syncfusion `DataGridRow` parameter type is gone with that
+  /// dependency. Plex call sites pass [PlexDataTableValueCell] rows.
+  final String Function(String columnName, List<PlexDataTableValueCell> row,
+      List<List<PlexDataTableValueCell>> rows)? customGroupingSummary;
 
   ///Editing a Cell
   final Widget? Function(int row, int column)? cellEditingWidget;
@@ -224,8 +209,6 @@ class PlexAdvanceDataTable extends StatefulWidget {
 }
 
 class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
-  final GlobalKey<SfDataGridState> _exportKey = GlobalKey<SfDataGridState>();
-
   bool get _paginate => widget.pageSize != null && widget.pageSize! > 0;
 
   int _resolvedPageSize(List<List<PlexDataTableValueCell>> rows) {
@@ -255,16 +238,16 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
     }
   }
 
-  Future<void> _exportPdf(BuildContext context) async {
-    final SfDataGridState? state = _exportKey.currentState;
-    if (state == null) {
-      context.showSnackBar("Unable to save file, Please try again...");
-      return;
-    }
+  Future<void> _exportPdf(
+    BuildContext context,
+    List<List<PlexDataTableValueCell>> rows,
+  ) async {
     try {
-      final document = state.exportToPdfDocument(autoColumnWidth: true);
-      final List<int> bytes = document.saveSync();
-      final String? path = await PlexPrinter.savePdfFile(widget.title, bytes);
+      final String? path = await PlexPrinter.printPdf(
+        widget.title,
+        PlexAdvanceDataTableAdapter.excelHeaders(widget.columns),
+        PlexAdvanceDataTableAdapter.excelRows(widget.columns, rows),
+      );
       if (!context.mounted) return;
       if (path == null) {
         context.showSnackBar("Unable to save file, Please try again...");
@@ -304,7 +287,7 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
           IconButton(
             key: const Key('plex-advance-data-table-pdf'),
             tooltip: 'Pdf',
-            onPressed: () => _exportPdf(context),
+            onPressed: () => _exportPdf(context, rows),
             icon: const Icon(Icons.picture_as_pdf_outlined),
           ),
         if (widget.onRefresh != null)
@@ -326,90 +309,30 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
         final List<List<PlexDataTableValueCell>> rows =
             (data as List<List<PlexDataTableValueCell>>?) ??
                 const <List<PlexDataTableValueCell>>[];
-        return Column(
-          children: [
-            Expanded(
-              child: PlexDataGrid<List<PlexDataTableValueCell>>(
-                key: const Key('plex-advance-data-table-grid'),
-                title: widget.title,
-                columns: PlexAdvanceDataTableAdapter.columns(widget.columns),
-                rows: rows,
-                pageSize: _resolvedPageSize(rows),
-                showFooter: _paginate,
-                showSearch:
-                    widget.columns.any((c) => c.showFilterControl),
-                showDensityToggle: false,
-                selectionMode: widget.showCheckboxColumn
-                    ? PlexDataGridSelectionMode.multiple
-                    : PlexDataGridSelectionMode.none,
-                actions: _actions(context, rows),
-              ),
-            ),
-            if (widget.enablePdfExport)
-              Offstage(
-                child: SizedBox(
-                  width: 800,
-                  height: 400,
-                  child: SfDataGrid(
-                    key: _exportKey,
-                    source: _PlexAdvanceDataTableExportSource(rows),
-                    columns: widget.columns
-                        .map(
-                          (PlexDataTableHeaderCell e) => GridColumn(
-                            columnName: e.columnName,
-                            columnWidthMode: e._getWidthMode(),
-                            label: Text(e.columnName),
-                          ),
-                        )
-                        .toList(),
-                  ),
-                ),
-              ),
-          ],
+        return PlexDataGrid<List<PlexDataTableValueCell>>(
+          key: const Key('plex-advance-data-table-grid'),
+          title: widget.title,
+          columns: PlexAdvanceDataTableAdapter.columns(widget.columns),
+          rows: rows,
+          pageSize: _resolvedPageSize(rows),
+          showFooter: _paginate,
+          showSearch: widget.columns.any((c) => c.showFilterControl),
+          showDensityToggle: false,
+          selectionMode: widget.showCheckboxColumn
+              ? PlexDataGridSelectionMode.multiple
+              : PlexDataGridSelectionMode.none,
+          actions: _actions(context, rows),
         );
       },
     );
   }
 }
 
-class _PlexAdvanceDataTableExportSource extends DataGridSource {
-  _PlexAdvanceDataTableExportSource(List<List<PlexDataTableValueCell>> data) {
-    _rows = data
-        .map((List<PlexDataTableValueCell> e) => DataGridRow(cells: e))
-        .toList();
-  }
-
-  late final List<DataGridRow> _rows;
-
-  @override
-  List<DataGridRow> get rows => _rows;
-
-  @override
-  DataGridRowAdapter buildRow(DataGridRow row) {
-    return DataGridRowAdapter(
-      cells: row.getCells().map((DataGridCell dataGridCell) {
-        final PlexDataTableValueCell cell =
-            dataGridCell as PlexDataTableValueCell;
-        if (cell.isWidget) {
-          return cell.value as Widget;
-        }
-        return Text(dataGridCell.value.toString());
-      }).toList(),
-    );
-  }
-}
-
-class CustomColumnSizer extends ColumnSizer {
-  @override
-  double computeHeaderCellWidth(GridColumn column, TextStyle style) {
-    style = style.copyWith(fontWeight: FontWeight.bold);
-    return super.computeHeaderCellWidth(column, style);
-  }
-
-  @override
-  double computeCellWidth(GridColumn column, DataGridRow row, Object? cellValue,
-      TextStyle textStyle) {
-    textStyle = textStyle.copyWith(fontWeight: FontWeight.bold);
-    return super.computeCellWidth(column, row, cellValue, textStyle);
-  }
+/// Unused. Column sizing is handled by [PlexDataGrid].
+///
+/// Kept so historic `CustomColumnSizer()` call sites still compile after
+/// Syncfusion `ColumnSizer` was removed.
+@Deprecated('Unused. Column sizing is handled by PlexDataGrid.')
+class CustomColumnSizer {
+  CustomColumnSizer();
 }

@@ -177,7 +177,7 @@ class AdvanceDataTableDemoScreen extends StatelessWidget {
               tone: PlexBadgeTone.warning,
             ),
             child: Text(
-              "Existing call sites keep compiling. New tables should use PlexDataGrid. Grouping, freeze, and cell editing are not mapped.",
+              "PlexDataGrid is the visible engine. Excel and PDF export use PlexPrinter (Plex-owned PDF; xlsio for Excel). Grouping, freeze, and cell editing are not mapped. Prefer PlexDataGrid for new tables.",
             ),
           ),
           const SizedBox(height: PlexDim.medium),

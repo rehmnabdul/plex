@@ -97,14 +97,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.1"
-  convert:
-    dependency: transitive
-    description:
-      name: convert
-      sha256: b30acd5944035672bc15c6b7a8b47d773e41e2f17de064350988c5d02adb1c68
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.1.2"
   crypto:
     dependency: transitive
     description:
@@ -494,7 +486,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "2.0.1-beta.7"
+    version: "2.0.1-beta.8"
   plugin_platform_interface:
     dependency: transitive
     description:
@@ -721,30 +713,6 @@ packages:
     description:
       name: syncfusion_flutter_core
       sha256: "6b8b8cb5b4647e6a5858d47fceda9b7e5a9a2be57cff28120acb65edbd92a48c"
-      url: "https://pub.dev"
-    source: hosted
-    version: "30.2.6"
-  syncfusion_flutter_datagrid:
-    dependency: transitive
-    description:
-      name: syncfusion_flutter_datagrid
-      sha256: "6f1ae3eed3afeec951faa9341b3b8c57723c17e3e2c1344284ed097a9a3c76da"
-      url: "https://pub.dev"
-    source: hosted
-    version: "30.2.6"
-  syncfusion_flutter_datagrid_export:
-    dependency: transitive
-    description:
-      name: syncfusion_flutter_datagrid_export
-      sha256: "838656bafc5694e1aa7953f215b4f3cb91201005977dcec7182ef66ea9ad161c"
-      url: "https://pub.dev"
-    source: hosted
-    version: "30.2.6"
-  syncfusion_flutter_pdf:
-    dependency: transitive
-    description:
-      name: syncfusion_flutter_pdf
-      sha256: f1701c52ea5dd48654d8f4bd55ef72b3207bc17d179a0a3e1d05b8f33b0cd311
       url: "https://pub.dev"
     source: hosted
     version: "30.2.6"

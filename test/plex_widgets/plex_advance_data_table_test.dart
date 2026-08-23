@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:plex/plex_theme.dart';
+import 'package:plex/plex_utils/plex_printer.dart';
 import 'package:plex/plex_widget.dart';
 import 'package:plex/plex_widgets/plex_adv_data_table.dart';
 import 'package:plex/plex_widgets/plex_advance_data_table_adapter.dart';
@@ -45,6 +46,9 @@ PlexAdvanceDataTable _table({
   bool enableExcelExport = false,
   bool enablePdfExport = false,
   int? pageSize,
+  String Function(String columnName, List<PlexDataTableValueCell> row,
+          List<List<PlexDataTableValueCell>> rows)?
+      customGroupingSummary,
 }) {
   return PlexAdvanceDataTable(
     title: 'People',
@@ -53,6 +57,7 @@ PlexAdvanceDataTable _table({
     enableExcelExport: enableExcelExport,
     enablePdfExport: enablePdfExport,
     pageSize: pageSize,
+    customGroupingSummary: customGroupingSummary,
     columns: columns ??
         <PlexDataTableHeaderCell>[
           PlexDataTableHeaderCell.text('Name'),
@@ -62,6 +67,47 @@ PlexAdvanceDataTable _table({
 }
 
 void main() {
+  test('PlexDataTableValueCell is a Plex type with historic fields', () {
+    final PlexDataTableValueCell text =
+        PlexDataTableValueCell.text('Age', 30, numberField: true);
+    expect(text.columnName, 'Age');
+    expect(text.value, 30);
+    expect(text.isNumber, isTrue);
+    expect(text.isWidget, isFalse);
+    expect(text.cellValue, isNull);
+    expect(text.clone(newValue: 31).value, 31);
+
+    final PlexDataTableValueCell custom = PlexDataTableValueCell.custom(
+      'Flag',
+      'yes',
+      const SizedBox(key: Key('plex-cell-flag')),
+    );
+    expect(custom.columnName, 'Flag');
+    expect(custom.isWidget, isTrue);
+    expect(custom.cellValue, 'yes');
+    expect(custom.value, isA<PlexComparableWidget>());
+  });
+
+  test('CustomColumnSizer still constructs as a no-op', () {
+    expect(CustomColumnSizer(), isA<CustomColumnSizer>());
+  });
+
+  test('PlexPrinter.buildTablePdf emits a PDF document', () {
+    final List<int> bytes = PlexPrinter.buildTablePdf(
+      'People',
+      <dynamic>['Name', 'Age'],
+      <List<dynamic>>[
+        <dynamic>['Bob', 30],
+        <dynamic>['Alice', 20],
+      ],
+    );
+    final String header = String.fromCharCodes(bytes.take(8));
+    expect(header.startsWith('%PDF'), isTrue);
+    final String asText = String.fromCharCodes(bytes);
+    expect(asText.contains('EOF'), isTrue);
+    expect(asText, contains('People'));
+    expect(asText, contains('Bob'));
+  });
   test('adapter maps header flags onto PlexDataGrid columns', () {
     final List<PlexDataGridColumn<List<PlexDataTableValueCell>>> columns =
         PlexAdvanceDataTableAdapter.columns(
@@ -221,7 +267,8 @@ void main() {
       ),
     );
     await tester.pump();
-    expect(find.byKey(const Key('plex-advance-data-table-excel')), findsNothing);
+    expect(
+        find.byKey(const Key('plex-advance-data-table-excel')), findsNothing);
     expect(find.byKey(const Key('plex-advance-data-table-pdf')), findsNothing);
 
     await tester.pumpWidget(
@@ -239,5 +286,45 @@ void main() {
       findsOneWidget,
     );
     expect(find.byKey(const Key('plex-advance-data-table-pdf')), findsNothing);
+  });
+
+  testWidgets('pdf export button is wired without throwing', (tester) async {
+    await tester.pumpWidget(
+      _wrap(
+        _table(
+          controller: _controller(),
+          enablePdfExport: true,
+        ),
+      ),
+    );
+    await tester.pump();
+
+    expect(
+        find.byKey(const Key('plex-advance-data-table-pdf')), findsOneWidget);
+    final IconButton button = tester.widget<IconButton>(
+      find.byKey(const Key('plex-advance-data-table-pdf')),
+    );
+    expect(button.onPressed, isNotNull);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('grouping callback accepts Plex cell rows', (tester) async {
+    await tester.pumpWidget(
+      _wrap(
+        _table(
+          controller: _controller(),
+          customGroupingSummary: (
+            String columnName,
+            List<PlexDataTableValueCell> row,
+            List<List<PlexDataTableValueCell>> rows,
+          ) {
+            return '${row.length}/${rows.length}/$columnName';
+          },
+        ),
+      ),
+    );
+    await tester.pump();
+    expect(tester.takeException(), isNull);
+    expect(find.text('Bob'), findsOneWidget);
   });
 }

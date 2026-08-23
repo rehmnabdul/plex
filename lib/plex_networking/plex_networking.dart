@@ -136,11 +136,11 @@ class PlexNetworking {
     try {
       var startTime = DateTime.now();
       var uri = Uri.parse(_isValidUrl(url) ? url : _apiUrl() + url);
-      if (kDebugMode) print("Started: ${uri.toString()}");
+      if (kDebugMode) debugPrint("Started: ${uri.toString()}");
 
       var data = await http.get(uri, headers: currentHeaders);
       var diffInMillis = DateTime.now().difference(startTime).inMilliseconds;
-      if (kDebugMode) print("Completed: ${data.statusCode}: ${uri.toString()} in ${diffInMillis}ms");
+      if (kDebugMode) debugPrint("Completed: ${data.statusCode}: ${uri.toString()} in ${diffInMillis}ms");
       if (data.statusCode.toString().startsWith("2")) {
         return PlexSuccess(data.body, data.statusCode);
       } else {
@@ -153,7 +153,7 @@ class PlexNetworking {
       if (e is SocketException) {
         return _connectionFailed;
       }
-      if (kDebugMode) print("Error: ${e.toString()}");
+      if (kDebugMode) debugPrint("Error: ${e.toString()}");
       return PlexError(400, e.toString());
     }
   }
@@ -189,7 +189,7 @@ class PlexNetworking {
     try {
       var startTime = DateTime.now();
       var uri = Uri.parse(_isValidUrl(url) ? url : _apiUrl() + url);
-      if (kDebugMode) print("Started: ${uri.toString()}");
+      if (kDebugMode) debugPrint("Started: ${uri.toString()}");
 
       late http.Response data;
       if (formData != null) {
@@ -201,7 +201,7 @@ class PlexNetworking {
       }
 
       var diffInMillis = DateTime.now().difference(startTime).inMilliseconds;
-      if (kDebugMode) print("Completed: ${data.statusCode}: ${uri.toString()} in ${diffInMillis}ms");
+      if (kDebugMode) debugPrint("Completed: ${data.statusCode}: ${uri.toString()} in ${diffInMillis}ms");
       if (data.statusCode.toString().startsWith("2")) {
         return PlexSuccess(data.body, data.statusCode);
       } else {
@@ -214,7 +214,7 @@ class PlexNetworking {
       if (e is SocketException) {
         return _connectionFailed;
       }
-      if (kDebugMode) print("Error: ${e.toString()}");
+      if (kDebugMode) debugPrint("Error: ${e.toString()}");
       return PlexError(400, e.toString());
     }
   }
@@ -250,7 +250,7 @@ class PlexNetworking {
     try {
       var startTime = DateTime.now();
       var uri = Uri.parse(_isValidUrl(url) ? url : _apiUrl() + url);
-      if (kDebugMode) print("Started: ${uri.toString()}");
+      if (kDebugMode) debugPrint("Started: ${uri.toString()}");
 
       late http.Response data;
       if (formData != null) {
@@ -262,7 +262,7 @@ class PlexNetworking {
       }
 
       var diffInMillis = DateTime.now().difference(startTime).inMilliseconds;
-      if (kDebugMode) print("Completed: ${data.statusCode}: ${uri.toString()} in ${diffInMillis}ms");
+      if (kDebugMode) debugPrint("Completed: ${data.statusCode}: ${uri.toString()} in ${diffInMillis}ms");
       if (data.statusCode.toString().startsWith("2")) {
         return PlexSuccess(data.body, data.statusCode);
       } else {
@@ -275,7 +275,7 @@ class PlexNetworking {
       if (e is SocketException) {
         return _connectionFailed;
       }
-      if (kDebugMode) print("Error: ${e.toString()}");
+      if (kDebugMode) debugPrint("Error: ${e.toString()}");
       return PlexError(400, e.toString());
     }
   }
@@ -317,7 +317,7 @@ class PlexNetworking {
     try {
       var startTime = DateTime.now();
       var uri = Uri.parse(_isValidUrl(url) ? url : _apiUrl() + url);
-      if (kDebugMode) print("Started: ${uri.toString()}");
+      if (kDebugMode) debugPrint("Started: ${uri.toString()}");
 
       var multipartFiles = List<http.MultipartFile>.empty(growable: true);
       var filesKeys = files.keys.toList();
@@ -334,7 +334,7 @@ class PlexNetworking {
       var data = await request.send();
 
       var diffInMillis = DateTime.now().difference(startTime).inMilliseconds;
-      if (kDebugMode) print("Completed: ${data.statusCode}: ${uri.toString()} in ${diffInMillis}ms");
+      if (kDebugMode) debugPrint("Completed: ${data.statusCode}: ${uri.toString()} in ${diffInMillis}ms");
       if (data.statusCode.toString().startsWith("2")) {
         var responseBody = await data.stream.transform(utf8.decoder).join();
         return PlexSuccess(responseBody, data.statusCode);
@@ -349,7 +349,7 @@ class PlexNetworking {
       if (e is SocketException) {
         return _connectionFailed;
       }
-      if (kDebugMode) print("Error: ${e.toString()}");
+      if (kDebugMode) debugPrint("Error: ${e.toString()}");
       return PlexError(400, e.toString());
     }
   }
@@ -383,11 +383,11 @@ class PlexNetworking {
     }
 
 // ✅ Do not manually set Content-Type for multipart requests
-    if (kDebugMode) print("Headers: $currentHeaders");
+    if (kDebugMode) debugPrint("Headers: $currentHeaders");
 
     try {
       var uri = Uri.parse(_isValidUrl(url) ? url : _apiUrl() + url);
-      if (kDebugMode) print("Started: ${uri.toString()}");
+      if (kDebugMode) debugPrint("Started: ${uri.toString()}");
 
       /// Prepare Multipart Request
       var request = http.MultipartRequest('POST', uri);
@@ -404,7 +404,7 @@ class PlexNetworking {
 
       var responseBody = await streamedResponse.stream.transform(utf8.decoder).join();
 
-      if (kDebugMode) print("Completed: ${streamedResponse.statusCode}: ${responseBody.toString()}");
+      if (kDebugMode) debugPrint("Completed: ${streamedResponse.statusCode}: ${responseBody.toString()}");
 
       /// Handle JSON & Text Responses Correctly
       if (streamedResponse.statusCode.toString().startsWith("2")) {
@@ -427,7 +427,7 @@ class PlexNetworking {
       if (e is SocketException) {
         return _connectionFailed;
       }
-      if (kDebugMode) print("Error: ${e.toString()}");
+      if (kDebugMode) debugPrint("Error: ${e.toString()}");
       return PlexError(400, e.toString());
     }
   }
@@ -467,11 +467,11 @@ class PlexNetworking {
     try {
       var startTime = DateTime.now();
       var uri = Uri.parse(_isValidUrl(url) ? url : _apiUrl() + url);
-      if (kDebugMode) print("Started: ${uri.toString()}");
+      if (kDebugMode) debugPrint("Started: ${uri.toString()}");
 
       var data = await http.get(uri, headers: currentHeaders);
       var diffInMillis = DateTime.now().difference(startTime).inMilliseconds;
-      if (kDebugMode) print("Completed: ${data.statusCode}: ${uri.toString()} in ${diffInMillis}ms");
+      if (kDebugMode) debugPrint("Completed: ${data.statusCode}: ${uri.toString()} in ${diffInMillis}ms");
       if (data.statusCode.toString().startsWith("2")) {
         return PlexSuccess.bytes(data.bodyBytes, data.statusCode);
       } else {
@@ -484,7 +484,7 @@ class PlexNetworking {
       if (e is SocketException) {
         return _connectionFailed;
       }
-      if (kDebugMode) print("Error: ${e.toString()}");
+      if (kDebugMode) debugPrint("Error: ${e.toString()}");
       return PlexError(400, e.toString());
     }
   }

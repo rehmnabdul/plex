@@ -15,7 +15,7 @@ class PlexRx {
 
   set value(Object value) {
     _value = value;
-    print("Rx $id-${value.toString()}");
+    debugPrint("Rx $id-${value.toString()}");
     for (var element in _listeners) {
       element.call();
     }
@@ -56,7 +56,7 @@ class _PlexRxWidgetState extends State<PlexRxWidget> {
 
   @override
   Widget build(BuildContext context) {
-    print("From Widget ${widget._rx.id}-${widget._rx.value.toString()}");
+    debugPrint("From Widget ${widget._rx.id}-${widget._rx.value.toString()}");
     return widget._widget;
   }
 }

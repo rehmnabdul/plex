@@ -27,6 +27,7 @@ class PlexGanttDemoScreen extends StatelessWidget {
         start: DateTime(2024, 6, 1, 12),
         end: DateTime(2024, 6, 1, 16),
         color: colors.statusInfo,
+        dependsOn: ['1'],
       ),
       GantTask(
         id: '3',
@@ -63,7 +64,7 @@ class PlexGanttDemoScreen extends StatelessWidget {
             subtitle: "Tasks plotted across a working day",
             actions: const PlexBadge(label: "Charts", tone: PlexBadgeTone.info),
             child: Text(
-              "This page still demonstrates the Gantt widget. Chrome uses the same tokens as the rest of the example. The Review bar shows progress (0.6). Tap is wired if you add onTaskTap.",
+              "This page still demonstrates the Gantt widget. Chrome uses the same tokens as the rest of the example. The Review bar shows progress (0.6). Development depends on Design. Tap is wired if you add onTaskTap.",
               style: TextStyle(color: colors.textSecondary),
             ),
           ),

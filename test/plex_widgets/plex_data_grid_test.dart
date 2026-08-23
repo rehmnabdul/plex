@@ -767,6 +767,77 @@ void main() {
     await tester.pump();
     expect(edited, 'name:Robert');
   });
+
+  testWidgets('frozenRowCount builds', (tester) async {
+    await tester.pumpWidget(
+      _wrap(
+        PlexDataGrid<_Person>(
+          columns: _columns,
+          rows: _people,
+          rowId: (_Person row) => row.id,
+          frozenRowCount: 1,
+        ),
+      ),
+    );
+    expect(find.byType(PlexDataGrid<_Person>), findsOneWidget);
+    expect(find.text('Bob'), findsWidgets);
+  });
+
+  testWidgets('applyCellEdit mutates rows and fires onRowsChanged',
+      (tester) async {
+    final List<_MutablePerson> rows = <_MutablePerson>[
+      _MutablePerson(id: 1, name: 'Bob', age: 30),
+      _MutablePerson(id: 2, name: 'Alice', age: 20),
+    ];
+    List<_MutablePerson>? changed;
+
+    await tester.pumpWidget(
+      _wrap(
+        PlexDataGrid<_MutablePerson>(
+          columns: <PlexDataGridColumn<_MutablePerson>>[
+            PlexDataGridColumn<_MutablePerson>(
+              id: 'name',
+              title: 'Name',
+              editable: true,
+              value: (_MutablePerson row) => row.name,
+            ),
+          ],
+          rows: rows,
+          rowId: (_MutablePerson row) => row.id,
+          applyCellEdit: (_MutablePerson row, String columnId, String value) {
+            row.name = value;
+            return row;
+          },
+          onRowsChanged: (List<_MutablePerson> next) => changed = next,
+        ),
+      ),
+    );
+
+    await tester.enterText(
+      find.byKey(const Key('plex-data-grid-edit-name-1')),
+      'Robert',
+    );
+    await tester.testTextInput.receiveAction(TextInputAction.done);
+    await tester.pump();
+
+    expect(changed, isNotNull);
+    expect(
+      changed!.firstWhere((_MutablePerson p) => p.id == 1).name,
+      'Robert',
+    );
+  });
+}
+
+class _MutablePerson {
+  _MutablePerson({
+    required this.id,
+    required this.name,
+    required this.age,
+  });
+
+  final int id;
+  String name;
+  final int age;
 }
 
 final List<PlexDataGridColumn<_Person>> _deptColumns =

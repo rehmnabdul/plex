@@ -272,7 +272,7 @@ PlexActivityFeed(items: [
 ```
 
 #### Wizard, chart, calendar
-Opt-in widgets. Import `package:plex/plex_package.dart` or the files under `plex_widgets/`. Footer labels on `PlexWizard` are Back, Next, Finish. `PlexChart` types are bar, line, pie, donut, scatter, combo, heatmap. `PlexCalendar` supports month / week / day / agenda (not a `PlexFormFieldDate` replacement).
+Opt-in widgets. Import `package:plex/plex_package.dart` or the files under `plex_widgets/`. Footer labels on `PlexWizard` are Back, Next, Finish. `PlexChart` types are bar, line, pie, donut, scatter, combo, heatmap, trellis. `PlexCalendar` supports month / week / day / agenda (not a `PlexFormFieldDate` replacement).
 
 ```dart
 PlexWizard(steps: [
@@ -284,15 +284,15 @@ PlexChart(type: PlexChartType.bar, series: [PlexChartSeries(name: 'Units', data:
 PlexCalendar(selected: DateTime(2026, 8, 15), onSelected: (d) {}, focusedMonth: DateTime(2026, 8, 1), view: PlexCalendarView.month, events: [PlexCalendarEvent(id: '1', start: DateTime(2026, 8, 15), title: 'Standup')])
 ```
 
-#### Backlog 2–5 (2.0.1-beta.12)
+#### Backlog 2–5 (2.0.1-beta.12) and remainder (2.0.1-beta.13)
 Additive follow-up after **2.0.1-beta.11**. Existing constructors still work.
 
 - **Wizard:** `axis: PlexWizardAxis.vertical`, `allowStepJump` (tap rail; Next still validates).
-- **Chart:** `PlexChartType.donut` / `scatter` / `combo` / `heatmap`. Optional `PlexChartSeries.mark` for combo.
-- **Calendar:** `PlexCalendarView`, `events`, `onEventTap`. Month cells show event dots.
-- **DataGrid:** `frozenColumnCount`, `PlexDataGridColumn.editable` + `onCellEdited`, filter match `startsWith` / `greaterThan` / `lessThan`. Advance wrapper maps `freezeColumns`.
-- **Kits:** `PlexLookup`, `PlexTag` / `PlexTagInput` (not `PlexBadge`), `PlexMobileList` / `PlexMobileTallyItem`, Gantt `progress` / `onTaskTap` and `typedef PlexGanttChart = PlexChartGant`.
-- **Still deferred:** trellis charts, frozen rows, in-grid row mutation, xlsio replacement, recurrence/drag calendar.
+- **Chart:** `PlexChartType.donut` / `scatter` / `combo` / `heatmap` / `trellis`. Optional `PlexChartSeries.mark` for combo. `trellis: true` or `type: PlexChartType.trellis` facets one pane per series (`trellisInnerType`, default bar).
+- **Calendar:** `PlexCalendarView`, `events`, `onEventTap`. `PlexCalendarRecurrence.daily` / `.weekly` (`interval`, `count`, `until`) expanded by `PlexCalendarRecurrence.expand`. Week/day long-press drag (`onEventMoved`) and resize handle (`onEventResized`). Month cells show event dots.
+- **DataGrid:** `frozenColumnCount`, `frozenRowCount`, `PlexDataGridColumn.editable` + `onCellEdited`, `applyCellEdit` + `onRowsChanged`. Filter match `startsWith` / `greaterThan` / `lessThan`. Advance wrapper maps `freezeColumns` / `freezeRows`.
+- **Kits:** `PlexLookup`, `PlexTag` / `PlexTagInput` (not `PlexBadge`), `PlexMobileList` / `PlexMobileTallyItem`, `PlexMobileTally` (scan / typed code increment), Gantt `progress` / `dependsOn` / `showNowLine` / `enablePanZoom` / `onTaskTap` and `typedef PlexGanttChart = PlexChartGant`.
+- **Excel:** `PlexPrinter.printExcel` / `buildExcelBytes` write OOXML via `archive` (`PlexXlsx`). `syncfusion_flutter_xlsio` is removed.
 
 #### `PlexDataGrid`
 Plex-owned client-side grid. Prefer this over the deprecated `PlexAdvanceDataTable` wrapper.
@@ -597,7 +597,7 @@ List<T>.groupBy((item) => key)
 ```
 
 #### `PlexPrinter`
-Excel still uses Syncfusion xlsio. PDF is Plex-owned (no Syncfusion DataGrid).
+Excel export is Plex-owned OOXML (`archive` + `PlexXlsx`). PDF is Plex-owned (no Syncfusion DataGrid).
 ```dart
 await PlexPrinter.printExcel(title, columns, rows);
 await PlexPrinter.printPdf(title, columns, rows);
@@ -699,7 +699,7 @@ Add PLEX to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  plex: 2.0.1-beta.12
+  plex: 2.0.1-beta.13
 ```
 
 Then run:
@@ -857,9 +857,9 @@ See **Widgets & Components** for IconButton, Badge, Avatar, Alert, ProgressBar, 
 
 ### What changed (2.0.1 betas) / Migration
 
-This 2.x beta line started after pub.dev `2.0.1-beta.1`. Pin **2.0.1-beta.12**. Stable **2.0.1** follows the beta series.
+This 2.x beta line started after pub.dev `2.0.1-beta.1`. Pin **2.0.1-beta.13**. Stable **2.0.1** follows the beta series.
 
-Shipped: **beta.2** Phase 0 tokens · **beta.3** `.pubignore` for Interloop Design · **beta.4** Phase 1 · **beta.5** Phases 2–4 · **beta.6** `PlexDataGrid` + example redesign · **beta.7** `PlexAdvanceDataTable` wrapper · **beta.8** Phase 5c (Syncfusion grid removal) · **beta.9** DataGrid grouping, summaries, export flags, filters, and cell styles · **beta.10** Phase 6 dashboard widgets · **beta.11** Phase 7 wizard, chart, calendar · **beta.12** backlog 2–5 (wizard axis/jump, extra charts, calendar views+events, DataGrid freeze/edit/filters, lookup/tags, Gantt progress, mobile list).
+Shipped: **beta.2** Phase 0 tokens · **beta.3** `.pubignore` for Interloop Design · **beta.4** Phase 1 · **beta.5** Phases 2–4 · **beta.6** `PlexDataGrid` + example redesign · **beta.7** `PlexAdvanceDataTable` wrapper · **beta.8** Phase 5c (Syncfusion grid removal) · **beta.9** DataGrid grouping, summaries, export flags, filters, and cell styles · **beta.10** Phase 6 dashboard widgets · **beta.11** Phase 7 wizard, chart, calendar · **beta.12** backlog 2–5 (wizard axis/jump, extra charts, calendar views+events, DataGrid freeze/edit/filters, lookup/tags, Gantt progress, mobile list) · **beta.13** trellis, frozen rows, in-grid mutation, calendar recurrence/drag, Gantt rewrite, `PlexMobileTally`, Excel without xlsio.
 
 **Constructors are mostly additive.** Existing required arguments did not change. New optional fields default to previous behavior.
 
@@ -874,7 +874,7 @@ Shipped: **beta.2** Phase 0 tokens · **beta.3** `.pubignore` for Interloop Desi
   - Package no longer depends on `syncfusion_flutter_datagrid` or `syncfusion_flutter_datagrid_export`.
   - `PlexDataTableValueCell` no longer extends Syncfusion `DataGridCell`. Public fields still match the historic constructor (`columnName`, `value`, `numberField`, custom widget).
   - `customGroupingSummary` is now `(String columnName, List<PlexDataTableValueCell> row, List<List<PlexDataTableValueCell>> rows)?` — not Syncfusion `DataGridRow`.
-  - PDF export uses `PlexPrinter.printPdf` / `buildTablePdf` (Plex-owned table PDF). Excel still uses `syncfusion_flutter_xlsio` via `PlexPrinter.printExcel`. CSV uses `PlexPrinter.buildCsv` / `printCsv`.
+  - PDF export uses `PlexPrinter.printPdf` / `buildTablePdf` (Plex-owned table PDF). Excel uses `PlexPrinter.printExcel` / `buildExcelBytes` (Plex OOXML via `archive`; `syncfusion_flutter_xlsio` removed). CSV uses `PlexPrinter.buildCsv` / `printCsv`.
   - `CustomColumnSizer` is a deprecated no-op (column sizing is handled by `PlexDataGrid`).
   - Grouping and per-column filters on `PlexAdvanceDataTable` now map onto `PlexDataGrid`. Freeze and cell editing still compile but are not mapped (mapped in **2.0.1-beta.12**).
 - **Phase 5d (2.0.1-beta.9) `PlexDataGrid` features:**
@@ -887,6 +887,7 @@ Shipped: **beta.2** Phase 0 tokens · **beta.3** `.pubignore` for Interloop Desi
 - **Phase 6 (2.0.1-beta.10) dashboard widgets** (additive): `PlexStatCard`, `PlexStatTile`, `PlexStatGrid`, `PlexProgressRing`, `PlexWidgetCard`, `PlexMiniTable`, `PlexDataList`, `PlexActivityFeed`. They do not replace `PlexDataGrid`, `PlexDataTable`, or reactive `PlexWidget`.
 - **Phase 7 (2.0.1-beta.11) wizard, chart, calendar** (additive): `PlexWizard` / `PlexWizardStep`, `PlexChart` (bar / line / pie), `PlexCalendar` (month view). They do not replace login, `PlexTabs`, `PlexChartGant`, or `PlexFormFieldDate`.
 - **Backlog 2–5 (2.0.1-beta.12)** (additive): wizard vertical / jump, extra chart types, calendar views + events, DataGrid freeze / edit / extra filters, `PlexLookup` / `PlexTag` / `PlexMobileList`, Gantt progress. They do not replace `PlexBadge`, `PlexFormFieldDate`, or existing Gantt call sites (`PlexGanttChart` is a typedef).
+- **Backlog remainder (2.0.1-beta.13)** (additive): chart trellis, DataGrid `frozenRowCount` / `applyCellEdit`, calendar recurrence and drag/resize, Gantt pan/zoom / now line / `dependsOn`, `PlexMobileTally`, Excel via `archive` + `PlexXlsx` (`syncfusion_flutter_xlsio` removed).
 - **Interloop Design** stays in git as a reference folder. It is **not** in the published package (`.pubignore`). Do not treat it as a runtime dependency.
 
 #### Additive by phase
@@ -905,6 +906,7 @@ Shipped: **beta.2** Phase 0 tokens · **beta.3** `.pubignore` for Interloop Desi
 | **6** | beta.10 | Dashboard widgets: `PlexStatCard` / `PlexStatTile` / `PlexStatGrid` / `PlexProgressRing`, `PlexWidgetCard`, `PlexMiniTable`, `PlexDataList`, `PlexActivityFeed`. |
 | **7** | beta.11 | `PlexWizard` / `PlexWizardStep`, `PlexChart` (bar / line / pie), `PlexCalendar` month view. |
 | **7+** | beta.12 | Wizard vertical / jump, extra charts, calendar views + events, DataGrid freeze / edit / filters, lookup / tags / mobile list, Gantt progress. |
+| **7+** | beta.13 | Trellis, frozen rows, in-grid mutation, calendar recurrence/drag, Gantt rewrite, `PlexMobileTally`, Excel without xlsio. |
 
 `brandConfig` is optional on `PlexApp`. Omit it to keep seed-only theming.
 

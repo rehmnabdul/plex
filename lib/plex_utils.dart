@@ -2,8 +2,7 @@ import 'package:flutter/foundation.dart';
 
 console(String message, {bool printInRelease = false}) {
   if (kDebugMode || printInRelease) {
-    // ignore: avoid_print
-    print("Console: \t\t\t\t$message");
+    debugPrint("Console: \t\t\t\t$message");
   }
 }
 

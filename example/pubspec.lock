@@ -264,14 +264,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.1"
-  image:
-    dependency: transitive
-    description:
-      name: image
-      sha256: "4e973fcf4caae1a4be2fa0a13157aa38a8f9cb049db6529aa00b4d71abc4d928"
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.5.4"
   intl:
     dependency: transitive
     description:
@@ -280,14 +272,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.20.2"
-  jiffy:
-    dependency: transitive
-    description:
-      name: jiffy
-      sha256: "9bafbfe6d97587048bf449165e050029e716a12438f54a3d39e7e3a256decdac"
-      url: "https://pub.dev"
-    source: hosted
-    version: "6.4.3"
   leak_tracker:
     dependency: transitive
     description:
@@ -511,14 +495,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.0.3"
-  quiver:
-    dependency: transitive
-    description:
-      name: quiver
-      sha256: ea0b925899e64ecdfbf9c7becb60d5b50e706ade44a85b2363be2a22d88117d2
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.2.2"
   rxdart:
     dependency: transitive
     description:
@@ -708,30 +684,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.4.1"
-  syncfusion_flutter_core:
-    dependency: transitive
-    description:
-      name: syncfusion_flutter_core
-      sha256: "6b8b8cb5b4647e6a5858d47fceda9b7e5a9a2be57cff28120acb65edbd92a48c"
-      url: "https://pub.dev"
-    source: hosted
-    version: "30.2.6"
-  syncfusion_flutter_xlsio:
-    dependency: transitive
-    description:
-      name: syncfusion_flutter_xlsio
-      sha256: "47c7a65f8e4da7816f8741adbd34987091c0a5f5916f7f01121f64ca7d452511"
-      url: "https://pub.dev"
-    source: hosted
-    version: "30.2.6"
-  syncfusion_officecore:
-    dependency: transitive
-    description:
-      name: syncfusion_officecore
-      sha256: e442cc22f5e57590e8d2d690cf1a03e060d6363f6fad37262f3c6e79b85e9e2a
-      url: "https://pub.dev"
-    source: hosted
-    version: "30.2.6"
   synchronized:
     dependency: transitive
     description:

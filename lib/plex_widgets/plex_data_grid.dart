@@ -118,8 +118,9 @@ class PlexDataGridColumn<T> {
   final bool numeric;
   final double? width;
 
-  /// When true and [PlexDataGrid.onCellEdited] is set, default text cells
-  /// can be edited. Custom [cell] widgets are not replaced.
+  /// When true and [PlexDataGrid.onCellEdited] or
+  /// [PlexDataGrid.applyCellEdit] is set, default text cells can be edited.
+  /// Custom [cell] widgets are not replaced.
   final bool editable;
 }
 
@@ -582,7 +583,10 @@ class PlexDataGrid<T> extends StatefulWidget {
     this.groupSummaryBuilder,
     this.rowStyle,
     this.frozenColumnCount = 0,
+    this.frozenRowCount = 0,
     this.onCellEdited,
+    this.applyCellEdit,
+    this.onRowsChanged,
   }) : assert(pageSize > 0, 'pageSize must be greater than 0');
 
   final List<PlexDataGridColumn<T>> columns;
@@ -671,9 +675,29 @@ class PlexDataGrid<T> extends StatefulWidget {
   /// single-scroll layout.
   final int frozenColumnCount;
 
-  /// Fired after an editable default text cell is submitted. The grid does
-  /// not mutate [rows].
+  /// First N data rows of the current page (after sort/filter/paging) that
+  /// stay visible while the rest of the page scrolls vertically. The header
+  /// is already frozen. `0` keeps the current layout. Combined with
+  /// [frozenColumnCount] this forms a 2×2 freeze pane (top-left locked,
+  /// top-right scroll-x, bottom-left scroll-y, bottom-right both).
+  final int frozenRowCount;
+
+  /// Fired after an editable default text cell is submitted.
+  /// Does not rewrite [rows] unless [applyCellEdit] is also set.
   final void Function(T row, String columnId, String newValue)? onCellEdited;
+
+  /// Maps a row to an updated row after an in-place edit. If null, the grid
+  /// does not rewrite [rows].
+  ///
+  /// When set, the grid replaces that item in an internal working copy so
+  /// the new value shows even if the parent is Stateless and ignores
+  /// [onRowsChanged]. A parent rebuild that passes a new [rows] list (not
+  /// [identical] to the previous) replaces that copy with [rows] again.
+  final T Function(T row, String columnId, String newValue)? applyCellEdit;
+
+  /// Fired with the full row list after [applyCellEdit] (same order as
+  /// [rows], edited index replaced).
+  final ValueChanged<List<T>>? onRowsChanged;
 
   @override
   State<PlexDataGrid<T>> createState() => _PlexDataGridState<T>();
@@ -702,6 +726,7 @@ class _PlexDataGridState<T> extends State<PlexDataGrid<T>> {
   PlexDensity? _densityOverride;
   late List<String> _groupByColumnIds;
   late bool _showGroupSummaries;
+  late List<T> _workingRows;
   final ScrollController _frozenVertical = ScrollController();
   final ScrollController _scrollVertical = ScrollController();
   bool _syncingVertical = false;
@@ -713,6 +738,7 @@ class _PlexDataGridState<T> extends State<PlexDataGrid<T>> {
     _densityOverride = widget.density;
     _groupByColumnIds = _resolveGroupByColumnIds();
     _showGroupSummaries = widget.showGroupSummaries;
+    _workingRows = List<T>.from(widget.rows);
     _frozenVertical.addListener(() => _syncVertical(_frozenVertical, _scrollVertical));
     _scrollVertical.addListener(() => _syncVertical(_scrollVertical, _frozenVertical));
   }
@@ -736,6 +762,7 @@ class _PlexDataGridState<T> extends State<PlexDataGrid<T>> {
       _densityOverride = widget.density;
     }
     if (!identical(oldWidget.rows, widget.rows)) {
+      _workingRows = List<T>.from(widget.rows);
       _pruneSelection();
     }
     if (!_listEquals(oldWidget.groupByColumnIds, widget.groupByColumnIds) ||
@@ -788,7 +815,7 @@ class _PlexDataGridState<T> extends State<PlexDataGrid<T>> {
 
   List<T> _filteredRows() {
     return PlexDataGridEngine.filter(
-      PlexDataGridEngine.search(widget.rows, widget.columns, _search),
+      PlexDataGridEngine.search(_workingRows, widget.columns, _search),
       widget.columns,
       _columnFilters,
     );
@@ -1079,15 +1106,51 @@ class _PlexDataGridState<T> extends State<PlexDataGrid<T>> {
   int _pageCount(int total) => math.max(1, (total / _pageSize).ceil());
 
   void _pruneSelection() {
-    final Set<Object> live = widget.rows.map(_idFor).toSet();
+    final Set<Object> live = _workingRows.map(_idFor).toSet();
     _selectedIds.removeWhere((Object id) => !live.contains(id));
   }
 
   void _emitSelection() {
-    final List<T> selected = widget.rows
+    final List<T> selected = _workingRows
         .where((T row) => _selectedIds.contains(_idFor(row)))
         .toList();
     widget.onSelectionChanged?.call(selected);
+  }
+
+  void _commitCellEdit(T row, String columnId, String newValue) {
+    widget.onCellEdited?.call(row, columnId, newValue);
+    final T Function(T, String, String)? apply = widget.applyCellEdit;
+    if (apply == null) return;
+    final T updated = apply(row, columnId, newValue);
+    int index = _workingRows.indexWhere((T r) => identical(r, row));
+    if (index < 0) {
+      final Object id = _idFor(row);
+      index = _workingRows.indexWhere((T r) => _idFor(r) == id);
+    }
+    if (index < 0) return;
+    setState(() {
+      _workingRows[index] = updated;
+    });
+    widget.onRowsChanged?.call(List<T>.from(_workingRows));
+  }
+
+  /// Prefix of [pageLines] containing the first [PlexDataGrid.frozenRowCount]
+  /// data rows. Group/summary lines before that count stay with the prefix.
+  List<PlexDataGridLine<T>> _frozenPageLines(
+    List<PlexDataGridLine<T>> pageLines,
+  ) {
+    final int want = widget.frozenRowCount;
+    if (want <= 0 || pageLines.isEmpty) {
+      return <PlexDataGridLine<T>>[];
+    }
+    int dataSeen = 0;
+    final List<PlexDataGridLine<T>> frozen = <PlexDataGridLine<T>>[];
+    for (final PlexDataGridLine<T> line in pageLines) {
+      if (dataSeen >= want) break;
+      frozen.add(line);
+      if (line.row != null) dataSeen++;
+    }
+    return frozen;
   }
 
   void _onSearchChanged(String value) {
@@ -1483,6 +1546,123 @@ class _PlexDataGridState<T> extends State<PlexDataGrid<T>> {
     );
   }
 
+  Widget _buildPageLine({
+    required PlexThemeData theme,
+    required PlexColorTokens colors,
+    required PlexDensity density,
+    required PlexDataGridLine<T> line,
+    required List<double> widths,
+    List<PlexDataGridColumn<T>>? columns,
+    bool? includeSelection,
+    String keyPrefix = '',
+    bool leading = true,
+  }) {
+    if (line.isGroup) {
+      return _buildGroupRow(
+        theme: theme,
+        colors: colors,
+        density: density,
+        line: line,
+        widths: widths,
+        includeSelection: includeSelection,
+        leading: leading,
+      );
+    }
+    if (line.isSummary) {
+      return _buildSummaryRow(
+        theme: theme,
+        colors: colors,
+        density: density,
+        line: line,
+        widths: widths,
+        columns: columns,
+        includeSelection: includeSelection,
+        leading: leading,
+      );
+    }
+    return _buildRow(
+      theme: theme,
+      colors: colors,
+      density: density,
+      row: line.row as T,
+      widths: widths,
+      keyPrefix: keyPrefix,
+      columns: columns,
+      includeSelection: includeSelection,
+    );
+  }
+
+  Widget _buildFrozenRowBand({
+    required PlexThemeData theme,
+    required PlexColorTokens colors,
+    required PlexDensity density,
+    required List<PlexDataGridLine<T>> lines,
+    required List<double> widths,
+    List<PlexDataGridColumn<T>>? columns,
+    bool? includeSelection,
+    String keyPrefix = '',
+    bool leading = true,
+  }) {
+    if (lines.isEmpty) return const SizedBox.shrink();
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        border: Border(bottom: BorderSide(color: colors.borderDefault)),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          for (final PlexDataGridLine<T> line in lines)
+            _buildPageLine(
+              theme: theme,
+              colors: colors,
+              density: density,
+              line: line,
+              widths: widths,
+              columns: columns,
+              includeSelection: includeSelection,
+              keyPrefix: keyPrefix,
+              leading: leading,
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildScrollingLines({
+    required PlexThemeData theme,
+    required PlexColorTokens colors,
+    required PlexDensity density,
+    required List<PlexDataGridLine<T>> pageLines,
+    required List<PlexDataGridLine<T>> scrollingLines,
+    required List<double> widths,
+    ScrollController? controller,
+    List<PlexDataGridColumn<T>>? columns,
+    bool? includeSelection,
+    String keyPrefix = '',
+    bool leading = true,
+  }) {
+    if (pageLines.isEmpty) return _buildEmpty(theme, colors);
+    return ListView.builder(
+      controller: controller,
+      primary: controller == null ? null : false,
+      itemCount: scrollingLines.length,
+      itemExtent: _rowHeight(density),
+      itemBuilder: (BuildContext context, int index) {
+        return _buildPageLine(
+          theme: theme,
+          colors: colors,
+          density: density,
+          line: scrollingLines[index],
+          widths: widths,
+          columns: columns,
+          includeSelection: includeSelection,
+          keyPrefix: keyPrefix,
+          leading: leading,
+        );
+      },
+    );
+  }
+
   Widget _buildBody({
     required PlexThemeData theme,
     required PlexColorTokens colors,
@@ -1493,6 +1673,9 @@ class _PlexDataGridState<T> extends State<PlexDataGrid<T>> {
     required double minWidth,
   }) {
     final int frozen = widget.frozenColumnCount.clamp(0, widget.columns.length);
+    final List<PlexDataGridLine<T>> frozenLines = _frozenPageLines(pageLines);
+    final List<PlexDataGridLine<T>> scrollingLines =
+        frozenLines.isEmpty ? pageLines : pageLines.sublist(frozenLines.length);
     if (frozen > 0) {
       return _buildFrozenBody(
         theme: theme,
@@ -1500,6 +1683,8 @@ class _PlexDataGridState<T> extends State<PlexDataGrid<T>> {
         density: density,
         pageLines: pageLines,
         pageRows: pageRows,
+        frozenLines: frozenLines,
+        scrollingLines: scrollingLines,
         widths: widths,
         frozen: frozen,
       );
@@ -1515,41 +1700,23 @@ class _PlexDataGridState<T> extends State<PlexDataGrid<T>> {
               child: Column(
                 children: [
                   _buildHeader(theme, colors, density, pageRows, widths),
+                  if (frozenLines.isNotEmpty)
+                    _buildFrozenRowBand(
+                      theme: theme,
+                      colors: colors,
+                      density: density,
+                      lines: frozenLines,
+                      widths: widths,
+                    ),
                   Expanded(
-                    child: pageLines.isEmpty
-                        ? _buildEmpty(theme, colors)
-                        : ListView.builder(
-                            itemCount: pageLines.length,
-                            itemExtent: _rowHeight(density),
-                            itemBuilder: (BuildContext context, int index) {
-                              final PlexDataGridLine<T> line = pageLines[index];
-                              if (line.isGroup) {
-                                return _buildGroupRow(
-                                  theme: theme,
-                                  colors: colors,
-                                  density: density,
-                                  line: line,
-                                  widths: widths,
-                                );
-                              }
-                              if (line.isSummary) {
-                                return _buildSummaryRow(
-                                  theme: theme,
-                                  colors: colors,
-                                  density: density,
-                                  line: line,
-                                  widths: widths,
-                                );
-                              }
-                              return _buildRow(
-                                theme: theme,
-                                colors: colors,
-                                density: density,
-                                row: line.row as T,
-                                widths: widths,
-                              );
-                            },
-                          ),
+                    child: _buildScrollingLines(
+                      theme: theme,
+                      colors: colors,
+                      density: density,
+                      pageLines: pageLines,
+                      scrollingLines: scrollingLines,
+                      widths: widths,
+                    ),
                   ),
                 ],
               ),
@@ -1566,6 +1733,8 @@ class _PlexDataGridState<T> extends State<PlexDataGrid<T>> {
     required PlexDensity density,
     required List<PlexDataGridLine<T>> pageLines,
     required List<T> pageRows,
+    required List<PlexDataGridLine<T>> frozenLines,
+    required List<PlexDataGridLine<T>> scrollingLines,
     required List<double> widths,
     required int frozen,
   }) {
@@ -1583,6 +1752,9 @@ class _PlexDataGridState<T> extends State<PlexDataGrid<T>> {
     final double scrollWidth =
         scrollWidths.fold<double>(0, (double a, double b) => a + b);
 
+    // 2×2 freeze panes when [frozenLines] is non-empty: top-left locked,
+    // top-right scroll-x (with this pane's horizontal view), bottom-left
+    // scroll-y, bottom-right both. Vertical controllers stay synced.
     Widget pane({
       required ScrollController controller,
       required List<PlexDataGridColumn<T>> columns,
@@ -1602,51 +1774,32 @@ class _PlexDataGridState<T> extends State<PlexDataGrid<T>> {
             columns: columns,
             includeSelection: includeSelection,
           ),
+          if (frozenLines.isNotEmpty)
+            _buildFrozenRowBand(
+              theme: theme,
+              colors: colors,
+              density: density,
+              lines: frozenLines,
+              widths: paneWidths,
+              columns: columns,
+              includeSelection: includeSelection,
+              keyPrefix: keyPrefix,
+              leading: leading,
+            ),
           Expanded(
-            child: pageLines.isEmpty
-                ? _buildEmpty(theme, colors)
-                : ListView.builder(
-                    controller: controller,
-                    primary: false,
-                    itemCount: pageLines.length,
-                    itemExtent: _rowHeight(density),
-                    itemBuilder: (BuildContext context, int index) {
-                      final PlexDataGridLine<T> line = pageLines[index];
-                      if (line.isGroup) {
-                        return _buildGroupRow(
-                          theme: theme,
-                          colors: colors,
-                          density: density,
-                          line: line,
-                          widths: paneWidths,
-                          includeSelection: includeSelection,
-                          leading: leading,
-                        );
-                      }
-                      if (line.isSummary) {
-                        return _buildSummaryRow(
-                          theme: theme,
-                          colors: colors,
-                          density: density,
-                          line: line,
-                          widths: paneWidths,
-                          columns: columns,
-                          includeSelection: includeSelection,
-                          leading: leading,
-                        );
-                      }
-                      return _buildRow(
-                        theme: theme,
-                        colors: colors,
-                        density: density,
-                        row: line.row as T,
-                        widths: paneWidths,
-                        keyPrefix: keyPrefix,
-                        columns: columns,
-                        includeSelection: includeSelection,
-                      );
-                    },
-                  ),
+            child: _buildScrollingLines(
+              theme: theme,
+              colors: colors,
+              density: density,
+              pageLines: pageLines,
+              scrollingLines: scrollingLines,
+              widths: paneWidths,
+              controller: controller,
+              columns: columns,
+              includeSelection: includeSelection,
+              keyPrefix: keyPrefix,
+              leading: leading,
+            ),
           ),
         ],
       );
@@ -2191,8 +2344,9 @@ class _PlexDataGridState<T> extends State<PlexDataGrid<T>> {
           ? const <FontFeature>[FontFeature.tabularFigures()]
           : null,
     );
-    final bool canEdit =
-        custom == null && column.editable && widget.onCellEdited != null;
+    final bool canEdit = custom == null &&
+        column.editable &&
+        (widget.onCellEdited != null || widget.applyCellEdit != null);
     late final Widget content;
     if (custom != null) {
       content = custom;
@@ -2202,7 +2356,7 @@ class _PlexDataGridState<T> extends State<PlexDataGrid<T>> {
       void submit(String value) {
         if (submitted) return;
         submitted = true;
-        widget.onCellEdited?.call(row, column.id, value);
+        _commitCellEdit(row, column.id, value);
       }
 
       content = Focus(

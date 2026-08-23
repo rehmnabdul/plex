@@ -156,7 +156,7 @@ class PlexCalls {
         requestHeaders.addAll(standardHeaders);
       }
 
-      if (kDebugMode) print("DELETE Started: ${uri.toString()}");
+      if (kDebugMode) debugPrint("DELETE Started: ${uri.toString()}");
       final startTime = DateTime.now();
 
       if (body != null) {
@@ -173,7 +173,7 @@ class PlexCalls {
       }
 
       final diffInMillis = DateTime.now().difference(startTime).inMilliseconds;
-      if (kDebugMode) print("DELETE Completed: ${response.statusCode}: ${uri.toString()} in ${diffInMillis}ms");
+      if (kDebugMode) debugPrint("DELETE Completed: ${response.statusCode}: ${uri.toString()} in ${diffInMillis}ms");
 
       // Parse response
       if (response.statusCode >= 200 && response.statusCode < 300) {
@@ -188,7 +188,7 @@ class PlexCalls {
         return PlexApiResult(false, response.statusCode, response.body.isEmpty ? response.reasonPhrase ?? 'Error' : response.body, null);
       }
     } catch (e) {
-      if (kDebugMode) print("DELETE Error: ${e.toString()}");
+      if (kDebugMode) debugPrint("DELETE Error: ${e.toString()}");
       if (e is SocketException) {
         return PlexApiResult(false, 5002, 'Network Available But Unable To Connect With Server', null);
       }

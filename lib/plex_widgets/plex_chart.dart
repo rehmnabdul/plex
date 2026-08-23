@@ -18,6 +18,7 @@ enum PlexChartType {
   scatter,
   combo,
   heatmap,
+  trellis,
 }
 
 /// One plotted series.
@@ -33,8 +34,10 @@ class PlexChartSeries {
   final List<double> data;
   final Color? color;
 
-  /// Per-series mark for [PlexChartType.combo] (`bar` or `line`).
-  /// Null uses the combo default (first series bars, remaining series lines).
+  /// Per-series mark for [PlexChartType.combo] and [PlexChartType.trellis]
+  /// (`bar` or `line`).
+  /// Null uses the combo default (first series bars, remaining series lines)
+  /// or [PlexChart.trellisInnerType] inside a trellis facet.
   final PlexChartType? mark;
 }
 
@@ -44,10 +47,13 @@ const double _kPadT = 12;
 const double _kPadB = 8;
 const double _kBarRadius = 2;
 const int _kTickCount = 4;
+const double _kTrellisBreakpoint = 520;
+const double _kTrellisPaneMinH = 180;
+const double _kTrellisPaneMaxH = 200;
 
-/// Analytics chart (bar / line / pie / donut / scatter / combo / heatmap)
-/// in the enterprise-BI idiom: horizontal gridlines only, hairline weight,
-/// near-square bars.
+/// Analytics chart (bar / line / pie / donut / scatter / combo / heatmap /
+/// trellis) in the enterprise-BI idiom: horizontal gridlines only, hairline
+/// weight, near-square bars.
 class PlexChart extends StatelessWidget {
   const PlexChart({
     super.key,
@@ -55,12 +61,33 @@ class PlexChart extends StatelessWidget {
     required this.series,
     this.labels,
     this.height = 240,
-  });
+    this.trellis = false,
+    this.trellisInnerType = PlexChartType.bar,
+  }) : _hideLegend = false;
+
+  /// Nested facet pane: one series, no duplicate legend.
+  const PlexChart._pane({
+    required this.type,
+    required this.series,
+    this.labels,
+    required this.height,
+  })  : trellis = false,
+        trellisInnerType = PlexChartType.bar,
+        _hideLegend = true;
 
   final PlexChartType type;
   final List<PlexChartSeries> series;
   final List<String>? labels;
   final double height;
+
+  /// When true, facets one mini chart per series even if [type] is not
+  /// [PlexChartType.trellis].
+  final bool trellis;
+
+  /// Mark used inside each trellis facet when [PlexChartSeries.mark] is null.
+  final PlexChartType trellisInnerType;
+
+  final bool _hideLegend;
 
   static List<Color> _palette(PlexColorTokens colors) {
     return <Color>[
@@ -88,11 +115,30 @@ class PlexChart extends StatelessWidget {
     return series[index].color ?? palette[index % palette.length];
   }
 
+  bool get _isTrellis => type == PlexChartType.trellis || trellis;
+
+  double get _trellisPaneHeight =>
+      height.clamp(_kTrellisPaneMinH, _kTrellisPaneMaxH);
+
+  PlexChartType _facetType(PlexChartSeries s) {
+    if (s.mark == PlexChartType.bar || s.mark == PlexChartType.line) {
+      return s.mark!;
+    }
+    if (trellisInnerType == PlexChartType.trellis) {
+      return PlexChartType.bar;
+    }
+    return trellisInnerType;
+  }
+
   @override
   Widget build(BuildContext context) {
     final PlexColorTokens colors = PlexThemeData.of(context).colors;
     final List<Color> palette = _palette(colors);
     final bool empty = _isEmpty;
+
+    if (_isTrellis && series.isNotEmpty) {
+      return _buildTrellis(colors, palette);
+    }
 
     final List<Color> seriesColors = <Color>[
       for (int i = 0; i < series.length; i++) _seriesColor(colors, i),
@@ -178,7 +224,8 @@ class PlexChart extends StatelessWidget {
               ],
             ),
           ),
-        if (series.isNotEmpty || (labels != null && labels!.isNotEmpty)) ...[
+        if (!_hideLegend &&
+            (series.isNotEmpty || (labels != null && labels!.isNotEmpty))) ...[
           const SizedBox(height: PlexDim.small),
           _ChartLegend(
             colors: colors,
@@ -186,6 +233,53 @@ class PlexChart extends StatelessWidget {
           ),
         ],
       ],
+    );
+  }
+
+  Widget _buildTrellis(
+    PlexColorTokens colors,
+    List<Color> palette,
+  ) {
+    final double paneH = _trellisPaneHeight;
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        final double maxW = constraints.maxWidth;
+        final int columns =
+            maxW.isFinite && maxW >= _kTrellisBreakpoint ? 2 : 1;
+        const double gap = PlexDim.small;
+        final double paneW =
+            maxW.isFinite ? (maxW - gap * (columns - 1)) / columns : maxW;
+
+        return Wrap(
+          key: const Key('plex-chart-trellis'),
+          spacing: gap,
+          runSpacing: gap,
+          children: [
+            for (int i = 0; i < series.length; i++)
+              SizedBox(
+                key: Key('plex-chart-trellis-${series[i].name}'),
+                width: paneW.isFinite && paneW > 0 ? paneW : null,
+                child: _TrellisPane(
+                  colors: colors,
+                  title: series[i].name,
+                  child: PlexChart._pane(
+                    type: _facetType(series[i]),
+                    series: <PlexChartSeries>[
+                      PlexChartSeries(
+                        name: series[i].name,
+                        data: series[i].data,
+                        color: series[i].color ?? palette[i % palette.length],
+                        mark: series[i].mark,
+                      ),
+                    ],
+                    labels: labels,
+                    height: paneH,
+                  ),
+                ),
+              ),
+          ],
+        );
+      },
     );
   }
 
@@ -289,6 +383,55 @@ int _categoryCount(List<PlexChartSeries> series, List<String>? labels) {
     if (s.data.length > n) n = s.data.length;
   }
   return n;
+}
+
+class _TrellisPane extends StatelessWidget {
+  const _TrellisPane({
+    required this.colors,
+    required this.title,
+    required this.child,
+  });
+
+  final PlexColorTokens colors;
+  final String title;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: colors.surfaceCard,
+        border: Border.all(color: colors.borderSubtle),
+        borderRadius: BorderRadius.circular(PlexRadius.md),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(
+          PlexDim.small,
+          PlexDim.small,
+          PlexDim.small,
+          PlexDim.smallest,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              title,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: colors.textSecondary,
+                fontSize: PlexFontSize.small,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: PlexDim.mini),
+            child,
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 class _ChartLegend extends StatelessWidget {

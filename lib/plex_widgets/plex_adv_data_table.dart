@@ -302,6 +302,7 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
                 },
           actions: _actions(context),
           frozenColumnCount: widget.freezeColumns,
+          frozenRowCount: widget.freezeRows,
         );
       },
     );

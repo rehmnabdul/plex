@@ -24,6 +24,7 @@ class _UiKitCalendarScreenState extends State<UiKitCalendarScreen> {
       end: DateTime(2026, 8, 3, 9, 30),
       title: 'Planning standup',
       color: Color(0xFF2563EB),
+      recurrence: PlexCalendarRecurrence.daily(count: 5),
     ),
     PlexCalendarEvent(
       id: 'aug-vendor',
@@ -126,6 +127,10 @@ class _UiKitCalendarScreenState extends State<UiKitCalendarScreen> {
                 events: _events,
                 onSelected: (date) => setState(() => _selected = date),
                 onEventTap: (event) => setState(() => _lastEvent = event.title),
+                onEventMoved: (event) => setState(() =>
+                    _lastEvent = '${event.title} → ${event.start}'),
+                onEventResized: (event) => setState(() =>
+                    _lastEvent = '${event.title} ends ${event.end}'),
               ),
               const SizedBox(height: PlexDim.medium),
               Text(

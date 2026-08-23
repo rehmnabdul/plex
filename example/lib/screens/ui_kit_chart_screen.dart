@@ -128,6 +128,17 @@ class UiKitChartScreen extends StatelessWidget {
             height: 180,
           ),
         ),
+        const SizedBox(height: PlexDim.large),
+        const ExampleSectionTitle("Trellis"),
+        const ExampleCard(
+          title: "Units by series",
+          child: PlexChart(
+            type: PlexChartType.trellis,
+            series: [_units, _returns],
+            labels: _labels,
+            height: 200,
+          ),
+        ),
       ],
     );
   }

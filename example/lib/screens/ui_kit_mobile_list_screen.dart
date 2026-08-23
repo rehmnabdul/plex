@@ -4,6 +4,7 @@ import 'package:plex/plex_utils/plex_dimensions.dart';
 import 'package:plex/plex_utils/plex_messages.dart';
 import 'package:plex/plex_widgets/plex_badge.dart';
 import 'package:plex/plex_widgets/plex_mobile_list.dart';
+import 'package:plex/plex_widgets/plex_mobile_tally.dart';
 import 'package:plex_app/screens/example_chrome.dart';
 
 class UiKitMobileListScreen extends StatefulWidget {
@@ -86,6 +87,17 @@ class _UiKitMobileListScreenState extends State<UiKitMobileListScreen> {
             onIncrement: (item) => _bump(item, 1),
             onDecrement: (item) => _bump(item, -1),
             onTap: (item) => context.showMessage(item.title, title: "SKU"),
+          ),
+        ),
+        const SizedBox(height: PlexDim.medium),
+        ExampleCard(
+          title: "PlexMobileTally",
+          subtitle: "Same lines plus scan / typed code",
+          child: PlexMobileTally(
+            enableScanner: false,
+            items: _items(),
+            onIncrement: (item) => _bump(item, 1),
+            onDecrement: (item) => _bump(item, -1),
           ),
         ),
       ],

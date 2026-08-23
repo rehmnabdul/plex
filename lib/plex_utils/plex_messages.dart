@@ -126,13 +126,13 @@ extension SnackBarUtils on BuildContext {
       dragToClose: true,
       applyBlurEffect: true,
       callbacks: ToastificationCallbacks(
-        onTap: (toastItem) => print('Toast ${toastItem.id} tapped'),
+        onTap: (toastItem) => debugPrint('Toast ${toastItem.id} tapped'),
         onCloseButtonTap: (toastItem) {
-          print('Toast ${toastItem.id} close button tapped');
+          debugPrint('Toast ${toastItem.id} close button tapped');
           toastification.dismissById(toastItem.id);
         },
-        onAutoCompleteCompleted: (toastItem) => print('Toast ${toastItem.id} auto complete completed'),
-        onDismissed: (toastItem) => print('Toast ${toastItem.id} dismissed'),
+        onAutoCompleteCompleted: (toastItem) => debugPrint('Toast ${toastItem.id} auto complete completed'),
+        onDismissed: (toastItem) => debugPrint('Toast ${toastItem.id} dismissed'),
       ),
     ).id;
   }
@@ -240,13 +240,13 @@ extension SnackBarUtilsOnObject on Object {
       dragToClose: true,
       applyBlurEffect: true,
       callbacks: ToastificationCallbacks(
-        onTap: (toastItem) => print('Toast ${toastItem.id} tapped'),
+        onTap: (toastItem) => debugPrint('Toast ${toastItem.id} tapped'),
         onCloseButtonTap: (toastItem) {
-          print('Toast ${toastItem.id} close button tapped');
+          debugPrint('Toast ${toastItem.id} close button tapped');
           toastification.dismissById(toastItem.id);
         },
-        onAutoCompleteCompleted: (toastItem) => print('Toast ${toastItem.id} auto complete completed'),
-        onDismissed: (toastItem) => print('Toast ${toastItem.id} dismissed'),
+        onAutoCompleteCompleted: (toastItem) => debugPrint('Toast ${toastItem.id} auto complete completed'),
+        onDismissed: (toastItem) => debugPrint('Toast ${toastItem.id} dismissed'),
       ),
     ).id;
   }

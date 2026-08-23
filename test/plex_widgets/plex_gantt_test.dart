@@ -35,4 +35,34 @@ void main() {
     expect(find.byType(PlexChartGant), findsOneWidget);
     expect(find.text('Design'), findsOneWidget);
   });
+
+  testWidgets('task with progress 0.5 builds', (tester) async {
+    final DateTime now = DateTime.now();
+    await tester.pumpWidget(
+      _wrap(
+        SizedBox(
+          width: 800,
+          height: 240,
+          child: PlexChartGant(
+            tasks: [
+              GantTask(
+                id: '2',
+                title: 'Build',
+                start: now.subtract(const Duration(hours: 1)),
+                end: now.add(const Duration(hours: 1)),
+                color: Colors.green,
+                progress: 0.5,
+              ),
+            ],
+            chartStart: now.subtract(const Duration(hours: 2)),
+            chartEnd: now.add(const Duration(hours: 2)),
+          ),
+        ),
+      ),
+    );
+
+    expect(find.byType(PlexChartGant), findsOneWidget);
+    expect(find.text('Build'), findsOneWidget);
+    expect(find.byKey(const Key('plex-gantt-now')), findsOneWidget);
+  });
 }

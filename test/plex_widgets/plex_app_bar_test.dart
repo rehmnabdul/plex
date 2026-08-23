@@ -91,5 +91,53 @@ void main() {
     expect(bar.preferredSize.height, PlexLayout.topbarHeight);
     expect(find.text('Home Screen Title'), findsWidgets);
     expect(find.text('DashBody'), findsOneWidget);
+
+    final Scaffold scaffold = tester.widget<Scaffold>(find.byType(Scaffold));
+    expect(scaffold.appBar, isA<PlexAppBar>());
+    expect(scaffold.appBar, same(bar));
+  });
+
+  testWidgets('dashboard overflow menu keeps theme actions without Material 3',
+      (tester) async {
+    PlexApp(
+      appInfo: PlexAppInfo(
+        title: 'Test App',
+        appLogo: const Text('AppLogo'),
+        initialRoute: '/home',
+        versionName: 'v1.0.0',
+      ),
+      dashboardConfig: PlexDashboardConfig(
+        dashboardScreens: [
+          PlexRoute(
+            route: '/home',
+            title: 'Home Screen Title',
+            screen: (context, {data}) => const Text('DashBody'),
+          ),
+        ],
+      ),
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ThemeData(
+          useMaterial3: true,
+          extensions: <ThemeExtension<dynamic>>[PlexThemeData.fallback()],
+        ),
+        home: PlexDashboardScreen((ThemeMode mode) {}, () {}),
+      ),
+    );
+    await tester.pump();
+
+    await tester.tap(find.byIcon(Icons.more_vert));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Animations'), findsOneWidget);
+    expect(find.text('Theme'), findsOneWidget);
+    expect(find.text('Material 3'), findsNothing);
+    expect(find.textContaining('Version: v1.0.0'), findsWidgets);
+
+    await tester.tap(find.text('Theme'));
+    await tester.pumpAndSettle();
+    expect(find.text('Brightness Mode'), findsOneWidget);
   });
 }

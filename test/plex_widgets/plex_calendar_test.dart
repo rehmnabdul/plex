@@ -140,4 +140,93 @@ void main() {
     );
     expect(find.byType(PlexCalendar), findsOneWidget);
   });
+
+  test('daily recurrence expand yields three occurrences', () {
+    final PlexCalendarEvent event = PlexCalendarEvent(
+      id: 'standup',
+      start: DateTime(2026, 8, 15, 9),
+      title: 'Line A standup',
+      recurrence: PlexCalendarRecurrence.daily(count: 3),
+    );
+    final List<PlexCalendarEvent> expanded = PlexCalendarRecurrence.expand(
+      event,
+      rangeStart: DateTime(2026, 8, 1),
+      rangeEnd: DateTime(2026, 8, 31),
+    );
+
+    expect(expanded, hasLength(3));
+    expect(
+      expanded
+          .map((PlexCalendarEvent e) =>
+              DateTime(e.start.year, e.start.month, e.start.day))
+          .toList(),
+      <DateTime>[
+        DateTime(2026, 8, 15),
+        DateTime(2026, 8, 16),
+        DateTime(2026, 8, 17),
+      ],
+    );
+  });
+
+  testWidgets('recurring event appears more than once in August 2026',
+      (tester) async {
+    await tester.pumpWidget(
+      _wrap(
+        SizedBox(
+          width: 900,
+          height: 800,
+          child: PlexCalendar(
+            focusedMonth: DateTime(2026, 8, 1),
+            view: PlexCalendarView.agenda,
+            events: [
+              PlexCalendarEvent(
+                id: 'standup',
+                start: DateTime(2026, 8, 15, 9),
+                title: 'Line A standup',
+                recurrence: PlexCalendarRecurrence.daily(count: 3),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    expect(find.text('Line A standup'), findsAtLeastNWidgets(2));
+  });
+
+  testWidgets('dragging week event calls onEventMoved', (tester) async {
+    PlexCalendarEvent? moved;
+    await tester.pumpWidget(
+      _wrap(
+        SizedBox(
+          width: 900,
+          height: 800,
+          child: PlexCalendar(
+            focusedMonth: DateTime(2026, 8, 1),
+            selected: DateTime(2026, 8, 15),
+            view: PlexCalendarView.week,
+            onEventMoved: (PlexCalendarEvent event) => moved = event,
+            events: [
+              PlexCalendarEvent(
+                id: '1',
+                start: DateTime(2026, 8, 15, 9),
+                title: 'Line A standup',
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    final Finder eventFinder = find.byKey(const Key('plex-cal-event-1'));
+    expect(eventFinder, findsOneWidget);
+    final TestGesture gesture =
+        await tester.startGesture(tester.getCenter(eventFinder));
+    await tester.pump(const Duration(milliseconds: 400));
+    await gesture.moveBy(const Offset(160, 0));
+    await tester.pump();
+    await gesture.up();
+    await tester.pumpAndSettle();
+    expect(moved, isNotNull);
+  });
 }

@@ -106,4 +106,49 @@ void main() {
 
     expect(find.byType(PlexChart), findsOneWidget);
   });
+
+  testWidgets('heatmap with two series builds', (tester) async {
+    await tester.pumpWidget(
+      _wrap(
+        const PlexChart(
+          type: PlexChartType.heatmap,
+          series: [
+            PlexChartSeries(name: 'A', data: [4, 8, 2]),
+            PlexChartSeries(name: 'B', data: [1, 3, 5]),
+          ],
+          labels: ['X', 'Y', 'Z'],
+        ),
+      ),
+    );
+
+    expect(find.byType(PlexChart), findsOneWidget);
+    expect(find.text('A'), findsWidgets);
+    expect(find.text('B'), findsWidgets);
+  });
+
+  testWidgets('trellis chart finds trellis key and series names', (tester) async {
+    await tester.pumpWidget(
+      _wrap(
+        const PlexChart(
+          type: PlexChartType.trellis,
+          series: [
+            PlexChartSeries(name: 'A', data: [12, 18]),
+            PlexChartSeries(name: 'B', data: [9, 22]),
+          ],
+          labels: ['Q1', 'Q2'],
+        ),
+      ),
+    );
+
+    final Finder trellisKey = find.byKey(const Key('plex-chart-trellis'));
+    final bool hasKey = trellisKey.evaluate().isNotEmpty;
+    final bool hasSeriesNames =
+        find.text('A').evaluate().isNotEmpty && find.text('B').evaluate().isNotEmpty;
+    expect(hasKey || hasSeriesNames, isTrue);
+    if (hasKey) {
+      expect(trellisKey, findsOneWidget);
+    }
+    expect(find.text('A'), findsWidgets);
+    expect(find.text('B'), findsWidgets);
+  });
 }

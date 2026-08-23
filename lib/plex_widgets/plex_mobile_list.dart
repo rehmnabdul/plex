@@ -12,6 +12,7 @@ class PlexMobileTallyItem {
     this.subtitle,
     this.qty = 0,
     this.unit,
+    this.barcode,
   });
 
   final String id;
@@ -19,6 +20,9 @@ class PlexMobileTallyItem {
   final String? subtitle;
   final int qty;
   final String? unit;
+
+  /// Optional scan code. Default [PlexMobileTally] matching uses [id] or this.
+  final String? barcode;
 }
 
 /// Dense shop-floor tally list (title, qty, +/−).

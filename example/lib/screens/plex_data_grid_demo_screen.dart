@@ -59,8 +59,9 @@ class PlexDataGridDemoScreen extends StatelessWidget {
       child: PlexDataGrid<_DemoEmployee>(
         title: 'Employees',
         subtitle:
-            'Freeze first column, edit First, filters: contains/equals/startsWith/gt/lt',
+            'Freeze first column and first data row, edit First, filters: contains/equals/startsWith/gt/lt',
         frozenColumnCount: 1,
+        frozenRowCount: 1,
         onCellEdited: (_DemoEmployee row, String columnId, String value) {},
         selectionMode: PlexDataGridSelectionMode.multiple,
         pageSize: 10,

@@ -1,3 +1,19 @@
+## 2.0.1-beta.13
+
+### Backlog remainder — trellis, frozen rows, mutation, calendar drag, Gantt, Excel
+- Chart: `PlexChartType.trellis` (or `trellis: true`) small-multiples; `trellisInnerType` defaults to bar
+- DataGrid: `frozenRowCount` (2×2 panes with `frozenColumnCount`); `applyCellEdit` + `onRowsChanged` after `onCellEdited`
+- Calendar: `PlexCalendarRecurrence.daily` / `.weekly` and `PlexCalendarRecurrence.expand`; `onEventMoved` / `onEventResized`
+- Gantt rewrite: sticky labels, pan/zoom (`enablePanZoom`), now line (`showNowLine`), `GantTask.dependsOn`; public `GantTask` / `PlexChartGant` / `PlexGanttChart` unchanged
+- Mobile: `PlexMobileTally` scan/typed increment; `PlexMobileTallyItem.barcode`
+- Excel: removed `syncfusion_flutter_xlsio`; `PlexPrinter.buildExcelBytes` / `printExcel` use `archive` + `PlexXlsx`
+- Dashboard: `buildAppBar()` returns `PlexAppBar` (no dead `return null`); Material 2 switch hidden
+- Analyzer: `print` → `debugPrint` in utils, rx, messages, networking
+
+### Docs and example
+- README, CHANGELOG, and example README pin `2.0.1-beta.13`
+- Widget tests for trellis, frozen rows, calendar recurrence/drag, Gantt rewrite, `PlexMobileTally`, and Excel via `archive`
+
 ## 2.0.1-beta.12
 
 ### Backlog 2–5 — wizard, charts, calendar, DataGrid, and kits
@@ -7,7 +23,7 @@
 - DataGrid: `frozenColumnCount`, `PlexDataGridColumn.editable` + `onCellEdited`, filter match `startsWith` / `greaterThan` / `lessThan`. `PlexAdvanceDataTable` maps `freezeColumns`
 - Kits: `PlexLookup`, `PlexTag` / `PlexTagInput` (not `PlexBadge`), `PlexMobileList` / `PlexMobileTallyItem`, Gantt `progress` / `onTaskTap`, and `typedef PlexGanttChart = PlexChartGant`
 - Housekeeping: unused imports and small analyzer cleanups. Existing constructors still work
-- Still deferred: trellis charts, frozen rows, in-grid row mutation, xlsio replacement, recurrence/drag calendar
+- Still deferred in this tag: trellis, frozen rows, in-grid mutation, xlsio, recurrence/drag (shipped in **2.0.1-beta.13**)
 
 ### Docs and example
 - README, CHANGELOG, and example README pin `2.0.1-beta.12`

@@ -279,10 +279,6 @@ class PlexTheme {
     }
     extensions.add(merged);
     ThemeData result = base.copyWith(
-      // copyWith.useMaterial3 is deprecated; ThemeData constructors set M3.
-      // We still force M3 onto appTheme overlays so this flag cannot revive M2.
-      // ignore: deprecated_member_use
-      useMaterial3: true,
       extensions: extensions,
     );
     if (PlexTheme.appTextTheme != null) {

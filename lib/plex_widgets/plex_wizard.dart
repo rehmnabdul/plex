@@ -286,12 +286,15 @@ class _PlexWizardRailTap extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (!enabled) return child;
-    return InkWell(
+    final Widget keyed = KeyedSubtree(
       key: Key('plex-wizard-step-$index'),
+      child: child,
+    );
+    if (!enabled) return keyed;
+    return InkWell(
       onTap: () => onTap(index),
       borderRadius: BorderRadius.circular(PlexRadius.md),
-      child: child,
+      child: keyed,
     );
   }
 }

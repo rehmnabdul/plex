@@ -34,6 +34,11 @@ export 'plex_widgets/plex_dashboard_widgets.dart';
 export 'plex_widgets/plex_wizard.dart';
 export 'plex_widgets/plex_chart.dart';
 export 'plex_widgets/plex_calendar.dart';
+export 'plex_widgets/plex_lookup.dart';
+export 'plex_widgets/plex_tag.dart';
+export 'plex_widgets/plex_mobile_list.dart';
+export 'plex_widgets/plex_data_grid.dart';
+export 'plex_charts/plex_chart_gant.dart';
 
 part 'plex_screens/plex_dashboard_screen.dart';
 

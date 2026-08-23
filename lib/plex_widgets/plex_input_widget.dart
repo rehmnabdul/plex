@@ -50,7 +50,7 @@ class PlexInputWidget<T> extends StatefulWidget {
     this.dropdownAsyncItems,
     this.dropdownItemWidget,
     this.dropdownOnSearch,
-    this.dropdownItemAsString,
+    String Function(dynamic item)? dropdownItemAsString,
     this.dropdownItemOnSelect,
     this.dropdownSelectionController,
     this.multiSelectionController,
@@ -63,7 +63,8 @@ class PlexInputWidget<T> extends StatefulWidget {
     this.buttonClick,
     this.buttonEnabled = true,
     this.noDataText = "N/A",
-  });
+  }) : dropdownItemAsString =
+            dropdownItemAsString ?? ((item) => item.toString());
 
   final String? title;
   final PlexInputWidgetType type;
@@ -89,9 +90,8 @@ class PlexInputWidget<T> extends StatefulWidget {
   final Widget Function(dynamic item)? dropDownLeadingIcon;
   final Future<List<dynamic>>? dropdownAsyncItems;
   final Widget Function(dynamic item)? dropdownItemWidget;
-  final bool Function(String query, dynamic item)? dropdownOnSearch;
-  String Function(dynamic item)? dropdownItemAsString =
-      (item) => item.toString();
+  final   bool Function(String query, dynamic item)? dropdownOnSearch;
+  final String Function(dynamic item)? dropdownItemAsString;
   final Function(dynamic item)? dropdownItemOnSelect;
   final Function? dropdownCustomOnTap;
 
@@ -155,7 +155,7 @@ class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
         onChanged: (c) {
           widget.inputOnChange?.call(c.toString());
         },
-        focusNode: widget?.inputFocusNode,
+        focusNode: widget.inputFocusNode,
         obscureText: widget.isPassword,
         decoration: InputDecoration(
           border: OutlineInputBorder(
@@ -358,6 +358,7 @@ class _PlexInputWidgetState<T> extends State<PlexInputWidget> {
                             lastDate: DateTime(5000, 12, 31),
                             useRootNavigator: true,
                           ).then((selectedDate) {
+                            if (!context.mounted) return;
                             if (selectedDate != null) {
                               showTimePicker(
                                 context: context,

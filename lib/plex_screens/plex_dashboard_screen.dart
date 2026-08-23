@@ -530,8 +530,9 @@ class _PlexDashboardScreenState extends PlexState<PlexDashboardScreen> {
   @override
   Widget? buildBottomNavigation() {
     if (PlexApp.app.dashboardConfig!.disableBottomNavigation) return null;
-    if (!smallScreen || (PlexApp.app.dashboardConfig!._routes.length) <= 1)
+    if (!smallScreen || (PlexApp.app.dashboardConfig!._routes.length) <= 1) {
       return null;
+    }
     return NavigationBar(
       selectedIndex: navigationSelectedIndex.first > maxBottomNavDestinations
           ? maxBottomNavDestinations

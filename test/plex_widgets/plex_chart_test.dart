@@ -76,6 +76,29 @@ void main() {
     expect(find.byType(PlexChart), findsOneWidget);
   });
 
+  testWidgets('donut scatter combo heatmap build', (tester) async {
+    for (final PlexChartType type in <PlexChartType>[
+      PlexChartType.donut,
+      PlexChartType.scatter,
+      PlexChartType.combo,
+      PlexChartType.heatmap,
+    ]) {
+      await tester.pumpWidget(
+        _wrap(
+          PlexChart(
+            type: type,
+            series: const [
+              PlexChartSeries(name: 'A', data: [4, 8, 2]),
+              PlexChartSeries(name: 'B', data: [1, 3, 5]),
+            ],
+            labels: const ['X', 'Y', 'Z'],
+          ),
+        ),
+      );
+      expect(find.byType(PlexChart), findsOneWidget);
+    }
+  });
+
   testWidgets('empty series builds without throwing', (tester) async {
     await tester.pumpWidget(
       _wrap(const PlexChart(series: [])),

@@ -23,7 +23,7 @@ class UiKitChartScreen extends StatelessWidget {
         ExampleCard(
           title: "PlexChart",
           subtitle:
-              "Bar, line, and pie. CustomPaint — not a Gantt replacement.",
+              "Bar, line, pie, donut, scatter, combo, and heatmap. CustomPaint — not a Gantt replacement.",
           actions: const PlexBadge(label: "Phase 7", tone: PlexBadgeTone.info),
           child: Text(
             "Gantt stays under Charts at /gantt-demo. Tokens come from PlexThemeData.",
@@ -64,6 +64,68 @@ class UiKitChartScreen extends StatelessWidget {
               PlexChartSeries(name: "Pack", data: [25]),
             ],
             height: 240,
+          ),
+        ),
+        const SizedBox(height: PlexDim.large),
+        const ExampleSectionTitle("Donut"),
+        const ExampleCard(
+          title: "Mix by line",
+          child: PlexChart(
+            type: PlexChartType.donut,
+            series: [
+              PlexChartSeries(name: "Cut", data: [40]),
+              PlexChartSeries(name: "Sew", data: [35]),
+              PlexChartSeries(name: "Pack", data: [25]),
+            ],
+            height: 240,
+          ),
+        ),
+        const SizedBox(height: PlexDim.large),
+        const ExampleSectionTitle("Scatter"),
+        const ExampleCard(
+          title: "Units vs returns",
+          child: PlexChart(
+            type: PlexChartType.scatter,
+            series: [_units, _returns],
+            labels: _labels,
+            height: 240,
+          ),
+        ),
+        const SizedBox(height: PlexDim.large),
+        const ExampleSectionTitle("Combo"),
+        const ExampleCard(
+          title: "Units vs returns",
+          child: PlexChart(
+            type: PlexChartType.combo,
+            series: [
+              PlexChartSeries(
+                name: "Units",
+                data: [12, 18, 9, 22, 15],
+                mark: PlexChartType.bar,
+              ),
+              PlexChartSeries(
+                name: "Returns",
+                data: [2, 1, 4, 3, 2],
+                mark: PlexChartType.line,
+              ),
+            ],
+            labels: _labels,
+            height: 240,
+          ),
+        ),
+        const SizedBox(height: PlexDim.large),
+        const ExampleSectionTitle("Heatmap"),
+        const ExampleCard(
+          title: "Shift load",
+          child: PlexChart(
+            type: PlexChartType.heatmap,
+            series: [
+              PlexChartSeries(name: "Cut", data: [2, 5, 8, 3, 6]),
+              PlexChartSeries(name: "Sew", data: [4, 7, 3, 9, 5]),
+              PlexChartSeries(name: "Pack", data: [1, 3, 6, 4, 8]),
+            ],
+            labels: _labels,
+            height: 180,
           ),
         ),
       ],

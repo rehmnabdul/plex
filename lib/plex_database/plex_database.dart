@@ -2,7 +2,6 @@ import 'package:path_provider/path_provider.dart';
 import 'package:plex/plex_database/plex_collection.dart';
 import 'package:plex/plex_database/plex_entity.dart';
 import 'package:plex/plex_database/plex_entity_collection.dart';
-import 'package:sembast/sembast.dart';
 import 'package:sembast/sembast_io.dart';
 
 class PlexDbConfig {

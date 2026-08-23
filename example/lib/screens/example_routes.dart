@@ -22,6 +22,8 @@ class Routes {
   static const uiWizard = "/ui-wizard";
   static const uiChart = "/ui-chart";
   static const uiCalendar = "/ui-calendar";
+  static const uiLookupTags = "/ui-lookup-tags";
+  static const uiMobileList = "/ui-mobile-list";
   static const autocompleteSample = "newPath1";
   static const logoRouteSample = "newPath2";
 }

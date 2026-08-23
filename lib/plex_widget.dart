@@ -51,20 +51,20 @@ class PlexWidgetController<T> extends ChangeNotifier {
 
   ///If Data is of type int, double, float or any num, you can increment (default 1)
   void increment({num increment = 1}) {
-    var oldData = this.data;
-    this.data = ((this.data as num) + increment) as T?;
+    var oldData = data;
+    data = ((data as num) + increment) as T?;
     if (isDisposed) return;
     notifyListeners();
-    onUpdate?.call(oldData, this.data);
+    onUpdate?.call(oldData, data);
   }
 
   ///If Data is of type int, double, float or any num, you can decrement (default 1)
   void decrement({num decrement = 1}) {
-    var oldData = this.data;
-    this.data = ((this.data as num) - decrement) as T?;
+    var oldData = data;
+    data = ((data as num) - decrement) as T?;
     if (isDisposed) return;
     notifyListeners();
-    onUpdate?.call(oldData, this.data);
+    onUpdate?.call(oldData, data);
   }
 
   @override

@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
@@ -27,10 +26,11 @@ class PlexSuccess<T> extends PlexApiResponse<T> {
     if (body == null || body == "") {
       response = null;
     } else {
+      final String text = body;
       try {
-        response = jsonDecode(body!);
+        response = jsonDecode(text);
       } catch (e) {
-        response = body!.toString();
+        response = text.toString();
       }
     }
   }

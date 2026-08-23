@@ -59,7 +59,9 @@ class PlexDataGridDemoScreen extends StatelessWidget {
       child: PlexDataGrid<_DemoEmployee>(
         title: 'Employees',
         subtitle:
-            'Sort, search, column filters, grouping, CSV / Excel / PDF',
+            'Freeze first column, edit First, filters: contains/equals/startsWith/gt/lt',
+        frozenColumnCount: 1,
+        onCellEdited: (_DemoEmployee row, String columnId, String value) {},
         selectionMode: PlexDataGridSelectionMode.multiple,
         pageSize: 10,
         rowId: (_DemoEmployee row) => row.id,
@@ -98,6 +100,7 @@ class PlexDataGridDemoScreen extends StatelessWidget {
           PlexDataGridColumn<_DemoEmployee>(
             id: 'first',
             title: 'First',
+            editable: true,
             value: (_DemoEmployee row) => row.first,
           ),
           PlexDataGridColumn<_DemoEmployee>(

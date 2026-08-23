@@ -32,6 +32,8 @@ import 'package:plex_app/screens/ui_kit_chart_screen.dart';
 import 'package:plex_app/screens/ui_kit_dashboard_widgets_screen.dart';
 import 'package:plex_app/screens/ui_kit_tabs_screen.dart';
 import 'package:plex_app/screens/ui_kit_theme_screen.dart';
+import 'package:plex_app/screens/ui_kit_lookup_tags_screen.dart';
+import 'package:plex_app/screens/ui_kit_mobile_list_screen.dart';
 import 'package:plex_app/screens/ui_kit_wizard_screen.dart';
 
 export 'package:plex_app/screens/example_routes.dart';
@@ -335,6 +337,26 @@ void main() async {
           logo: const Icon(Icons.calendar_month_outlined),
           selectedLogo: const Icon(Icons.calendar_month),
           screen: (context, {data}) => const UiKitCalendarScreen(),
+        ),
+        PlexRoute(
+          route: Routes.uiLookupTags,
+          category: "Design system",
+          title: "Lookup & tags",
+          shortTitle: "Lookup",
+          tag: "8",
+          logo: const Icon(Icons.search_outlined),
+          selectedLogo: const Icon(Icons.search),
+          screen: (context, {data}) => const UiKitLookupTagsScreen(),
+        ),
+        PlexRoute(
+          route: Routes.uiMobileList,
+          category: "Design system",
+          title: "Mobile tally",
+          shortTitle: "Tally",
+          tag: "8",
+          logo: const Icon(Icons.playlist_add_check_outlined),
+          selectedLogo: const Icon(Icons.playlist_add_check),
+          screen: (context, {data}) => const UiKitMobileListScreen(),
         ),
         PlexRoute(
           route: Routes.dataGridScreen,

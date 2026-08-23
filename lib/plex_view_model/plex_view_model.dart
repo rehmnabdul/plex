@@ -4,7 +4,7 @@ import 'package:plex/plex_screens/plex_screen.dart';
 import 'package:plex/plex_screens/plex_view.dart';
 
 ///When extend PlexViewModel use your PlexScreen and PlexState like this:
-///class MyViewModel extends PlexViewModel<MyPlexScreen, MyPlexScreenState> {
+///class MyViewModel extends `PlexViewModel<MyPlexScreen, MyPlexScreenState>` {
 ///}
 class PlexViewModel<Sc extends PlexScreen, St extends PlexState<Sc>> {
   St? _state;
@@ -27,7 +27,7 @@ class PlexViewModel<Sc extends PlexScreen, St extends PlexState<Sc>> {
   }
 
   ///Set the State of Screen on Init
-  setState(St state) => this._state = state;
+  setState(St state) => _state = state;
 
   showLoading() {
     state?.showLoading();
@@ -73,7 +73,7 @@ class PlexViewViewModel<Sc extends PlexView, St extends PlexViewState<Sc>> {
   }
 
   ///Set the State of Screen on Init
-  setState(St state) => this._state = state;
+  setState(St state) => _state = state;
 
   showLoading() {
     state?.showLoading();

@@ -14,6 +14,10 @@ enum PlexChartType {
   bar,
   line,
   pie,
+  donut,
+  scatter,
+  combo,
+  heatmap,
 }
 
 /// One plotted series.
@@ -22,11 +26,16 @@ class PlexChartSeries {
     required this.name,
     required this.data,
     this.color,
+    this.mark,
   });
 
   final String name;
   final List<double> data;
   final Color? color;
+
+  /// Per-series mark for [PlexChartType.combo] (`bar` or `line`).
+  /// Null uses the combo default (first series bars, remaining series lines).
+  final PlexChartType? mark;
 }
 
 const double _kPadL = 44;
@@ -36,8 +45,9 @@ const double _kPadB = 8;
 const double _kBarRadius = 2;
 const int _kTickCount = 4;
 
-/// Analytics chart (bar / line / pie) in the enterprise-BI idiom:
-/// horizontal gridlines only, hairline weight, near-square bars.
+/// Analytics chart (bar / line / pie / donut / scatter / combo / heatmap)
+/// in the enterprise-BI idiom: horizontal gridlines only, hairline weight,
+/// near-square bars.
 class PlexChart extends StatelessWidget {
   const PlexChart({
     super.key,
@@ -91,14 +101,23 @@ class PlexChart extends StatelessWidget {
     final CustomPainter painter;
     if (empty) {
       painter = _PlexEmptyChartPainter(grid: colors.borderSubtle);
-    } else if (type == PlexChartType.pie) {
+    } else if (type == PlexChartType.pie || type == PlexChartType.donut) {
       painter = _PlexPiePainter(
         values: _pieValues(),
         sliceColors: _pieColors(palette, seriesColors),
+        holeColor: type == PlexChartType.donut ? colors.surfaceCard : null,
+      );
+    } else if (type == PlexChartType.heatmap) {
+      painter = _PlexHeatmapPainter(
+        series: series,
+        categoryCount: _categoryCount(series, labels),
+        lo: colors.surfaceSunken,
+        hi: colors.brandPrimary,
+        tick: colors.textMuted,
       );
     } else {
       painter = _PlexCartesianPainter(
-        isBar: type == PlexChartType.bar,
+        marks: _plotMarks(),
         series: series,
         seriesColors: seriesColors,
         categoryCount: _categoryCount(series, labels),
@@ -133,7 +152,7 @@ class PlexChart extends StatelessWidget {
                 : const SizedBox.expand(),
           ),
         ),
-        if (type != PlexChartType.pie && labels != null && labels!.isNotEmpty)
+        if (!_isRadial && labels != null && labels!.isNotEmpty)
           Padding(
             padding: const EdgeInsets.only(
               left: _kPadL,
@@ -197,7 +216,7 @@ class PlexChart extends StatelessWidget {
     List<Color> palette,
     List<Color> seriesColors,
   ) {
-    if (type == PlexChartType.pie) {
+    if (_isRadial) {
       if (_pieFromSeries || (labels == null || labels!.isEmpty)) {
         return <({Color color, String name})>[
           for (int i = 0; i < series.length; i++)
@@ -233,7 +252,36 @@ class PlexChart extends StatelessWidget {
         (color: seriesColors[i], name: series[i].name),
     ];
   }
+
+  bool get _isRadial =>
+      type == PlexChartType.pie || type == PlexChartType.donut;
+
+  List<_PlotMark> _plotMarks() {
+    switch (type) {
+      case PlexChartType.line:
+        return List<_PlotMark>.filled(series.length, _PlotMark.line);
+      case PlexChartType.scatter:
+        return List<_PlotMark>.filled(series.length, _PlotMark.scatter);
+      case PlexChartType.combo:
+        final bool allNull =
+            series.every((PlexChartSeries s) => s.mark == null);
+        if (allNull) {
+          return <_PlotMark>[
+            for (int i = 0; i < series.length; i++)
+              i == 0 ? _PlotMark.bar : _PlotMark.line,
+          ];
+        }
+        return <_PlotMark>[
+          for (final PlexChartSeries s in series)
+            s.mark == PlexChartType.line ? _PlotMark.line : _PlotMark.bar,
+        ];
+      default:
+        return List<_PlotMark>.filled(series.length, _PlotMark.bar);
+    }
+  }
 }
+
+enum _PlotMark { bar, line, scatter }
 
 int _categoryCount(List<PlexChartSeries> series, List<String>? labels) {
   int n = labels?.length ?? 0;
@@ -313,7 +361,7 @@ class _PlexEmptyChartPainter extends CustomPainter {
 
 class _PlexCartesianPainter extends CustomPainter {
   _PlexCartesianPainter({
-    required this.isBar,
+    required this.marks,
     required this.series,
     required this.seriesColors,
     required this.categoryCount,
@@ -324,7 +372,7 @@ class _PlexCartesianPainter extends CustomPainter {
     required this.surface,
   });
 
-  final bool isBar;
+  final List<_PlotMark> marks;
   final List<PlexChartSeries> series;
   final List<Color> seriesColors;
   final int categoryCount;
@@ -424,12 +472,16 @@ class _PlexCartesianPainter extends CustomPainter {
 
     final double bandW = plotW / categoryCount;
 
-    if (isBar) {
-      final int groupCount = math.max(1, series.length);
+    final int barCount =
+        marks.where((_PlotMark m) => m == _PlotMark.bar).length;
+    if (barCount > 0) {
+      final int groupCount = math.max(1, barCount);
       final double barW = math.min(52, (bandW * 0.66) / groupCount);
       const double gap = 2;
       final double drawW = math.max(1, barW - gap);
+      int barIndex = 0;
       for (int si = 0; si < series.length; si++) {
+        if (si >= marks.length || marks[si] != _PlotMark.bar) continue;
         final Paint fill = Paint()
           ..color = seriesColors[si]
           ..style = PaintingStyle.fill;
@@ -439,18 +491,22 @@ class _PlexCartesianPainter extends CustomPainter {
           final double y0 = _yAt(0, plotH, scale.min, span);
           final double top = math.min(y, y0);
           final double h = math.max(0, (y - y0).abs());
-          final double x = _xAt(i, bandW) - (barW * groupCount) / 2 + barW * si;
+          final double x =
+              _xAt(i, bandW) - (barW * groupCount) / 2 + barW * barIndex;
           final RRect rrect = RRect.fromRectAndRadius(
             Rect.fromLTWH(x, top, drawW, math.max(h, 0.5)),
             const Radius.circular(_kBarRadius),
           );
           canvas.drawRRect(rrect, fill);
         }
+        barIndex++;
       }
-      return;
     }
 
     for (int si = 0; si < series.length; si++) {
+      final _PlotMark mark = si < marks.length ? marks[si] : _PlotMark.line;
+      if (mark == _PlotMark.bar) continue;
+
       final List<Offset> pts = <Offset>[];
       for (int i = 0; i < categoryCount; i++) {
         final double v = i < series[si].data.length ? series[si].data[i] : 0;
@@ -458,13 +514,13 @@ class _PlexCartesianPainter extends CustomPainter {
       }
       if (pts.isEmpty) continue;
 
-      final Paint linePaint = Paint()
-        ..color = seriesColors[si]
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 2
-        ..strokeCap = StrokeCap.round
-        ..strokeJoin = StrokeJoin.round;
-      if (pts.length >= 2) {
+      if (mark == _PlotMark.line && pts.length >= 2) {
+        final Paint linePaint = Paint()
+          ..color = seriesColors[si]
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2
+          ..strokeCap = StrokeCap.round
+          ..strokeJoin = StrokeJoin.round;
         final Path path = Path()..moveTo(pts.first.dx, pts.first.dy);
         for (int i = 1; i < pts.length; i++) {
           path.lineTo(pts[i].dx, pts[i].dy);
@@ -488,7 +544,7 @@ class _PlexCartesianPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _PlexCartesianPainter oldDelegate) {
-    return oldDelegate.isBar != isBar ||
+    return oldDelegate.marks != marks ||
         oldDelegate.series != series ||
         oldDelegate.seriesColors != seriesColors ||
         oldDelegate.categoryCount != categoryCount ||
@@ -504,10 +560,12 @@ class _PlexPiePainter extends CustomPainter {
   _PlexPiePainter({
     required this.values,
     required this.sliceColors,
+    this.holeColor,
   });
 
   final List<double> values;
   final List<Color> sliceColors;
+  final Color? holeColor;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -535,17 +593,124 @@ class _PlexPiePainter extends CustomPainter {
         ..style = PaintingStyle.fill;
       if (sweep >= math.pi * 2 - 0.0001) {
         canvas.drawCircle(center, radius, fill);
+        _punchHole(canvas, center, radius);
         return;
       }
       canvas.drawArc(rect, start, sweep, true, fill);
       start += sweep;
     }
+    _punchHole(canvas, center, radius);
+  }
+
+  void _punchHole(Canvas canvas, Offset center, double radius) {
+    if (holeColor == null) return;
+    canvas.drawCircle(
+      center,
+      radius * 0.55,
+      Paint()
+        ..color = holeColor!
+        ..style = PaintingStyle.fill,
+    );
   }
 
   @override
   bool shouldRepaint(covariant _PlexPiePainter oldDelegate) {
     return oldDelegate.values != values ||
-        oldDelegate.sliceColors != sliceColors;
+        oldDelegate.sliceColors != sliceColors ||
+        oldDelegate.holeColor != holeColor;
+  }
+}
+
+class _PlexHeatmapPainter extends CustomPainter {
+  _PlexHeatmapPainter({
+    required this.series,
+    required this.categoryCount,
+    required this.lo,
+    required this.hi,
+    required this.tick,
+  });
+
+  final List<PlexChartSeries> series;
+  final int categoryCount;
+  final Color lo;
+  final Color hi;
+  final Color tick;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (size.isEmpty || series.isEmpty || categoryCount <= 0) return;
+
+    double rawMin = double.infinity;
+    double rawMax = double.negativeInfinity;
+    for (final PlexChartSeries s in series) {
+      for (final double v in s.data) {
+        if (v < rawMin) rawMin = v;
+        if (v > rawMax) rawMax = v;
+      }
+    }
+    if (rawMin == double.infinity) {
+      rawMin = 0;
+      rawMax = 0;
+    }
+
+    final double plotW = math.max(1, size.width - _kPadL - _kPadR);
+    final double plotH = math.max(1, size.height - _kPadT - _kPadB);
+    final double cellW = plotW / categoryCount;
+    final double cellH = plotH / series.length;
+    const double gap = 3;
+    final double span = rawMax - rawMin == 0 ? 1 : rawMax - rawMin;
+
+    final TextStyle rowStyle = TextStyle(
+      color: tick,
+      fontSize: PlexFontSize.smallest,
+      fontWeight: FontWeight.w600,
+    );
+
+    for (int r = 0; r < series.length; r++) {
+      final TextPainter tp = TextPainter(
+        text: TextSpan(text: series[r].name, style: rowStyle),
+        textDirection: ui.TextDirection.ltr,
+        maxLines: 1,
+        ellipsis: '…',
+      )..layout(maxWidth: _kPadL - 8);
+      tp.paint(
+        canvas,
+        Offset(
+          _kPadL - 6 - tp.width,
+          _kPadT + cellH * (r + 0.5) - tp.height / 2,
+        ),
+      );
+
+      for (int c = 0; c < categoryCount; c++) {
+        final double v = c < series[r].data.length ? series[r].data[c] : 0;
+        final double t = ((v - rawMin) / span).clamp(0.0, 1.0);
+        final Color fillColor = Color.lerp(lo, hi, t) ?? hi;
+        final Paint fill = Paint()
+          ..color = fillColor
+          ..style = PaintingStyle.fill;
+        final double x = _kPadL + cellW * c + gap / 2;
+        final double y = _kPadT + cellH * r + gap / 2;
+        final RRect rrect = RRect.fromRectAndRadius(
+          Rect.fromLTWH(
+            x,
+            y,
+            math.max(1, cellW - gap),
+            math.max(1, cellH - gap),
+          ),
+          const Radius.circular(_kBarRadius),
+        );
+        canvas.drawRRect(rrect, fill);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _PlexHeatmapPainter oldDelegate) {
+    return oldDelegate.series != series ||
+        oldDelegate.categoryCount != categoryCount ||
+        oldDelegate.lo != lo ||
+        oldDelegate.hi != hi ||
+        oldDelegate.tick != tick;
   }
 }
 

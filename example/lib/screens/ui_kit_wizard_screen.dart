@@ -71,6 +71,44 @@ class _UiKitWizardScreenState extends State<UiKitWizardScreen> {
             context.showMessage("Wizard finished", title: "PlexWizard");
           },
         ),
+        const SizedBox(height: PlexDim.large),
+        ExampleCard(
+          title: "Vertical + jump",
+          subtitle:
+              "Left rail. Tap a step to jump; Next still runs the current validator.",
+          child: Text(
+            "Rail taps skip validators. Next still validates the current step.",
+            style: TextStyle(color: colors.textSecondary),
+          ),
+        ),
+        const SizedBox(height: PlexDim.medium),
+        PlexWizard(
+          axis: PlexWizardAxis.vertical,
+          allowStepJump: true,
+          steps: [
+            PlexWizardStep(
+              title: "Start",
+              child: Text(
+                "Tap Done in the rail to skip ahead.",
+                style: TextStyle(color: colors.textSecondary),
+              ),
+            ),
+            PlexWizardStep(
+              title: "Middle",
+              child: Text(
+                "Back and Next still move one step at a time.",
+                style: TextStyle(color: colors.textSecondary),
+              ),
+            ),
+            PlexWizardStep(
+              title: "Done",
+              child: Text(
+                "Finish completes this demo.",
+                style: TextStyle(color: colors.textSecondary),
+              ),
+            ),
+          ],
+        ),
       ],
     );
   }

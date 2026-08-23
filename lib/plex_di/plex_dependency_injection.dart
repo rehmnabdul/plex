@@ -5,15 +5,15 @@ class _PlexInjector<T> {
   T Function(dynamic parm)? builder;
 
   _PlexInjector.singleton(this.injector, this.tag) {
-    this.singleton = true;
+    singleton = true;
   }
 
   _PlexInjector.singletonLazy(this.builder, this.tag) {
-    this.singleton = true;
+    singleton = true;
   }
 
   _PlexInjector.factory(this.builder, this.tag) {
-    this.singleton = false;
+    singleton = false;
   }
 
   T getValue({dynamic parm}) {

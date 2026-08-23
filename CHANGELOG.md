@@ -1,3 +1,20 @@
+## 2.0.1-beta.12
+
+### Backlog 2–5 — wizard, charts, calendar, DataGrid, and kits
+- Wizard: `axis: PlexWizardAxis.vertical` and `allowStepJump` (tap the rail; Next still validates)
+- Chart: `PlexChartType.donut` / `scatter` / `combo` / `heatmap`. Optional `PlexChartSeries.mark` for combo. Bar, line, and pie are unchanged
+- Calendar: `PlexCalendarView` month / week / day / agenda, `events`, and `onEventTap`. Month cells show event dots. Not a `PlexFormFieldDate` replacement
+- DataGrid: `frozenColumnCount`, `PlexDataGridColumn.editable` + `onCellEdited`, filter match `startsWith` / `greaterThan` / `lessThan`. `PlexAdvanceDataTable` maps `freezeColumns`
+- Kits: `PlexLookup`, `PlexTag` / `PlexTagInput` (not `PlexBadge`), `PlexMobileList` / `PlexMobileTallyItem`, Gantt `progress` / `onTaskTap`, and `typedef PlexGanttChart = PlexChartGant`
+- Housekeeping: unused imports and small analyzer cleanups. Existing constructors still work
+- Still deferred: trellis charts, frozen rows, in-grid row mutation, xlsio replacement, recurrence/drag calendar
+
+### Docs and example
+- README, CHANGELOG, and example README pin `2.0.1-beta.12`
+- Example Design system `/ui-wizard`, `/ui-chart`, `/ui-calendar`, `/data-grid`, `/ui-lookup-tags`, `/ui-mobile-list`, plus Gantt progress on `/gantt-demo`
+- Widget tests for wizard, chart, calendar, DataGrid, lookup, tags, mobile list, and Gantt
+- Example calendar demo uses `static final` event data (const `DateTime.now()` is not allowed)
+
 ## 2.0.1-beta.11
 
 ### Phase 7 — wizard, chart, calendar

@@ -224,10 +224,8 @@ class _PlexLoginScreenState extends PlexState<PlexLoginScreen> {
     final String headline =
         widget.loginConfig.brandHeadline ?? PlexApp.app.appInfo.title;
     final String? subtitle = widget.loginConfig.brandSubtitle;
-    final String? footer = widget.loginConfig.brandFooter ??
-        (PlexApp.app.appInfo.versionName != null
-            ? PlexApp.app.appInfo.versionName
-            : null);
+    final String? footer =
+        widget.loginConfig.brandFooter ?? PlexApp.app.appInfo.versionName;
 
     return Container(
       key: PlexLoginScreen.brandPanelKey,
@@ -449,7 +447,7 @@ class _PlexLoginScreenState extends PlexState<PlexLoginScreen> {
     var splits = userData.split("|");
     if (splits.isEmpty) return "N/A";
     if (location == 0) {
-      return splits.length > 0 ? splits[0] : "N/A";
+      return splits.isNotEmpty ? splits[0] : "N/A";
     } else if (location == 1) {
       return splits.length > 1 ? splits[1] : "N/A";
     } else if (location == 2) {

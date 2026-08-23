@@ -15,7 +15,7 @@ class PlexRx {
 
   set value(Object value) {
     _value = value;
-    print("Rx ${id}-${value.toString()}");
+    print("Rx $id-${value.toString()}");
     for (var element in _listeners) {
       element.call();
     }
@@ -29,26 +29,22 @@ extension PlexRxExt on Object {
 }
 
 class PlexRxWidget extends StatefulWidget {
-  Widget _widget;
-  PlexRx _rx;
+  final Widget _widget;
+  final PlexRx _rx;
 
-  PlexRxWidget(this._widget, this._rx, {super.key});
+  const PlexRxWidget(this._widget, this._rx, {super.key});
 
   @override
   State<PlexRxWidget> createState() => _PlexRxWidgetState();
 }
 
 class _PlexRxWidgetState extends State<PlexRxWidget> {
-
-  int _counter = 0;
   late PlexRxListener _listener;
 
   @override
   void initState() {
     super.initState();
-    _listener = () => setState(() {
-      _counter++;
-    });
+    _listener = () => setState(() {});
     widget._rx._listeners.add(_listener);
   }
 
@@ -61,7 +57,6 @@ class _PlexRxWidgetState extends State<PlexRxWidget> {
   @override
   Widget build(BuildContext context) {
     print("From Widget ${widget._rx.id}-${widget._rx.value.toString()}");
-    _counter++;
     return widget._widget;
   }
 }

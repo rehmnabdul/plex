@@ -1,6 +1,6 @@
 # plex_app
 
-Example application for the Plex Flutter UI framework. It is a visual QA of Phases 0–7 plus restyled feature demos — not a product branded app.
+Example application for the Plex Flutter UI framework. It is a visual QA of Phases 0–7 plus backlog 2–5, and restyled feature demos — not a product branded app.
 
 ## Run
 
@@ -12,7 +12,7 @@ flutter pub get
 flutter run
 ```
 
-The example depends on the local package (`plex: path: ../../plex`). Published apps should use `plex: 2.0.1-beta.11` (see the root README).
+The example depends on the local package (`plex: path: ../../plex`). Published apps should use `plex: 2.0.1-beta.12` (see the root README).
 
 ## What you will see
 
@@ -22,14 +22,14 @@ Login defaults to `PlexLoginLayout.split` with generic copy and `assets/app.png`
 
 `PlexDataGrid` is the table engine. `PlexAdvanceDataTable` is a deprecated wrapper around it. Excel and PDF export use `PlexPrinter` (Plex-owned PDF; Excel still via xlsio). The package no longer depends on Syncfusion DataGrid.
 
-**`PlexDataGrid` capabilities** (Design system → **Plex Data Grid**, route `/data-grid`): sort, toolbar search, per-column filters (`showColumnFilters`), nested grouping (`groupByColumnIds`), per-group summaries, CSV / Excel / PDF (opt-in flags), custom `cell` widgets, and `rowStyle` / `cellStyle`. Export flags default to off on the grid; the Advance wrapper still defaults Excel/PDF on.
+**`PlexDataGrid` capabilities** (Design system → **Plex Data Grid**, route `/data-grid`): sort, toolbar search, per-column filters (`showColumnFilters`, including startsWith / greaterThan / lessThan), nested grouping (`groupByColumnIds`), per-group summaries, frozen columns (`frozenColumnCount`), cell editing, CSV / Excel / PDF (opt-in flags), custom `cell` widgets, and `rowStyle` / `cellStyle`. Export flags default to off on the grid; the Advance wrapper still defaults Excel/PDF on and maps `freezeColumns`.
 
 ### Dashboard categories
 
 | Category | Routes | Purpose |
 | --- | --- | --- |
 | **Overview** | `/home` | Landing page, shortcuts, badges, avatar |
-| **Design system** | `/ui-theme`, `/ui-buttons`, `/ui-forms`, `/ui-feedback`, `/ui-tabs`, `/ui-dashboard`, `/ui-wizard`, `/ui-chart`, `/ui-calendar`, `/data-grid` | Phases 0–7 widget QA |
+| **Design system** | `/ui-theme`, `/ui-buttons`, `/ui-forms`, `/ui-feedback`, `/ui-tabs`, `/ui-dashboard`, `/ui-wizard`, `/ui-chart`, `/ui-calendar`, `/ui-lookup-tags`, `/ui-mobile-list`, `/data-grid` | Phases 0–7 plus backlog 2–5 widget QA |
 | **Tables** | `/dashboard`, `/paginated-table`, `/advance-data-table`, `/dashboardExternal` | Existing table widgets (`PlexAdvanceDataTable` is a deprecated wrapper around `PlexDataGrid`; Excel/PDF export use `PlexPrinter`) |
 | **Forms** | `/all-inputs`, `/form-usage` | Full field catalog and `PlexFormWidget` |
 | **Widgets** | autocomplete sample, logo route, updatable widget, info sheet, scanner | Existing demos, restyled |
@@ -44,11 +44,13 @@ Dashboard AppBar is `PlexAppBar`. Screens inside the dashboard should not add a 
 - **Forms** — restyled `PlexFormField*`, checkbox, switch
 - **Cards & feedback** — card slots, `PlexAlert`, `PlexProgressBar`, `PlexSkeleton` / `PlexShimmer`, toasts
 - **Tabs** — `PlexTabs` + `PlexTabPanel`
-- **Plex Data Grid** — `/data-grid` — `PlexDataGrid` (sort, search, column filters, nested grouping, summaries, CSV / Excel / PDF, custom cells, styles). Prefer over the deprecated `PlexAdvanceDataTable` wrapper
+- **Plex Data Grid** — `/data-grid` — `PlexDataGrid` (sort, search, column filters, nested grouping, summaries, freeze, cell editing, CSV / Excel / PDF, custom cells, styles). Prefer over the deprecated `PlexAdvanceDataTable` wrapper
 - **Dashboard widgets** — `/ui-dashboard` — `PlexStatCard` / `PlexStatTile` / `PlexStatGrid` / `PlexProgressRing`, `PlexWidgetCard`, `PlexMiniTable`, `PlexDataList`, `PlexActivityFeed`
-- **Wizard** — `/ui-wizard` — `PlexWizard` + `PlexWizardStep` (Back / Next / Finish)
-- **Chart** — `/ui-chart` — `PlexChart` bar, line, pie (Gantt stays at `/gantt-demo`)
-- **Calendar** — `/ui-calendar` — `PlexCalendar` month view
+- **Wizard** — `/ui-wizard` — `PlexWizard` + `PlexWizardStep` (horizontal / vertical, optional step jump)
+- **Chart** — `/ui-chart` — `PlexChart` bar, line, pie, donut, scatter, combo, heatmap (Gantt stays at `/gantt-demo`)
+- **Calendar** — `/ui-calendar` — `PlexCalendar` month / week / day / agenda with events
+- **Lookup & tags** — `/ui-lookup-tags` — `PlexLookup`, `PlexTag` / `PlexTagInput`
+- **Mobile list** — `/ui-mobile-list` — `PlexMobileList` / `PlexMobileTallyItem`
 
 ## Copy-paste: app wiring
 

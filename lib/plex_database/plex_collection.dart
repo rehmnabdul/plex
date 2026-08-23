@@ -1,4 +1,3 @@
-import 'package:plex/plex_database/plex_entity.dart';
 import 'package:sembast/sembast.dart';
 import 'package:sembast/utils/value_utils.dart';
 

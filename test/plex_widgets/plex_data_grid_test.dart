@@ -263,6 +263,45 @@ void main() {
     );
     expect(filtered.map((_Person p) => p.name), <String>['Alice']);
 
+    final List<_Person> starts = PlexDataGridEngine.filter(
+      _people,
+      _columns,
+      <String, PlexDataGridColumnFilter>{
+        'name': const PlexDataGridColumnFilter(
+          columnId: 'name',
+          query: 'Al',
+          match: PlexDataGridFilterMatch.startsWith,
+        ),
+      },
+    );
+    expect(starts.map((_Person p) => p.name), <String>['Alice']);
+
+    final List<_Person> older = PlexDataGridEngine.filter(
+      _people,
+      _columns,
+      <String, PlexDataGridColumnFilter>{
+        'age': const PlexDataGridColumnFilter(
+          columnId: 'age',
+          query: '24',
+          match: PlexDataGridFilterMatch.greaterThan,
+        ),
+      },
+    );
+    expect(older.map((_Person p) => p.name), <String>['Bob', 'Carol']);
+
+    final List<_Person> younger = PlexDataGridEngine.filter(
+      _people,
+      _columns,
+      <String, PlexDataGridColumnFilter>{
+        'age': const PlexDataGridColumnFilter(
+          columnId: 'age',
+          query: '25',
+          match: PlexDataGridFilterMatch.lessThan,
+        ),
+      },
+    );
+    expect(younger.map((_Person p) => p.name), <String>['Alice']);
+
     final List<_Person> sorted = PlexDataGridEngine.sort(
       List<_Person>.from(_people),
       _columns,
@@ -681,6 +720,52 @@ void main() {
     final Text positive = tester.widget<Text>(find.text('5'));
     expect(positive.style?.color, isNot(Colors.red));
     expect(positive.style?.fontSize, isNot(18));
+  });
+
+  testWidgets('frozenColumnCount builds', (tester) async {
+    await tester.pumpWidget(
+      _wrap(
+        PlexDataGrid<_Person>(
+          columns: _columns,
+          rows: _people,
+          rowId: (_Person row) => row.id,
+          frozenColumnCount: 1,
+        ),
+      ),
+    );
+    expect(find.byType(PlexDataGrid<_Person>), findsOneWidget);
+    expect(find.text('Bob'), findsWidgets);
+  });
+
+  testWidgets('editable cell submits onCellEdited', (tester) async {
+    String? edited;
+    await tester.pumpWidget(
+      _wrap(
+        PlexDataGrid<_Person>(
+          columns: <PlexDataGridColumn<_Person>>[
+            PlexDataGridColumn<_Person>(
+              id: 'name',
+              title: 'Name',
+              editable: true,
+              value: (_Person row) => row.name,
+            ),
+          ],
+          rows: _people,
+          rowId: (_Person row) => row.id,
+          onCellEdited: (_Person row, String columnId, String value) {
+            edited = '$columnId:$value';
+          },
+        ),
+      ),
+    );
+
+    await tester.enterText(
+      find.byKey(const Key('plex-data-grid-edit-name-1')),
+      'Robert',
+    );
+    await tester.testTextInput.receiveAction(TextInputAction.done);
+    await tester.pump();
+    expect(edited, 'name:Robert');
   });
 }
 

@@ -114,4 +114,36 @@ void main() {
     expect(find.text('Step one body'), findsOneWidget);
     expect(find.text('Step two body'), findsNothing);
   });
+
+  testWidgets('vertical axis builds', (tester) async {
+    await tester.pumpWidget(
+      _wrap(
+        PlexWizard(
+          axis: PlexWizardAxis.vertical,
+          steps: _threeSteps(),
+        ),
+      ),
+    );
+    expect(find.text('Step one body'), findsOneWidget);
+    expect(find.text('Account'), findsOneWidget);
+  });
+
+  testWidgets('jump skips validators', (tester) async {
+    int? changedTo;
+    await tester.pumpWidget(
+      _wrap(
+        PlexWizard(
+          allowStepJump: true,
+          onStepChanged: (index) => changedTo = index,
+          steps: _threeSteps(firstValidator: () => false),
+        ),
+      ),
+    );
+
+    await tester.tap(find.byKey(const Key('plex-wizard-step-2')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Step three body'), findsOneWidget);
+    expect(changedTo, 2);
+  });
 }

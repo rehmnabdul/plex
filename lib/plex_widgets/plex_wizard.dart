@@ -21,20 +21,29 @@ class PlexWizardStep {
   final bool Function()? validator;
 }
 
+/// Rail orientation for [PlexWizard]. Default [horizontal] preserves the
+/// original top numbered row.
+enum PlexWizardAxis { horizontal, vertical }
+
 /// Linear multi-step flow: numbered rail, step panel, Back / Next / Finish.
 ///
 /// Opt-in widget — does not replace login, routing, or [PlexTabs].
+/// Set [allowStepJump] to tap rail items and skip validators.
 class PlexWizard extends StatefulWidget {
   const PlexWizard({
     super.key,
     required this.steps,
     this.onComplete,
     this.onStepChanged,
+    this.axis = PlexWizardAxis.horizontal,
+    this.allowStepJump = false,
   }) : assert(steps.length > 0, 'PlexWizard requires at least one step');
 
   final List<PlexWizardStep> steps;
   final VoidCallback? onComplete;
   final ValueChanged<int>? onStepChanged;
+  final PlexWizardAxis axis;
+  final bool allowStepJump;
 
   @override
   State<PlexWizard> createState() => _PlexWizardState();
@@ -68,10 +77,29 @@ class _PlexWizardState extends State<PlexWizard> {
     widget.onStepChanged?.call(_index);
   }
 
+  void _jumpTo(int index) {
+    if (index < 0 || index >= widget.steps.length || index == _index) {
+      return;
+    }
+    setState(() => _index = index);
+    widget.onStepChanged?.call(_index);
+  }
+
   @override
   Widget build(BuildContext context) {
     final PlexColorTokens colors = PlexThemeData.of(context).colors;
     final PlexWizardStep step = widget.steps[_index];
+    final bool vertical = widget.axis == PlexWizardAxis.vertical;
+
+    final Widget body = Padding(
+      padding: const EdgeInsets.fromLTRB(
+        PlexDim.mediumPlus,
+        PlexDim.small,
+        PlexDim.mediumPlus,
+        PlexDim.medium,
+      ),
+      child: step.child,
+    );
 
     return Material(
       color: colors.surfaceCard,
@@ -86,19 +114,28 @@ class _PlexWizardState extends State<PlexWizard> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _PlexWizardRail(
-            steps: widget.steps,
-            currentIndex: _index,
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(
-              PlexDim.mediumPlus,
-              PlexDim.small,
-              PlexDim.mediumPlus,
-              PlexDim.medium,
+          if (vertical)
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _PlexWizardVerticalRail(
+                  steps: widget.steps,
+                  currentIndex: _index,
+                  allowStepJump: widget.allowStepJump,
+                  onStepTap: _jumpTo,
+                ),
+                Expanded(child: body),
+              ],
+            )
+          else ...[
+            _PlexWizardRail(
+              steps: widget.steps,
+              currentIndex: _index,
+              allowStepJump: widget.allowStepJump,
+              onStepTap: _jumpTo,
             ),
-            child: step.child,
-          ),
+            body,
+          ],
           _PlexWizardFooter(
             index: _index,
             count: widget.steps.length,
@@ -117,10 +154,14 @@ class _PlexWizardRail extends StatelessWidget {
   const _PlexWizardRail({
     required this.steps,
     required this.currentIndex,
+    required this.allowStepJump,
+    required this.onStepTap,
   });
 
   final List<PlexWizardStep> steps;
   final int currentIndex;
+  final bool allowStepJump;
+  final ValueChanged<int> onStepTap;
 
   @override
   Widget build(BuildContext context) {
@@ -152,15 +193,105 @@ class _PlexWizardRail extends StatelessWidget {
                   ),
                 ),
               ),
-            _PlexWizardRailItem(
-              step: steps[i],
-              number: i + 1,
-              completed: i < currentIndex,
-              current: i == currentIndex,
+            _PlexWizardRailTap(
+              index: i,
+              enabled: allowStepJump,
+              onTap: onStepTap,
+              child: _PlexWizardRailItem(
+                step: steps[i],
+                number: i + 1,
+                completed: i < currentIndex,
+                current: i == currentIndex,
+              ),
             ),
           ],
         ],
       ),
+    );
+  }
+}
+
+class _PlexWizardVerticalRail extends StatelessWidget {
+  const _PlexWizardVerticalRail({
+    required this.steps,
+    required this.currentIndex,
+    required this.allowStepJump,
+    required this.onStepTap,
+  });
+
+  final List<PlexWizardStep> steps;
+  final int currentIndex;
+  final bool allowStepJump;
+  final ValueChanged<int> onStepTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final PlexColorTokens colors = PlexThemeData.of(context).colors;
+
+    return Container(
+      padding: const EdgeInsets.fromLTRB(
+        PlexDim.mediumPlus,
+        PlexDim.medium,
+        PlexDim.smallMedium,
+        PlexDim.medium,
+      ),
+      decoration: BoxDecoration(
+        border: Border(right: BorderSide(color: colors.borderSubtle)),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          for (int i = 0; i < steps.length; i++) ...[
+            if (i > 0)
+              Padding(
+                padding: const EdgeInsets.only(left: 13),
+                child: ColoredBox(
+                  color: i <= currentIndex
+                      ? colors.brandPrimary
+                      : colors.borderSubtle,
+                  child: const SizedBox(width: 2, height: PlexDim.medium),
+                ),
+              ),
+            _PlexWizardRailTap(
+              index: i,
+              enabled: allowStepJump,
+              onTap: onStepTap,
+              child: _PlexWizardRailItem(
+                step: steps[i],
+                number: i + 1,
+                completed: i < currentIndex,
+                current: i == currentIndex,
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _PlexWizardRailTap extends StatelessWidget {
+  const _PlexWizardRailTap({
+    required this.index,
+    required this.enabled,
+    required this.onTap,
+    required this.child,
+  });
+
+  final int index;
+  final bool enabled;
+  final ValueChanged<int> onTap;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    if (!enabled) return child;
+    return InkWell(
+      key: Key('plex-wizard-step-$index'),
+      onTap: () => onTap(index),
+      borderRadius: BorderRadius.circular(PlexRadius.md),
+      child: child,
     );
   }
 }

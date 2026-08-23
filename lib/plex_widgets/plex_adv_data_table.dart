@@ -31,14 +31,6 @@ class PlexComparableWidget extends StatelessWidget {
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) => value;
-
-  @override
-  int get hashCode => value.hashCode;
-
-  @override
-  bool operator ==(Object other) {
-    return hashCode == other.hashCode;
-  }
 }
 
 class PlexDataTableHeaderCell {
@@ -120,8 +112,8 @@ class PlexDataTableValueCell {
 /// Existing constructor parameters and [PlexDataTableHeaderCell] /
 /// [PlexDataTableValueCell] models still compile. The visible grid is
 /// [PlexDataGrid]. Excel, PDF, and optional CSV export use [PlexPrinter].
-/// Column grouping and per-column filters map onto [PlexDataGrid]. Frozen
-/// panes and cell editing still compile but are not mapped.
+/// Column grouping, per-column filters, and frozen leading columns map onto
+/// [PlexDataGrid]. Cell editing still compiles but is not mapped.
 @Deprecated('Use PlexDataGrid')
 class PlexAdvanceDataTable extends StatefulWidget {
   @Deprecated('Use PlexDataGrid')
@@ -309,6 +301,7 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
                   ];
                 },
           actions: _actions(context),
+          frozenColumnCount: widget.freezeColumns,
         );
       },
     );

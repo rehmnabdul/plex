@@ -60,4 +60,84 @@ void main() {
 
     expect(find.byType(PlexCalendar), findsOneWidget);
   });
+
+  testWidgets('month with events still shows day 15 and onSelected',
+      (tester) async {
+    DateTime? selected;
+    await tester.pumpWidget(
+      _wrap(
+        PlexCalendar(
+          focusedMonth: DateTime(2026, 8, 1),
+          events: [
+            PlexCalendarEvent(
+              id: '1',
+              start: DateTime(2026, 8, 15, 9),
+              title: 'Line A standup',
+            ),
+          ],
+          onSelected: (date) => selected = date,
+        ),
+      ),
+    );
+
+    expect(find.text('15'), findsAtLeastNWidgets(1));
+
+    await tester.tap(find.text('15').first);
+    await tester.pumpAndSettle();
+
+    expect(selected, isNotNull);
+    expect(selected!.year, 2026);
+    expect(selected!.month, 8);
+    expect(selected!.day, 15);
+  });
+
+  testWidgets('agenda view shows event title', (tester) async {
+    await tester.pumpWidget(
+      _wrap(
+        PlexCalendar(
+          focusedMonth: DateTime(2026, 8, 1),
+          view: PlexCalendarView.agenda,
+          events: [
+            PlexCalendarEvent(
+              id: '1',
+              start: DateTime(2026, 8, 15, 9),
+              title: 'Line A standup',
+            ),
+          ],
+        ),
+      ),
+    );
+    expect(find.text('Line A standup'), findsOneWidget);
+  });
+
+  testWidgets('week and day views build', (tester) async {
+    await tester.pumpWidget(
+      _wrap(
+        PlexCalendar(
+          focusedMonth: DateTime(2026, 8, 1),
+          selected: DateTime(2026, 8, 15),
+          view: PlexCalendarView.week,
+          events: [
+            PlexCalendarEvent(
+              id: '1',
+              start: DateTime(2026, 8, 15, 9),
+              title: 'Line A standup',
+            ),
+          ],
+        ),
+      ),
+    );
+    expect(find.byType(PlexCalendar), findsOneWidget);
+
+    await tester.pumpWidget(
+      _wrap(
+        PlexCalendar(
+          focusedMonth: DateTime(2026, 8, 1),
+          selected: DateTime(2026, 8, 15),
+          view: PlexCalendarView.day,
+        ),
+      ),
+    );
+    expect(find.byType(PlexCalendar), findsOneWidget);
+  });
 }

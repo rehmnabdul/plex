@@ -27,11 +27,6 @@ PlexPlatform getPlatform() {
   }
 }
 
-
-double get _widthRatio {
-  return WidgetsBinding.instance.platformDispatcher.views.first.physicalSize.width / WidgetsBinding.instance.platformDispatcher.views.first.devicePixelRatio;
-}
-
 isExtLargeScreen(BuildContext context) {
   // return _widthRatio >= 1300;
   return MediaQuery.of(context).size.width >= 1300;

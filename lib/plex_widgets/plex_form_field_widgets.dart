@@ -293,6 +293,7 @@ class PlexFormFieldDate extends StatelessWidget {
                               getController().data ?? DateTime.now()),
                           useRootNavigator: true,
                         ).then((value) {
+                          if (!context.mounted) return;
                           if (value != null) {
                             DateTime dateTime =
                                 getController().data ?? DateTime.now();
@@ -327,6 +328,7 @@ class PlexFormFieldDate extends StatelessWidget {
                           lastDate: maxDatetime ?? DateTime(5000, 12, 31),
                           useRootNavigator: true,
                         ).then((selectedDate) {
+                          if (!context.mounted) return;
                           if (selectedDate != null) {
                             showTimePicker(
                               context: context,
@@ -340,6 +342,7 @@ class PlexFormFieldDate extends StatelessWidget {
                                 );
                               },
                             ).then((value) {
+                              if (!context.mounted) return;
                               if (value != null) {
                                 var dateTime = DateTime(
                                   selectedDate.year,
@@ -874,8 +877,9 @@ class PlexFormFieldCheckbox extends StatelessWidget {
           onChanged: properties.enabled ? onChanged : null,
           checkColor: colors.textInverse,
           fillColor: WidgetStateProperty.resolveWith((states) {
-            if (states.contains(WidgetState.selected))
+            if (states.contains(WidgetState.selected)) {
               return colors.brandPrimary;
+            }
             return colors.surfaceCard;
           }),
           side: BorderSide(color: colors.borderStrong, width: 1.5),
@@ -961,13 +965,15 @@ class PlexFormFieldSwitch extends StatelessWidget {
           value: value,
           onChanged: properties.enabled ? onChanged : null,
           trackColor: WidgetStateProperty.resolveWith((states) {
-            if (states.contains(WidgetState.selected))
+            if (states.contains(WidgetState.selected)) {
               return colors.brandPrimary;
+            }
             return colors.borderDefault;
           }),
           thumbColor: WidgetStateProperty.resolveWith((states) {
-            if (states.contains(WidgetState.selected))
+            if (states.contains(WidgetState.selected)) {
               return colors.textInverse;
+            }
             return colors.surfaceCard;
           }),
         ),

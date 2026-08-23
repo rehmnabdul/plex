@@ -1,18 +1,15 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:plex/plex_utils.dart';
 import 'package:plex/plex_utils/plex_dimensions.dart';
 import 'package:plex/plex_utils/plex_routing.dart';
 import 'package:plex/plex_widgets/plex_form_field_widgets.dart';
-import 'package:plex/plex_widgets/plex_input_widget.dart';
 
 class PlexScanner extends StatefulWidget {
   const PlexScanner({super.key});
 
   @override
-  _PlexScannerState createState() => _PlexScannerState();
+  State<PlexScanner> createState() => _PlexScannerState();
 }
 
 class _PlexScannerState extends State<PlexScanner> {

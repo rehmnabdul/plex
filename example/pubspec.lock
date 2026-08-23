@@ -486,7 +486,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "2.0.1-beta.10"
+    version: "2.0.1-beta.11"
   plugin_platform_interface:
     dependency: transitive
     description:

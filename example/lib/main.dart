@@ -27,9 +27,12 @@ import 'package:plex_app/screens/table_demo_screens.dart';
 import 'package:plex_app/screens/ui_kit_buttons_screen.dart';
 import 'package:plex_app/screens/ui_kit_feedback_screen.dart';
 import 'package:plex_app/screens/ui_kit_forms_screen.dart';
+import 'package:plex_app/screens/ui_kit_calendar_screen.dart';
+import 'package:plex_app/screens/ui_kit_chart_screen.dart';
 import 'package:plex_app/screens/ui_kit_dashboard_widgets_screen.dart';
 import 'package:plex_app/screens/ui_kit_tabs_screen.dart';
 import 'package:plex_app/screens/ui_kit_theme_screen.dart';
+import 'package:plex_app/screens/ui_kit_wizard_screen.dart';
 
 export 'package:plex_app/screens/example_routes.dart';
 
@@ -302,6 +305,36 @@ void main() async {
           logo: const Icon(Icons.space_dashboard_outlined),
           selectedLogo: const Icon(Icons.space_dashboard),
           screen: (context, {data}) => const UiKitDashboardWidgetsScreen(),
+        ),
+        PlexRoute(
+          route: Routes.uiWizard,
+          category: "Design system",
+          title: "Wizard",
+          shortTitle: "Wizard",
+          tag: "7",
+          logo: const Icon(Icons.view_carousel_outlined),
+          selectedLogo: const Icon(Icons.view_carousel),
+          screen: (context, {data}) => const UiKitWizardScreen(),
+        ),
+        PlexRoute(
+          route: Routes.uiChart,
+          category: "Design system",
+          title: "Chart",
+          shortTitle: "Chart",
+          tag: "7",
+          logo: const Icon(Icons.bar_chart_outlined),
+          selectedLogo: const Icon(Icons.bar_chart),
+          screen: (context, {data}) => const UiKitChartScreen(),
+        ),
+        PlexRoute(
+          route: Routes.uiCalendar,
+          category: "Design system",
+          title: "Calendar",
+          shortTitle: "Calendar",
+          tag: "7",
+          logo: const Icon(Icons.calendar_month_outlined),
+          selectedLogo: const Icon(Icons.calendar_month),
+          screen: (context, {data}) => const UiKitCalendarScreen(),
         ),
         PlexRoute(
           route: Routes.dataGridScreen,

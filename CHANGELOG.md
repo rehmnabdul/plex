@@ -1,3 +1,16 @@
+## 2.0.1-beta.11
+
+### Phase 7 — wizard, chart, calendar
+- Add `PlexWizard` / `PlexWizardStep` for linear multi-step flows (numbered rail, Back / Next / Finish). Opt-in; does not replace login, routing, or `PlexTabs`
+- Add `PlexChart` with `PlexChartType` bar, line, and pie (`PlexChartSeries`). CustomPaint + `PlexThemeData` tokens. Gantt stays `PlexChartGant`
+- Add `PlexCalendar` month view (weekday headers, day cells, previous/next month). Not a `PlexFormFieldDate` replacement; week/day/agenda views are out of scope
+- Barrel: `plex_widgets/plex_wizard.dart`, `plex_chart.dart`, `plex_calendar.dart`, re-exported from `plex_package.dart`
+
+### Docs and example
+- README, CHANGELOG, and example README pin `2.0.1-beta.11` with copy-paste wizard, chart, and calendar snippets
+- Example Design system `/ui-wizard`, `/ui-chart`, `/ui-calendar` demos
+- Widget tests for wizard, chart, and calendar
+
 ## 2.0.1-beta.10
 
 ### Phase 6 — dashboard widgets

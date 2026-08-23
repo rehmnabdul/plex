@@ -120,6 +120,24 @@ class HomeOverviewScreen extends StatelessWidget {
               route: Routes.uiDashboard,
             ),
             _ShortcutCard(
+              title: "Wizard",
+              subtitle: "PlexWizard",
+              icon: Icons.view_carousel_outlined,
+              route: Routes.uiWizard,
+            ),
+            _ShortcutCard(
+              title: "Chart",
+              subtitle: "Bar, line, pie",
+              icon: Icons.bar_chart_outlined,
+              route: Routes.uiChart,
+            ),
+            _ShortcutCard(
+              title: "Calendar",
+              subtitle: "Month view",
+              icon: Icons.calendar_month_outlined,
+              route: Routes.uiCalendar,
+            ),
+            _ShortcutCard(
               title: "Data grid",
               subtitle: "PlexDataGrid — sort, filter, group, export",
               icon: Icons.grid_on_outlined,

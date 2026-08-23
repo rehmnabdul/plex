@@ -271,6 +271,19 @@ PlexActivityFeed(items: [
 ])
 ```
 
+#### Wizard, chart, calendar
+Opt-in widgets. Import `package:plex/plex_package.dart` or the files under `plex_widgets/`. Footer labels on `PlexWizard` are Back, Next, Finish. `PlexChart` types are bar, line, pie. `PlexCalendar` is month view only (not a `PlexFormFieldDate` replacement).
+
+```dart
+PlexWizard(steps: [
+  PlexWizardStep(title: '...', child: Text('...'), subtitle: '...', optional: false, validator: () => true),
+], onComplete: () {}, onStepChanged: (i) {})
+
+PlexChart(type: PlexChartType.bar, series: [PlexChartSeries(name: 'Units', data: [1,2,3])], labels: ['A','B','C'], height: 240)
+
+PlexCalendar(selected: DateTime(2026, 8, 15), onSelected: (d) {}, focusedMonth: DateTime(2026, 8, 1))
+```
+
 #### `PlexDataGrid`
 Plex-owned client-side grid. Prefer this over the deprecated `PlexAdvanceDataTable` wrapper.
 
@@ -676,7 +689,7 @@ Add PLEX to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  plex: 2.0.1-beta.10
+  plex: 2.0.1-beta.11
 ```
 
 Then run:
@@ -685,7 +698,7 @@ Then run:
 flutter pub get
 ```
 
-The example app under `/example` is a full visual QA of Phases 0–6 (theme, buttons, forms, feedback, tabs, `PlexDataGrid`, dashboard widgets) plus restyled feature demos. Run it with:
+The example app under `/example` is a full visual QA of Phases 0–7 (theme, buttons, forms, feedback, tabs, `PlexDataGrid`, dashboard widgets, wizard, chart, calendar) plus restyled feature demos. Run it with:
 
 ```sh
 cd example
@@ -830,13 +843,13 @@ PlexFormFieldButton(
 )
 ```
 
-See **Widgets & Components** for IconButton, Badge, Avatar, Alert, ProgressBar, Card slots, Tabs, dashboard widgets, DataGrid, and printer.
+See **Widgets & Components** for IconButton, Badge, Avatar, Alert, ProgressBar, Card slots, Tabs, dashboard widgets, Wizard, Chart, Calendar, DataGrid, and printer.
 
 ### What changed (2.0.1 betas) / Migration
 
-This 2.x beta line started after pub.dev `2.0.1-beta.1`. Pin **2.0.1-beta.10**. Stable **2.0.1** follows the beta series.
+This 2.x beta line started after pub.dev `2.0.1-beta.1`. Pin **2.0.1-beta.11**. Stable **2.0.1** follows the beta series.
 
-Shipped: **beta.2** Phase 0 tokens · **beta.3** `.pubignore` for Interloop Design · **beta.4** Phase 1 · **beta.5** Phases 2–4 · **beta.6** `PlexDataGrid` + example redesign · **beta.7** `PlexAdvanceDataTable` wrapper · **beta.8** Phase 5c (Syncfusion grid removal) · **beta.9** DataGrid grouping, summaries, export flags, filters, and cell styles · **beta.10** Phase 6 dashboard widgets.
+Shipped: **beta.2** Phase 0 tokens · **beta.3** `.pubignore` for Interloop Design · **beta.4** Phase 1 · **beta.5** Phases 2–4 · **beta.6** `PlexDataGrid` + example redesign · **beta.7** `PlexAdvanceDataTable` wrapper · **beta.8** Phase 5c (Syncfusion grid removal) · **beta.9** DataGrid grouping, summaries, export flags, filters, and cell styles · **beta.10** Phase 6 dashboard widgets · **beta.11** Phase 7 wizard, chart, calendar.
 
 **Constructors are mostly additive.** Existing required arguments did not change. New optional fields default to previous behavior.
 
@@ -862,6 +875,7 @@ Shipped: **beta.2** Phase 0 tokens · **beta.3** `.pubignore` for Interloop Desi
   - Custom column widgets via `PlexDataGridColumn.cell`; keep `value` for export.
   - `rowStyle` and `cellStyle` (`PlexDataGridCellStyle`); `cellStyle` overlays `rowStyle` field-by-field.
 - **Phase 6 (2.0.1-beta.10) dashboard widgets** (additive): `PlexStatCard`, `PlexStatTile`, `PlexStatGrid`, `PlexProgressRing`, `PlexWidgetCard`, `PlexMiniTable`, `PlexDataList`, `PlexActivityFeed`. They do not replace `PlexDataGrid`, `PlexDataTable`, or reactive `PlexWidget`.
+- **Phase 7 (2.0.1-beta.11) wizard, chart, calendar** (additive): `PlexWizard` / `PlexWizardStep`, `PlexChart` (bar / line / pie), `PlexCalendar` (month view). They do not replace login, `PlexTabs`, `PlexChartGant`, or `PlexFormFieldDate`.
 - **Interloop Design** stays in git as a reference folder. It is **not** in the published package (`.pubignore`). Do not treat it as a runtime dependency.
 
 #### Additive by phase
@@ -878,6 +892,7 @@ Shipped: **beta.2** Phase 0 tokens · **beta.3** `.pubignore` for Interloop Desi
 | **5c** | beta.8 | Remove Syncfusion DataGrid packages; Plex-owned PDF; cell type and grouping-callback breaks above. |
 | **5d** | beta.9 | Nested grouping, group summaries, column filters, export flags, custom `cell`, `rowStyle` / `cellStyle`. |
 | **6** | beta.10 | Dashboard widgets: `PlexStatCard` / `PlexStatTile` / `PlexStatGrid` / `PlexProgressRing`, `PlexWidgetCard`, `PlexMiniTable`, `PlexDataList`, `PlexActivityFeed`. |
+| **7** | beta.11 | `PlexWizard` / `PlexWizardStep`, `PlexChart` (bar / line / pie), `PlexCalendar` month view. |
 
 `brandConfig` is optional on `PlexApp`. Omit it to keep seed-only theming.
 

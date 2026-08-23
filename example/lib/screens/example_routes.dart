@@ -19,6 +19,9 @@ class Routes {
   static const uiFeedback = "/ui-feedback";
   static const uiTabs = "/ui-tabs";
   static const uiDashboard = "/ui-dashboard";
+  static const uiWizard = "/ui-wizard";
+  static const uiChart = "/ui-chart";
+  static const uiCalendar = "/ui-calendar";
   static const autocompleteSample = "newPath1";
   static const logoRouteSample = "newPath2";
 }

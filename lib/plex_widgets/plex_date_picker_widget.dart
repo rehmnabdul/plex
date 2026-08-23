@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:plex/plex_theme.dart';
 import 'package:plex/plex_utils/plex_date_utils.dart';
 import 'package:plex/plex_utils/plex_dimensions.dart';
 
@@ -28,10 +29,12 @@ class _PlexDatePickerWidgetState extends State<PlexDatePickerWidget> {
   Widget build(BuildContext context) {
     controller.text = widget.startDate?.toDateString() ?? "N/A";
 
+    final PlexColorTokens colors = PlexThemeData.of(context).colors;
     return Container(
-      decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.all(Radius.circular(PlexDim.small))),
+      decoration: BoxDecoration(
+          color: colors.surfaceSunken,
+          border: Border.all(color: colors.borderDefault),
+          borderRadius: const BorderRadius.all(Radius.circular(PlexRadius.md))),
       child: Padding(
         padding: EdgeInsets.symmetric(
             horizontal: (widget.removePadding ? PlexDim.zero : PlexDim.small)),

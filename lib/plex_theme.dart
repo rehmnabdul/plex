@@ -28,10 +28,12 @@ class PlexTheme {
   /// Extensions produced by [getThemeByBrightness], keyed by brightness.
   /// Context-free getters prefer light so GetMaterialApp building dark last
   /// does not leak dark surfaces into widgets that still use static colors.
-  static final Map<Brightness, PlexThemeData> _extensionsByBrightness = <Brightness, PlexThemeData>{};
+  static final Map<Brightness, PlexThemeData> _extensionsByBrightness =
+      <Brightness, PlexThemeData>{};
 
   static PlexThemeData? get _resolvedExtension =>
-      _extensionsByBrightness[Brightness.light] ?? _extensionsByBrightness[Brightness.dark];
+      _extensionsByBrightness[Brightness.light] ??
+      _extensionsByBrightness[Brightness.dark];
 
   static void _storeExtension(Brightness brightness, PlexThemeData data) {
     _extensionsByBrightness[brightness] = data;
@@ -61,7 +63,8 @@ class PlexTheme {
   static bool isMaterial3() => true;
 
   /// Deprecated no-op. Material 2 is no longer supported.
-  @Deprecated('Material 2 is no longer supported. Theme is always Material 3. This is a no-op.')
+  @Deprecated(
+      'Material 2 is no longer supported. Theme is always Material 3. This is a no-op.')
   static void setMaterial3(bool value) {
     // Intentionally ignored so existing apps still compile without hitting prefs.
   }
@@ -135,8 +138,21 @@ class PlexTheme {
       fontFamily: plexExtension.fontFamily,
       visualDensity: plexExtension.visualDensity,
       scaffoldBackgroundColor: plexExtension.colors.surfacePage,
+      appBarTheme: AppBarTheme(
+        toolbarHeight: PlexLayout.topbarHeight,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        backgroundColor: plexExtension.colors.surfaceCard,
+        foregroundColor: plexExtension.colors.textPrimary,
+        surfaceTintColor: Colors.transparent,
+        shadowColor: Colors.transparent,
+        shape: Border(
+          bottom: BorderSide(color: plexExtension.colors.borderSubtle),
+        ),
+      ),
       navigationBarTheme: NavigationBarThemeData(
-          labelTextStyle: const TextStyle(fontSize: PlexFontSize.smallest).getState()),
+          labelTextStyle:
+              const TextStyle(fontSize: PlexFontSize.smallest).getState()),
       brightness: brightness,
       textTheme: _textThemeFor(brightness, textColor),
       extensions: <ThemeExtension<dynamic>>[plexExtension],
@@ -181,7 +197,8 @@ class PlexTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(PlexRadius.md),
-          borderSide: BorderSide(color: plexExtension.colors.borderFocus, width: 1.5),
+          borderSide:
+              BorderSide(color: plexExtension.colors.borderFocus, width: 1.5),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(PlexRadius.md),
@@ -190,9 +207,29 @@ class PlexTheme {
       ),
       cardTheme: CardThemeData(
         color: plexExtension.colors.surfaceCard,
+        surfaceTintColor: Colors.transparent,
+        shadowColor: plexExtension.colors.brandInk.withValues(alpha: 0.12),
         elevation: PlexElevation.sm,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(PlexRadius.lg),
+          side: BorderSide(color: plexExtension.colors.borderSubtle),
+        ),
+      ),
+      dialogTheme: DialogThemeData(
+        backgroundColor: plexExtension.colors.surfaceCard,
+        surfaceTintColor: Colors.transparent,
+        elevation: PlexElevation.lg,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(PlexRadius.lg),
+        ),
+      ),
+      bottomSheetTheme: BottomSheetThemeData(
+        backgroundColor: plexExtension.colors.surfaceCard,
+        surfaceTintColor: Colors.transparent,
+        elevation: PlexElevation.lg,
+        shape: const RoundedRectangleBorder(
+          borderRadius:
+              BorderRadius.vertical(top: Radius.circular(PlexRadius.xl)),
         ),
       ),
     );
@@ -225,14 +262,16 @@ class PlexTheme {
     PlexThemeData fallbackExtension,
     Brightness brightness,
   ) {
-    final PlexThemeData existing = base.extension<PlexThemeData>() ?? fallbackExtension;
+    final PlexThemeData existing =
+        base.extension<PlexThemeData>() ?? fallbackExtension;
     final PlexThemeData merged = PlexThemeData(
       colors: existing.colors,
       fontFamily: existing.fontFamily,
       density: existing.density,
     );
     _storeExtension(brightness, merged);
-    final List<ThemeExtension<dynamic>> extensions = <ThemeExtension<dynamic>>[];
+    final List<ThemeExtension<dynamic>> extensions =
+        <ThemeExtension<dynamic>>[];
     for (final ThemeExtension<dynamic> ext in base.extensions.values) {
       if (ext is! PlexThemeData) {
         extensions.add(ext);

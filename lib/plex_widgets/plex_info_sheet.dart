@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:plex/plex_theme.dart';
 import 'package:plex/plex_utils/plex_dimensions.dart';
 import 'package:plex/plex_utils/plex_routing.dart';
 import 'package:plex/plex_widgets/plex_form_field_widgets.dart';
@@ -63,11 +64,14 @@ class PlexInfoSheet {
     double elevation = PlexDim.small,
     Widget? customContent,
   }) {
+    final PlexColorTokens colors = PlexThemeData.of(context).colors;
+    final ({Color accent, Color ink}) status = _statusColors(colors, type);
+
     return showModalBottomSheet<T>(
       context: context,
       isDismissible: isDismissible,
       enableDrag: enableDrag,
-      backgroundColor: backgroundColor,
+      backgroundColor: backgroundColor ?? colors.surfaceCard,
       barrierColor: barrierColor,
       shape: shape,
       constraints: constraints,
@@ -82,30 +86,40 @@ class PlexInfoSheet {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              Container(height: 3, color: status.accent),
               Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   if (icon != null)
                     Padding(
-                      padding: EdgeInsets.all(PlexDim.small),
-                      child: Center(child: icon),
+                      padding: const EdgeInsets.all(PlexDim.small),
+                      child: Center(
+                        child: IconTheme(
+                          data: IconThemeData(color: status.accent),
+                          child: icon,
+                        ),
+                      ),
                     ),
                   if (title != null)
                     Padding(
-                      padding: EdgeInsets.all(PlexDim.small),
+                      padding: const EdgeInsets.all(PlexDim.small),
                       child: Text(
                         title,
-                        style: Theme.of(context).textTheme.titleMedium,
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              color: status.ink,
+                            ),
                         textAlign: TextAlign.center,
                       ),
                     ),
                   if (message != null)
                     Padding(
-                      padding: EdgeInsets.all(PlexDim.small),
+                      padding: const EdgeInsets.all(PlexDim.small),
                       child: Text(
                         message,
-                        style: Theme.of(context).textTheme.bodyMedium,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: colors.textSecondary,
+                            ),
                         textAlign: TextAlign.center,
                       ),
                     ),
@@ -113,7 +127,7 @@ class PlexInfoSheet {
                 ],
               ),
               Padding(
-                padding: EdgeInsets.all(PlexDim.small),
+                padding: const EdgeInsets.all(PlexDim.small),
                 child: Row(
                   children: [
                     if (showCancel)
@@ -169,6 +183,20 @@ class PlexInfoSheet {
         );
       },
     );
+  }
+}
+
+({Color accent, Color ink}) _statusColors(
+  PlexColorTokens colors,
+  PlexInfoSheetType type,
+) {
+  switch (type) {
+    case PlexInfoSheetType.error:
+      return (accent: colors.statusDanger, ink: colors.statusDangerInk);
+    case PlexInfoSheetType.alert:
+      return (accent: colors.statusWarning, ink: colors.statusWarningInk);
+    case PlexInfoSheetType.info:
+      return (accent: colors.statusInfo, ink: colors.statusInfoInk);
   }
 }
 

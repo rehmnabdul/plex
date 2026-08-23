@@ -17,11 +17,15 @@ import 'package:plex/plex_widgets/plex_adv_data_table.dart';
 import 'package:plex/plex_widgets/plex_backgrounds/plex_background.dart';
 import 'package:plex/plex_widgets/plex_data_table.dart';
 import 'package:plex/plex_widgets/plex_data_table_paginated.dart';
+import 'package:plex/plex_widgets/plex_alert.dart';
 import 'package:plex/plex_widgets/plex_avatar.dart';
 import 'package:plex/plex_widgets/plex_badge.dart';
+import 'package:plex/plex_widgets/plex_card.dart';
 import 'package:plex/plex_widgets/plex_form_field_widgets.dart';
 import 'package:plex/plex_widgets/plex_icon_button.dart';
 import 'package:plex/plex_widgets/plex_info_dialog.dart';
+import 'package:plex/plex_widgets/plex_progress_bar.dart';
+import 'package:plex/plex_widgets/plex_shimmer.dart';
 import 'package:plex_app/screens/home_screen.dart';
 import 'package:plex_app/screens/plex_gantt_demo_screen.dart';
 import 'package:plex_app/screens/plex_info_sheet_demo_screen.dart';
@@ -818,6 +822,30 @@ void main() async {
                     showBarCode: true,
                   ),
                   const SizedBox(height: 16),
+                  const Text("PlexFormFieldCheckbox / Switch",
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  PlexFormFieldCheckbox(
+                    properties: const PlexFormFieldGeneric(
+                      title: "Accept terms",
+                      helperText: "Required to continue",
+                    ),
+                    value: true,
+                    onChanged: (value) {
+                      print("Checkbox Changed: $value");
+                    },
+                  ),
+                  PlexFormFieldSwitch(
+                    properties: const PlexFormFieldGeneric(
+                      title: "Email notifications",
+                      helperText: "Apply immediately",
+                    ),
+                    value: true,
+                    onChanged: (value) {
+                      print("Switch Changed: $value");
+                    },
+                  ),
+                  const SizedBox(height: 16),
                   const Text("PlexFormFieldButton",
                       style:
                           TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
@@ -1116,6 +1144,42 @@ void main() async {
                         square: true,
                         status: PlexAvatarStatus.online,
                       ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 16),
+                  const Text("PlexCard / PlexAlert / PlexProgressBar",
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  const PlexCard(
+                    title: "Inventory",
+                    subtitle: "Optional header slots",
+                    footer: Text("Footer"),
+                    child: Text("Child-only cards still work the same way."),
+                  ),
+                  const SizedBox(height: 8),
+                  PlexAlert(
+                    title: "Inline banner",
+                    message: "Dismissible PlexAlert using semantic tokens.",
+                    onClose: () {},
+                  ),
+                  const SizedBox(height: 8),
+                  const PlexProgressBar(
+                    label: "Sync",
+                    value: 64,
+                    showValue: true,
+                  ),
+                  const SizedBox(height: 8),
+                  const PlexProgressBar(
+                    label: "Indeterminate",
+                    indeterminate: true,
+                  ),
+                  const SizedBox(height: 8),
+                  const Row(
+                    children: [
+                      PlexSkeleton.circle(size: 32),
+                      SizedBox(width: 8),
+                      Expanded(child: PlexSkeleton.line()),
                     ],
                   ),
 

@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:plex/plex_package.dart';
 import 'package:plex/plex_route.dart';
 import 'package:plex/plex_theme.dart';
 import 'package:plex/plex_utils.dart';
 import 'package:plex/plex_utils/plex_dimensions.dart';
-import 'package:plex/plex_utils/plex_messages.dart';
 import 'package:plex/plex_utils/plex_routing.dart';
 import 'package:plex/plex_widgets/plex_highlight_widget.dart';
 
@@ -17,12 +15,16 @@ class PlexNavigationRailItem {
   final int? index;
   final PlexRoute? route;
 
-  const PlexNavigationRailItem(this.type, this.category, {this.index, this.route});
+  const PlexNavigationRailItem(this.type, this.category,
+      {this.index, this.route});
 }
 
 class PlexNavigationRail extends StatelessWidget {
-  final minWidth = 90.0;
-  final maxWidth = 260.0;
+  /// Widget default — [PlexLayout.railCollapsed] (90). Not the 76 sidebar token.
+  final double minWidth = PlexLayout.railCollapsed;
+
+  /// Widget default — [PlexLayout.railExpanded] (260). Not the 264 sidebar token.
+  final double maxWidth = PlexLayout.railExpanded;
   final bool extended;
   final Color backgroundColor;
   final List<Widget>? topWidgets;
@@ -30,6 +32,9 @@ class PlexNavigationRail extends StatelessWidget {
   final List<PlexRoute> destinations;
   final int selectedDestination;
   final Function(int index) onSelectDestination;
+
+  static const Key logoKey = Key('plex-nav-rail-logo');
+  static const Key versionKey = Key('plex-nav-rail-version');
 
   const PlexNavigationRail({
     super.key,
@@ -51,34 +56,48 @@ class PlexNavigationRail extends StatelessWidget {
       if (extended) {
         if (prevCategory != e.category) {
           prevCategory = e.category;
-          menus.add(PlexNavigationRailItem(PlexNavigationRailItemType.category, e.category));
+          menus.add(PlexNavigationRailItem(
+              PlexNavigationRailItemType.category, e.category));
         }
       }
-      menus.add(PlexNavigationRailItem(PlexNavigationRailItemType.item, e.category, index: index, route: e));
+      menus.add(PlexNavigationRailItem(
+          PlexNavigationRailItemType.item, e.category,
+          index: index, route: e));
     }
     return menus;
   }
 
   @override
   Widget build(BuildContext context) {
+    final PlexColorTokens colors = PlexThemeData.of(context).colors;
+    final BorderRadius itemRadius = BorderRadius.circular(PlexRadius.md);
+
     return Container(
       color: backgroundColor,
       width: extended ? maxWidth : minWidth,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: PlexDim.small, vertical: PlexDim.medium),
+        padding: const EdgeInsets.symmetric(
+            horizontal: PlexDim.small, vertical: PlexDim.medium),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             if (!PlexApp.app.dashboardConfig!.hideNavigationRailLogo) ...{
               SizedBox(
-                height: PlexApp.app.dashboardConfig!.hideNavigationRailLogoHeight,
+                key: PlexNavigationRail.logoKey,
+                height:
+                    PlexApp.app.dashboardConfig!.hideNavigationRailLogoHeight,
                 width: PlexApp.app.dashboardConfig!.hideNavigationRailLogoWidth,
                 child: PlexApp.app.getLogo(context),
               ),
               spaceSmall(),
             },
-            if (!PlexApp.app.dashboardConfig!.hideNavigationRailVersionInfo && PlexApp.app.appInfo.versionName != null) ...[
-              Text("${PlexApp.app.appInfo.versionName}", textAlign: TextAlign.center),
+            if (!PlexApp.app.dashboardConfig!.hideNavigationRailVersionInfo &&
+                PlexApp.app.appInfo.versionName != null) ...[
+              Text(
+                "${PlexApp.app.appInfo.versionName}",
+                key: PlexNavigationRail.versionKey,
+                textAlign: TextAlign.center,
+              ),
               spaceSmall(),
             ],
             ...?topWidgets,
@@ -87,83 +106,139 @@ class PlexNavigationRail extends StatelessWidget {
               (route) {
                 if (route.type == PlexNavigationRailItemType.category) {
                   return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: PlexDim.small),
+                    padding: const EdgeInsets.fromLTRB(PlexDim.small,
+                        PlexDim.medium, PlexDim.small, PlexDim.smallest),
                     child: Text(
                       route.category,
-                      style: const TextStyle(fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: PlexFontSize.smallest,
+                        letterSpacing: 0.8,
+                        color: colors.textMuted,
+                      ),
                     ),
                   );
                 }
                 var isSelected = route.index == selectedDestination;
                 return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: PlexDim.zero, horizontal: PlexDim.small),
-                  child: InkWell(
-                    canRequestFocus: true,
-                    hoverColor: PlexTheme.getActiveTheme(context).primaryColor.withOpacity(0.1),
-                    splashFactory: InkRipple.splashFactory,
-                    highlightColor: PlexTheme.getActiveTheme(context).primaryColor.withOpacity(0.5),
-                    hoverDuration: Durations.short1,
-                    enableFeedback: true,
-                    borderRadius: BorderRadius.circular(PlexDim.large),
-                    onTap: () {
-                      if(route.route?.external == true) {
-                        Plex.toNamed(route.route!.route);
-                        return;
-                      }
-                      onSelectDestination.call(route.index!);
-                    },
-                    onHover: (value) {},
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: PlexDim.small, horizontal: PlexDim.small),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Stack(
-                            children: [
-                              PlexHighlightWidget(
-                                enabled: route.route!.tag != null,
-                                tagBgColor: route.route!.tagBgColor,
-                                child: Transform.scale(
-                                  scale: isSelected ? 1.2 : 0.7,
-                                  child: createWidget(() {
-                                    if (isSelected) {
-                                      return route.route!.selectedLogo ?? route.route!.logo ?? const Icon(Icons.circle);
-                                    }
-                                    return route.route!.logo ?? const Icon(Icons.circle_outlined);
-                                  }),
+                  padding: const EdgeInsets.symmetric(
+                      vertical: PlexDim.mini, horizontal: PlexDim.smallest),
+                  child: Material(
+                    color:
+                        isSelected ? colors.brandPrimary : Colors.transparent,
+                    borderRadius: itemRadius,
+                    child: InkWell(
+                      canRequestFocus: true,
+                      hoverColor: isSelected
+                          ? colors.brandPrimaryHover.withValues(alpha: 0.24)
+                          : colors.surfaceHover,
+                      splashFactory: InkRipple.splashFactory,
+                      highlightColor: isSelected
+                          ? colors.brandPrimaryActive.withValues(alpha: 0.32)
+                          : colors.brandPrimary.withValues(alpha: 0.12),
+                      hoverDuration: Durations.short1,
+                      enableFeedback: true,
+                      borderRadius: itemRadius,
+                      onTap: () {
+                        if (route.route?.external == true) {
+                          Plex.toNamed(route.route!.route);
+                          return;
+                        }
+                        onSelectDestination.call(route.index!);
+                      },
+                      onHover: (value) {},
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: PlexDim.small,
+                            horizontal: PlexDim.smallMedium),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Stack(
+                              children: [
+                                PlexHighlightWidget(
+                                  enabled: route.route!.tag != null,
+                                  tagBgColor: route.route!.tagBgColor,
+                                  child: IconTheme(
+                                    data: IconThemeData(
+                                      size: 20,
+                                      color: isSelected
+                                          ? colors.textInverse
+                                          : colors.textSecondary,
+                                    ),
+                                    child: createWidget(() {
+                                      if (isSelected) {
+                                        return route.route!.selectedLogo ??
+                                            route.route!.logo ??
+                                            const Icon(Icons.circle);
+                                      }
+                                      return route.route!.logo ??
+                                          const Icon(Icons.circle_outlined);
+                                    }),
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
-                          if (extended) ...{
-                            spaceMedium(),
-                            Expanded(
-                              child: Text(
-                                route.route!.title,
-                                style: TextStyle(fontWeight: isSelected ? FontWeight.bold : null, fontSize: PlexFontSize.small, overflow: TextOverflow.clip),
-                                maxLines: 2,
-                              ),
+                              ],
                             ),
-                            if (route.route!.tag != null) ...{
-                              Tooltip(
-                                message: route.route!.tagDescription ?? "",
-                                child: Container(
-                                  padding: const EdgeInsets.all(8.0),
-                                  decoration: BoxDecoration(
-                                    color: route.route!.tagBgColor ?? PlexTheme.navigationTagColor,
-                                    borderRadius: BorderRadius.circular(20.0),
+                            if (extended) ...{
+                              spaceMedium(),
+                              Expanded(
+                                child: Text(
+                                  route.route!.title,
+                                  style: TextStyle(
+                                    fontWeight: isSelected
+                                        ? FontWeight.w700
+                                        : FontWeight.w600,
+                                    fontSize: PlexFontSize.small,
+                                    overflow: TextOverflow.clip,
+                                    color: isSelected
+                                        ? colors.textInverse
+                                        : colors.textSecondary,
                                   ),
-                                  child: Text(
-                                    route.route!.tag!,
-                                    style: TextStyle(fontSize: PlexFontSize.smallest, color: route.route!.tagTextColor ?? PlexTheme.navigationTagTextColor),
+                                  maxLines: 2,
+                                ),
+                              ),
+                              if (route.route!.tag != null) ...{
+                                Tooltip(
+                                  message: route.route!.tagDescription ?? "",
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 7, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: route.route!.tagBgColor ??
+                                          (isSelected
+                                              ? colors.textInverse
+                                                  .withValues(alpha: 0.25)
+                                              : PlexTheme.navigationTagColor),
+                                      borderRadius: BorderRadius.circular(
+                                          PlexRadius.pill),
+                                    ),
+                                    child: Text(
+                                      route.route!.tag!,
+                                      style: TextStyle(
+                                        fontSize: PlexFontSize.smallest,
+                                        color: route.route!.tagTextColor ??
+                                            (isSelected
+                                                ? colors.textInverse
+                                                : PlexTheme
+                                                    .navigationTagTextColor),
+                                      ),
+                                    ),
                                   ),
                                 ),
+                              },
+                              Icon(
+                                route.route?.external == true
+                                    ? Icons.launch
+                                    : Icons.arrow_right_outlined,
+                                color: isSelected
+                                    ? colors.textInverse.withValues(alpha: 0.7)
+                                    : colors.textMuted,
+                                size: 16,
                               ),
                             },
-                            Icon(route.route?.external == true ? Icons.launch : Icons.arrow_right_outlined, color: Colors.grey.shade500)
-                          },
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),

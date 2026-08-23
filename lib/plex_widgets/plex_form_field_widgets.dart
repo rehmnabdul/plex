@@ -45,7 +45,8 @@ class PlexFormFieldGeneric {
     this.helperText,
     this.useMargin = true,
     this.cornerRadius = PlexDim.small,
-    this.margin = const EdgeInsets.symmetric(horizontal: PlexDim.medium, vertical: PlexDim.small),
+    this.margin = const EdgeInsets.symmetric(
+        horizontal: PlexDim.medium, vertical: PlexDim.small),
   });
 
   const PlexFormFieldGeneric.empty()
@@ -54,14 +55,90 @@ class PlexFormFieldGeneric {
         enabled = true,
         useMargin = true,
         cornerRadius = PlexDim.small,
-        margin = const EdgeInsets.symmetric(horizontal: PlexDim.medium, vertical: PlexDim.small);
+        margin = const EdgeInsets.symmetric(
+            horizontal: PlexDim.medium, vertical: PlexDim.small);
 
   const PlexFormFieldGeneric.title(this.title)
       : helperText = null,
         enabled = true,
         useMargin = true,
         cornerRadius = PlexDim.small,
-        margin = const EdgeInsets.symmetric(horizontal: PlexDim.medium, vertical: PlexDim.small);
+        margin = const EdgeInsets.symmetric(
+            horizontal: PlexDim.medium, vertical: PlexDim.small);
+}
+
+InputDecoration _plexFormInputDecoration(
+  BuildContext context, {
+  required PlexFormFieldGeneric properties,
+  String? hintText,
+  Widget? prefixIcon,
+  Widget? suffixIcon,
+  String? errorText,
+}) {
+  final PlexColorTokens colors = PlexThemeData.of(context).colors;
+  final BorderRadius radius = BorderRadius.circular(properties.cornerRadius);
+  return InputDecoration(
+    filled: true,
+    fillColor: colors.surfaceSunken,
+    hintText: hintText,
+    prefixIcon: prefixIcon,
+    suffixIcon: suffixIcon,
+    labelText: properties.title ?? "",
+    helperText: properties.helperText,
+    errorText: errorText,
+    errorStyle: TextStyle(color: colors.statusDanger),
+    border:
+        OutlineInputBorder(gapPadding: PlexDim.smallest, borderRadius: radius),
+    enabledBorder: OutlineInputBorder(
+      gapPadding: PlexDim.smallest,
+      borderRadius: radius,
+      borderSide: BorderSide(color: colors.borderDefault),
+    ),
+    focusedBorder: OutlineInputBorder(
+      gapPadding: PlexDim.smallest,
+      borderRadius: radius,
+      borderSide: BorderSide(color: colors.borderFocus, width: 1.5),
+    ),
+    errorBorder: OutlineInputBorder(
+      gapPadding: PlexDim.smallest,
+      borderRadius: radius,
+      borderSide: BorderSide(color: colors.statusDanger),
+    ),
+    focusedErrorBorder: OutlineInputBorder(
+      gapPadding: PlexDim.smallest,
+      borderRadius: radius,
+      borderSide: BorderSide(color: colors.statusDanger, width: 1.5),
+    ),
+    disabledBorder: OutlineInputBorder(
+      gapPadding: PlexDim.smallest,
+      borderRadius: radius,
+      borderSide: BorderSide(color: colors.borderSubtle),
+    ),
+  );
+}
+
+BoxDecoration _plexFormSelectDecoration(
+  BuildContext context, {
+  required PlexFormFieldGeneric properties,
+  bool hasError = false,
+}) {
+  final PlexColorTokens colors = PlexThemeData.of(context).colors;
+  return BoxDecoration(
+    color: colors.surfaceSunken,
+    border: Border.all(
+      color: hasError
+          ? colors.statusDanger
+          : (properties.enabled ? colors.borderDefault : colors.borderSubtle),
+    ),
+    borderRadius: BorderRadius.circular(properties.cornerRadius),
+  );
+}
+
+Widget _wrapFormFieldMargin(PlexFormFieldGeneric properties, Widget child) {
+  if (properties.useMargin) {
+    return Padding(padding: properties.margin, child: child);
+  }
+  return child;
 }
 
 class PlexFormFieldInput extends StatelessWidget {
@@ -122,15 +199,13 @@ class PlexFormFieldInput extends StatelessWidget {
             maxLengthEnforcement: MaxLengthEnforcement.enforced,
             focusNode: inputFocusNode,
             obscureText: isPassword,
-            decoration: InputDecoration(
-              border: OutlineInputBorder(gapPadding: PlexDim.smallest, borderRadius: BorderRadius.all(Radius.circular(properties.cornerRadius.toDouble()))),
+            decoration: _plexFormInputDecoration(
+              context,
+              properties: properties,
               hintText: inputHint,
               prefixIcon: prefixIcon,
               suffixIcon: suffixIcon,
-              labelText: properties.title ?? "",
-              helperText: properties.helperText,
               errorText: errorController?.data?.toString(),
-              filled: true,
             ),
           );
         });
@@ -169,20 +244,23 @@ class PlexFormFieldDate extends StatelessWidget {
   PlexWidgetController<DateTime?>? _selectionController;
 
   PlexWidgetController<DateTime?> getController() {
-    _selectionController ??= (selectionController ?? PlexWidgetController<DateTime?>());
+    _selectionController ??=
+        (selectionController ?? PlexWidgetController<DateTime?>());
     return _selectionController!;
   }
 
   @override
   Widget build(BuildContext context) {
+    final PlexColorTokens colors = PlexThemeData.of(context).colors;
     Widget inputWidget = Container(
-      decoration: BoxDecoration(
-        color: PlexTheme.getActiveTheme(context).splashColor,
-        border: Border.all(color: errorController?.data != null ? PlexTheme.inputErrorColor : Theme.of(context).colorScheme.outline, width: 1),
-        borderRadius: BorderRadius.circular(properties.cornerRadius),
+      decoration: _plexFormSelectDecoration(
+        context,
+        properties: properties,
+        hasError: errorController?.data != null,
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: PlexDim.small, vertical: PlexDim.smallest),
+        padding: const EdgeInsets.symmetric(
+            horizontal: PlexDim.small, vertical: PlexDim.smallest),
         child: Row(
           children: [
             Expanded(
@@ -211,11 +289,13 @@ class PlexFormFieldDate extends StatelessWidget {
                       } else if (type == PlexFormFieldDateType.typeTime) {
                         showTimePicker(
                           context: context,
-                          initialTime: TimeOfDay.fromDateTime(getController().data ?? DateTime.now()),
+                          initialTime: TimeOfDay.fromDateTime(
+                              getController().data ?? DateTime.now()),
                           useRootNavigator: true,
                         ).then((value) {
                           if (value != null) {
-                            DateTime dateTime = getController().data ?? DateTime.now();
+                            DateTime dateTime =
+                                getController().data ?? DateTime.now();
                             dateTime = DateTime(
                               dateTime.year,
                               dateTime.month,
@@ -223,12 +303,16 @@ class PlexFormFieldDate extends StatelessWidget {
                               value.hour,
                               value.minute,
                             );
-                            if (minDatetime != null && dateTime.isBefore(minDatetime!)) {
-                              context.showMessageError("Invalid Time Selection");
+                            if (minDatetime != null &&
+                                dateTime.isBefore(minDatetime!)) {
+                              context
+                                  .showMessageError("Invalid Time Selection");
                               return;
                             }
-                            if (maxDatetime != null && dateTime.isAfter(maxDatetime!)) {
-                              context.showMessageError("Invalid Time Selection");
+                            if (maxDatetime != null &&
+                                dateTime.isAfter(maxDatetime!)) {
+                              context
+                                  .showMessageError("Invalid Time Selection");
                               return;
                             }
                             getController().setValue(dateTime as DateTime?);
@@ -250,7 +334,8 @@ class PlexFormFieldDate extends StatelessWidget {
                               useRootNavigator: true,
                               builder: (context, child) {
                                 return MediaQuery(
-                                  data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+                                  data: MediaQuery.of(context)
+                                      .copyWith(alwaysUse24HourFormat: true),
                                   child: child!,
                                 );
                               },
@@ -263,12 +348,16 @@ class PlexFormFieldDate extends StatelessWidget {
                                   value.hour,
                                   value.minute,
                                 );
-                                if (minDatetime != null && dateTime.isBefore(minDatetime!)) {
-                                  context.showMessageError("Invalid Time Selection");
+                                if (minDatetime != null &&
+                                    dateTime.isBefore(minDatetime!)) {
+                                  context.showMessageError(
+                                      "Invalid Time Selection");
                                   return;
                                 }
-                                if (maxDatetime != null && dateTime.isAfter(maxDatetime!)) {
-                                  context.showMessageError("Invalid Time Selection");
+                                if (maxDatetime != null &&
+                                    dateTime.isAfter(maxDatetime!)) {
+                                  context.showMessageError(
+                                      "Invalid Time Selection");
                                   return;
                                 }
                                 getController().setValue(dateTime as DateTime?);
@@ -291,7 +380,8 @@ class PlexFormFieldDate extends StatelessWidget {
                     ),
                     decoration: InputDecoration(
                       border: InputBorder.none,
-                      prefixIcon: const Icon(Icons.calendar_month_outlined, color: Colors.grey),
+                      prefixIcon: Icon(Icons.calendar_month_outlined,
+                          color: colors.textMuted),
                       labelText: properties.title ?? "",
                       helperText: properties.helperText,
                       errorText: errorController?.data?.toString(),
@@ -301,10 +391,10 @@ class PlexFormFieldDate extends StatelessWidget {
                 },
               ),
             ),
-            if(cancellable) ...{
+            if (cancellable) ...{
               IconButton(
                 icon: const Icon(Icons.close),
-                color: Colors.grey,
+                color: colors.textMuted,
                 onPressed: () {
                   getController().setValue(null);
                 },
@@ -328,8 +418,13 @@ class PlexFormFieldDate extends StatelessWidget {
               inputWidget,
               if (errorController!.data != null) ...{
                 Padding(
-                  padding: EdgeInsets.only(left: PlexDim.medium, right: PlexDim.medium, top: PlexDim.small),
-                  child: Text(errorController!.data!.toString(), textAlign: TextAlign.left, style: TextStyle(color: PlexTheme.inputErrorColor)),
+                  padding: EdgeInsets.only(
+                      left: PlexDim.medium,
+                      right: PlexDim.medium,
+                      top: PlexDim.small),
+                  child: Text(errorController!.data!.toString(),
+                      textAlign: TextAlign.left,
+                      style: TextStyle(color: colors.statusDanger)),
                 )
               },
             ],
@@ -384,11 +479,13 @@ class PlexFormFieldDropdown<T> extends StatelessWidget {
 
   bool _initialized = false;
 
-  String Function(dynamic item)? dropdownItemAsString = (item) => item.toString();
+  String Function(dynamic item)? dropdownItemAsString =
+      (item) => item.toString();
   PlexWidgetController<T?>? _dropdownSelectionController;
 
   PlexWidgetController<T?> getDropDownController() {
-    _dropdownSelectionController ??= (dropdownSelectionController ?? PlexWidgetController<T?>());
+    _dropdownSelectionController ??=
+        (dropdownSelectionController ?? PlexWidgetController<T?>());
     if (!_initialized && initialSelection != null) {
       _dropdownSelectionController!.setValue(initialSelection);
       _initialized = true;
@@ -425,37 +522,49 @@ class PlexFormFieldDropdown<T> extends StatelessWidget {
       },
       //   ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
       child: Container(
-        decoration: BoxDecoration(
-            border: Border.all(
-              color: Theme.of(context).colorScheme.outline,
-              width: 1,
-            ),
-            borderRadius: BorderRadius.circular(properties.cornerRadius)),
+        decoration: _plexFormSelectDecoration(context, properties: properties),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: PlexDim.small, vertical: PlexDim.small),
+          padding: const EdgeInsets.symmetric(
+              horizontal: PlexDim.small, vertical: PlexDim.small),
           child: Row(
             children: [
               Expanded(
                 child: PlexWidget<T?>(
                   controller: getDropDownController(),
                   createWidget: (context, data) {
+                    final PlexColorTokens colors =
+                        PlexThemeData.of(context).colors;
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         if (properties.title != null) ...{
-                          Text("${properties.title}", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: PlexDim.small)),
+                          Text("${properties.title}",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: PlexDim.small,
+                                  color: colors.textSecondary)),
                         },
-                        Text(data != null ? dropdownItemAsString?.call(data) ?? data.toString() : noDataText),
+                        Text(
+                          data != null
+                              ? dropdownItemAsString?.call(data) ??
+                                  data.toString()
+                              : noDataText,
+                          style: TextStyle(
+                              color: properties.enabled
+                                  ? colors.textPrimary
+                                  : colors.textDisabled),
+                        ),
                       ],
                     );
                   },
                 ),
               ),
-              const Icon(Icons.arrow_drop_down, color: Colors.grey),
+              Icon(Icons.arrow_drop_down,
+                  color: PlexThemeData.of(context).colors.textMuted),
               if (showClearButton) ...{
                 IconButton(
                   icon: const Icon(Icons.close),
-                  color: Colors.grey,
+                  color: PlexThemeData.of(context).colors.textMuted,
                   onPressed: () {
                     getDropDownController().setValue(null);
                   },
@@ -512,14 +621,17 @@ class PlexFormFieldMultiSelect<T> extends StatelessWidget {
   PlexWidgetController<List<T>?>? _multiSelectionController;
 
   PlexWidgetController<List<T>?> getMultiselectController() {
-    if (_multiSelectionController == null || _multiSelectionController!.isDisposed) {
-      _multiSelectionController = (multiSelectionController ?? PlexWidgetController<List<T>?>());
+    if (_multiSelectionController == null ||
+        _multiSelectionController!.isDisposed) {
+      _multiSelectionController =
+          (multiSelectionController ?? PlexWidgetController<List<T>?>());
       _multiSelectionController!.setValue(multiInitialSelection?.cast<T>());
     }
     return _multiSelectionController!;
   }
 
-  String getItemAsString(T item) => dropdownItemAsString?.call(item) ?? item.toString();
+  String getItemAsString(T item) =>
+      dropdownItemAsString?.call(item) ?? item.toString();
 
   @override
   Widget build(BuildContext context) {
@@ -549,26 +661,28 @@ class PlexFormFieldMultiSelect<T> extends StatelessWidget {
         );
       },
       child: Container(
-        decoration: BoxDecoration(
-            border: Border.all(
-              color: Theme.of(context).colorScheme.outline,
-              width: 1,
-            ),
-            borderRadius: BorderRadius.circular(properties.cornerRadius)),
+        decoration: _plexFormSelectDecoration(context, properties: properties),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: PlexDim.small, vertical: PlexDim.small),
+          padding: const EdgeInsets.symmetric(
+              horizontal: PlexDim.small, vertical: PlexDim.small),
           child: Row(
             children: [
               Expanded(
                 child: PlexWidget<List<T>?>(
                   controller: getMultiselectController(),
                   createWidget: (context, data) {
+                    final PlexColorTokens colors =
+                        PlexThemeData.of(context).colors;
                     List<T> selectionData = data ?? List<T>.empty();
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         if (properties.title != null) ...{
-                          Text("${properties.title}", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: PlexDim.small)),
+                          Text("${properties.title}",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: PlexDim.small,
+                                  color: colors.textSecondary)),
                         },
                         spaceSmall(),
                         Wrap(
@@ -579,8 +693,9 @@ class PlexFormFieldMultiSelect<T> extends StatelessWidget {
                               (e) =>
                                   customMultiSelectedWidget?.call(e) ??
                                   Chip(
-                                    elevation: PlexDim.small,
-                                    avatar: Icon(Icons.check_circle, color: Colors.green.shade500),
+                                    elevation: PlexElevation.sm,
+                                    avatar: Icon(Icons.check_circle,
+                                        color: colors.statusSuccess),
                                     label: Text(getItemAsString(e)),
                                   ),
                             ),
@@ -592,7 +707,8 @@ class PlexFormFieldMultiSelect<T> extends StatelessWidget {
                   },
                 ),
               ),
-              const Icon(Icons.arrow_drop_down, color: Colors.grey),
+              Icon(Icons.arrow_drop_down,
+                  color: PlexThemeData.of(context).colors.textMuted),
             ],
           ),
         ),
@@ -642,7 +758,8 @@ class PlexFormFieldAutoComplete<T> extends StatelessWidget {
   PlexWidgetController<T?>? _dropdownSelectionController;
 
   PlexWidgetController<T?> getDropDownController() {
-    _dropdownSelectionController ??= (dropdownSelectionController ?? PlexWidgetController<T?>());
+    _dropdownSelectionController ??=
+        (dropdownSelectionController ?? PlexWidgetController<T?>());
     return _dropdownSelectionController!;
   }
 
@@ -651,33 +768,45 @@ class PlexFormFieldAutoComplete<T> extends StatelessWidget {
     var inputWidget = InkWell(
       onTap: () => onFieldTap(context),
       child: Container(
-        decoration: BoxDecoration(
-            border: Border.all(
-              color: Theme.of(context).colorScheme.outline,
-              width: 1,
-            ),
-            borderRadius: BorderRadius.circular(properties.cornerRadius)),
+        decoration: _plexFormSelectDecoration(context, properties: properties),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: PlexDim.small, vertical: PlexDim.small),
+          padding: const EdgeInsets.symmetric(
+              horizontal: PlexDim.small, vertical: PlexDim.small),
           child: Row(
             children: [
               Expanded(
                 child: PlexWidget<T?>(
                   controller: getDropDownController(),
                   createWidget: (context, data) {
+                    final PlexColorTokens colors =
+                        PlexThemeData.of(context).colors;
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         if (properties.title != null) ...{
-                          Text("${properties.title}", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: PlexDim.small)),
+                          Text("${properties.title}",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: PlexDim.small,
+                                  color: colors.textSecondary)),
                         },
-                        Text(data != null ? dropdownItemAsString?.call(data) ?? data.toString() : noDataText),
+                        Text(
+                          data != null
+                              ? dropdownItemAsString?.call(data) ??
+                                  data.toString()
+                              : noDataText,
+                          style: TextStyle(
+                              color: properties.enabled
+                                  ? colors.textPrimary
+                                  : colors.textDisabled),
+                        ),
                       ],
                     );
                   },
                 ),
               ),
-              const Icon(Icons.arrow_drop_down, color: Colors.grey),
+              Icon(Icons.arrow_drop_down,
+                  color: PlexThemeData.of(context).colors.textMuted),
             ],
           ),
         ),
@@ -716,6 +845,135 @@ class PlexFormFieldAutoComplete<T> extends StatelessWidget {
       itemWidget: dropdownItemWidget,
       inputDelay: inputDelay,
     );
+  }
+}
+
+class PlexFormFieldCheckbox extends StatelessWidget {
+  const PlexFormFieldCheckbox({
+    super.key,
+    this.properties = const PlexFormFieldGeneric.empty(),
+    this.value = false,
+    this.onChanged,
+    this.tristate = false,
+  });
+
+  final PlexFormFieldGeneric properties;
+  final bool? value;
+  final ValueChanged<bool?>? onChanged;
+  final bool tristate;
+
+  @override
+  Widget build(BuildContext context) {
+    final PlexColorTokens colors = PlexThemeData.of(context).colors;
+    final Widget field = Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Checkbox(
+          value: tristate ? value : (value ?? false),
+          tristate: tristate,
+          onChanged: properties.enabled ? onChanged : null,
+          checkColor: colors.textInverse,
+          fillColor: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.selected))
+              return colors.brandPrimary;
+            return colors.surfaceCard;
+          }),
+          side: BorderSide(color: colors.borderStrong, width: 1.5),
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(PlexRadius.xs)),
+        ),
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.only(top: PlexDim.smallMedium),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (properties.title != null) ...{
+                  Text(
+                    properties.title!,
+                    style: TextStyle(
+                      color: properties.enabled
+                          ? colors.textPrimary
+                          : colors.textDisabled,
+                    ),
+                  ),
+                },
+                if (properties.helperText != null) ...{
+                  Text(
+                    properties.helperText!,
+                    style: TextStyle(
+                        color: colors.textMuted,
+                        fontSize: PlexFontSize.caption),
+                  ),
+                },
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+    return _wrapFormFieldMargin(properties, field);
+  }
+}
+
+class PlexFormFieldSwitch extends StatelessWidget {
+  const PlexFormFieldSwitch({
+    super.key,
+    this.properties = const PlexFormFieldGeneric.empty(),
+    this.value = false,
+    this.onChanged,
+  });
+
+  final PlexFormFieldGeneric properties;
+  final bool value;
+  final ValueChanged<bool>? onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final PlexColorTokens colors = PlexThemeData.of(context).colors;
+    final Widget field = Row(
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (properties.title != null) ...{
+                Text(
+                  properties.title!,
+                  style: TextStyle(
+                    color: properties.enabled
+                        ? colors.textPrimary
+                        : colors.textDisabled,
+                  ),
+                ),
+              },
+              if (properties.helperText != null) ...{
+                Text(
+                  properties.helperText!,
+                  style: TextStyle(
+                      color: colors.textMuted, fontSize: PlexFontSize.caption),
+                ),
+              },
+            ],
+          ),
+        ),
+        Switch(
+          value: value,
+          onChanged: properties.enabled ? onChanged : null,
+          trackColor: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.selected))
+              return colors.brandPrimary;
+            return colors.borderDefault;
+          }),
+          thumbColor: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.selected))
+              return colors.textInverse;
+            return colors.surfaceCard;
+          }),
+        ),
+      ],
+    );
+    return _wrapFormFieldMargin(properties, field);
   }
 }
 

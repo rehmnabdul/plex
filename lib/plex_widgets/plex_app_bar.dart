@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:plex/plex_utils/plex_dimensions.dart';
 
 /// Slots for AppBar layout - used by the CustomMultiChildLayout
 /// to identify and position each component of the AppBar
 enum _AppBarSlot {
   /// The leading widget (typically a back button or drawer hamburger)
   leading,
-  
+
   /// The title widget displayed in the center
   title,
-  
+
   /// The actions displayed at the right side
   actions,
 }
@@ -73,7 +74,8 @@ class PlexAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Size get preferredSize => Size.fromHeight(
-        (toolbarHeight ?? kToolbarHeight) + (bottom?.preferredSize.height ?? 0.0),
+        (toolbarHeight ?? PlexLayout.topbarHeight) +
+            (bottom?.preferredSize.height ?? 0.0),
       );
 
   @override
@@ -86,21 +88,35 @@ class PlexAppBar extends StatelessWidget implements PreferredSizeWidget {
     final double effectiveElevation = elevation ?? appBarTheme.elevation ?? 0.0;
     final ShapeBorder? effectiveShape = shape ?? appBarTheme.shape;
     final Color? effectiveShadow = shadowColor ?? appBarTheme.shadowColor;
-    final Color? effectiveSurfaceTint = surfaceTintColor ?? appBarTheme.surfaceTintColor;
-    final IconThemeData? effectiveIconTheme = iconTheme ?? appBarTheme.iconTheme;
-    final IconThemeData? effectiveActionsIconTheme = actionsIconTheme ?? appBarTheme.actionsIconTheme;
-    final double effectiveToolbarHeight = toolbarHeight ?? appBarTheme.toolbarHeight ?? kToolbarHeight;
-    final double effectiveTitleSpacing = titleSpacing ?? NavigationToolbar.kMiddleSpacing;
-    final bool effectiveCenterTitle = centerTitle ?? appBarTheme.centerTitle ?? false;
-    final SystemUiOverlayStyle? effectiveOverlay = systemOverlayStyle ?? appBarTheme.systemOverlayStyle;
+    final Color? effectiveSurfaceTint =
+        surfaceTintColor ?? appBarTheme.surfaceTintColor;
+    final IconThemeData? effectiveIconTheme =
+        iconTheme ?? appBarTheme.iconTheme;
+    final IconThemeData? effectiveActionsIconTheme =
+        actionsIconTheme ?? appBarTheme.actionsIconTheme;
+    final double effectiveToolbarHeight =
+        toolbarHeight ?? appBarTheme.toolbarHeight ?? PlexLayout.topbarHeight;
+    final double effectiveTitleSpacing =
+        titleSpacing ?? NavigationToolbar.kMiddleSpacing;
+    final bool effectiveCenterTitle =
+        centerTitle ?? appBarTheme.centerTitle ?? false;
+    final SystemUiOverlayStyle? effectiveOverlay =
+        systemOverlayStyle ?? appBarTheme.systemOverlayStyle;
 
     final Widget? leadingWidget = _buildLeading(context);
-    final Widget? constrainedLeading = leadingWidget == null || leadingWidth == null ? leadingWidget : SizedBox(width: leadingWidth, child: Align(alignment: Alignment.centerLeft, child: leadingWidget));
+    final Widget? constrainedLeading = leadingWidget == null ||
+            leadingWidth == null
+        ? leadingWidget
+        : SizedBox(
+            width: leadingWidth,
+            child:
+                Align(alignment: Alignment.centerLeft, child: leadingWidget));
 
     // Create a title text style that respects theme and foreground color
-    final TextStyle titleTextStyle = (theme.textTheme.titleLarge ?? const TextStyle())
-        .copyWith(color: effectiveFg);
-    
+    final TextStyle titleTextStyle =
+        (theme.textTheme.titleLarge ?? const TextStyle())
+            .copyWith(color: effectiveFg);
+
     // Wrap the title with appropriate text styling if it's not null
     final Widget? styledTitle = title != null
         ? DefaultTextStyle(
@@ -111,7 +127,7 @@ class PlexAppBar extends StatelessWidget implements PreferredSizeWidget {
             child: title!,
           )
         : null;
-    
+
     // Build the toolbar with appropriate icon theming
     final Widget toolbar = IconTheme.merge(
       data: effectiveIconTheme ?? const IconThemeData(),
@@ -135,8 +151,10 @@ class PlexAppBar extends StatelessWidget implements PreferredSizeWidget {
                 trailing: actions == null || actions!.isEmpty
                     ? null
                     : IconTheme.merge(
-                        data: effectiveActionsIconTheme ?? const IconThemeData(),
-                        child: Row(mainAxisSize: MainAxisSize.min, children: actions!),
+                        data:
+                            effectiveActionsIconTheme ?? const IconThemeData(),
+                        child: Row(
+                            mainAxisSize: MainAxisSize.min, children: actions!),
                       ),
                 centerMiddle: false,
                 middleSpacing: effectiveTitleSpacing,
@@ -169,7 +187,8 @@ class PlexAppBar extends StatelessWidget implements PreferredSizeWidget {
     );
 
     if (effectiveOverlay != null) {
-      return AnnotatedRegion<SystemUiOverlayStyle>(value: effectiveOverlay, child: bar);
+      return AnnotatedRegion<SystemUiOverlayStyle>(
+          value: effectiveOverlay, child: bar);
     }
     return bar;
   }
@@ -195,16 +214,16 @@ class PlexAppBar extends StatelessWidget implements PreferredSizeWidget {
         middleSpacing: titleSpacing ?? NavigationToolbar.kMiddleSpacing,
       );
     }
-    
+
     // Calculate space needed for leading and actions
     final double symmetricInset = _estimateSymmetricInset(
       hasLeading: leading != null,
       actionsCount: actions?.length ?? 0,
     );
-    
+
     // Create a list of children for the layout
     final List<Widget> layoutChildren = [];
-    
+
     // Add leading widget if present
     if (leading != null) {
       layoutChildren.add(
@@ -214,7 +233,7 @@ class PlexAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
       );
     }
-    
+
     // Always add title widget
     layoutChildren.add(
       LayoutId(
@@ -225,7 +244,7 @@ class PlexAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
       ),
     );
-    
+
     // Add actions if present
     if (actions != null && actions.isNotEmpty) {
       layoutChildren.add(
@@ -238,7 +257,7 @@ class PlexAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
       );
     }
-    
+
     return CustomMultiChildLayout(
       delegate: _AppBarLayoutDelegate(
         hasLeading: leading != null,
@@ -252,11 +271,14 @@ class PlexAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   static const double _kActionSlotExtent = 48.0;
 
-  double _estimateSymmetricInset({required bool hasLeading, required int actionsCount}) {
+  double _estimateSymmetricInset(
+      {required bool hasLeading, required int actionsCount}) {
     // Use a minimal padding to avoid hiding text unnecessarily
-    final double left = hasLeading ? (leadingWidth ?? kToolbarHeight) * 0.5 : 0.0;
-    final double right = actionsCount > 0 ? (_kActionSlotExtent * actionsCount) * 0.5 : 0.0;
-    
+    final double left =
+        hasLeading ? (leadingWidth ?? kToolbarHeight) * 0.5 : 0.0;
+    final double right =
+        actionsCount > 0 ? (_kActionSlotExtent * actionsCount) * 0.5 : 0.0;
+
     // Use a minimal inset to allow more text to be visible
     return (left > right ? left : right) * 0.5;
   }
@@ -266,7 +288,8 @@ class PlexAppBar extends StatelessWidget implements PreferredSizeWidget {
     if (!automaticallyImplyLeading) return null;
 
     final ModalRoute<dynamic>? parentRoute = ModalRoute.of(context);
-    final bool canPop = parentRoute?.canPop == true || Navigator.of(context).canPop();
+    final bool canPop =
+        parentRoute?.canPop == true || Navigator.of(context).canPop();
     final ScaffoldState? scaffold = Scaffold.maybeOf(context);
     final bool hasDrawer = scaffold?.hasDrawer == true;
 
@@ -304,13 +327,13 @@ class _AppBarLayoutDelegate extends MultiChildLayoutDelegate {
 
   /// Whether the AppBar has a leading widget.
   final bool hasLeading;
-  
+
   /// Whether the AppBar has action widgets.
   final bool hasActions;
-  
+
   /// Spacing around the title.
   final double titleSpacing;
-  
+
   /// Width of the leading widget, if specified.
   final double? leadingWidth;
 
@@ -318,7 +341,7 @@ class _AppBarLayoutDelegate extends MultiChildLayoutDelegate {
   void performLayout(Size size) {
     double leadingWidth = this.leadingWidth ?? kToolbarHeight;
     double actionsWidth = 0.0;
-    
+
     // Layout leading widget (left side)
     if (hasLeading && hasChild(_AppBarSlot.leading)) {
       // Constrain the leading widget to its specified width and full height
@@ -333,7 +356,7 @@ class _AppBarLayoutDelegate extends MultiChildLayoutDelegate {
     } else {
       leadingWidth = 0.0;
     }
-    
+
     // Layout actions widget (right side)
     if (hasActions && hasChild(_AppBarSlot.actions)) {
       // Allow actions to take as much space as needed
@@ -348,36 +371,39 @@ class _AppBarLayoutDelegate extends MultiChildLayoutDelegate {
       );
       actionsWidth = actionsSize.width;
     }
-    
+
     // Layout title widget (center)
     if (hasChild(_AppBarSlot.title)) {
       // Calculate the available width for the title
       // Use most of the available space, leaving only minimal margins for leading/actions
       final double minLeadingMargin = hasLeading ? 8.0 : 0.0;
       final double minActionsMargin = hasActions ? 8.0 : 0.0;
-      
+
       // Reserve just enough space for leading and actions with minimal margins
-      final double reservedLeadingWidth = leadingWidth > 0 ? leadingWidth + minLeadingMargin : 0.0;
-      final double reservedActionsWidth = actionsWidth > 0 ? actionsWidth + minActionsMargin : 0.0;
-      
+      final double reservedLeadingWidth =
+          leadingWidth > 0 ? leadingWidth + minLeadingMargin : 0.0;
+      final double reservedActionsWidth =
+          actionsWidth > 0 ? actionsWidth + minActionsMargin : 0.0;
+
       // Allow title to use most of the available space
-      final double maxWidth = size.width - reservedLeadingWidth - reservedActionsWidth;
-      
+      final double maxWidth =
+          size.width - reservedLeadingWidth - reservedActionsWidth;
+
       // Layout the title with the calculated constraints
       final Size titleSize = layoutChild(
         _AppBarSlot.title,
         BoxConstraints.loose(Size(maxWidth, size.height)),
       );
-      
+
       // Center the title horizontally and vertically
       final double titleX = (size.width - titleSize.width) / 2.0;
       final double titleY = (size.height - titleSize.height) / 2.0;
-      
+
       // Ensure title doesn't overlap with leading or actions
       final double minX = leadingWidth;
       final double maxX = size.width - actionsWidth - titleSize.width;
       final double adjustedTitleX = titleX.clamp(minX, maxX);
-      
+
       positionChild(_AppBarSlot.title, Offset(adjustedTitleX, titleY));
     }
   }

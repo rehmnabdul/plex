@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
+import 'package:plex/plex_theme.dart';
+import 'package:plex/plex_utils/plex_dimensions.dart';
 import 'package:toastification/toastification.dart';
 
 class MessageType {
@@ -23,6 +26,55 @@ class MessageStyle {
   const MessageStyle(this.style);
 }
 
+PlexColorTokens _messageTokens(BuildContext? context) {
+  final BuildContext? ctx = context ?? Get.context;
+  if (ctx != null) return PlexThemeData.of(ctx).colors;
+  return PlexThemeData.fallback().colors;
+}
+
+({Color primary, Color background, Color foreground}) _toastPalette(
+  PlexColorTokens colors,
+  MessageType type,
+) {
+  switch (type.type) {
+    case ToastificationType.success:
+      return (
+        primary: colors.statusSuccess,
+        background: colors.statusSuccessSoft,
+        foreground: colors.statusSuccessInk,
+      );
+    case ToastificationType.error:
+      return (
+        primary: colors.statusDanger,
+        background: colors.statusDangerSoft,
+        foreground: colors.statusDangerInk,
+      );
+    case ToastificationType.warning:
+      return (
+        primary: colors.statusWarning,
+        background: colors.statusWarningSoft,
+        foreground: colors.statusWarningInk,
+      );
+    case ToastificationType.info:
+      return (
+        primary: colors.statusInfo,
+        background: colors.statusInfoSoft,
+        foreground: colors.statusInfoInk,
+      );
+  }
+}
+
+List<BoxShadow> _toastShadow(PlexColorTokens colors) {
+  return [
+    BoxShadow(
+      color: colors.brandInk.withValues(alpha: 0.07),
+      blurRadius: 16,
+      offset: const Offset(0, 16),
+      spreadRadius: 0,
+    ),
+  ];
+}
+
 extension SnackBarUtils on BuildContext {
   ///Use [showMessage] If you are not using [PlexApp], If you are using the [PlexApp] use [showMessage] without context
   String? showMessage(
@@ -41,6 +93,8 @@ extension SnackBarUtils on BuildContext {
     Widget? customIcon,
   }) {
     if (!mounted) return null;
+    final PlexColorTokens colors = _messageTokens(this);
+    final palette = _toastPalette(colors, type);
     return toastification.show(
       context: this,
       type: type.type,
@@ -60,14 +114,11 @@ extension SnackBarUtils on BuildContext {
             }
           : null,
       icon: customIcon,
-      boxShadow: const [
-        BoxShadow(
-          color: Color(0x07000000),
-          blurRadius: 16,
-          offset: Offset(0, 16),
-          spreadRadius: 0,
-        )
-      ],
+      primaryColor: palette.primary,
+      backgroundColor: palette.background,
+      foregroundColor: palette.foreground,
+      borderRadius: BorderRadius.circular(PlexRadius.md),
+      boxShadow: _toastShadow(colors),
       showProgressBar: autoClose,
       closeButtonShowType: CloseButtonShowType.onHover,
       closeOnClick: false,
@@ -157,6 +208,8 @@ extension SnackBarUtilsOnObject on Object {
     int animationDurationMillis = 300,
     Widget? customIcon,
   }) {
+    final PlexColorTokens colors = _messageTokens(null);
+    final palette = _toastPalette(colors, type);
     return toastification.show(
       type: type.type,
       style: style.style,
@@ -175,14 +228,11 @@ extension SnackBarUtilsOnObject on Object {
             }
           : null,
       icon: customIcon,
-      boxShadow: const [
-        BoxShadow(
-          color: Color(0x07000000),
-          blurRadius: 16,
-          offset: Offset(0, 16),
-          spreadRadius: 0,
-        )
-      ],
+      primaryColor: palette.primary,
+      backgroundColor: palette.background,
+      foregroundColor: palette.foreground,
+      borderRadius: BorderRadius.circular(PlexRadius.md),
+      boxShadow: _toastShadow(colors),
       showProgressBar: autoClose,
       closeButtonShowType: CloseButtonShowType.onHover,
       closeOnClick: false,

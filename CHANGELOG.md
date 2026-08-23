@@ -1,3 +1,20 @@
+## 2.0.1-beta.5
+
+### Phase 2 — form fields
+- Restyle `PlexFormFieldInput`, date, dropdown, multi-select, and autocomplete with Phase 0 tokens (fill, border, radius, helper/error text). Existing constructors stay compatible
+- Add `PlexFormFieldCheckbox` and `PlexFormFieldSwitch` (title/helper via `PlexFormFieldGeneric`, brand colors)
+
+### Phase 3 — surfaces and feedback
+- Optional `PlexCard` slots: `title`, `subtitle`, `actions`, `footer`, plus `hover` and `flush`. Existing child-only cards keep prior padding/elevation
+- New widgets: `PlexAlert` (info/success/warning/danger, optional dismiss) and `PlexProgressBar` (size/tone)
+- Token-tint `PlexShimmer` defaults and toast/snackbar palettes in `PlexMessages`
+
+### Phase 4 — login chrome and navigation
+- `PlexLoginConfig.layout` defaults to `PlexLoginLayout.split` (pass `centered` for the historic card). Optional brand/form copy fields
+- `PlexAppBar` toolbar height defaults to 64 (`PlexLayout.topbarHeight`)
+- Navigation rail widget defaults stay 90 collapsed / 260 expanded (`PlexLayout.railCollapsed` / `railExpanded`)
+- New `PlexTabs` / `PlexTabPanel` for in-body tabs; `PlexScreen.getTabBar` is unchanged
+
 ## 2.0.1-beta.4
 
 ### Phase 1 — buttons, badge, avatar

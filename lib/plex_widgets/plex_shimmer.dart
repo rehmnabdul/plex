@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:plex/plex_theme.dart';
+import 'package:plex/plex_utils/plex_dimensions.dart';
 
 /// [PlexShimmerDirection] controls the direction of the shimmer effect
 ///
@@ -32,8 +34,8 @@ class PlexShimmer extends StatefulWidget {
     this.shimmerEffectCount = 0,
     this.showShimmerEffect = true,
     this.showGradient = false,
-    this.mainColor = Colors.grey,
-    this.secondaryColor = const Color(0xffE0E0E0),
+    this.mainColor,
+    this.secondaryColor,
   });
 
   /// The child of type [Widget] to display shimmer effect.
@@ -64,13 +66,13 @@ class PlexShimmer extends StatefulWidget {
 
   /// Defines the main color of the [child]'s shimmer effect.
   /// Child [Widget] takes main color, only if [showGradient] is false.
-  /// Default [showGradient] will be false.
-  final Color mainColor;
+  /// When null, uses [PlexColorTokens.surfaceSunken].
+  final Color? mainColor;
 
   /// defines the secondary color of the [child]'s shimmer effect.
   /// Child [Widget] takes secondary color, only if [showGradient] is false.
-  /// Default [showGradient] will be false.
-  final Color secondaryColor;
+  /// When null, uses [PlexColorTokens.surfaceHover].
+  final Color? secondaryColor;
 
   @override
   PlexShimmerState createState() => PlexShimmerState();
@@ -113,35 +115,29 @@ class PlexShimmerState extends State<PlexShimmer>
   }
 
   @override
-  Widget build(BuildContext context) => AnimatedBuilder(
-        animation: _controller,
-        child: widget.child,
-        builder: (BuildContext context, Widget? child) => _PlexShimmer(
-          direction: widget.direction,
-          gradient: widget.showGradient
-              ? widget.gradient
-              : LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.centerRight,
-                  colors: <Color>[
-                      widget.mainColor,
-                      widget.mainColor,
-                      widget.secondaryColor,
-                      widget.mainColor,
-                      widget.mainColor
-                    ],
-                  stops: const <double>[
-                      0,
-                      0.3,
-                      0.5,
-                      0.7,
-                      1
-                    ]),
-          controllerValue: _controller.value,
-          showShimmerEffect: widget.showShimmerEffect,
-          child: child,
-        ),
-      );
+  Widget build(BuildContext context) {
+    final PlexColorTokens colors = PlexThemeData.of(context).colors;
+    final Color main = widget.mainColor ?? colors.surfaceSunken;
+    final Color secondary = widget.secondaryColor ?? colors.surfaceHover;
+    return AnimatedBuilder(
+      animation: _controller,
+      child: widget.child,
+      builder: (BuildContext context, Widget? child) => _PlexShimmer(
+        direction: widget.direction,
+        gradient: widget.showGradient
+            ? widget.gradient
+            : LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.centerRight,
+                colors: <Color>[main, main, secondary, main, main],
+                stops: const <double>[0, 0.3, 0.5, 0.7, 1],
+              ),
+        controllerValue: _controller.value,
+        showShimmerEffect: widget.showShimmerEffect,
+        child: child,
+      ),
+    );
+  }
 
   @override
   void dispose() {
@@ -270,4 +266,53 @@ class PlexShimmerFilter extends RenderProxyBox {
 
   double _offset(double start, double end, double controllerValue) =>
       start + (end - start) * controllerValue;
+}
+
+/// Cheap placeholder block that reuses [PlexShimmer].
+class PlexSkeleton extends StatelessWidget {
+  const PlexSkeleton({
+    super.key,
+    this.width,
+    this.height = 12,
+    this.radius,
+    this.shape = BoxShape.rectangle,
+  });
+
+  const PlexSkeleton.line({
+    super.key,
+    this.width,
+    this.height = 12,
+  })  : radius = PlexRadius.sm,
+        shape = BoxShape.rectangle;
+
+  const PlexSkeleton.circle({
+    super.key,
+    double size = 40,
+  })  : width = size,
+        height = size,
+        radius = null,
+        shape = BoxShape.circle;
+
+  final double? width;
+  final double height;
+  final double? radius;
+  final BoxShape shape;
+
+  @override
+  Widget build(BuildContext context) {
+    final PlexColorTokens colors = PlexThemeData.of(context).colors;
+    return PlexShimmer(
+      child: Container(
+        width: width,
+        height: height,
+        decoration: BoxDecoration(
+          color: colors.surfaceSunken,
+          shape: shape,
+          borderRadius: shape == BoxShape.circle
+              ? null
+              : BorderRadius.circular(radius ?? PlexRadius.sm),
+        ),
+      ),
+    );
+  }
 }

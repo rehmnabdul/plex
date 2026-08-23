@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:plex/plex_theme.dart';
 import 'package:plex/plex_utils/plex_dimensions.dart';
 import 'package:plex/plex_utils/plex_routing.dart';
 import 'package:plex/plex_widgets/plex_form_field_widgets.dart';
@@ -52,6 +53,9 @@ class PlexInfoDialog {
     EdgeInsets insetPadding = const EdgeInsets.symmetric(horizontal: 40.0, vertical: 24.0),
     Widget? customContent,
   }) {
+    final PlexColorTokens colors = PlexThemeData.of(context).colors;
+    final ({Color accent, Color ink}) status = _statusColors(colors, type);
+
     return showDialog<T>(
       context: context,
       barrierDismissible: isDismissible,
@@ -59,95 +63,125 @@ class PlexInfoDialog {
       useSafeArea: useSafeArea,
       builder: (context) {
         return Dialog(
-          backgroundColor: backgroundColor,
+          backgroundColor: backgroundColor ?? colors.surfaceCard,
           elevation: elevation,
           shape: shape,
           insetPadding: insetPadding,
-          child: Padding(
-            padding: MediaQuery.of(context).viewInsets,
-            child: ConstrainedBox(
-              constraints: constraints ?? const BoxConstraints(),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Column(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Container(height: 3, color: status.accent),
+              Padding(
+                padding: MediaQuery.of(context).viewInsets,
+                child: ConstrainedBox(
+                  constraints: constraints ?? const BoxConstraints(),
+                  child: Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      if (icon != null)
-                        Padding(
-                          padding: EdgeInsets.all(PlexDim.small),
-                          child: Center(child: icon),
-                        ),
-                      if (title != null)
-                        Padding(
-                          padding: EdgeInsets.all(PlexDim.small),
-                          child: Text(
-                            title,
-                            style: Theme.of(context).textTheme.titleMedium,
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      if (message != null)
-                        Padding(
-                          padding: EdgeInsets.all(PlexDim.small),
-                          child: Text(
-                            message,
-                            style: Theme.of(context).textTheme.bodyMedium,
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      if (customContent != null) customContent,
-                    ],
-                  ),
-                  Padding(
-                    padding: EdgeInsets.all(PlexDim.small),
-                    child: Row(
-                      children: [
-                        if (showCancel)
-                          Expanded(
-                            child: PlexFormFieldButton(
-                              properties: PlexFormFieldGeneric.title(cancelLabel),
-                              buttonType: cancelButtonType,
-                              buttonClick: () {
-                                Plex.back();
-                                if (onCancel != null) onCancel();
-                              },
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          if (icon != null)
+                            Padding(
+                              padding: const EdgeInsets.all(PlexDim.small),
+                              child: Center(
+                                child: IconTheme(
+                                  data: IconThemeData(color: status.accent),
+                                  child: icon,
+                                ),
+                              ),
                             ),
-                          ),
-                        if (actions != null)
-                          ...actions.map((action) => Expanded(
+                          if (title != null)
+                            Padding(
+                              padding: const EdgeInsets.all(PlexDim.small),
+                              child: Text(
+                                title,
+                                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                      color: status.ink,
+                                    ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          if (message != null)
+                            Padding(
+                              padding: const EdgeInsets.all(PlexDim.small),
+                              child: Text(
+                                message,
+                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                      color: colors.textSecondary,
+                                    ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          if (customContent != null) customContent,
+                        ],
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(PlexDim.small),
+                        child: Row(
+                          children: [
+                            if (showCancel)
+                              Expanded(
                                 child: PlexFormFieldButton(
-                                  properties: PlexFormFieldGeneric.title(action.label),
-                                  buttonType: action.actionType,
+                                  properties: PlexFormFieldGeneric.title(cancelLabel),
+                                  buttonType: cancelButtonType,
                                   buttonClick: () {
                                     Plex.back();
-                                    action.onPressed?.call();
+                                    if (onCancel != null) onCancel();
                                   },
                                 ),
-                              )),
-                        if (showOk)
-                          Expanded(
-                            child: PlexFormFieldButton(
-                              properties: PlexFormFieldGeneric.title(okLabel),
-                              buttonType: okButtonType,
-                              buttonClick: () {
-                                Plex.back();
-                                if (onOk != null) onOk();
-                              },
-                            ),
-                          ),
-                      ],
-                    ),
+                              ),
+                            if (actions != null)
+                              ...actions.map((action) => Expanded(
+                                    child: PlexFormFieldButton(
+                                      properties: PlexFormFieldGeneric.title(action.label),
+                                      buttonType: action.actionType,
+                                      buttonClick: () {
+                                        Plex.back();
+                                        action.onPressed?.call();
+                                      },
+                                    ),
+                                  )),
+                            if (showOk)
+                              Expanded(
+                                child: PlexFormFieldButton(
+                                  properties: PlexFormFieldGeneric.title(okLabel),
+                                  buttonType: okButtonType,
+                                  buttonClick: () {
+                                    Plex.back();
+                                    if (onOk != null) onOk();
+                                  },
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
-            ),
+            ],
           ),
         );
       },
     );
+  }
+}
+
+({Color accent, Color ink}) _statusColors(
+  PlexColorTokens colors,
+  PlexInfoDialogType type,
+) {
+  switch (type) {
+    case PlexInfoDialogType.error:
+      return (accent: colors.statusDanger, ink: colors.statusDangerInk);
+    case PlexInfoDialogType.alert:
+      return (accent: colors.statusWarning, ink: colors.statusWarningInk);
+    case PlexInfoDialogType.info:
+      return (accent: colors.statusInfo, ink: colors.statusInfoInk);
   }
 }
 

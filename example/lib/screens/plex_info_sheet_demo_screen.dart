@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:plex/plex_screens/plex_screen.dart';
 import 'package:plex/plex_utils/plex_messages.dart';
+import 'package:plex/plex_widgets/plex_alert.dart';
 import 'package:plex/plex_widgets/plex_form_field_widgets.dart';
 import 'package:plex/plex_widgets/plex_info_sheet.dart';
 
@@ -162,6 +163,25 @@ class _PlexInfoSheetDemoScreenState extends PlexState<PlexInfoSheetDemoScreen> {
           properties: PlexFormFieldGeneric.title('Show Custom Content Sheet'),
           buttonType: PlexButtonType.elevated,
           buttonClick: _showCustomContentSheet,
+        ),
+        const SizedBox(height: 16),
+        PlexFormFieldButton(
+          properties: PlexFormFieldGeneric.title('Show Token Toast'),
+          buttonType: PlexButtonType.outlined,
+          buttonClick: () {
+            context.showMessage(
+              'Semantic toast colors from PlexThemeData.',
+              title: 'Toast',
+              type: MessageType.success,
+            );
+          },
+        ),
+        const SizedBox(height: 16),
+        PlexAlert(
+          variant: PlexAlertVariant.info,
+          title: 'Inline alert',
+          message: 'PlexAlert sits on the page, unlike the sheet.',
+          onClose: () {},
         ),
       ],
     );

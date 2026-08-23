@@ -79,6 +79,8 @@ class PlexMotion {
 }
 
 /// Layout constants. Rail *widgets* still use 90/260; 76/264 are optional tokens.
+/// [PlexNavigationRail] reads [railCollapsed] / [railExpanded] so widget
+/// defaults stay 90 / 260 and do not snap to [sidebarCollapsed] / [sidebarExpanded].
 class PlexLayout {
   PlexLayout._();
 
@@ -118,6 +120,8 @@ Widget spaceMini() => const SizedBox(width: PlexDim.mini, height: PlexDim.mini);
 Widget spaceSmallest() =>
     const SizedBox(width: PlexDim.smallest, height: PlexDim.smallest);
 
-Widget spaceSmall() => const SizedBox(width: PlexDim.small, height: PlexDim.small);
+Widget spaceSmall() =>
+    const SizedBox(width: PlexDim.small, height: PlexDim.small);
 
-Widget spaceMedium() => const SizedBox(width: PlexDim.medium, height: PlexDim.medium);
+Widget spaceMedium() =>
+    const SizedBox(width: PlexDim.medium, height: PlexDim.medium);

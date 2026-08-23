@@ -18,6 +18,8 @@ class PlexAdvanceDataTableAdapter {
             numeric: header.isNumber,
             sortable: header.showOrderByControl,
             searchable: header.showFilterControl,
+            filterable: header.showFilterControl,
+            groupable: true,
             value: (List<PlexDataTableValueCell> row) =>
                 valueFor(row, header.columnName),
             cell: (BuildContext context, List<PlexDataTableValueCell> row) {
@@ -66,17 +68,15 @@ class PlexAdvanceDataTableAdapter {
     }).toList();
   }
 
-  static Widget _buildCell(
+  static Widget? _buildCell(
     List<PlexDataTableValueCell> row,
     String columnName,
   ) {
     final PlexDataTableValueCell? cell = cellFor(row, columnName);
-    if (cell == null) return const SizedBox.shrink();
-    if (cell.isWidget) {
-      final Object? value = cell.value;
-      if (value is Widget) return value;
-      return Text(cell.cellValue ?? '');
-    }
-    return Text(cell.value?.toString() ?? '');
+    if (cell == null || !cell.isWidget) return null;
+    final Object? value = cell.value;
+    if (value is PlexComparableWidget) return value.widget;
+    if (value is Widget) return value;
+    return null;
   }
 }

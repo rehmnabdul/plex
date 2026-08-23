@@ -177,7 +177,7 @@ class AdvanceDataTableDemoScreen extends StatelessWidget {
               tone: PlexBadgeTone.warning,
             ),
             child: Text(
-              "PlexDataGrid is the visible engine. Excel and PDF export use PlexPrinter (Plex-owned PDF; xlsio for Excel). Grouping, freeze, and cell editing are not mapped. Prefer PlexDataGrid for new tables.",
+              "PlexDataGrid is the visible engine. Sort, search, per-column filters, grouping, and CSV / Excel / PDF export are mapped. Freeze and cell editing still compile but are not mapped. Prefer PlexDataGrid for new tables.",
             ),
           ),
           const SizedBox(height: PlexDim.medium),
@@ -186,6 +186,11 @@ class AdvanceDataTableDemoScreen extends StatelessWidget {
             child: PlexAdvanceDataTable(
               title: "Advance Data Table",
               widthMode: WidthMode.none,
+              enableColumnGrouping: true,
+              initialColumnGroup: ['Designation'],
+              enableExcelExport: true,
+              enablePdfExport: true,
+              enableCsvExport: true,
               columns: [
                 PlexDataTableHeaderCell.text("Id", showOrderByControl: false),
                 PlexDataTableHeaderCell.text("First", showFilterControl: false),

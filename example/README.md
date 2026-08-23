@@ -1,6 +1,6 @@
 # plex_app
 
-Example application for the Plex Flutter UI framework. It is a visual QA of Phases 0–5c plus restyled feature demos — not a product branded app.
+Example application for the Plex Flutter UI framework. It is a visual QA of Phases 0–5d plus restyled feature demos — not a product branded app.
 
 ## Run
 
@@ -12,7 +12,7 @@ flutter pub get
 flutter run
 ```
 
-The example depends on the local package (`plex: path: ../../plex`). Published apps should use `plex: 2.0.1-beta.8` (see the root README).
+The example depends on the local package (`plex: path: ../../plex`). Published apps should use `plex: 2.0.1-beta.9` (see the root README).
 
 ## What you will see
 
@@ -22,12 +22,14 @@ Login defaults to `PlexLoginLayout.split` with generic copy and `assets/app.png`
 
 `PlexDataGrid` is the table engine. `PlexAdvanceDataTable` is a deprecated wrapper around it. Excel and PDF export use `PlexPrinter` (Plex-owned PDF; Excel still via xlsio). The package no longer depends on Syncfusion DataGrid.
 
+**`PlexDataGrid` capabilities** (Design system → **Plex Data Grid**, route `/data-grid`): sort, toolbar search, per-column filters (`showColumnFilters`), nested grouping (`groupByColumnIds`), per-group summaries, CSV / Excel / PDF (opt-in flags), custom `cell` widgets, and `rowStyle` / `cellStyle`. Export flags default to off on the grid; the Advance wrapper still defaults Excel/PDF on.
+
 ### Dashboard categories
 
 | Category | Routes | Purpose |
 | --- | --- | --- |
 | **Overview** | `/home` | Landing page, shortcuts, badges, avatar |
-| **Design system** | `/ui-theme`, `/ui-buttons`, `/ui-forms`, `/ui-feedback`, `/ui-tabs`, `/data-grid` | Phases 0–5c widget QA |
+| **Design system** | `/ui-theme`, `/ui-buttons`, `/ui-forms`, `/ui-feedback`, `/ui-tabs`, `/data-grid` | Phases 0–5d widget QA |
 | **Tables** | `/dashboard`, `/paginated-table`, `/advance-data-table`, `/dashboardExternal` | Existing table widgets (`PlexAdvanceDataTable` is a deprecated wrapper around `PlexDataGrid`; Excel/PDF export use `PlexPrinter`) |
 | **Forms** | `/all-inputs`, `/form-usage` | Full field catalog and `PlexFormWidget` |
 | **Widgets** | autocomplete sample, logo route, updatable widget, info sheet, scanner | Existing demos, restyled |
@@ -42,7 +44,7 @@ Dashboard AppBar is `PlexAppBar`. Screens inside the dashboard should not add a 
 - **Forms** — restyled `PlexFormField*`, checkbox, switch
 - **Cards & feedback** — card slots, `PlexAlert`, `PlexProgressBar`, `PlexSkeleton` / `PlexShimmer`, toasts
 - **Tabs** — `PlexTabs` + `PlexTabPanel`
-- **Plex Data Grid** — `PlexDataGrid` (the table engine; prefer over the deprecated `PlexAdvanceDataTable` wrapper)
+- **Plex Data Grid** — `/data-grid` — `PlexDataGrid` (sort, search, column filters, nested grouping, summaries, CSV / Excel / PDF, custom cells, styles). Prefer over the deprecated `PlexAdvanceDataTable` wrapper
 
 ## Copy-paste: app wiring
 

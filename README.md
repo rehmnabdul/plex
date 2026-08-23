@@ -55,7 +55,7 @@ PlexDataTable(
 ```
 
 #### `PlexAdvanceDataTable`
-Deprecated compatibility wrapper around `PlexDataGrid`. Existing header/cell constructors still compile. Prefer `PlexDataGrid` for new tables — it is the table engine. Excel and PDF export use `PlexPrinter`. Grouping, freeze, and cell editing are not mapped.
+Deprecated compatibility wrapper around `PlexDataGrid`. Existing header/cell constructors still compile. Prefer `PlexDataGrid` for new tables — it is the table engine. Excel, PDF, and optional CSV export use `PlexPrinter`. Grouping and per-column filters map onto `PlexDataGrid`. Freeze and cell editing still compile but are not mapped.
 ```dart
 PlexAdvanceDataTable(
   title: "Employees",
@@ -243,16 +243,209 @@ PlexTabs(
 ```
 
 #### `PlexDataGrid`
-Plex-owned client-side grid (sort, search, selection, pagination). Prefer this over the deprecated `PlexAdvanceDataTable` wrapper.
+Plex-owned client-side grid. Prefer this over the deprecated `PlexAdvanceDataTable` wrapper.
+
+**Built in:** sort, toolbar search, per-column filters, nested grouping, per-group summaries, selection, pagination, CSV / Excel / PDF export, custom `cell` widgets, and `rowStyle` / `cellStyle`.
+
+##### Columns and `value`
+
+Every column needs `id`, `title`, and a `value` accessor. `value` drives sort, search, filter, grouping, summaries, and CSV / Excel / PDF. Optional `cell` only changes what is painted.
+
 ```dart
+class Employee {
+  const Employee({
+    required this.id,
+    required this.name,
+    required this.role,
+    required this.status,
+    required this.salary,
+  });
+
+  final int id;
+  final String name;
+  final String role;
+  final String status;
+  final double salary;
+}
+
 PlexDataGrid<Employee>(
   title: "Employees",
-  selectionMode: PlexDataGridSelectionMode.multiple,
-  pageSize: 10,
   rowId: (row) => row.id,
   columns: [
     PlexDataGridColumn(id: "id", title: "Id", numeric: true, value: (row) => row.id),
     PlexDataGridColumn(id: "name", title: "Name", value: (row) => row.name),
+    PlexDataGridColumn(id: "role", title: "Role", value: (row) => row.role),
+    PlexDataGridColumn(id: "status", title: "Status", value: (row) => row.status),
+    PlexDataGridColumn(
+      id: "salary",
+      title: "Salary",
+      numeric: true,
+      value: (row) => row.salary,
+    ),
+  ],
+  rows: employees,
+)
+```
+
+##### Sort, search, and per-column filter
+
+Header tap on a `sortable` column cycles **ascending → descending → unsorted** (single-column sort). Toolbar search (`showSearch`, default `true`) matches `searchable` columns. Set `showColumnFilters: true` for a filter row under the header. Each `filterable` column gets a contains/equals field (`PlexDataGridFilterMatch`).
+
+```dart
+PlexDataGrid<Employee>(
+  title: "Employees",
+  rowId: (row) => row.id,
+  showSearch: true,
+  showColumnFilters: true,
+  onSort: (sort) {
+    // sort is PlexDataGridSort? — null when unsorted
+  },
+  onSearch: (query) {},
+  columns: [
+    PlexDataGridColumn(id: "id", title: "Id", numeric: true, value: (row) => row.id),
+    PlexDataGridColumn(id: "name", title: "Name", value: (row) => row.name),
+    PlexDataGridColumn(
+      id: "role",
+      title: "Role",
+      value: (row) => row.role,
+      filterable: true, // default; set false to skip the filter field
+    ),
+  ],
+  rows: employees,
+)
+```
+
+##### CSV / Excel / PDF export
+
+Flags are **opt-in on `PlexDataGrid`** (all default `false`). The deprecated `PlexAdvanceDataTable` wrapper still defaults **Excel and PDF to `true`** and CSV to `false`. Export always uses `value`, not the `cell` widget.
+
+```dart
+PlexDataGrid<Employee>(
+  title: "Employees",
+  rowId: (row) => row.id,
+  enableCsvExport: true,
+  enableExcelExport: true,
+  enablePdfExport: true,
+  columns: [
+    PlexDataGridColumn(id: "name", title: "Name", value: (row) => row.name),
+    PlexDataGridColumn(id: "salary", title: "Salary", numeric: true, value: (row) => row.salary),
+  ],
+  rows: employees,
+)
+```
+
+##### Nested grouping
+
+`enableGrouping: true` shows the group-by toolbar (chips plus a header action). Pass `groupByColumnIds` for nested groups — first id is the outer group. `groupByColumnId` still works as a single-column convenience when `groupByColumnIds` is omitted. `onGroupChanged` receives the full `List<String>` of grouping ids (empty list means no grouping).
+
+```dart
+PlexDataGrid<Employee>(
+  title: "Employees",
+  rowId: (row) => row.id,
+  enableGrouping: true,
+  groupByColumnIds: ["role", "status"],
+  // groupByColumnId: "role", // still valid for a single grouping column
+  autoExpandGroups: true,
+  onGroupChanged: (List<String> columnIds) {
+    // [] when the user clears grouping
+  },
+  columns: [
+    PlexDataGridColumn(id: "name", title: "Name", value: (row) => row.name),
+    PlexDataGridColumn(id: "role", title: "Role", value: (row) => row.role),
+    PlexDataGridColumn(id: "status", title: "Status", value: (row) => row.status),
+    PlexDataGridColumn(id: "salary", title: "Salary", numeric: true, value: (row) => row.salary),
+  ],
+  rows: employees,
+)
+```
+
+##### Group summaries
+
+Summaries are **on by default** (`showGroupSummaries: true`). Default cells are **row count** plus **sum** of each `numeric` column, using that group's leaf `rows` (all descendants in nested groups). Users can hide/show summaries from the toolbar. Return `null` from `groupSummary` to keep the default; supply cells to replace it. `groupSummaryBuilder` is used when `groupSummary` is null or returns null — return `null` there to keep the default widget.
+
+```dart
+PlexDataGrid<Employee>(
+  title: "Employees",
+  rowId: (row) => row.id,
+  enableGrouping: true,
+  groupByColumnIds: ["role"],
+  showGroupSummaries: true,
+  groupSummary: (PlexDataGridGroup<Employee> group) {
+    // group.rows is every descendant leaf row in this group
+    return [
+      PlexDataGridSummaryCell(
+        columnId: "name",
+        text: "${group.rows.length} people",
+      ),
+    ];
+  },
+  columns: [
+    PlexDataGridColumn(id: "name", title: "Name", value: (row) => row.name),
+    PlexDataGridColumn(id: "role", title: "Role", value: (row) => row.role),
+    PlexDataGridColumn(id: "salary", title: "Salary", numeric: true, value: (row) => row.salary),
+  ],
+  rows: employees,
+)
+```
+
+##### Custom `cell` widgets
+
+Optional `cell` replaces the default text for that column (buttons, badges, etc.). Keep `value` for sort, filter, grouping, and export.
+
+```dart
+PlexDataGridColumn<Employee>(
+  id: "status",
+  title: "Status",
+  value: (row) => row.status, // still used for search / filter / CSV / Excel / PDF
+  cell: (context, row) {
+    return PlexBadge(
+      label: row.status,
+      tone: row.status == "Active" ? PlexBadgeTone.success : PlexBadgeTone.warning,
+      dot: true,
+    );
+  },
+),
+PlexDataGridColumn<Employee>(
+  id: "action",
+  title: "Action",
+  sortable: false,
+  filterable: false,
+  groupable: false,
+  value: (row) => row.id,
+  cell: (context, row) {
+    return IconButton(
+      icon: const Icon(Icons.edit_outlined),
+      onPressed: () {},
+    );
+  },
+),
+```
+
+##### `rowStyle` vs `cellStyle`
+
+`PlexDataGrid.rowStyle` styles every default text cell in the row. `PlexDataGridColumn.cellStyle` overlays that row style **field-by-field** (`PlexDataGridCellStyle.merge`: non-null fields on `cellStyle` win). Conditions are ordinary Dart in the callbacks. `rowStyle.backgroundColor` tints the whole row (selection color still wins when the row is selected). Custom `cell` widgets are not restyled by these text styles.
+
+```dart
+PlexDataGrid<Employee>(
+  title: "Employees",
+  rowId: (row) => row.id,
+  rowStyle: (row) {
+    if (row.status == "On leave") {
+      return const PlexDataGridCellStyle(color: Color(0xFFB45309));
+    }
+    return null;
+  },
+  columns: [
+    PlexDataGridColumn(id: "name", title: "Name", value: (row) => row.name),
+    PlexDataGridColumn(
+      id: "salary",
+      title: "Salary",
+      numeric: true,
+      value: (row) => row.salary,
+      cellStyle: (row) => row.salary < 0
+          ? const PlexDataGridCellStyle(color: Color(0xFFB91C1C))
+          : null,
+    ),
   ],
   rows: employees,
 )
@@ -454,7 +647,7 @@ Add PLEX to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  plex: 2.0.1-beta.8
+  plex: 2.0.1-beta.9
 ```
 
 Then run:
@@ -463,7 +656,7 @@ Then run:
 flutter pub get
 ```
 
-The example app under `/example` is a full visual QA of Phases 0–5c (theme, buttons, forms, feedback, tabs, `PlexDataGrid`) plus restyled feature demos. Run it with:
+The example app under `/example` is a full visual QA of Phases 0–5d (theme, buttons, forms, feedback, tabs, `PlexDataGrid`) plus restyled feature demos. Run it with:
 
 ```sh
 cd example
@@ -612,9 +805,9 @@ See **Widgets & Components** for IconButton, Badge, Avatar, Alert, ProgressBar, 
 
 ### What changed (2.0.1 betas) / Migration
 
-This 2.x beta line started after pub.dev `2.0.1-beta.1`. Pin **2.0.1-beta.8**. Stable **2.0.1** follows the beta series.
+This 2.x beta line started after pub.dev `2.0.1-beta.1`. Pin **2.0.1-beta.9**. Stable **2.0.1** follows the beta series.
 
-Shipped: **beta.2** Phase 0 tokens · **beta.3** `.pubignore` for Interloop Design · **beta.4** Phase 1 · **beta.5** Phases 2–4 · **beta.6** `PlexDataGrid` + example redesign · **beta.7** `PlexAdvanceDataTable` wrapper · **beta.8** Phase 5c (Syncfusion grid removal) + this docs pass.
+Shipped: **beta.2** Phase 0 tokens · **beta.3** `.pubignore` for Interloop Design · **beta.4** Phase 1 · **beta.5** Phases 2–4 · **beta.6** `PlexDataGrid` + example redesign · **beta.7** `PlexAdvanceDataTable` wrapper · **beta.8** Phase 5c (Syncfusion grid removal) · **beta.9** DataGrid grouping, summaries, export flags, filters, and cell styles.
 
 **Constructors are mostly additive.** Existing required arguments did not change. New optional fields default to previous behavior.
 
@@ -629,9 +822,16 @@ Shipped: **beta.2** Phase 0 tokens · **beta.3** `.pubignore` for Interloop Desi
   - Package no longer depends on `syncfusion_flutter_datagrid` or `syncfusion_flutter_datagrid_export`.
   - `PlexDataTableValueCell` no longer extends Syncfusion `DataGridCell`. Public fields still match the historic constructor (`columnName`, `value`, `numberField`, custom widget).
   - `customGroupingSummary` is now `(String columnName, List<PlexDataTableValueCell> row, List<List<PlexDataTableValueCell>> rows)?` — not Syncfusion `DataGridRow`.
-  - PDF export uses `PlexPrinter.printPdf` / `buildTablePdf` (Plex-owned table PDF). Excel still uses `syncfusion_flutter_xlsio` via `PlexPrinter.printExcel`.
+  - PDF export uses `PlexPrinter.printPdf` / `buildTablePdf` (Plex-owned table PDF). Excel still uses `syncfusion_flutter_xlsio` via `PlexPrinter.printExcel`. CSV uses `PlexPrinter.buildCsv` / `printCsv`.
   - `CustomColumnSizer` is a deprecated no-op (column sizing is handled by `PlexDataGrid`).
-  - Grouping, freeze, and cell editing still compile on `PlexAdvanceDataTable` but are not mapped onto `PlexDataGrid`.
+  - Grouping and per-column filters on `PlexAdvanceDataTable` now map onto `PlexDataGrid`. Freeze and cell editing still compile but are not mapped.
+- **Phase 5d (2.0.1-beta.9) `PlexDataGrid` features:**
+  - Nested grouping via `groupByColumnIds` (`groupByColumnId` still works). `enableGrouping` shows the toolbar UI; `onGroupChanged` is `List<String>`.
+  - Per-group summaries default to count plus numeric sums; hide from the toolbar (`showGroupSummaries`). Override with `groupSummary` / `groupSummaryBuilder` (`group.rows` is all descendant leaf rows).
+  - Toolbar search plus `showColumnFilters` (contains/equals per `filterable` column).
+  - Opt-in `enableCsvExport` / `enableExcelExport` / `enablePdfExport` on the grid (all default `false`). Advance still defaults Excel/PDF to `true`.
+  - Custom column widgets via `PlexDataGridColumn.cell`; keep `value` for export.
+  - `rowStyle` and `cellStyle` (`PlexDataGridCellStyle`); `cellStyle` overlays `rowStyle` field-by-field.
 - **Interloop Design** stays in git as a reference folder. It is **not** in the published package (`.pubignore`). Do not treat it as a runtime dependency.
 
 #### Additive by phase
@@ -646,6 +846,7 @@ Shipped: **beta.2** Phase 0 tokens · **beta.3** `.pubignore` for Interloop Desi
 | **5a** | beta.6 | `PlexDataGrid` — client-side sort, search, selection (`none` / `single` / `multiple`), pagination, density. |
 | **5b** | beta.7 | `PlexAdvanceDataTable` deprecated wrapper around `PlexDataGrid`; old `PlexDataTableHeaderCell` / `PlexDataTableValueCell` API. |
 | **5c** | beta.8 | Remove Syncfusion DataGrid packages; Plex-owned PDF; cell type and grouping-callback breaks above. |
+| **5d** | beta.9 | Nested grouping, group summaries, column filters, export flags, custom `cell`, `rowStyle` / `cellStyle`. |
 
 `brandConfig` is optional on `PlexApp`. Omit it to keep seed-only theming.
 

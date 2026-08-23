@@ -1,3 +1,18 @@
+## 2.0.1-beta.9
+
+### `PlexDataGrid` grouping, summaries, export, filters, and styles
+- Nested grouping via `groupByColumnIds` (first id is the outer group). `groupByColumnId` still maps to a one-item list
+- `enableGrouping` shows the toolbar group-by UI; `onGroupChanged` receives `List<String>` (empty list means no grouping)
+- Per-group summaries default to leaf-row count plus sums of `numeric` columns. Hide/show from the toolbar (`showGroupSummaries`). Override with `groupSummary` or `groupSummaryBuilder` (`group.rows` is all descendant leaf rows)
+- Toolbar search plus `showColumnFilters` (contains/equals per `filterable` column)
+- Opt-in `enableCsvExport` / `enableExcelExport` / `enablePdfExport` on `PlexDataGrid` (all default `false`). `PlexAdvanceDataTable` still defaults Excel/PDF to `true` and maps these flags onto the grid
+- Custom column widgets via `PlexDataGridColumn.cell`; sort, filter, grouping, and export still use `value`
+- `rowStyle` and per-column `cellStyle` (`PlexDataGridCellStyle`); `cellStyle` overlays `rowStyle` field-by-field
+
+### Docs and example
+- README, CHANGELOG, and example README pin `2.0.1-beta.9` with copy-paste `PlexDataGrid` usage (columns, sort/filter, export, grouping, summaries, `cell`, styles)
+- Example Design system `/data-grid` demo covers grouping, summaries, export, custom cells, and styles
+
 ## 2.0.1-beta.8
 
 ### Phase 5c — Syncfusion DataGrid removal

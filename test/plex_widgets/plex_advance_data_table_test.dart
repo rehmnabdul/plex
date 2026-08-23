@@ -45,6 +45,9 @@ PlexAdvanceDataTable _table({
   bool showCheckboxColumn = false,
   bool enableExcelExport = false,
   bool enablePdfExport = false,
+  bool enableCsvExport = false,
+  bool enableColumnGrouping = true,
+  List<String>? initialColumnGroup,
   int? pageSize,
   String Function(String columnName, List<PlexDataTableValueCell> row,
           List<List<PlexDataTableValueCell>> rows)?
@@ -56,6 +59,9 @@ PlexAdvanceDataTable _table({
     showCheckboxColumn: showCheckboxColumn,
     enableExcelExport: enableExcelExport,
     enablePdfExport: enablePdfExport,
+    enableCsvExport: enableCsvExport,
+    enableColumnGrouping: enableColumnGrouping,
+    initialColumnGroup: initialColumnGroup,
     pageSize: pageSize,
     customGroupingSummary: customGroupingSummary,
     columns: columns ??
@@ -130,8 +136,11 @@ void main() {
     expect(columns[0].numeric, isTrue);
     expect(columns[0].sortable, isFalse);
     expect(columns[0].searchable, isTrue);
+    expect(columns[0].filterable, isTrue);
+    expect(columns[0].groupable, isTrue);
     expect(columns[1].sortable, isTrue);
     expect(columns[1].searchable, isFalse);
+    expect(columns[1].filterable, isFalse);
 
     final List<PlexDataTableValueCell> row = <PlexDataTableValueCell>[
       PlexDataTableValueCell.text('Id', 7, numberField: true),
@@ -267,9 +276,8 @@ void main() {
       ),
     );
     await tester.pump();
-    expect(
-        find.byKey(const Key('plex-advance-data-table-excel')), findsNothing);
-    expect(find.byKey(const Key('plex-advance-data-table-pdf')), findsNothing);
+    expect(find.byKey(const Key('plex-data-grid-excel')), findsNothing);
+    expect(find.byKey(const Key('plex-data-grid-pdf')), findsNothing);
 
     await tester.pumpWidget(
       _wrap(
@@ -282,10 +290,10 @@ void main() {
     );
     await tester.pump();
     expect(
-      find.byKey(const Key('plex-advance-data-table-excel')),
+      find.byKey(const Key('plex-data-grid-excel')),
       findsOneWidget,
     );
-    expect(find.byKey(const Key('plex-advance-data-table-pdf')), findsNothing);
+    expect(find.byKey(const Key('plex-data-grid-pdf')), findsNothing);
   });
 
   testWidgets('pdf export button is wired without throwing', (tester) async {
@@ -299,32 +307,121 @@ void main() {
     );
     await tester.pump();
 
-    expect(
-        find.byKey(const Key('plex-advance-data-table-pdf')), findsOneWidget);
-    final IconButton button = tester.widget<IconButton>(
-      find.byKey(const Key('plex-advance-data-table-pdf')),
-    );
-    expect(button.onPressed, isNotNull);
+    expect(find.byKey(const Key('plex-data-grid-pdf')), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('grouping callback accepts Plex cell rows', (tester) async {
+  testWidgets('grouping flags map onto the grid', (tester) async {
     await tester.pumpWidget(
       _wrap(
         _table(
-          controller: _controller(),
-          customGroupingSummary: (
-            String columnName,
-            List<PlexDataTableValueCell> row,
-            List<List<PlexDataTableValueCell>> rows,
-          ) {
-            return '${row.length}/${rows.length}/$columnName';
-          },
+          controller: _controller(
+            rows: <List<PlexDataTableValueCell>>[
+              <PlexDataTableValueCell>[
+                PlexDataTableValueCell.text('Name', 'Bob'),
+                PlexDataTableValueCell.text('Dept', 'Eng'),
+              ],
+              <PlexDataTableValueCell>[
+                PlexDataTableValueCell.text('Name', 'Alice'),
+                PlexDataTableValueCell.text('Dept', 'Eng'),
+              ],
+              <PlexDataTableValueCell>[
+                PlexDataTableValueCell.text('Name', 'Carol'),
+                PlexDataTableValueCell.text('Dept', 'HR'),
+              ],
+            ],
+          ),
+          columns: <PlexDataTableHeaderCell>[
+            PlexDataTableHeaderCell.text('Name'),
+            PlexDataTableHeaderCell.text('Dept'),
+          ],
+          enableColumnGrouping: true,
+          initialColumnGroup: <String>['Dept'],
         ),
       ),
     );
     await tester.pump();
-    expect(tester.takeException(), isNull);
+    expect(find.text('Eng (2)'), findsOneWidget);
+    expect(find.text('HR (1)'), findsOneWidget);
     expect(find.text('Bob'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  test('adapter value for custom cells uses textValue not the Widget', () {
+    final List<PlexDataTableHeaderCell> headers = <PlexDataTableHeaderCell>[
+      PlexDataTableHeaderCell.text('Flag'),
+      PlexDataTableHeaderCell.text('Name'),
+    ];
+    final List<PlexDataGridColumn<List<PlexDataTableValueCell>>> columns =
+        PlexAdvanceDataTableAdapter.columns(headers);
+
+    final List<PlexDataTableValueCell> row = <PlexDataTableValueCell>[
+      PlexDataTableValueCell.custom(
+        'Flag',
+        'yes',
+        const SizedBox(key: Key('plex-cell-flag')),
+      ),
+      PlexDataTableValueCell.text('Name', 'Bob'),
+    ];
+
+    expect(columns[0].value(row), 'yes');
+    expect(columns[0].value(row), isNot(isA<Widget>()));
+    expect(columns[1].value(row), 'Bob');
+    expect(
+      PlexAdvanceDataTableAdapter.excelRows(
+        headers,
+        <List<PlexDataTableValueCell>>[row],
+      ).single,
+      <dynamic>['yes', 'Bob'],
+    );
+  });
+
+  testWidgets('custom cells render interactive widgets', (tester) async {
+    var tapped = false;
+    final List<PlexDataTableHeaderCell> headers = <PlexDataTableHeaderCell>[
+      PlexDataTableHeaderCell.text('Name'),
+      PlexDataTableHeaderCell.text('Action'),
+    ];
+    final List<PlexDataTableValueCell> row = <PlexDataTableValueCell>[
+      PlexDataTableValueCell.text('Name', 'Bob'),
+      PlexDataTableValueCell.custom(
+        'Action',
+        'edit',
+        TextButton(
+          key: const Key('plex-cell-edit'),
+          onPressed: () => tapped = true,
+          child: const Text('Edit'),
+        ),
+      ),
+    ];
+
+    await tester.pumpWidget(
+      _wrap(
+        _table(
+          controller: _controller(
+            rows: <List<PlexDataTableValueCell>>[row],
+          ),
+          columns: headers,
+        ),
+      ),
+    );
+    await tester.pump();
+
+    expect(find.byKey(const Key('plex-cell-edit')), findsOneWidget);
+    expect(find.text('Edit'), findsOneWidget);
+    expect(find.text('Bob'), findsOneWidget);
+
+    final BuildContext context =
+        tester.element(find.byType(PlexAdvanceDataTable));
+    final List<PlexDataGridColumn<List<PlexDataTableValueCell>>> columns =
+        PlexAdvanceDataTableAdapter.columns(headers);
+    expect(columns[0].cell?.call(context, row), isNull);
+    expect(columns[1].cell?.call(context, row), isA<TextButton>());
+    expect(columns[1].cell?.call(context, row),
+        isNot(isA<PlexComparableWidget>()));
+
+    await tester.tap(find.byKey(const Key('plex-cell-edit')));
+    await tester.pump();
+    expect(tapped, isTrue);
   });
 }

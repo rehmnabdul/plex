@@ -1,10 +1,6 @@
 // ignore_for_file: deprecated_member_use_from_same_package, use_build_context_synchronously
 
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:plex/plex_utils/plex_messages.dart';
-import 'package:plex/plex_utils/plex_printer.dart';
 import 'package:plex/plex_widget.dart';
 import 'package:plex/plex_widgets/plex_advance_data_table_adapter.dart';
 import 'package:plex/plex_widgets/plex_data_grid.dart';
@@ -123,11 +119,9 @@ class PlexDataTableValueCell {
 ///
 /// Existing constructor parameters and [PlexDataTableHeaderCell] /
 /// [PlexDataTableValueCell] models still compile. The visible grid is
-/// [PlexDataGrid]. Excel export uses [PlexPrinter.printExcel]. PDF export uses
-/// [PlexPrinter.printPdf] (a Plex-owned table PDF, not Syncfusion).
-///
-/// Column grouping, frozen panes, and cell editing are still accepted on the
-/// constructor so call sites compile; they are not mapped onto [PlexDataGrid].
+/// [PlexDataGrid]. Excel, PDF, and optional CSV export use [PlexPrinter].
+/// Column grouping and per-column filters map onto [PlexDataGrid]. Frozen
+/// panes and cell editing still compile but are not mapped.
 @Deprecated('Use PlexDataGrid')
 class PlexAdvanceDataTable extends StatefulWidget {
   @Deprecated('Use PlexDataGrid')
@@ -151,6 +145,7 @@ class PlexAdvanceDataTable extends StatefulWidget {
     this.initialColumnGroup,
     this.enableExcelExport = true,
     this.enablePdfExport = true,
+    this.enableCsvExport = false,
     this.autoExpandGroups = true,
     this.groupSummary,
     this.groupSummaryFormat,
@@ -182,7 +177,7 @@ class PlexAdvanceDataTable extends StatefulWidget {
   final String? groupSummaryFormat;
   final String Function(String summary)? groupSummary;
 
-  /// Unused. Column grouping is not mapped onto [PlexDataGrid].
+  /// Optional caption builder for grouped rows on [PlexDataGrid].
   ///
   /// The previous Syncfusion `DataGridRow` parameter type is gone with that
   /// dependency. Plex call sites pass [PlexDataTableValueCell] rows.
@@ -199,6 +194,7 @@ class PlexAdvanceDataTable extends StatefulWidget {
   ///Hide and show Print Button
   final bool enableExcelExport;
   final bool enablePdfExport;
+  final bool enableCsvExport;
 
   final int? pageSize;
   final List<PlexDataTableHeaderCell> columns;
@@ -213,83 +209,20 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
 
   int _resolvedPageSize(List<List<PlexDataTableValueCell>> rows) {
     if (_paginate) return widget.pageSize!;
-    return rows.isEmpty ? 1 : rows.length;
+    // Group headers add extra lines; keep them on one "page" when not paginating.
+    return rows.isEmpty ? 1 : rows.length + 64;
   }
 
-  Future<void> _exportExcel(
-    BuildContext context,
-    List<List<PlexDataTableValueCell>> rows,
-  ) async {
-    try {
-      final String? path = await PlexPrinter.printExcel(
-        widget.title,
-        PlexAdvanceDataTableAdapter.excelHeaders(widget.columns),
-        PlexAdvanceDataTableAdapter.excelRows(widget.columns, rows),
-      );
-      if (!context.mounted) return;
-      if (path == null) {
-        context.showSnackBar("Unable to save file, Please try again...");
-        return;
-      }
-      context.showSnackBar("Report saved at \"$path\"");
-    } catch (_) {
-      if (!context.mounted) return;
-      context.showSnackBar("Unable to save file, Please try again...");
-    }
-  }
-
-  Future<void> _exportPdf(
-    BuildContext context,
-    List<List<PlexDataTableValueCell>> rows,
-  ) async {
-    try {
-      final String? path = await PlexPrinter.printPdf(
-        widget.title,
-        PlexAdvanceDataTableAdapter.excelHeaders(widget.columns),
-        PlexAdvanceDataTableAdapter.excelRows(widget.columns, rows),
-      );
-      if (!context.mounted) return;
-      if (path == null) {
-        context.showSnackBar("Unable to save file, Please try again...");
-        return;
-      }
-      context.showSnackBar("Report saved at \"$path\"");
-    } catch (_) {
-      if (!context.mounted) return;
-      context.showSnackBar("Unable to save file, Please try again...");
-    }
-  }
-
-  Widget? _actions(
-    BuildContext context,
-    List<List<PlexDataTableValueCell>> rows,
-  ) {
+  Widget? _actions(BuildContext context) {
     final List<Widget> custom =
         widget.customWidgets?.call(context) ?? const <Widget>[];
-    if (custom.isEmpty &&
-        !widget.enableExcelExport &&
-        !widget.enablePdfExport &&
-        widget.onRefresh == null) {
+    if (custom.isEmpty && widget.onRefresh == null) {
       return null;
     }
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         ...custom,
-        if (widget.enableExcelExport)
-          IconButton(
-            key: const Key('plex-advance-data-table-excel'),
-            tooltip: 'Excel',
-            onPressed: () => _exportExcel(context, rows),
-            icon: const Icon(Icons.table_chart_outlined),
-          ),
-        if (widget.enablePdfExport)
-          IconButton(
-            key: const Key('plex-advance-data-table-pdf'),
-            tooltip: 'Pdf',
-            onPressed: () => _exportPdf(context, rows),
-            icon: const Icon(Icons.picture_as_pdf_outlined),
-          ),
         if (widget.onRefresh != null)
           IconButton(
             key: const Key('plex-advance-data-table-refresh'),
@@ -301,6 +234,30 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
     );
   }
 
+  String _groupCaption(
+    Object? key,
+    List<List<PlexDataTableValueCell>> groupRows,
+    PlexDataGridColumn<List<PlexDataTableValueCell>> column,
+  ) {
+    if (widget.customGroupingSummary != null && groupRows.isNotEmpty) {
+      return widget.customGroupingSummary!(
+        column.id,
+        groupRows.first,
+        groupRows,
+      );
+    }
+    final String formatted = (widget.groupSummaryFormat ?? '{Key} ({Count})')
+        .replaceAll('{Key}', key?.toString() ?? '')
+        .replaceAll('{Count}', '${groupRows.length}');
+    if (widget.groupSummary != null) {
+      return widget.groupSummary!(formatted);
+    }
+    return PlexDataGridEngine.defaultGroupCaption(
+      key?.toString() ?? '',
+      groupRows.length,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return PlexWidget(
@@ -309,6 +266,8 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
         final List<List<PlexDataTableValueCell>> rows =
             (data as List<List<PlexDataTableValueCell>>?) ??
                 const <List<PlexDataTableValueCell>>[];
+        final bool anyFilter = widget.columns
+            .any((PlexDataTableHeaderCell c) => c.showFilterControl);
         return PlexDataGrid<List<PlexDataTableValueCell>>(
           key: const Key('plex-advance-data-table-grid'),
           title: widget.title,
@@ -316,12 +275,40 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
           rows: rows,
           pageSize: _resolvedPageSize(rows),
           showFooter: _paginate,
-          showSearch: widget.columns.any((c) => c.showFilterControl),
+          showSearch: anyFilter,
+          showColumnFilters: anyFilter,
           showDensityToggle: false,
           selectionMode: widget.showCheckboxColumn
               ? PlexDataGridSelectionMode.multiple
               : PlexDataGridSelectionMode.none,
-          actions: _actions(context, rows),
+          enableExcelExport: widget.enableExcelExport,
+          enablePdfExport: widget.enablePdfExport,
+          enableCsvExport: widget.enableCsvExport,
+          enableGrouping: widget.enableColumnGrouping,
+          groupByColumnIds: widget.enableColumnGrouping
+              ? widget.initialColumnGroup
+              : null,
+          autoExpandGroups: widget.autoExpandGroups,
+          groupCaption: _groupCaption,
+          groupSummary: widget.customGroupingSummary == null
+              ? null
+              : (PlexDataGridGroup<List<PlexDataTableValueCell>> group) {
+                  if (group.rows.isEmpty) return null;
+                  final String text = widget.customGroupingSummary!(
+                    group.columnId ?? '',
+                    group.rows.first,
+                    group.rows,
+                  );
+                  return <PlexDataGridSummaryCell>[
+                    PlexDataGridSummaryCell(
+                      columnId: widget.columns.isEmpty
+                          ? ''
+                          : widget.columns.first.columnName,
+                      text: text,
+                    ),
+                  ];
+                },
+          actions: _actions(context),
         );
       },
     );

@@ -14,8 +14,9 @@ import 'package:syncfusion_flutter_xlsio/xlsio.dart';
 class PlexPrinter {
   PlexPrinter._();
 
-  static printExcel(
-      String title, List<dynamic> columns, List<List<dynamic>> rows) async {
+  /// Builds an .xlsx workbook in memory. Does not prompt to save.
+  static List<int> buildExcelBytes(
+      String title, List<dynamic> columns, List<List<dynamic>> rows) {
     var workbook = Workbook();
 
     final Worksheet productionSheet = workbook.worksheets[0];
@@ -70,8 +71,12 @@ class PlexPrinter {
 
     final List<int> bytes = workbook.saveAsStream();
     workbook.dispose();
+    return bytes;
+  }
 
-    return await saveExcelFile(title, bytes);
+  static printExcel(
+      String title, List<dynamic> columns, List<List<dynamic>> rows) async {
+    return await saveExcelFile(title, buildExcelBytes(title, columns, rows));
   }
 
   /// Builds a simple table PDF and saves it via [savePdfFile].
@@ -151,6 +156,70 @@ class PlexPrinter {
     }
     var filePath = File(result).absolute.path;
     return filePath;
+  }
+
+  /// RFC 4180 CSV from headers and row values. Does not prompt to save.
+  static String buildCsv(List<dynamic> columns, List<List<dynamic>> rows) {
+    final StringBuffer out = StringBuffer();
+    out.writeln(columns.map(_csvField).join(','));
+    for (final List<dynamic> row in rows) {
+      final List<String> cells = List<String>.generate(columns.length, (int i) {
+        if (i >= row.length) return _csvField('');
+        return _csvField(row[i]);
+      });
+      out.writeln(cells.join(','));
+    }
+    return out.toString();
+  }
+
+  static Future<String?> printCsv(
+      String title, List<dynamic> columns, List<List<dynamic>> rows) async {
+    final List<int> bytes = utf8.encode(buildCsv(columns, rows));
+    return await saveCsvFile(title, bytes);
+  }
+
+  static Future<String?> saveCsvFile(String title, List<int> bytes) async {
+    String ext = "csv";
+    Future<String?> fileSaveTask;
+    title = "$title-${DateFormat("dd-MMM-yyyy-HHmmss").format(DateTime.now())}";
+    if (GetPlatform.isAndroid || GetPlatform.isIOS) {
+      fileSaveTask = FileSaver.instance.saveAs(
+        name: "$title.$ext",
+        bytes: Uint8List.fromList(bytes),
+        ext: ext,
+        mimeType: MimeType.csv,
+      );
+    } else {
+      fileSaveTask = FileSaver.instance.saveFile(
+        name: title,
+        bytes: Uint8List.fromList(bytes),
+        ext: ext,
+        mimeType: MimeType.csv,
+      );
+    }
+
+    final result = await fileSaveTask;
+
+    if (kDebugMode) {
+      print(result ?? "Unable to save file");
+    }
+
+    if (result == null) {
+      return null;
+    }
+    var filePath = File(result).absolute.path;
+    return filePath;
+  }
+
+  static String _csvField(dynamic value) {
+    final String text = value?.toString() ?? '';
+    if (text.contains(',') ||
+        text.contains('"') ||
+        text.contains('\n') ||
+        text.contains('\r')) {
+      return '"${text.replaceAll('"', '""')}"';
+    }
+    return text;
   }
 }
 

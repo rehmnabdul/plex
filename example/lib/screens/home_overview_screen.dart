@@ -115,7 +115,7 @@ class HomeOverviewScreen extends StatelessWidget {
             ),
             _ShortcutCard(
               title: "Data grid",
-              subtitle: "PlexDataGrid — sort, search, pages",
+              subtitle: "PlexDataGrid — sort, filter, group, export",
               icon: Icons.grid_on_outlined,
               route: Routes.dataGridScreen,
             ),

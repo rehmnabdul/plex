@@ -27,6 +27,7 @@ import 'package:plex_app/screens/table_demo_screens.dart';
 import 'package:plex_app/screens/ui_kit_buttons_screen.dart';
 import 'package:plex_app/screens/ui_kit_feedback_screen.dart';
 import 'package:plex_app/screens/ui_kit_forms_screen.dart';
+import 'package:plex_app/screens/ui_kit_dashboard_widgets_screen.dart';
 import 'package:plex_app/screens/ui_kit_tabs_screen.dart';
 import 'package:plex_app/screens/ui_kit_theme_screen.dart';
 
@@ -291,6 +292,16 @@ void main() async {
           logo: const Icon(Icons.tab_outlined),
           selectedLogo: const Icon(Icons.tab),
           screen: (context, {data}) => const UiKitTabsScreen(),
+        ),
+        PlexRoute(
+          route: Routes.uiDashboard,
+          category: "Design system",
+          title: "Dashboard widgets",
+          shortTitle: "Dashboard",
+          tag: "6",
+          logo: const Icon(Icons.space_dashboard_outlined),
+          selectedLogo: const Icon(Icons.space_dashboard),
+          screen: (context, {data}) => const UiKitDashboardWidgetsScreen(),
         ),
         PlexRoute(
           route: Routes.dataGridScreen,

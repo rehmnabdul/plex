@@ -30,6 +30,7 @@ import 'package:toastification/toastification.dart';
 import 'plex_widgets/plex_backgrounds/plex_background.dart';
 
 export 'plex_theme/plex_brand_config.dart';
+export 'plex_widgets/plex_dashboard_widgets.dart';
 
 part 'plex_screens/plex_dashboard_screen.dart';
 

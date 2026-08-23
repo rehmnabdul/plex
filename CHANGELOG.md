@@ -1,3 +1,17 @@
+## 2.0.1-beta.10
+
+### Phase 6 — dashboard widgets
+- Add `PlexStatCard`, `PlexStatTile`, `PlexStatGrid`, and `PlexProgressRing` for KPI tiles (tokens from `PlexThemeData`). `PlexProgressRing` is circular; `PlexProgressBar` stays horizontal
+- Add `PlexWidgetCard` dashboard shell (eyebrow/title/actions, loading/empty). Does not replace reactive `PlexWidget` / `PlexWidgetController`
+- Add `PlexMiniTable` compact read-only table. Does not replace `PlexDataTable` or `PlexDataGrid`
+- Add `PlexDataList` with `PlexDataListItem` (plain/ranked/people/icon variants)
+- Add `PlexActivityFeed` timeline (`PlexActivityItem`) with optional day grouping
+- Barrel: `plex_widgets/plex_dashboard_widgets.dart`, re-exported from `plex_package.dart`
+
+### Docs and example
+- README, CHANGELOG, and example README pin `2.0.1-beta.10` with copy-paste dashboard widget snippets
+- Example Design system `/ui-dashboard` demo
+
 ## 2.0.1-beta.9
 
 ### `PlexDataGrid` grouping, summaries, export, filters, and styles

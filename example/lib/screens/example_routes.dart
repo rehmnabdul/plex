@@ -18,6 +18,7 @@ class Routes {
   static const uiForms = "/ui-forms";
   static const uiFeedback = "/ui-feedback";
   static const uiTabs = "/ui-tabs";
+  static const uiDashboard = "/ui-dashboard";
   static const autocompleteSample = "newPath1";
   static const logoRouteSample = "newPath2";
 }

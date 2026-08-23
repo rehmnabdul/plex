@@ -114,6 +114,12 @@ class HomeOverviewScreen extends StatelessWidget {
               route: Routes.uiTabs,
             ),
             _ShortcutCard(
+              title: "Dashboard widgets",
+              subtitle: "Stats, lists, activity",
+              icon: Icons.space_dashboard_outlined,
+              route: Routes.uiDashboard,
+            ),
+            _ShortcutCard(
               title: "Data grid",
               subtitle: "PlexDataGrid — sort, filter, group, export",
               icon: Icons.grid_on_outlined,

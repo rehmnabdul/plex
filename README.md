@@ -242,6 +242,35 @@ PlexTabs(
 )
 ```
 
+#### Dashboard widgets
+Compact tiles for overview screens. Tokens come from `PlexThemeData`. These do **not** replace `PlexDataTable`, `PlexDataGrid`, or the reactive `PlexWidget` / `PlexWidgetController`.
+
+```dart
+PlexStatCard(label: "Orders", value: "128", delta: "+6.1%", icon: Icons.shopping_bag_outlined)
+PlexStatTile(label: "On time", value: "94", unit: "%")
+PlexStatGrid(children: [/* PlexStatTile … */])
+PlexProgressRing(value: 72, label: "Capacity") // circular; PlexProgressBar stays horizontal
+
+PlexWidgetCard(
+  eyebrow: "Operations",
+  title: "Late SKUs",
+  loading: false,
+  empty: false,
+  child: PlexMiniTable(
+    columns: [
+      PlexMiniTableColumn(id: "sku", header: "Sku"),
+      PlexMiniTableColumn(id: "qty", header: "Qty", numeric: true),
+    ],
+    rows: [["A-1042", "240"]],
+  ),
+)
+
+PlexDataList(items: [PlexDataListItem(title: "WO-1042", subtitle: "Cutting", value: "240 pcs")])
+PlexActivityFeed(items: [
+  PlexActivityItem(id: "1", title: "Lot approved", time: DateTime.now(), body: "QA signed off"),
+])
+```
+
 #### `PlexDataGrid`
 Plex-owned client-side grid. Prefer this over the deprecated `PlexAdvanceDataTable` wrapper.
 
@@ -647,7 +676,7 @@ Add PLEX to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  plex: 2.0.1-beta.9
+  plex: 2.0.1-beta.10
 ```
 
 Then run:
@@ -656,7 +685,7 @@ Then run:
 flutter pub get
 ```
 
-The example app under `/example` is a full visual QA of Phases 0–5d (theme, buttons, forms, feedback, tabs, `PlexDataGrid`) plus restyled feature demos. Run it with:
+The example app under `/example` is a full visual QA of Phases 0–6 (theme, buttons, forms, feedback, tabs, `PlexDataGrid`, dashboard widgets) plus restyled feature demos. Run it with:
 
 ```sh
 cd example
@@ -801,13 +830,13 @@ PlexFormFieldButton(
 )
 ```
 
-See **Widgets & Components** for IconButton, Badge, Avatar, Alert, ProgressBar, Card slots, Tabs, DataGrid, and printer.
+See **Widgets & Components** for IconButton, Badge, Avatar, Alert, ProgressBar, Card slots, Tabs, dashboard widgets, DataGrid, and printer.
 
 ### What changed (2.0.1 betas) / Migration
 
-This 2.x beta line started after pub.dev `2.0.1-beta.1`. Pin **2.0.1-beta.9**. Stable **2.0.1** follows the beta series.
+This 2.x beta line started after pub.dev `2.0.1-beta.1`. Pin **2.0.1-beta.10**. Stable **2.0.1** follows the beta series.
 
-Shipped: **beta.2** Phase 0 tokens · **beta.3** `.pubignore` for Interloop Design · **beta.4** Phase 1 · **beta.5** Phases 2–4 · **beta.6** `PlexDataGrid` + example redesign · **beta.7** `PlexAdvanceDataTable` wrapper · **beta.8** Phase 5c (Syncfusion grid removal) · **beta.9** DataGrid grouping, summaries, export flags, filters, and cell styles.
+Shipped: **beta.2** Phase 0 tokens · **beta.3** `.pubignore` for Interloop Design · **beta.4** Phase 1 · **beta.5** Phases 2–4 · **beta.6** `PlexDataGrid` + example redesign · **beta.7** `PlexAdvanceDataTable` wrapper · **beta.8** Phase 5c (Syncfusion grid removal) · **beta.9** DataGrid grouping, summaries, export flags, filters, and cell styles · **beta.10** Phase 6 dashboard widgets.
 
 **Constructors are mostly additive.** Existing required arguments did not change. New optional fields default to previous behavior.
 
@@ -832,6 +861,7 @@ Shipped: **beta.2** Phase 0 tokens · **beta.3** `.pubignore` for Interloop Desi
   - Opt-in `enableCsvExport` / `enableExcelExport` / `enablePdfExport` on the grid (all default `false`). Advance still defaults Excel/PDF to `true`.
   - Custom column widgets via `PlexDataGridColumn.cell`; keep `value` for export.
   - `rowStyle` and `cellStyle` (`PlexDataGridCellStyle`); `cellStyle` overlays `rowStyle` field-by-field.
+- **Phase 6 (2.0.1-beta.10) dashboard widgets** (additive): `PlexStatCard`, `PlexStatTile`, `PlexStatGrid`, `PlexProgressRing`, `PlexWidgetCard`, `PlexMiniTable`, `PlexDataList`, `PlexActivityFeed`. They do not replace `PlexDataGrid`, `PlexDataTable`, or reactive `PlexWidget`.
 - **Interloop Design** stays in git as a reference folder. It is **not** in the published package (`.pubignore`). Do not treat it as a runtime dependency.
 
 #### Additive by phase
@@ -847,6 +877,7 @@ Shipped: **beta.2** Phase 0 tokens · **beta.3** `.pubignore` for Interloop Desi
 | **5b** | beta.7 | `PlexAdvanceDataTable` deprecated wrapper around `PlexDataGrid`; old `PlexDataTableHeaderCell` / `PlexDataTableValueCell` API. |
 | **5c** | beta.8 | Remove Syncfusion DataGrid packages; Plex-owned PDF; cell type and grouping-callback breaks above. |
 | **5d** | beta.9 | Nested grouping, group summaries, column filters, export flags, custom `cell`, `rowStyle` / `cellStyle`. |
+| **6** | beta.10 | Dashboard widgets: `PlexStatCard` / `PlexStatTile` / `PlexStatGrid` / `PlexProgressRing`, `PlexWidgetCard`, `PlexMiniTable`, `PlexDataList`, `PlexActivityFeed`. |
 
 `brandConfig` is optional on `PlexApp`. Omit it to keep seed-only theming.
 

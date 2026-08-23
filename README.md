@@ -27,7 +27,8 @@ PLEX is a powerful, open-source UI framework for Flutter, designed to accelerate
 - **SignalR Integration**: Native support for real-time communication using Microsoft SignalR.
 - **Networking Utilities**: Built-in HTTP client with `PlexNetworking` / `PlexCalls` for JSON APIs, file downloads to disk, and in-memory binary downloads.
 - **Persistent Storage**: Easy-to-use local storage utilities for app data and user preferences.
-- **Material 2 & 3, Light & Dark Modes**: Effortlessly switch between Material versions and color schemes.
+- **Material 3, Light & Dark Modes**: Theme is always Material 3. Switch brightness from the dashboard; Material 2 flags are deprecated no-ops.
+- **Design tokens**: `PlexBrandConfig`, `themeFromColor`, and `PlexThemeData.of(context)` for brand, density, and semantic colors.
 - **Code Generation**: Annotation-based model enhancements (e.g., `copy()`, `asString()` methods).
 - **Extensible & Customizable**: Designed for flexibility—override, extend, and adapt to your needs.
 
@@ -53,17 +54,16 @@ PlexDataTable(
 )
 ```
 
-#### `PlexAdvDataTable`
-A modern, feature-rich data table with advanced export (Excel, PDF) and pagination.
+#### `PlexAdvanceDataTable`
+A Syncfusion-backed data table with export (Excel, PDF), grouping, and cell editing. Not replaced by `PlexDataGrid`.
 ```dart
-PlexAdvDataTable(
-  columns: [PlexDataCell.text("ID"), PlexDataCell.text("Name")],
-  rows: [
-    [PlexDataCell.text("1"), PlexDataCell.text("Alice")],
-    [PlexDataCell.text("2"), PlexDataCell.text("Bob")],
+PlexAdvanceDataTable(
+  title: "Employees",
+  columns: [
+    PlexDataTableHeaderCell.text("ID"),
+    PlexDataTableHeaderCell.text("Name"),
   ],
-  enableExportExcel: true,
-  enableExportPdf: true,
+  controller: PlexWidgetController(data: rows),
 )
 ```
 
@@ -93,7 +93,7 @@ class User with PlexForm {
   ];
 }
 // Usage:
-PlexFormWidget<User>(form: User(), onSubmit: (user) => print(user.name))
+PlexFormWidget<User>(entity: User(), onSubmit: (user) => print(user.name))
 ```
 
 #### Specialized Form Fields
@@ -102,7 +102,9 @@ PlexFormWidget<User>(form: User(), onSubmit: (user) => print(user.name))
 - **Dropdown**: `PlexFormFieldDropdown`
 - **Multi-Select**: `PlexFormFieldMultiSelect`
 - **Autocomplete**: `PlexFormFieldAutoComplete`
-- **Button**: `PlexFormFieldButton`
+- **Button**: `PlexFormFieldButton` (`PlexButtonType`: elevated, text, outlined, filled, filledTonal, ink, danger)
+- **Checkbox**: `PlexFormFieldCheckbox`
+- **Switch**: `PlexFormFieldSwitch`
 
 Example:
 ```dart
@@ -115,6 +117,16 @@ PlexFormFieldDropdown(dropdownItems: ["A", "B", "C"])
 PlexFormFieldMultiSelect(dropdownItems: ["A", "B", "C"])
 PlexFormFieldAutoComplete(autoCompleteItems: (query) async => ["A", "B", "C"])
 PlexFormFieldButton(properties: PlexFormFieldGeneric(title: "Submit"), buttonClick: () {})
+PlexFormFieldCheckbox(
+  properties: PlexFormFieldGeneric(title: "Accept terms"),
+  value: true,
+  onChanged: (value) {},
+)
+PlexFormFieldSwitch(
+  properties: PlexFormFieldGeneric(title: "Email notifications"),
+  value: true,
+  onChanged: (value) {},
+)
 ```
 
 #### `PlexInputWidget` (Legacy)
@@ -137,11 +149,16 @@ PlexNavigationRail(
 )
 ```
 
-#### `PlexCard` & `PlexCardGlass`
-Material and glassmorphic card widgets for modern UIs.
+#### `PlexCard` & `PlexCardGlassEffect`
+Material card with optional header slots. Glass is opt-in; default chrome is flat.
 ```dart
-PlexCard(child: Text("Standard Card"))
-PlexCardGlass(child: Text("Glass Card"))
+PlexCard(
+  title: "Inventory",
+  subtitle: "Optional header slots",
+  footer: Text("Footer"),
+  child: Text("Body"),
+)
+PlexCardGlassEffect(child: Text("Glass card"))
 ```
 
 #### `PlexMenu`
@@ -161,10 +178,93 @@ PlexLoaderV1()
 PlexLoaderV2()
 ```
 
-#### `PlexShimmer`
-Show shimmer effect while loading data.
+#### `PlexShimmer` & `PlexSkeleton`
+Show shimmer effect while loading data. `PlexSkeleton` is a placeholder that reuses shimmer.
 ```dart
 PlexShimmer(child: Container(width: 200, height: 20))
+PlexSkeleton.line()
+PlexSkeleton.circle(size: 32)
+```
+
+#### `PlexIconButton`
+Square icon-only button for toolbars and row actions.
+```dart
+PlexIconButton(
+  icon: Icon(Icons.filter_list),
+  variant: PlexIconButtonVariant.outline,
+  label: "Filter",
+  onPressed: () {},
+)
+```
+
+#### `PlexBadge`
+Compact status or category label.
+```dart
+PlexBadge(label: "Neutral")
+PlexBadge(label: "Info", tone: PlexBadgeTone.info, dot: true)
+PlexBadge(label: "Danger", tone: PlexBadgeTone.danger, appearance: PlexBadgeAppearance.solid)
+```
+
+#### `PlexAvatar`
+Initials or image avatar with optional presence.
+```dart
+PlexAvatar(name: "Ada Lovelace")
+PlexAvatar(name: "Grace Hopper", size: 32, square: true, status: PlexAvatarStatus.online)
+```
+
+#### `PlexAlert`
+Inline contextual banner (not a modal). Use `PlexInfoSheet` for sheets.
+```dart
+PlexAlert(
+  variant: PlexAlertVariant.info,
+  title: "Inline banner",
+  message: "Dismissible alert using semantic tokens.",
+  onClose: () {},
+)
+```
+
+#### `PlexProgressBar`
+Determinate or indeterminate progress.
+```dart
+PlexProgressBar(label: "Sync", value: 64, showValue: true)
+PlexProgressBar(label: "Working", indeterminate: true)
+```
+
+#### `PlexTabs`
+Body-level tab strip. Does not replace `PlexScreen.getTabBar()`.
+```dart
+PlexTabs(
+  tabs: [Tab(text: "Overview"), Tab(text: "Activity")],
+  children: [
+    PlexTabPanel(child: Text("Overview")),
+    PlexTabPanel(child: Text("Activity")),
+  ],
+)
+```
+
+#### `PlexDataGrid`
+Plex-owned client-side grid (sort, search, selection, pagination). Does not replace `PlexAdvanceDataTable`.
+```dart
+PlexDataGrid<Employee>(
+  title: "Employees",
+  selectionMode: PlexDataGridSelectionMode.multiple,
+  pageSize: 10,
+  rowId: (row) => row.id,
+  columns: [
+    PlexDataGridColumn(id: "id", title: "Id", numeric: true, value: (row) => row.id),
+    PlexDataGridColumn(id: "name", title: "Name", value: (row) => row.name),
+  ],
+  rows: employees,
+)
+```
+
+#### `PlexAppBar`
+Drop-in `PreferredSizeWidget` used by the dashboard chrome. You can also use it on stacked / external routes.
+```dart
+Scaffold(
+  appBar: PlexAppBar(title: Text("External Screen")),
+  body: child,
+)
 ```
 
 #### `PlexInfoSheet`
@@ -330,9 +430,11 @@ await PlexSignalR.instance.start();
 
 ## 📸 Screenshots
 
-| Material 3 Light | Material 3 Dark | Material 2 Light | Material 2 Dark |
-|:---:|:---:|:---:|:---:|
-| ![M3 Light](https://raw.githubusercontent.com/rehmnabdul/plex/main/screenshots/img_2.png) | ![M3 Dark](https://raw.githubusercontent.com/rehmnabdul/plex/main/screenshots/img_4.png) | ![M2 Light](https://raw.githubusercontent.com/rehmnabdul/plex/main/screenshots/img_1.png) | ![M2 Dark](https://raw.githubusercontent.com/rehmnabdul/plex/main/screenshots/img_3.png) |
+Theme is always Material 3. Light and dark still apply:
+
+| Light | Dark |
+|:---:|:---:|
+| ![Light](https://raw.githubusercontent.com/rehmnabdul/plex/main/screenshots/img_2.png) | ![Dark](https://raw.githubusercontent.com/rehmnabdul/plex/main/screenshots/img_4.png) |
 
 More examples in the `/screenshots` folder.
 
@@ -344,7 +446,7 @@ Add PLEX to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  plex: ^<latest_version>
+  plex: 2.0.1-beta.6
 ```
 
 Then run:
@@ -353,9 +455,163 @@ Then run:
 flutter pub get
 ```
 
+The example app under `/example` is a full visual QA of Phases 0–5a (theme, buttons, forms, feedback, tabs, data grid) plus restyled feature demos. Run it with:
+
+```sh
+cd example
+flutter run
+```
+
 ---
 
 ## 🛠️ Usage
+
+### `PlexApp` + `PlexAppInfo` logos
+
+Logos live on `PlexAppInfo`, not on `PlexBrandConfig`.
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:plex/plex_package.dart';
+import 'package:plex/plex_route.dart';
+import 'package:plex/plex_screens/plex_login_screen.dart';
+import 'package:plex/plex_theme.dart';
+
+void main() {
+  runApp(PlexApp(
+    themeFromColor: PlexTheme.defaultSeedColor, // #607D8B
+    brandConfig: const PlexBrandConfig(
+      density: PlexDensity.comfortable,
+    ),
+    appInfo: PlexAppInfo(
+      title: "Plex Example",
+      appLogo: Image.asset("assets/app.png"),
+      appLogoDark: Image.asset("assets/app.png"),
+      initialRoute: "/home",
+      versionCode: 1,
+      versionName: "v1.0.0",
+    ),
+    useAuthorization: true,
+    loginConfig: PlexLoginConfig(
+      layout: PlexLoginLayout.split, // package default
+      onLogin: (context, email, password) async { /* return PlexUser */ },
+      userFromJson: (json) { /* hydrate PlexUser */ },
+    ),
+    dashboardConfig: PlexDashboardConfig(
+      useBackground: false, // glass is opt-in; default chrome is flat
+      dashboardScreens: [
+        PlexRoute(
+          route: "/home",
+          category: "Overview",
+          title: "Home",
+          screen: (context, {data}) => const HomeScreen(),
+        ),
+      ],
+    ),
+  ));
+}
+```
+
+### Theme: `PlexBrandConfig`, `themeFromColor`, `PlexTheme.appTextTheme`
+
+Resolution order for colors: widget-level → `PlexBrandConfig` → ColorScheme / seed → generic fallbacks. Default seed is Material Blue Grey 500 (`#607D8B`).
+
+```dart
+runApp(PlexApp(
+  themeFromColor: const Color(0xFF607D8B),
+  brandConfig: const PlexBrandConfig(
+    // All fields optional. Null means "use seed / fallbacks".
+    brandPrimary: null,
+    brandInk: null,
+    success: null,
+    warning: null,
+    danger: null,
+    info: null,
+    fontFamily: null, // package default is Roboto
+    density: PlexDensity.comfortable, // or PlexDensity.compact
+  ),
+  appInfo: PlexAppInfo(
+    title: "My App",
+    appLogo: Icon(Icons.business),
+    initialRoute: "/home",
+  ),
+  dashboardConfig: PlexDashboardConfig(dashboardScreens: [...]),
+));
+
+// Optional: override typography after init. Wins over brandConfig.fontFamily.
+PlexTheme.appTextTheme = GoogleFonts.outfitTextTheme();
+```
+
+Use `themeFromImage` instead of `themeFromColor` if you want a scheme extracted from an image. Do not set both.
+
+### Theme extension lookup
+
+```dart
+final plex = PlexThemeData.of(context);
+final Color page = plex.colors.surfacePage;
+final Color brand = plex.colors.brandPrimary;
+final PlexDensity density = plex.density;
+```
+
+`PlexThemeData.of` never returns null — missing extension yields generic fallbacks.
+
+### Login layout
+
+`PlexLoginLayout.split` is the package default (brand panel + form). Pass `centered` for the historic single card.
+
+```dart
+PlexLoginConfig(
+  layout: PlexLoginLayout.split,
+  brandHeadline: "Plex Example",
+  brandSubtitle: "Enterprise UI kit for Flutter",
+  formTitle: "Sign in",
+  formHint: "Use your workspace credentials.",
+  onLogin: (context, email, password) async => user,
+  userFromJson: (json) => userFrom(json),
+)
+
+// Historic centered card:
+PlexLoginConfig(
+  layout: PlexLoginLayout.centered,
+  onLogin: ...,
+  userFromJson: ...,
+)
+```
+
+Set `useBackground: true` on login or dashboard only if you want glass / `PlexBackground`. Default chrome is flat.
+
+### Always Material 3
+
+Theme is always Material 3. These flags still compile but do nothing:
+
+- `PlexApp.forceMaterial3`
+- `PlexDashboardConfig.showMaterialSwitch`
+- `PlexTheme.setMaterial3(bool)`
+
+### Buttons
+
+```dart
+PlexFormFieldButton(
+  properties: PlexFormFieldGeneric(title: "Save", useMargin: false),
+  buttonType: PlexButtonType.filled, // elevated, text, outlined, filledTonal, ink, danger
+  buttonIcon: Icon(Icons.check),
+  loading: false,
+  buttonClick: () {},
+)
+```
+
+See **Widgets & Components** below for IconButton, Badge, Avatar, Alert, ProgressBar, Card slots, Tabs, and DataGrid.
+
+### Migration notes
+
+- **Constructors**: no required-argument changes for existing widgets.
+- **`brandConfig`**: optional on `PlexApp`. Omit it to keep seed-only theming.
+- **Login**: split layout is the new default. Pass `PlexLoginLayout.centered` to keep the old card.
+- **Default seed**: `#607D8B` (`PlexTheme.defaultSeedColor`). Override with `themeFromColor` or `PlexBrandConfig.brandPrimary`.
+- **Material 2**: removed. M2 flags are no-ops.
+- **`PlexDataGrid`**: additive. Keep `PlexAdvanceDataTable` / `PlexDataTable` where you already use them.
+
+---
 
 ### Quick App Scaffold
 
@@ -372,7 +628,11 @@ void main() {
     ),
     dashboardConfig: PlexDashboardConfig(
       dashboardScreens: [
-        // Define your screens here
+        PlexRoute(
+          route: "/dashboard",
+          title: "Dashboard",
+          screen: (context, {data}) => const DashboardScreen(),
+        ),
       ],
     ),
   ));
@@ -440,7 +700,7 @@ await PlexSignalR.instance.start();
 ## 🏗️ Architecture & Extensibility
 
 - **MVVM Pattern**: Clean separation of UI and business logic.
-- **Customizable Themes**: Use your own color schemes, images, or Material versions.
+- **Customizable Themes**: `themeFromColor` / `PlexBrandConfig`, light and dark, always Material 3.
 - **Flexible Routing**: Define routes and navigation with ease.
 - **Widget Extensibility**: All core widgets are designed for extension and override.
 

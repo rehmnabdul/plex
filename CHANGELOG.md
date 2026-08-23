@@ -1,3 +1,19 @@
+## 2.0.1-beta.6
+
+### Phase 5a — `PlexDataGrid`
+- Add `PlexDataGrid` (Plex-owned, token-themed). Client-side sort, search, selection, and pagination
+- Column model: `PlexDataGridColumn` with `value` accessor and optional custom `cell`
+- Selection: `none` / `single` / `multiple`; toolbar, density toggle, empty/loading states
+- Does not replace `PlexAdvanceDataTable` / `PlexDataTable` — keep those for existing call sites
+
+### Example app — design-system demo
+- Redesign the example as visual QA for Phases 0–5a (theme, buttons, forms, feedback, tabs, data grid)
+- Categorized dashboard routes plus restyled feature demos (tables, forms, scanner, gantt, info sheet)
+
+### Docs
+- README usage guide for `PlexApp` wiring, Phase widgets, and `PlexDataGrid`
+- Example README documents demo routes and install pin
+
 ## 2.0.1-beta.5
 
 ### Phase 2 — form fields

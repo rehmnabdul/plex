@@ -69,8 +69,8 @@ class PlexDataGridColumn<T> {
 /// Plex-owned data grid (Phase 5a). Client-side sort, search, selection, and
 /// pagination. Uses [PlexThemeData] tokens — not Syncfusion theming.
 ///
-/// Does not replace [PlexAdvanceDataTable]; that widget remains for existing
-/// call sites until a later mapping pass.
+/// [PlexAdvanceDataTable] is now a deprecated compatibility wrapper around
+/// this widget. Prefer [PlexDataGrid] for new call sites.
 class PlexDataGrid<T> extends StatefulWidget {
   const PlexDataGrid({
     super.key,

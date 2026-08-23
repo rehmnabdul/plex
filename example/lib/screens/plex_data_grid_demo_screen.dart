@@ -21,7 +21,7 @@ class _DemoEmployee {
   final String status;
 }
 
-/// Additive Phase 5a demo. Does not replace AdvanceDataTable screens.
+/// Phase 5a/5b demo. Prefer this over the deprecated PlexAdvanceDataTable wrapper.
 class PlexDataGridDemoScreen extends StatelessWidget {
   const PlexDataGridDemoScreen({super.key});
 

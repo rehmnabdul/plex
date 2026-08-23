@@ -1,3 +1,12 @@
+## 2.0.1-beta.7
+
+### Phase 5b — `PlexAdvanceDataTable` wrapper
+- `PlexAdvanceDataTable` is now a deprecated compatibility wrapper around `PlexDataGrid`; existing header/cell constructors still compile
+- Visible grid, sort, search, selection, and pagination run on `PlexDataGrid` (token-themed, not Syncfusion UI)
+- Excel export uses `PlexPrinter.printExcel`; PDF export still uses a hidden Syncfusion `SfDataGrid` because `exportToPdfDocument` requires `SfDataGridState`
+- Column grouping, frozen panes, and cell editing remain on the constructor so call sites compile; they are not mapped onto `PlexDataGrid`
+- New tables should use `PlexDataGrid` directly
+
 ## 2.0.1-beta.6
 
 ### Phase 5a — `PlexDataGrid`

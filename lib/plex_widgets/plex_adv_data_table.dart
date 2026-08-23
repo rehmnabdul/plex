@@ -1,23 +1,15 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: deprecated_member_use_from_same_package, use_build_context_synchronously
 
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:plex/plex_assets.dart';
-import 'package:plex/plex_theme.dart';
-import 'package:plex/plex_utils/plex_dimensions.dart';
-import 'package:plex/plex_utils/plex_material.dart';
 import 'package:plex/plex_utils/plex_messages.dart';
 import 'package:plex/plex_utils/plex_printer.dart';
-import 'package:plex/plex_utils/plex_utils.dart';
 import 'package:plex/plex_widget.dart';
-import 'package:plex/plex_widgets/plex_form_field_widgets.dart';
-import 'package:plex/plex_widgets/plex_selection_list.dart';
-import 'package:syncfusion_flutter_core/theme.dart';
+import 'package:plex/plex_widgets/plex_advance_data_table_adapter.dart';
+import 'package:plex/plex_widgets/plex_data_grid.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:syncfusion_flutter_datagrid_export/export.dart';
-import 'package:syncfusion_flutter_xlsio/xlsio.dart' as xl;
 
 enum WidthMode {
   none,
@@ -65,14 +57,22 @@ class PlexDataTableHeaderCell {
   final bool showFilterControl;
 
   ///[columnName] is required as it is text only cell
-  PlexDataTableHeaderCell.text(this.columnName, {this.isNumber = false, this.widthMode = WidthMode.auto, this.showOrderByControl = true, this.showFilterControl = true}) {
+  PlexDataTableHeaderCell.text(this.columnName,
+      {this.isNumber = false,
+      this.widthMode = WidthMode.auto,
+      this.showOrderByControl = true,
+      this.showFilterControl = true}) {
     cell = null;
   }
 
   ///For custom design and handling of cell use this constructor.
   ///[columnName] is optional
   ///[cell] is required for custom cell
-  PlexDataTableHeaderCell.custom(this.columnName, this.cell, {this.isNumber = false, this.widthMode = WidthMode.auto, this.showOrderByControl = true, this.showFilterControl = true});
+  PlexDataTableHeaderCell.custom(this.columnName, this.cell,
+      {this.isNumber = false,
+      this.widthMode = WidthMode.auto,
+      this.showOrderByControl = true,
+      this.showFilterControl = true});
 
   ColumnWidthMode _getWidthMode() {
     switch (widthMode) {
@@ -98,7 +98,8 @@ class PlexDataTableValueCell extends DataGridCell {
   late final String? cellValue;
 
   ///[value] is required as it is text only cell
-  PlexDataTableValueCell.text(String columnName, value, {bool numberField = false})
+  PlexDataTableValueCell.text(String columnName, value,
+      {bool numberField = false})
       : super(
           columnName: columnName,
           value: value,
@@ -116,7 +117,9 @@ class PlexDataTableValueCell extends DataGridCell {
     String textValue,
     Widget widget, {
     bool numberField = false,
-  }) : super(columnName: columnName, value: PlexComparableWidget(widget, textValue)) {
+  }) : super(
+            columnName: columnName,
+            value: PlexComparableWidget(widget, textValue)) {
     cellValue = textValue;
     isWidget = true;
     isNumber = numberField || value is int || value is double;
@@ -124,14 +127,29 @@ class PlexDataTableValueCell extends DataGridCell {
 
   PlexDataTableValueCell clone({dynamic newValue}) {
     if (!isWidget) {
-      return PlexDataTableValueCell.text(columnName, newValue ?? value, numberField: isNumber);
+      return PlexDataTableValueCell.text(columnName, newValue ?? value,
+          numberField: isNumber);
     } else {
-      return PlexDataTableValueCell.custom(columnName, newValue ?? cellValue, value, numberField: isNumber);
+      return PlexDataTableValueCell.custom(
+          columnName, newValue ?? cellValue, value,
+          numberField: isNumber);
     }
   }
 }
 
+/// Deprecated compatibility wrapper around [PlexDataGrid].
+///
+/// Existing constructor parameters and [PlexDataTableHeaderCell] /
+/// [PlexDataTableValueCell] models are unchanged. The visible grid is
+/// [PlexDataGrid]. Excel export uses [PlexPrinter.printExcel]. PDF export
+/// still uses a hidden Syncfusion [SfDataGrid] because
+/// `exportToPdfDocument` requires [SfDataGridState].
+///
+/// Column grouping, frozen panes, and cell editing are still accepted on the
+/// constructor so call sites compile; they are not mapped onto [PlexDataGrid].
+@Deprecated('Use PlexDataGrid')
 class PlexAdvanceDataTable extends StatefulWidget {
+  @Deprecated('Use PlexDataGrid')
   const PlexAdvanceDataTable({
     super.key,
     required this.title,
@@ -182,7 +200,9 @@ class PlexAdvanceDataTable extends StatefulWidget {
   final bool autoExpandGroups;
   final String? groupSummaryFormat;
   final String Function(String summary)? groupSummary;
-  final String Function(String columnName, DataGridRow row, List<DataGridRow> rows)? customGroupingSummary;
+  final String Function(
+      String columnName, DataGridRow row, List<DataGridRow> rows)?
+      customGroupingSummary;
 
   ///Editing a Cell
   final Widget? Function(int row, int column)? cellEditingWidget;
@@ -204,424 +224,147 @@ class PlexAdvanceDataTable extends StatefulWidget {
 }
 
 class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
-  final GlobalKey<SfDataGridState> key = GlobalKey<SfDataGridState>();
-  late _PlexAdvanceDataTableDataSource source;
-  final DataGridController _dataGridController = DataGridController();
+  final GlobalKey<SfDataGridState> _exportKey = GlobalKey<SfDataGridState>();
 
-  List<List<PlexDataTableValueCell>>? getRows() => widget.controller.data;
+  bool get _paginate => widget.pageSize != null && widget.pageSize! > 0;
 
-  double getPages() => ((getRows()?.length ?? 0) / widget.pageSize!) + 1;
-
-  @override
-  void initState() {
-    super.initState();
-    initializeDataSource();
-    initializeGrouping();
+  int _resolvedPageSize(List<List<PlexDataTableValueCell>> rows) {
+    if (_paginate) return widget.pageSize!;
+    return rows.isEmpty ? 1 : rows.length;
   }
 
-  void initializeDataSource() {
-    source = _PlexAdvanceDataTableDataSource(
-      getRows() ?? List.empty(),
-      pageSize: widget.pageSize,
-      alternateColor: widget.alternateColor,
-      dataGridController: _dataGridController,
-      groupSummary: widget.groupSummary,
-      cellEditingWidget: widget.cellEditingWidget,
-      cellEditingSubmit: widget.cellEditingSubmit,
-      customGroupingSummary: widget.customGroupingSummary,
-    );
-  }
-
-  void initializeGrouping() {
-    if (widget.initialColumnGroup == null) return;
-    var oldSelection = source.groupedColumns;
-    for (var item in widget.initialColumnGroup!) {
-      if (oldSelection.firstWhereOrNull((column) => column.name == item) == null) {
-        source.addColumnGroup(ColumnGroup(name: item, sortGroupRows: true));
+  Future<void> _exportExcel(
+    BuildContext context,
+    List<List<PlexDataTableValueCell>> rows,
+  ) async {
+    try {
+      final String? path = await PlexPrinter.printExcel(
+        widget.title,
+        PlexAdvanceDataTableAdapter.excelHeaders(widget.columns),
+        PlexAdvanceDataTableAdapter.excelRows(widget.columns, rows),
+      );
+      if (!context.mounted) return;
+      if (path == null) {
+        context.showSnackBar("Unable to save file, Please try again...");
+        return;
       }
+      context.showSnackBar("Report saved at \"$path\"");
+    } catch (_) {
+      if (!context.mounted) return;
+      context.showSnackBar("Unable to save file, Please try again...");
     }
+  }
+
+  Future<void> _exportPdf(BuildContext context) async {
+    final SfDataGridState? state = _exportKey.currentState;
+    if (state == null) {
+      context.showSnackBar("Unable to save file, Please try again...");
+      return;
+    }
+    try {
+      final document = state.exportToPdfDocument(autoColumnWidth: true);
+      final List<int> bytes = document.saveSync();
+      final String? path = await PlexPrinter.savePdfFile(widget.title, bytes);
+      if (!context.mounted) return;
+      if (path == null) {
+        context.showSnackBar("Unable to save file, Please try again...");
+        return;
+      }
+      context.showSnackBar("Report saved at \"$path\"");
+    } catch (_) {
+      if (!context.mounted) return;
+      context.showSnackBar("Unable to save file, Please try again...");
+    }
+  }
+
+  Widget? _actions(
+    BuildContext context,
+    List<List<PlexDataTableValueCell>> rows,
+  ) {
+    final List<Widget> custom =
+        widget.customWidgets?.call(context) ?? const <Widget>[];
+    if (custom.isEmpty &&
+        !widget.enableExcelExport &&
+        !widget.enablePdfExport &&
+        widget.onRefresh == null) {
+      return null;
+    }
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        ...custom,
+        if (widget.enableExcelExport)
+          IconButton(
+            key: const Key('plex-advance-data-table-excel'),
+            tooltip: 'Excel',
+            onPressed: () => _exportExcel(context, rows),
+            icon: const Icon(Icons.table_chart_outlined),
+          ),
+        if (widget.enablePdfExport)
+          IconButton(
+            key: const Key('plex-advance-data-table-pdf'),
+            tooltip: 'Pdf',
+            onPressed: () => _exportPdf(context),
+            icon: const Icon(Icons.picture_as_pdf_outlined),
+          ),
+        if (widget.onRefresh != null)
+          IconButton(
+            key: const Key('plex-advance-data-table-refresh'),
+            tooltip: 'Refresh',
+            onPressed: widget.onRefresh,
+            icon: const Icon(Icons.refresh),
+          ),
+      ],
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return PlexWidget(
       controller: widget.controller,
-      createWidget: (context, data) {
-        initializeDataSource();
-        initializeGrouping();
+      createWidget: (BuildContext context, dynamic data) {
+        final List<List<PlexDataTableValueCell>> rows =
+            (data as List<List<PlexDataTableValueCell>>?) ??
+                const <List<PlexDataTableValueCell>>[];
         return Column(
           children: [
-            spaceSmall(),
-            Row(
-              children: [
-                Expanded(child: Text(widget.title, style: const TextStyle(fontWeight: FontWeight.bold))),
-                if (isLargeScreen(context) || isExtLargeScreen(context)) ...{
-                  ...?widget.customWidgets?.call(context),
-                  if (widget.enableColumnGrouping) ...{
-                    space(8),
-                    PlexFormFieldButton(
-                      properties: PlexFormFieldGeneric(title: "Group By", useMargin: false),
-                      buttonIcon: Icon(Icons.grid_view_outlined),
-                      buttonClick: () {
-                        showPlexMultiSelection<ColumnGroup>(
-                          context,
-                          focusNode: FocusNode(),
-                          itemText: (item) {
-                            return item.name;
-                          },
-                          onSelect: (items) {
-                            var oldSelection = source.groupedColumns;
-                            for (var column in oldSelection) {
-                              if (items.firstWhereOrNull((item) => item.name == column.name) == null) {
-                                source.removeColumnGroup(column);
-                              }
-                            }
-                            oldSelection = source.groupedColumns;
-                            for (var item in items) {
-                              if (oldSelection.firstWhereOrNull((column) => column.name == item.name) == null) {
-                                source.addColumnGroup(item);
-                              }
-                            }
-
-                            source.notifyListeners();
-                          },
-                          initialSelection: source.groupedColumns,
-                          items: widget.columns.map((e) => ColumnGroup(name: e.columnName, sortGroupRows: true)).toList(),
-                        );
-                      },
-                    ),
-                  },
-                  if (widget.enableExcelExport) ...{
-                    space(8),
-                    PlexFormFieldButton(
-                      properties: PlexFormFieldGeneric(useMargin: false),
-                      buttonClick: () async {
-                        final xl.Workbook workbook = key.currentState!.exportToExcelWorkbook();
-                        workbook.worksheets[0].getRangeByIndex(1, 1, workbook.worksheets[0].rows.count, workbook.worksheets[0].columns.count).autoFit();
-                        final List<int> bytes = workbook.saveAsStream();
-                        var path = await PlexPrinter.saveExcelFile(widget.title, bytes);
-                        if (path == null) {
-                          context.showSnackBar("Unable to save file, Please try again...");
-                        }
-                        context.showSnackBar("Report saved at \"$path\"");
-                      },
-                      buttonIcon: Image.asset(excel, width: 20, height: 20, color: Colors.green),
-                    ),
-                  },
-                  if (widget.enablePdfExport) ...{
-                    space(8),
-                    PlexFormFieldButton(
-                      properties: PlexFormFieldGeneric(useMargin: false),
-                      buttonClick: () async {
-                        var document = key.currentState!.exportToPdfDocument(autoColumnWidth: true);
-                        final List<int> bytes = document.saveSync();
-                        var path = await PlexPrinter.savePdfFile(widget.title, bytes);
-                        if (path == null) {
-                          context.showSnackBar("Unable to save file, Please try again...");
-                        }
-                        context.showSnackBar("Report saved at \"$path\"");
-                      },
-                      buttonIcon: Image.asset(pdf, width: 20, height: 20, color: Colors.redAccent),
-                    ),
-                  },
-                  if (widget.onRefresh != null) ...{
-                    space(8),
-                    PlexFormFieldButton(
-                      properties: PlexFormFieldGeneric(useMargin: false),
-                      buttonClick: () async {
-                        widget.onRefresh?.call();
-                      },
-                      buttonIcon: const Icon(Icons.refresh),
-                    ),
-                  },
-                  space(8),
-                } else if (isMediumScreen(context)) ...{
-                  if (widget.enableColumnGrouping) ...{
-                    FilledButton.tonalIcon(
-                      onPressed: () {
-                        showPlexMultiSelection<ColumnGroup>(
-                          context,
-                          focusNode: FocusNode(),
-                          itemText: (item) {
-                            return item.name;
-                          },
-                          onSelect: (items) {
-                            var oldSelection = source.groupedColumns;
-                            for (var column in oldSelection) {
-                              if (items.firstWhereOrNull((item) => item.name == column.name) == null) {
-                                source.removeColumnGroup(column);
-                              }
-                            }
-
-                            oldSelection = source.groupedColumns;
-                            for (var item in items) {
-                              if (oldSelection.firstWhereOrNull((column) => column.name == item.name) == null) {
-                                source.addColumnGroup(item);
-                              }
-                            }
-                          },
-                          initialSelection: source.groupedColumns,
-                          items: widget.columns.map((e) => ColumnGroup(name: e.columnName, sortGroupRows: true)).toList(),
-                        );
-                      },
-                      style: ButtonStyle(backgroundColor: Colors.blue.shade100.getMaterialState(), elevation: PlexDim.smallest.getMaterialState()),
-                      icon: Image.asset(groupData, height: 25, width: 25, color: Colors.blue),
-                      label: const Text('Group By', style: TextStyle(color: Colors.blue)),
-                    ),
-                  },
-                  MenuAnchor(
-                    menuChildren: [
-                      if (widget.enableExcelExport) ...{
-                        MenuItemButton(
-                          onPressed: () async {
-                            final xl.Workbook workbook = key.currentState!.exportToExcelWorkbook();
-                            workbook.worksheets[0].getRangeByIndex(1, 1, workbook.worksheets[0].rows.count, workbook.worksheets[0].columns.count).autoFit();
-                            final List<int> bytes = workbook.saveAsStream();
-                            var path = await PlexPrinter.saveExcelFile(widget.title, bytes);
-
-                            if (path == null) {
-                              context.showSnackBar("Unable to save file, Please try again...");
-                            }
-                            context.showSnackBar("Report saved at \"$path\"");
-                          },
-                          style: ButtonStyle(backgroundColor: Colors.green.shade100.getMaterialState(), elevation: PlexDim.smallest.getMaterialState()),
-                          leadingIcon: Image.asset(excel, width: 20, height: 20, color: Colors.green),
-                          child: const Text('Excel', style: TextStyle(color: Colors.green)),
-                        ),
-                      },
-                      if (widget.enablePdfExport) ...{
-                        MenuItemButton(
-                          onPressed: () async {
-                            var document = key.currentState!.exportToPdfDocument(autoColumnWidth: true);
-                            final List<int> bytes = document.saveSync();
-                            var path = await PlexPrinter.savePdfFile(widget.title, bytes);
-                            if (path == null) {
-                              context.showSnackBar("Unable to save file, Please try again...");
-                            }
-                            context.showSnackBar("Report saved at \"$path\"");
-                          },
-                          style: ButtonStyle(backgroundColor: Colors.red.shade100.getMaterialState(), elevation: PlexDim.smallest.getMaterialState()),
-                          leadingIcon: Image.asset(pdf, width: 20, height: 20, color: Colors.redAccent),
-                          child: const Text('Pdf', style: TextStyle(color: Colors.redAccent)),
-                        ),
-                      },
-                      if (widget.onRefresh != null) ...{
-                        MenuItemButton(
-                          onPressed: () async {
-                            widget.onRefresh?.call();
-                          },
-                          leadingIcon: const Icon(Icons.refresh),
-                          child: const Text('Refresh'),
-                        ),
-                      },
-                      ...?widget.customWidgets?.call(context).map((e) {
-                        if (e is PlexFormFieldButton) {
-                          return MenuItemButton(
-                            onPressed: () async {
-                              e.buttonClick?.call();
-                            },
-                            leadingIcon: e.buttonIcon,
-                            child: Text(e.properties.title ?? ''),
-                          );
-                        }
-                        return e;
-                      }),
-                    ],
-                    builder: (context, controller, child) {
-                      return IconButton(
-                        onPressed: () {
-                          if (controller.isOpen) {
-                            controller.close();
-                          } else {
-                            controller.open();
-                          }
-                        },
-                        icon: const Icon(Icons.more_vert),
-                      );
-                    },
-                  ),
-                } else ...{
-                  MenuAnchor(
-                    menuChildren: [
-                      if (widget.enableColumnGrouping) ...{
-                        MenuItemButton(
-                          style: ButtonStyle(backgroundColor: Colors.blue.shade100.getMaterialState(), elevation: PlexDim.smallest.getMaterialState()),
-                          leadingIcon: Image.asset(groupData, height: 25, width: 25, color: Colors.blue),
-                          onPressed: () {
-                            showPlexMultiSelection<ColumnGroup>(
-                              context,
-                              focusNode: FocusNode(),
-                              itemText: (item) {
-                                return item.name;
-                              },
-                              onSelect: (items) {
-                                var oldSelection = source.groupedColumns;
-                                for (var column in oldSelection) {
-                                  if (items.firstWhereOrNull((item) => item.name == column.name) == null) {
-                                    source.removeColumnGroup(column);
-                                  }
-                                }
-
-                                oldSelection = source.groupedColumns;
-                                for (var item in items) {
-                                  if (oldSelection.firstWhereOrNull((column) => column.name == item.name) == null) {
-                                    source.addColumnGroup(item);
-                                  }
-                                }
-                              },
-                              initialSelection: source.groupedColumns,
-                              items: widget.columns.map((e) => ColumnGroup(name: e.columnName, sortGroupRows: true)).toList(),
-                            );
-                          },
-                          child: const Text('Group By', style: TextStyle(color: Colors.blue)),
-                        ),
-                      },
-                      if (widget.enableExcelExport) ...{
-                        MenuItemButton(
-                          onPressed: () async {
-                            final xl.Workbook workbook = key.currentState!.exportToExcelWorkbook();
-                            workbook.worksheets[0].getRangeByIndex(1, 1, workbook.worksheets[0].rows.count, workbook.worksheets[0].columns.count).autoFit();
-                            final List<int> bytes = workbook.saveAsStream();
-                            var path = await PlexPrinter.saveExcelFile(widget.title, bytes);
-
-                            if (path == null) {
-                              context.showSnackBar("Unable to save file, Please try again...");
-                            }
-                            context.showSnackBar("Report saved at \"$path\"");
-                          },
-                          style: ButtonStyle(backgroundColor: Colors.green.shade100.getMaterialState(), elevation: PlexDim.smallest.getMaterialState()),
-                          leadingIcon: Image.asset(excel, width: 20, height: 20, color: Colors.green),
-                          child: const Text('Excel', style: TextStyle(color: Colors.green)),
-                        ),
-                      },
-                      if (widget.enablePdfExport) ...{
-                        MenuItemButton(
-                          onPressed: () async {
-                            var document = key.currentState!.exportToPdfDocument(autoColumnWidth: true);
-                            final List<int> bytes = document.saveSync();
-                            var path = await PlexPrinter.savePdfFile(widget.title, bytes);
-                            if (path == null) {
-                              context.showSnackBar("Unable to save file, Please try again...");
-                            }
-                            context.showSnackBar("Report saved at \"$path\"");
-                          },
-                          style: ButtonStyle(backgroundColor: Colors.red.shade100.getMaterialState(), elevation: PlexDim.smallest.getMaterialState()),
-                          leadingIcon: Image.asset(pdf, width: 20, height: 20, color: Colors.redAccent),
-                          child: const Text('Pdf', style: TextStyle(color: Colors.redAccent)),
-                        ),
-                      },
-                      if (widget.onRefresh != null) ...{
-                        MenuItemButton(
-                          onPressed: () async {
-                            widget.onRefresh?.call();
-                          },
-                          leadingIcon: const Icon(Icons.refresh),
-                          child: const Text('Refresh'),
-                        ),
-                      },
-                      ...?widget.customWidgets?.call(context).map((e) {
-                        if (e is PlexFormFieldButton) {
-                          return MenuItemButton(
-                            onPressed: () async {
-                              e.buttonClick?.call();
-                            },
-                            leadingIcon: e.buttonIcon,
-                            child: Text(e.properties.title ?? ''),
-                          );
-                        }
-                        return e;
-                      }),
-                    ],
-                    builder: (context, controller, child) {
-                      return IconButton(
-                        onPressed: () {
-                          if (controller.isOpen) {
-                            controller.close();
-                          } else {
-                            controller.open();
-                          }
-                        },
-                        icon: const Icon(Icons.more_vert),
-                      );
-                    },
-                  ),
-                },
-              ],
-            ),
-            spaceSmall(),
             Expanded(
-              child: SfDataGridTheme(
-                data: SfDataGridThemeData(
-                  headerColor: widget.headerBackground,
-                  filterIconColor: widget.headerTextStyle?.color?.withOpacity(0.8),
-                  filterIconHoverColor: widget.headerTextStyle?.color,
-                  sortIconColor: widget.headerTextStyle?.color?.withOpacity(0.8),
-                  selectionColor: PlexTheme.selectionColor,
-                ),
-                child: SfDataGrid(
-                  key: key,
-                  allowColumnsResizing: false,
-                  allowColumnsDragging: false,
-                  allowExpandCollapseGroup: true,
-                  frozenColumnsCount: widget.freezeColumns,
-                  frozenRowsCount: widget.freezeRows,
-                  allowFiltering: true,
-                  allowSorting: true,
-                  allowMultiColumnSorting: true,
-                  showSortNumbers: true,
-                  allowSwiping: false,
-                  allowEditing: true,
-                  showCheckboxColumn: widget.showCheckboxColumn,
-                  selectionMode: SelectionMode.multiple,
-                  headerGridLinesVisibility: GridLinesVisibility.both,
-                  gridLinesVisibility: GridLinesVisibility.both,
-                  showVerticalScrollbar: true,
-                  showHorizontalScrollbar: true,
-                  isScrollbarAlwaysShown: true,
-                  shrinkWrapRows: false,
-                  shrinkWrapColumns: false,
-                  columnWidthCalculationRange: ColumnWidthCalculationRange.allRows,
-                  navigationMode: GridNavigationMode.cell,
-                  autoExpandGroups: widget.autoExpandGroups,
-                  groupCaptionTitleFormat: widget.groupSummaryFormat ?? '{ColumnName} : {Key} - {ItemsCount} Items',
-                  // onCellTap: (details) {
-                  //   if (details.rowColumnIndex.rowIndex == 0) return;
-                  //   if (widget.enableCopy) {
-                  //     var cell = source._dataGridRows[details.rowColumnIndex.rowIndex - 1].getCells()[details.rowColumnIndex.columnIndex];
-                  //     debugPrint(cell.value?.toString());
-                  //     context.copyToClipboard(cell.value?.toString() ?? "N/A");
-                  //   }
-                  // },
-                  source: source,
-                  columns: widget.columns
-                      .map(
-                        (e) => GridColumn(
-                          columnName: e.columnName,
-                          columnWidthMode: e._getWidthMode(),
-                          allowSorting: e.showOrderByControl,
-                          allowFiltering: e.showFilterControl,
-                          label: Padding(
-                            padding: const EdgeInsets.all(PlexDim.medium),
-                            child: Text(
-                              e.columnName,
-                              style: widget.headerTextStyle,
-                              overflow: TextOverflow.ellipsis,
-                              softWrap: true,
-                            ),
-                          ),
-                        ),
-                      )
-                      .toList(),
-                ),
+              child: PlexDataGrid<List<PlexDataTableValueCell>>(
+                key: const Key('plex-advance-data-table-grid'),
+                title: widget.title,
+                columns: PlexAdvanceDataTableAdapter.columns(widget.columns),
+                rows: rows,
+                pageSize: _resolvedPageSize(rows),
+                showFooter: _paginate,
+                showSearch:
+                    widget.columns.any((c) => c.showFilterControl),
+                showDensityToggle: false,
+                selectionMode: widget.showCheckboxColumn
+                    ? PlexDataGridSelectionMode.multiple
+                    : PlexDataGridSelectionMode.none,
+                actions: _actions(context, rows),
               ),
             ),
-            if (widget.pageSize != null) ...{
-              SfDataPager(
-                delegate: source,
-                pageCount: getPages(),
-                direction: Axis.horizontal,
+            if (widget.enablePdfExport)
+              Offstage(
+                child: SizedBox(
+                  width: 800,
+                  height: 400,
+                  child: SfDataGrid(
+                    key: _exportKey,
+                    source: _PlexAdvanceDataTableExportSource(rows),
+                    columns: widget.columns
+                        .map(
+                          (PlexDataTableHeaderCell e) => GridColumn(
+                            columnName: e.columnName,
+                            columnWidthMode: e._getWidthMode(),
+                            label: Text(e.columnName),
+                          ),
+                        )
+                        .toList(),
+                  ),
+                ),
               ),
-            },
           ],
         );
       },
@@ -629,104 +372,30 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
   }
 }
 
-class _PlexAdvanceDataTableDataSource extends DataGridSource {
-  late List<DataGridRow> _data;
-  List<DataGridRow> _dataGridRows = [];
-  Color? _alternateColor;
-  int isAlternate = -1;
-  final DataGridController dataGridController;
-  final String Function(String summary)? groupSummary;
-  final Widget? Function(int row, int col)? cellEditingWidget;
-  final Future Function(int row, int col)? cellEditingSubmit;
-  final String Function(String columnName, DataGridRow row, List<DataGridRow> rows)? customGroupingSummary;
-
-  final int? pageSize;
-
-  _PlexAdvanceDataTableDataSource(
-    List<List<PlexDataTableValueCell>> data, {
-    required this.pageSize,
-    required this.dataGridController,
-    this.groupSummary,
-    this.cellEditingWidget,
-    this.cellEditingSubmit,
-    this.customGroupingSummary,
-    Color? alternateColor,
-  }) {
-    _data = data.map((e) => DataGridRow(cells: e)).toList();
-    _dataGridRows = pageSize != null && pageSize! <= data.length ? _data.getRange(0, pageSize!).toList(growable: false) : _data;
-    _alternateColor = alternateColor;
+class _PlexAdvanceDataTableExportSource extends DataGridSource {
+  _PlexAdvanceDataTableExportSource(List<List<PlexDataTableValueCell>> data) {
+    _rows = data
+        .map((List<PlexDataTableValueCell> e) => DataGridRow(cells: e))
+        .toList();
   }
 
-  @override
-  List<DataGridRow> get rows => _dataGridRows;
+  late final List<DataGridRow> _rows;
 
   @override
-  bool shouldRecalculateColumnWidths() {
-    return true;
-  }
+  List<DataGridRow> get rows => _rows;
 
   @override
-  Widget? buildEditWidget(DataGridRow dataGridRow, RowColumnIndex rowColumnIndex, GridColumn column, CellSubmit submitCell) {
-    return cellEditingWidget?.call(rowColumnIndex.rowIndex, rowColumnIndex.columnIndex - 1);
-  }
-
-  @override
-  Future<void> onCellSubmit(DataGridRow dataGridRow, RowColumnIndex rowColumnIndex, GridColumn column) async {
-    await cellEditingSubmit?.call(rowColumnIndex.rowIndex, rowColumnIndex.columnIndex - 1);
-  }
-
-  @override
-  DataGridRowAdapter? buildRow(DataGridRow row) {
+  DataGridRowAdapter buildRow(DataGridRow row) {
     return DataGridRowAdapter(
-        color: isAlternate++ % 2 == 0 ? _alternateColor : null,
-        cells: row.getCells().map((dataGridCell) {
-          var cell = dataGridCell as PlexDataTableValueCell;
-          return cell.isWidget
-              ? cell.value as Widget
-              : Padding(
-                  padding: const EdgeInsets.all(PlexDim.medium - 1),
-                  child: Text(
-                    dataGridCell.value.toString(),
-                    textAlign: cell.isNumber ? TextAlign.right : TextAlign.left,
-                    softWrap: true,
-                  ),
-                );
-        }).toList());
-  }
-
-  @override
-  Widget? buildGroupCaptionCellWidget(RowColumnIndex rowColumnIndex, String summaryValue) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 15),
-      child: Text(groupSummary?.call(summaryValue) ?? summaryValue),
+      cells: row.getCells().map((DataGridCell dataGridCell) {
+        final PlexDataTableValueCell cell =
+            dataGridCell as PlexDataTableValueCell;
+        if (cell.isWidget) {
+          return cell.value as Widget;
+        }
+        return Text(dataGridCell.value.toString());
+      }).toList(),
     );
-  }
-
-  @override
-  Future<bool> handlePageChange(int oldPageIndex, int newPageIndex) async {
-    if (pageSize == null) return false;
-    int startIndex = newPageIndex * pageSize!;
-    int endIndex = startIndex + pageSize!;
-    if (startIndex < _data.length) {
-      if (endIndex <= _data.length) {
-        _dataGridRows = _data.getRange(startIndex, endIndex).toList(growable: false);
-      } else {
-        _dataGridRows = _data.getRange(startIndex, _data.length).toList(growable: false);
-      }
-    } else {
-      _dataGridRows = [];
-    }
-    notifyListeners();
-
-    return true;
-  }
-
-  @override
-  String performGrouping(String columnName, DataGridRow row) {
-    if (customGroupingSummary != null) {
-      return customGroupingSummary!(columnName, row, rows);
-    }
-    return super.performGrouping(columnName, row);
   }
 }
 
@@ -738,7 +407,8 @@ class CustomColumnSizer extends ColumnSizer {
   }
 
   @override
-  double computeCellWidth(GridColumn column, DataGridRow row, Object? cellValue, TextStyle textStyle) {
+  double computeCellWidth(GridColumn column, DataGridRow row, Object? cellValue,
+      TextStyle textStyle) {
     textStyle = textStyle.copyWith(fontWeight: FontWeight.bold);
     return super.computeCellWidth(column, row, cellValue, textStyle);
   }

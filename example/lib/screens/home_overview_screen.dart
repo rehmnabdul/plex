@@ -138,7 +138,7 @@ class HomeOverviewScreen extends StatelessWidget {
             ),
             _ShortcutCard(
               title: "Advance table",
-              subtitle: "Syncfusion grid",
+              subtitle: "Deprecated wrapper",
               icon: Icons.table_chart_outlined,
               route: Routes.advanceDataTable,
             ),

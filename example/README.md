@@ -1,6 +1,6 @@
 # plex_app
 
-Example application for the Plex Flutter UI framework. It is a visual QA of Phases 0–5a plus restyled feature demos — not a product branded app.
+Example application for the Plex Flutter UI framework. It is a visual QA of Phases 0–5b plus restyled feature demos — not a product branded app.
 
 ## Run
 
@@ -12,7 +12,7 @@ flutter pub get
 flutter run
 ```
 
-The example depends on the local package (`plex: path: ../../plex`). Published apps should use `plex: 2.0.1-beta.6` (see the root README).
+The example depends on the local package (`plex: path: ../../plex`). Published apps should use `plex: 2.0.1-beta.7` (see the root README).
 
 ## What you will see
 
@@ -25,8 +25,8 @@ Login defaults to `PlexLoginLayout.split` with generic copy and `assets/app.png`
 | Category | Routes | Purpose |
 | --- | --- | --- |
 | **Overview** | `/home` | Landing page, shortcuts, badges, avatar |
-| **Design system** | `/ui-theme`, `/ui-buttons`, `/ui-forms`, `/ui-feedback`, `/ui-tabs`, `/data-grid` | Phases 0–5a widget QA |
-| **Tables** | `/dashboard`, `/paginated-table`, `/advance-data-table`, `/dashboardExternal` | Existing table widgets (including Syncfusion) |
+| **Design system** | `/ui-theme`, `/ui-buttons`, `/ui-forms`, `/ui-feedback`, `/ui-tabs`, `/data-grid` | Phases 0–5b widget QA |
+| **Tables** | `/dashboard`, `/paginated-table`, `/advance-data-table`, `/dashboardExternal` | Existing table widgets (`PlexAdvanceDataTable` is a deprecated wrapper; PDF export still uses Syncfusion) |
 | **Forms** | `/all-inputs`, `/form-usage` | Full field catalog and `PlexFormWidget` |
 | **Widgets** | autocomplete sample, logo route, updatable widget, info sheet, scanner | Existing demos, restyled |
 | **Charts** | `/gantt-demo` | `PlexChartGant` |
@@ -40,7 +40,7 @@ Dashboard AppBar is `PlexAppBar`. Screens inside the dashboard should not add a 
 - **Forms** — restyled `PlexFormField*`, checkbox, switch
 - **Cards & feedback** — card slots, `PlexAlert`, `PlexProgressBar`, `PlexSkeleton` / `PlexShimmer`, toasts
 - **Tabs** — `PlexTabs` + `PlexTabPanel`
-- **Plex Data Grid** — Phase 5a `PlexDataGrid` (does not replace `PlexAdvanceDataTable`)
+- **Plex Data Grid** — Phase 5a `PlexDataGrid` (prefer over the deprecated `PlexAdvanceDataTable` wrapper)
 
 ## Copy-paste: app wiring
 

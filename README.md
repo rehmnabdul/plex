@@ -55,7 +55,7 @@ PlexDataTable(
 ```
 
 #### `PlexAdvanceDataTable`
-A Syncfusion-backed data table with export (Excel, PDF), grouping, and cell editing. Not replaced by `PlexDataGrid`.
+Deprecated compatibility wrapper around `PlexDataGrid`. Existing header/cell constructors still compile. Prefer `PlexDataGrid` for new tables. Excel export uses `PlexPrinter`; PDF export still uses a hidden Syncfusion `SfDataGrid`. Grouping, freeze, and cell editing are not mapped.
 ```dart
 PlexAdvanceDataTable(
   title: "Employees",
@@ -243,7 +243,7 @@ PlexTabs(
 ```
 
 #### `PlexDataGrid`
-Plex-owned client-side grid (sort, search, selection, pagination). Does not replace `PlexAdvanceDataTable`.
+Plex-owned client-side grid (sort, search, selection, pagination). Prefer this over the deprecated `PlexAdvanceDataTable` wrapper.
 ```dart
 PlexDataGrid<Employee>(
   title: "Employees",
@@ -446,7 +446,7 @@ Add PLEX to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  plex: 2.0.1-beta.6
+  plex: 2.0.1-beta.7
 ```
 
 Then run:
@@ -455,7 +455,7 @@ Then run:
 flutter pub get
 ```
 
-The example app under `/example` is a full visual QA of Phases 0–5a (theme, buttons, forms, feedback, tabs, data grid) plus restyled feature demos. Run it with:
+The example app under `/example` is a full visual QA of Phases 0–5b (theme, buttons, forms, feedback, tabs, data grid) plus restyled feature demos. Run it with:
 
 ```sh
 cd example
@@ -609,7 +609,7 @@ See **Widgets & Components** below for IconButton, Badge, Avatar, Alert, Progres
 - **Login**: split layout is the new default. Pass `PlexLoginLayout.centered` to keep the old card.
 - **Default seed**: `#607D8B` (`PlexTheme.defaultSeedColor`). Override with `themeFromColor` or `PlexBrandConfig.brandPrimary`.
 - **Material 2**: removed. M2 flags are no-ops.
-- **`PlexDataGrid`**: additive. Keep `PlexAdvanceDataTable` / `PlexDataTable` where you already use them.
+- **`PlexDataGrid`**: prefer for new tables. `PlexAdvanceDataTable` is a deprecated wrapper; keep `PlexDataTable` where you already use it.
 
 ---
 

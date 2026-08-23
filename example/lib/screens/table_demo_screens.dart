@@ -170,17 +170,19 @@ class AdvanceDataTableDemoScreen extends StatelessWidget {
         children: [
           const ExampleCard(
             title: "PlexAdvanceDataTable",
-            subtitle: "Syncfusion-backed grid — not replaced by PlexDataGrid",
+            subtitle:
+                "Deprecated wrapper around PlexDataGrid — old header/cell API",
             actions: PlexBadge(
-              label: "Syncfusion",
+              label: "Deprecated",
               tone: PlexBadgeTone.warning,
             ),
             child: Text(
-              "Keep this widget for existing call sites. New tables can use PlexDataGrid.",
+              "Existing call sites keep compiling. New tables should use PlexDataGrid. Grouping, freeze, and cell editing are not mapped.",
             ),
           ),
           const SizedBox(height: PlexDim.medium),
           Expanded(
+            // ignore: deprecated_member_use
             child: PlexAdvanceDataTable(
               title: "Advance Data Table",
               widthMode: WidthMode.none,

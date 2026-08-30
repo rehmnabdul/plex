@@ -12,7 +12,7 @@ flutter pub get
 flutter run
 ```
 
-The example depends on the local package (`plex: path: ../../plex`). Published apps should use `plex: 2.0.1-beta.13` (see the root README).
+The example depends on the local package (`plex: path: ../../plex`). Published apps should use `plex: 2.0.1-beta.14` (see the root README).
 
 ## What you will see
 
@@ -22,7 +22,7 @@ Login defaults to `PlexLoginLayout.split` with generic copy and `assets/app.png`
 
 `PlexDataGrid` is the table engine. `PlexAdvanceDataTable` is a deprecated wrapper around it. Excel and PDF export use `PlexPrinter` (Plex-owned PDF and OOXML Excel via `archive`). The package no longer depends on Syncfusion DataGrid or xlsio.
 
-**`PlexDataGrid` capabilities** (Design system → **Plex Data Grid**, route `/data-grid`): sort, toolbar search, per-column filters (`showColumnFilters`, including startsWith / greaterThan / lessThan), nested grouping (`groupByColumnIds`), per-group summaries, frozen columns (`frozenColumnCount`) and frozen rows (`frozenRowCount`), cell editing (`onCellEdited` / `applyCellEdit`), CSV / Excel / PDF (opt-in flags), custom `cell` widgets, and `rowStyle` / `cellStyle`. Export flags default to off on the grid; the Advance wrapper still defaults Excel/PDF on and maps `freezeColumns` / `freezeRows`.
+**`PlexDataGrid` capabilities** (Design system → **Plex Data Grid**, route `/data-grid`): sort, toolbar search, per-column filters (`showColumnFilters`, including startsWith / greaterThan / lessThan), nested grouping (`groupByColumnIds`), per-group summaries, frozen columns (`frozenColumnCount`) and frozen rows (`frozenRowCount`), cell editing (`onCellEdited` / `applyCellEdit`), CSV / Excel / PDF, custom `cell` widgets, and `rowStyle` / `cellStyle`. Export, grouping, and `autoExpandGroups` default to on for `PlexDataGrid`; the Advance wrapper still defaults Excel/PDF on, CSV off, and maps `freezeColumns` / `freezeRows`.
 
 ### Dashboard categories
 

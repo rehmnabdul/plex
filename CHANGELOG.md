@@ -1,3 +1,13 @@
+## 2.0.1-beta.14
+
+### PlexDataGrid column/row size modes and toolbar defaults
+- `columnSizeMode` / `rowSizeMode` / `headerRowSizeMode` (`fixed` default). Modes: `fixed`, `auto` (header plus current page), `header`, `cells`, `fill`, `lastFill`. Rows: `fixed` vs `auto` wrap. `minWidth` / `maxWidth` clamp columns. Advance `WidthMode` maps onto these modes
+- `enableCsvExport`, `enableExcelExport`, `enablePdfExport`, `enableGrouping`, and `autoExpandGroups` now default to `true` on `PlexDataGrid`. Pass `false` to turn a control off. `PlexAdvanceDataTable` still defaults Excel/PDF to `true` and CSV to `false`
+
+### Docs and example
+- README, CHANGELOG, and example README pin `2.0.1-beta.14`
+- Design system `/data-grid` demo covers size modes; widget tests for layout and default flags
+
 ## 2.0.1-beta.13
 
 ### Backlog remainder — trellis, frozen rows, mutation, calendar drag, Gantt, Excel

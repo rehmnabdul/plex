@@ -64,6 +64,7 @@ PlexDataGrid<_Person> _grid({
   bool loading = false,
   bool showSearch = true,
   bool showColumnFilters = false,
+  // Explicit false keeps a clean toolbar; constructor defaults are true.
   bool enableGrouping = false,
   String? groupByColumnId,
   List<String>? groupByColumnIds,
@@ -73,6 +74,11 @@ PlexDataGrid<_Person> _grid({
   bool enableCsvExport = false,
   bool enableExcelExport = false,
   bool enablePdfExport = false,
+  bool showFooter = true,
+  int frozenColumnCount = 0,
+  PlexDataGridColumnSizeMode columnSizeMode = PlexDataGridColumnSizeMode.fixed,
+  PlexDataGridRowSizeMode rowSizeMode = PlexDataGridRowSizeMode.fixed,
+  PlexDataGridRowSizeMode headerRowSizeMode = PlexDataGridRowSizeMode.fixed,
   PlexDataGridCellStyle? Function(_Person row)? rowStyle,
 }) {
   return PlexDataGrid<_Person>(
@@ -96,7 +102,18 @@ PlexDataGrid<_Person> _grid({
     enableCsvExport: enableCsvExport,
     enableExcelExport: enableExcelExport,
     enablePdfExport: enablePdfExport,
+    showFooter: showFooter,
+    frozenColumnCount: frozenColumnCount,
+    columnSizeMode: columnSizeMode,
+    rowSizeMode: rowSizeMode,
+    headerRowSizeMode: headerRowSizeMode,
     rowStyle: rowStyle,
+  );
+}
+
+Size _enclosingSizedBox(WidgetTester tester, Finder of) {
+  return tester.getSize(
+    find.ancestor(of: of, matching: find.byType(SizedBox)).first,
   );
 }
 
@@ -586,6 +603,22 @@ void main() {
     );
   });
 
+  testWidgets('export and grouping toolbars are on by default', (tester) async {
+    await tester.pumpWidget(
+      _wrap(
+        PlexDataGrid<_Person>(
+          columns: _columns,
+          rows: _people,
+          rowId: (_Person row) => row.id,
+        ),
+      ),
+    );
+    expect(find.byKey(const Key('plex-data-grid-csv')), findsOneWidget);
+    expect(find.byKey(const Key('plex-data-grid-excel')), findsOneWidget);
+    expect(find.byKey(const Key('plex-data-grid-pdf')), findsOneWidget);
+    expect(find.byKey(const Key('plex-data-grid-group-by')), findsOneWidget);
+  });
+
   testWidgets('export buttons appear when flags are on', (tester) async {
     await tester.pumpWidget(
       _wrap(
@@ -825,6 +858,205 @@ void main() {
       changed!.firstWhere((_MutablePerson p) => p.id == 1).name,
       'Robert',
     );
+  });
+
+  testWidgets('default constructors unchanged keep 160 column width',
+      (tester) async {
+    await tester.pumpWidget(
+      _wrap(
+        _grid(
+          showSearch: false,
+          showFooter: false,
+          columns: <PlexDataGridColumn<_Person>>[
+            PlexDataGridColumn<_Person>(
+              id: 'gridDefHdr',
+              title: 'GridDefHdr',
+              value: (_Person row) => row.name,
+            ),
+          ],
+        ),
+      ),
+    );
+
+    expect(find.byType(PlexDataGrid<_Person>), findsOneWidget);
+    expect(find.text('GRIDDEFHDR'), findsOneWidget);
+    expect(find.text('Bob'), findsOneWidget);
+    expect(_enclosingSizedBox(tester, find.text('GRIDDEFHDR')).width, 160);
+    expect(_enclosingSizedBox(tester, find.text('Bob')).width, 160);
+  });
+
+  testWidgets('fixed width column is 80', (tester) async {
+    await tester.pumpWidget(
+      _wrap(
+        _grid(
+          showSearch: false,
+          showFooter: false,
+          columns: <PlexDataGridColumn<_Person>>[
+            PlexDataGridColumn<_Person>(
+              id: 'fixed80',
+              title: 'Fixed80',
+              width: 80,
+              sizeMode: PlexDataGridColumnSizeMode.fixed,
+              value: (_Person row) => row.name,
+            ),
+          ],
+        ),
+      ),
+    );
+
+    expect(
+      _enclosingSizedBox(tester, find.text('FIXED80')).width,
+      closeTo(80, 1),
+    );
+    expect(
+      _enclosingSizedBox(tester, find.text('Bob')).width,
+      closeTo(80, 1),
+    );
+  });
+
+  testWidgets('auto width from long cell is wider than fixed', (tester) async {
+    const String longCell = 'WWWWWWWWWWWWWWWWWWWW';
+    await tester.pumpWidget(
+      _wrap(
+        _grid(
+          showSearch: false,
+          showFooter: false,
+          columns: <PlexDataGridColumn<_Person>>[
+            PlexDataGridColumn<_Person>(
+              id: 'autoName',
+              title: 'N',
+              sizeMode: PlexDataGridColumnSizeMode.auto,
+              value: (_Person row) => row.id == 1 ? longCell : row.name,
+            ),
+            PlexDataGridColumn<_Person>(
+              id: 'fixed80',
+              title: 'Fixed80',
+              width: 80,
+              sizeMode: PlexDataGridColumnSizeMode.fixed,
+              value: (_Person row) => row.age,
+            ),
+          ],
+        ),
+      ),
+    );
+
+    final double autoWidth =
+        _enclosingSizedBox(tester, find.text(longCell)).width;
+    final double fixedWidth =
+        _enclosingSizedBox(tester, find.text('FIXED80')).width;
+    expect(autoWidth, greaterThan(fixedWidth));
+  });
+
+  testWidgets('wrap height with fixed width exceeds density 44',
+      (tester) async {
+    const String wrapCell =
+        'alpha bravo charlie delta echo foxtrot golf hotel india';
+    const List<_Person> rows = <_Person>[
+      _Person(id: 101, name: wrapCell, age: 1),
+      _Person(id: 102, name: 'Hi', age: 2),
+    ];
+    await tester.pumpWidget(
+      _wrap(
+        _grid(
+          rows: rows,
+          showSearch: false,
+          showFooter: false,
+          rowSizeMode: PlexDataGridRowSizeMode.auto,
+          columns: <PlexDataGridColumn<_Person>>[
+            PlexDataGridColumn<_Person>(
+              id: 'wrapCol',
+              title: 'WrapCol',
+              width: 80,
+              sizeMode: PlexDataGridColumnSizeMode.fixed,
+              rowSizeMode: PlexDataGridRowSizeMode.auto,
+              value: (_Person row) => row.name,
+            ),
+          ],
+        ),
+      ),
+    );
+
+    final double wrapHeight = tester
+        .getSize(find.byKey(const ValueKey<Object>('plex-data-grid-row-101')))
+        .height;
+    final double shortHeight = tester
+        .getSize(find.byKey(const ValueKey<Object>('plex-data-grid-row-102')))
+        .height;
+    expect(wrapHeight, greaterThan(44));
+    expect(wrapHeight, greaterThan(shortHeight));
+  });
+
+  testWidgets('fill flex shares space with flex 2 wider', (tester) async {
+    await tester.pumpWidget(
+      _wrap(
+        _grid(
+          showSearch: false,
+          showFooter: false,
+          columns: <PlexDataGridColumn<_Person>>[
+            PlexDataGridColumn<_Person>(
+              id: 'fillOne',
+              title: 'FillOne',
+              sizeMode: PlexDataGridColumnSizeMode.fill,
+              flex: 1,
+              value: (_Person row) => row.name,
+            ),
+            PlexDataGridColumn<_Person>(
+              id: 'fillTwo',
+              title: 'FillTwo',
+              sizeMode: PlexDataGridColumnSizeMode.fill,
+              flex: 2,
+              value: (_Person row) => row.age,
+            ),
+          ],
+        ),
+      ),
+    );
+
+    final double flex1 =
+        _enclosingSizedBox(tester, find.text('FILLONE')).width;
+    final double flex2 =
+        _enclosingSizedBox(tester, find.text('FILLTWO')).width;
+    expect(flex1, greaterThan(160));
+    expect(flex2, greaterThan(160));
+    expect(flex2, greaterThan(flex1));
+  });
+
+  testWidgets('freeze plus auto still shows long cell', (tester) async {
+    const String frozenLong = 'FROZEN_AUTO_WWWWWWWWWWWWWWWWWWWW';
+    await tester.pumpWidget(
+      _wrap(
+        _grid(
+          showSearch: false,
+          showFooter: false,
+          frozenColumnCount: 1,
+          columns: <PlexDataGridColumn<_Person>>[
+            PlexDataGridColumn<_Person>(
+              id: 'frozenAuto',
+              title: 'FzAuto',
+              sizeMode: PlexDataGridColumnSizeMode.auto,
+              value: (_Person row) => row.id == 1 ? frozenLong : row.name,
+            ),
+            PlexDataGridColumn<_Person>(
+              id: 'shortFixed',
+              title: 'Short80',
+              width: 80,
+              sizeMode: PlexDataGridColumnSizeMode.fixed,
+              value: (_Person row) => row.age,
+            ),
+          ],
+        ),
+      ),
+    );
+
+    expect(find.byType(PlexDataGrid<_Person>), findsOneWidget);
+    expect(find.text(frozenLong), findsWidgets);
+    final double autoWidth = _enclosingSizedBox(
+      tester,
+      find.text(frozenLong).first,
+    ).width;
+    final double fixedWidth =
+        _enclosingSizedBox(tester, find.text('SHORT80').first).width;
+    expect(autoWidth, greaterThan(fixedWidth));
   });
 }
 

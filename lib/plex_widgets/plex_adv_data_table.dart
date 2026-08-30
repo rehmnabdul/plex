@@ -5,6 +5,8 @@ import 'package:plex/plex_widget.dart';
 import 'package:plex/plex_widgets/plex_advance_data_table_adapter.dart';
 import 'package:plex/plex_widgets/plex_data_grid.dart';
 
+/// Advance column/table width behavior. Maps onto [PlexDataGridColumnSizeMode]
+/// via [PlexAdvanceDataTableAdapter.sizeModeFor].
 enum WidthMode {
   none,
   fitByColumnName,
@@ -263,7 +265,13 @@ class _PlexAdvanceDataTableState extends State<PlexAdvanceDataTable> {
         return PlexDataGrid<List<PlexDataTableValueCell>>(
           key: const Key('plex-advance-data-table-grid'),
           title: widget.title,
-          columns: PlexAdvanceDataTableAdapter.columns(widget.columns),
+          columns: PlexAdvanceDataTableAdapter.columns(
+            widget.columns,
+            tableWidthMode: widget.widthMode,
+          ),
+          columnSizeMode: widget.widthMode == null
+              ? PlexDataGridColumnSizeMode.fixed
+              : PlexAdvanceDataTableAdapter.sizeModeFor(widget.widthMode!),
           rows: rows,
           pageSize: _resolvedPageSize(rows),
           showFooter: _paginate,

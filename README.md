@@ -339,6 +339,19 @@ PlexDataGrid<Employee>(
 )
 ```
 
+##### Column and row size modes
+
+`columnSizeMode` and `rowSizeMode` default to `fixed` (current behavior). `width` is still pixels and defaults to 160.
+
+- **fixed** — `width` in px
+- **auto** — header plus **current page** cells, not the full dataset
+- **header** — header title
+- **cells** — current-page cell values
+- **fill** — share leftover width by `flex`
+- **lastFill** — last column takes leftover width
+
+Rows: `fixed` vs `auto` wrap (row height is the max cell). `headerRowSizeMode` can wrap the header independently. `minWidth` / `maxWidth` clamp columns. Advance `WidthMode` now maps onto these modes (`none` → `fixed`, `auto` → `auto`, `fitByColumnName` → `header`, `fitByCellValue` → `cells`, `fill` → `fill`, `lastColumnFill` → `lastFill`).
+
 ##### Sort, search, and per-column filter
 
 Header tap on a `sortable` column cycles **ascending → descending → unsorted** (single-column sort). Toolbar search (`showSearch`, default `true`) matches `searchable` columns. Set `showColumnFilters: true` for a filter row under the header. Each `filterable` column gets a contains/equals field (`PlexDataGridFilterMatch`).
@@ -369,7 +382,7 @@ PlexDataGrid<Employee>(
 
 ##### CSV / Excel / PDF export
 
-Flags are **opt-in on `PlexDataGrid`** (all default `false`). The deprecated `PlexAdvanceDataTable` wrapper still defaults **Excel and PDF to `true`** and CSV to `false`. Export always uses `value`, not the `cell` widget.
+CSV, Excel, and PDF export are **on by default** on `PlexDataGrid`. Pass `false` to hide a button. The deprecated `PlexAdvanceDataTable` wrapper still defaults **Excel and PDF to `true`** and CSV to `false`. Export always uses `value`, not the `cell` widget.
 
 ```dart
 PlexDataGrid<Employee>(
@@ -388,7 +401,7 @@ PlexDataGrid<Employee>(
 
 ##### Nested grouping
 
-`enableGrouping: true` shows the group-by toolbar (chips plus a header action). Pass `groupByColumnIds` for nested groups — first id is the outer group. `groupByColumnId` still works as a single-column convenience when `groupByColumnIds` is omitted. `onGroupChanged` receives the full `List<String>` of grouping ids (empty list means no grouping).
+`enableGrouping` (default `true`) shows the group-by toolbar (chips plus a header action). Pass `false` to hide it. Pass `groupByColumnIds` for nested groups — first id is the outer group. `groupByColumnId` still works as a single-column convenience when `groupByColumnIds` is omitted. `onGroupChanged` receives the full `List<String>` of grouping ids (empty list means no grouping). `autoExpandGroups` defaults to `true`.
 
 ```dart
 PlexDataGrid<Employee>(
@@ -699,7 +712,7 @@ Add PLEX to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  plex: 2.0.1-beta.13
+  plex: 2.0.1-beta.14
 ```
 
 Then run:
@@ -857,9 +870,9 @@ See **Widgets & Components** for IconButton, Badge, Avatar, Alert, ProgressBar, 
 
 ### What changed (2.0.1 betas) / Migration
 
-This 2.x beta line started after pub.dev `2.0.1-beta.1`. Pin **2.0.1-beta.13**. Stable **2.0.1** follows the beta series.
+This 2.x beta line started after pub.dev `2.0.1-beta.1`. Pin **2.0.1-beta.14**. Stable **2.0.1** follows the beta series.
 
-Shipped: **beta.2** Phase 0 tokens · **beta.3** `.pubignore` for Interloop Design · **beta.4** Phase 1 · **beta.5** Phases 2–4 · **beta.6** `PlexDataGrid` + example redesign · **beta.7** `PlexAdvanceDataTable` wrapper · **beta.8** Phase 5c (Syncfusion grid removal) · **beta.9** DataGrid grouping, summaries, export flags, filters, and cell styles · **beta.10** Phase 6 dashboard widgets · **beta.11** Phase 7 wizard, chart, calendar · **beta.12** backlog 2–5 (wizard axis/jump, extra charts, calendar views+events, DataGrid freeze/edit/filters, lookup/tags, Gantt progress, mobile list) · **beta.13** trellis, frozen rows, in-grid mutation, calendar recurrence/drag, Gantt rewrite, `PlexMobileTally`, Excel without xlsio.
+Shipped: **beta.2** Phase 0 tokens · **beta.3** `.pubignore` for Interloop Design · **beta.4** Phase 1 · **beta.5** Phases 2–4 · **beta.6** `PlexDataGrid` + example redesign · **beta.7** `PlexAdvanceDataTable` wrapper · **beta.8** Phase 5c (Syncfusion grid removal) · **beta.9** DataGrid grouping, summaries, export flags, filters, and cell styles · **beta.10** Phase 6 dashboard widgets · **beta.11** Phase 7 wizard, chart, calendar · **beta.12** backlog 2–5 (wizard axis/jump, extra charts, calendar views+events, DataGrid freeze/edit/filters, lookup/tags, Gantt progress, mobile list) · **beta.13** trellis, frozen rows, in-grid mutation, calendar recurrence/drag, Gantt rewrite, `PlexMobileTally`, Excel without xlsio · **beta.14** DataGrid size modes and export/grouping defaults on.
 
 **Constructors are mostly additive.** Existing required arguments did not change. New optional fields default to previous behavior.
 
@@ -881,13 +894,14 @@ Shipped: **beta.2** Phase 0 tokens · **beta.3** `.pubignore` for Interloop Desi
   - Nested grouping via `groupByColumnIds` (`groupByColumnId` still works). `enableGrouping` shows the toolbar UI; `onGroupChanged` is `List<String>`.
   - Per-group summaries default to count plus numeric sums; hide from the toolbar (`showGroupSummaries`). Override with `groupSummary` / `groupSummaryBuilder` (`group.rows` is all descendant leaf rows).
   - Toolbar search plus `showColumnFilters` (contains/equals per `filterable` column).
-  - Opt-in `enableCsvExport` / `enableExcelExport` / `enablePdfExport` on the grid (all default `false`). Advance still defaults Excel/PDF to `true`.
+  - `enableCsvExport` / `enableExcelExport` / `enablePdfExport` on the grid (all default `true`). Advance still defaults Excel/PDF to `true` and CSV to `false`.
   - Custom column widgets via `PlexDataGridColumn.cell`; keep `value` for export.
   - `rowStyle` and `cellStyle` (`PlexDataGridCellStyle`); `cellStyle` overlays `rowStyle` field-by-field.
 - **Phase 6 (2.0.1-beta.10) dashboard widgets** (additive): `PlexStatCard`, `PlexStatTile`, `PlexStatGrid`, `PlexProgressRing`, `PlexWidgetCard`, `PlexMiniTable`, `PlexDataList`, `PlexActivityFeed`. They do not replace `PlexDataGrid`, `PlexDataTable`, or reactive `PlexWidget`.
 - **Phase 7 (2.0.1-beta.11) wizard, chart, calendar** (additive): `PlexWizard` / `PlexWizardStep`, `PlexChart` (bar / line / pie), `PlexCalendar` (month view). They do not replace login, `PlexTabs`, `PlexChartGant`, or `PlexFormFieldDate`.
 - **Backlog 2–5 (2.0.1-beta.12)** (additive): wizard vertical / jump, extra chart types, calendar views + events, DataGrid freeze / edit / extra filters, `PlexLookup` / `PlexTag` / `PlexMobileList`, Gantt progress. They do not replace `PlexBadge`, `PlexFormFieldDate`, or existing Gantt call sites (`PlexGanttChart` is a typedef).
 - **Backlog remainder (2.0.1-beta.13)** (additive): chart trellis, DataGrid `frozenRowCount` / `applyCellEdit`, calendar recurrence and drag/resize, Gantt pan/zoom / now line / `dependsOn`, `PlexMobileTally`, Excel via `archive` + `PlexXlsx` (`syncfusion_flutter_xlsio` removed).
+- **DataGrid size and defaults (2.0.1-beta.14)** (additive): `columnSizeMode` / `rowSizeMode` / `headerRowSizeMode`; Advance `WidthMode` maps onto them. Export, grouping, and `autoExpandGroups` default to `true` on `PlexDataGrid` (Advance still defaults Excel/PDF on, CSV off).
 - **Interloop Design** stays in git as a reference folder. It is **not** in the published package (`.pubignore`). Do not treat it as a runtime dependency.
 
 #### Additive by phase
@@ -907,6 +921,7 @@ Shipped: **beta.2** Phase 0 tokens · **beta.3** `.pubignore` for Interloop Desi
 | **7** | beta.11 | `PlexWizard` / `PlexWizardStep`, `PlexChart` (bar / line / pie), `PlexCalendar` month view. |
 | **7+** | beta.12 | Wizard vertical / jump, extra charts, calendar views + events, DataGrid freeze / edit / filters, lookup / tags / mobile list, Gantt progress. |
 | **7+** | beta.13 | Trellis, frozen rows, in-grid mutation, calendar recurrence/drag, Gantt rewrite, `PlexMobileTally`, Excel without xlsio. |
+| **7+** | beta.14 | DataGrid `columnSizeMode` / `rowSizeMode`; export, grouping, and `autoExpandGroups` default on. |
 
 `brandConfig` is optional on `PlexApp`. Omit it to keep seed-only theming.
 

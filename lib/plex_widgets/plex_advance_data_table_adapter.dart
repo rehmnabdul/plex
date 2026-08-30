@@ -6,28 +6,67 @@ import 'package:plex/plex_widgets/plex_data_grid.dart';
 class PlexAdvanceDataTableAdapter {
   const PlexAdvanceDataTableAdapter._();
 
+  /// Maps Advance [WidthMode] onto [PlexDataGridColumnSizeMode].
+  static PlexDataGridColumnSizeMode sizeModeFor(WidthMode mode) {
+    switch (mode) {
+      case WidthMode.none:
+        return PlexDataGridColumnSizeMode.fixed;
+      case WidthMode.auto:
+        return PlexDataGridColumnSizeMode.auto;
+      case WidthMode.fill:
+        return PlexDataGridColumnSizeMode.fill;
+      case WidthMode.lastColumnFill:
+        return PlexDataGridColumnSizeMode.lastFill;
+      case WidthMode.fitByColumnName:
+        return PlexDataGridColumnSizeMode.header;
+      case WidthMode.fitByCellValue:
+        return PlexDataGridColumnSizeMode.cells;
+    }
+  }
+
   static List<PlexDataGridColumn<List<PlexDataTableValueCell>>> columns(
-    List<PlexDataTableHeaderCell> headers,
-  ) {
-    return headers
-        .map(
-          (PlexDataTableHeaderCell header) =>
-              PlexDataGridColumn<List<PlexDataTableValueCell>>(
-            id: header.columnName,
-            title: header.columnName,
-            numeric: header.isNumber,
-            sortable: header.showOrderByControl,
-            searchable: header.showFilterControl,
-            filterable: header.showFilterControl,
-            groupable: true,
-            value: (List<PlexDataTableValueCell> row) =>
-                valueFor(row, header.columnName),
-            cell: (BuildContext context, List<PlexDataTableValueCell> row) {
-              return _buildCell(row, header.columnName);
-            },
+    List<PlexDataTableHeaderCell> headers, {
+    WidthMode? tableWidthMode,
+  }) {
+    return <PlexDataGridColumn<List<PlexDataTableValueCell>>>[
+      for (int i = 0; i < headers.length; i++)
+        PlexDataGridColumn<List<PlexDataTableValueCell>>(
+          id: headers[i].columnName,
+          title: headers[i].columnName,
+          numeric: headers[i].isNumber,
+          sortable: headers[i].showOrderByControl,
+          searchable: headers[i].showFilterControl,
+          filterable: headers[i].showFilterControl,
+          groupable: true,
+          sizeMode: _columnSizeMode(
+            headers[i],
+            tableWidthMode: tableWidthMode,
+            isLast: i == headers.length - 1,
           ),
-        )
-        .toList();
+          value: (List<PlexDataTableValueCell> row) =>
+              valueFor(row, headers[i].columnName),
+          cell: (BuildContext context, List<PlexDataTableValueCell> row) {
+            return _buildCell(row, headers[i].columnName);
+          },
+        ),
+    ];
+  }
+
+  /// Per-header [WidthMode] wins, except table-level `fill` / `lastColumnFill`
+  /// still apply when headers keep the Advance default (`auto`).
+  static PlexDataGridColumnSizeMode _columnSizeMode(
+    PlexDataTableHeaderCell header, {
+    WidthMode? tableWidthMode,
+    required bool isLast,
+  }) {
+    if (tableWidthMode == WidthMode.lastColumnFill && isLast) {
+      return PlexDataGridColumnSizeMode.lastFill;
+    }
+    if (tableWidthMode == WidthMode.fill &&
+        header.widthMode == WidthMode.auto) {
+      return PlexDataGridColumnSizeMode.fill;
+    }
+    return sizeModeFor(header.widthMode);
   }
 
   static PlexDataTableValueCell? cellFor(

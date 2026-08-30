@@ -72,11 +72,45 @@ class PlexDataGridCellStyle {
   }
 }
 
+/// How a [PlexDataGrid] column gets its pixel width.
+enum PlexDataGridColumnSizeMode {
+  /// Pixel width from [PlexDataGridColumn.width] or 160. Current behavior. DEFAULT.
+  fixed,
+
+  /// Max of header text (uppercase as painted) vs cell text on the current page.
+  auto,
+
+  /// Header/title only (SF fitByColumnName).
+  header,
+
+  /// Cell values on the current page only (SF fitByCellValue).
+  cells,
+
+  /// Share leftover viewport width by [PlexDataGridColumn.flex] (default 1). Does not shrink below min.
+  fill,
+
+  /// This column (or the last such column) takes remaining viewport space after others.
+  lastFill,
+}
+
+/// How a [PlexDataGrid] data row gets its pixel height.
+enum PlexDataGridRowSizeMode {
+  /// Density height (34 compact / 44 comfortable). Current behavior. DEFAULT.
+  fixed,
+
+  /// Wrap default text cells; row height = max child (at least density height).
+  auto,
+}
+
 /// Column model for [PlexDataGrid].
 ///
 /// [value] is the cell/sort/search accessor. Optional [cell] replaces the
 /// default text rendering for that column. Optional [cellStyle] styles the
 /// default text cell and overrides [PlexDataGrid.rowStyle] field-by-field.
+///
+/// Auto-fit widths ([PlexDataGridColumnSizeMode.auto], `.header`, `.cells`)
+/// sample **header text plus the current page rows only** (after sort, filter,
+/// and paging), not the whole dataset. See [PlexDataGridSizer].
 class PlexDataGridColumn<T> {
   const PlexDataGridColumn({
     required this.id,
@@ -90,6 +124,11 @@ class PlexDataGridColumn<T> {
     this.groupable = true,
     this.numeric = false,
     this.width,
+    this.sizeMode,
+    this.minWidth,
+    this.maxWidth,
+    this.flex = 1,
+    this.rowSizeMode,
     this.editable = false,
   });
 
@@ -116,12 +155,459 @@ class PlexDataGridColumn<T> {
   /// Offered in the group-by toolbar control when [PlexDataGrid.enableGrouping] is true.
   final bool groupable;
   final bool numeric;
+
+  /// Pixel width when [sizeMode] (or [PlexDataGrid.columnSizeMode]) is
+  /// [PlexDataGridColumnSizeMode.fixed]. Ignored as a minimum for auto-fit;
+  /// use [minWidth] for that. Defaults to 160 when null and mode is fixed.
   final double? width;
+
+  /// When null, inherits [PlexDataGrid.columnSizeMode].
+  final PlexDataGridColumnSizeMode? sizeMode;
+
+  /// Lower bound after measurement / fill. Unset auto-fit uses ~48.
+  final double? minWidth;
+
+  /// Upper bound after measurement / fill. Unset auto-fit uses ~480.
+  final double? maxWidth;
+
+  /// Share of leftover viewport width when [sizeMode] is
+  /// [PlexDataGridColumnSizeMode.fill].
+  final double flex;
+
+  /// When null, inherits [PlexDataGrid.rowSizeMode].
+  final PlexDataGridRowSizeMode? rowSizeMode;
 
   /// When true and [PlexDataGrid.onCellEdited] or
   /// [PlexDataGrid.applyCellEdit] is set, default text cells can be edited.
   /// Custom [cell] widgets are not replaced.
   final bool editable;
+}
+
+/// Deterministic [TextPainter] measurements for [PlexDataGrid] column widths
+/// and row heights.
+///
+/// Auto-width samples **header + current page rows only** (after sort, filter,
+/// and paging), not the whole dataset. Custom [PlexDataGridColumn.cell]
+/// widgets are measured via [PlexDataGridColumn.value] `.toString()`; arbitrary
+/// widgets cannot be measured.
+///
+/// Extents are cached for the frame (keyed by style + text + maxWidth).
+class PlexDataGridSizer {
+  PlexDataGridSizer({this.fontFamily = 'Roboto'});
+
+  final String fontFamily;
+
+  static const double horizontalPadding = PlexDim.small * 2;
+  static const double defaultMinWidth = 48;
+  static const double defaultMaxWidth = 480;
+  static const double defaultFixedWidth = 160;
+  static const double sortIconExtra = 14;
+  static const double groupIconExtra = 30;
+  static const double selectColumnWidth = 44;
+
+  final Map<Object, Size> _cache = <Object, Size>{};
+
+  double densityRowHeight(PlexDensity density) {
+    return density == PlexDensity.compact ? 34 : 44;
+  }
+
+  double densityHeaderHeight(PlexDensity density) {
+    return density == PlexDensity.compact ? 38 : 44;
+  }
+
+  /// Unconstrained width of [text] with body cell styling.
+  double measureCellWidth(
+    String text, {
+    bool numeric = false,
+    double? fontSize,
+    FontWeight? fontWeight,
+    String? fontFamily,
+  }) {
+    return _measure(
+          text: text,
+          fontSize: fontSize ?? PlexFontSize.body,
+          fontWeight: fontWeight,
+          tabular: numeric,
+          fontFamily: fontFamily,
+        ).width +
+        horizontalPadding;
+  }
+
+  /// Wrapped height of [text] at [maxWidth] with body cell styling.
+  double measureCellHeight(
+    String text, {
+    required double maxWidth,
+    bool numeric = false,
+    double? fontSize,
+    FontWeight? fontWeight,
+    String? fontFamily,
+  }) {
+    return _measure(
+      text: text,
+      fontSize: fontSize ?? PlexFontSize.body,
+      fontWeight: fontWeight,
+      tabular: numeric,
+      fontFamily: fontFamily,
+      maxWidth: maxWidth,
+    ).height;
+  }
+
+  /// Header label width: [title] painted uppercase + padding, plus [sortIconExtra]
+  /// when [sortable] and [groupIconExtra] when [groupable].
+  double measureHeaderWidth(
+    String title, {
+    bool sortable = false,
+    bool groupable = false,
+    String? fontFamily,
+  }) {
+    return _measure(
+          text: title.toUpperCase(),
+          fontSize: PlexFontSize.small,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 0.05 * PlexFontSize.small,
+          fontFamily: fontFamily,
+        ).width +
+        horizontalPadding +
+        (sortable ? sortIconExtra : 0) +
+        (groupable ? groupIconExtra : 0);
+  }
+
+  /// Preferred width of [column] before fill / lastFill leftover is applied.
+  ///
+  /// [pageRows] must already be the visible page (after sort/filter/paging).
+  double columnIntrinsicWidth<T>({
+    required PlexDataGridColumn<T> column,
+    required List<T> pageRows,
+    required PlexDataGridColumnSizeMode gridColumnSizeMode,
+    PlexDataGridCellStyle? Function(T row)? rowStyle,
+    bool groupingEnabled = false,
+  }) {
+    final PlexDataGridColumnSizeMode mode =
+        column.sizeMode ?? gridColumnSizeMode;
+    switch (mode) {
+      case PlexDataGridColumnSizeMode.fixed:
+        return _clampWidth(
+          column.width ?? defaultFixedWidth,
+          column,
+          autoCaps: false,
+        );
+      case PlexDataGridColumnSizeMode.fill:
+      case PlexDataGridColumnSizeMode.lastFill:
+        return column.minWidth ??
+            defaultMinWidth +
+                (groupingEnabled && column.groupable ? groupIconExtra : 0);
+      case PlexDataGridColumnSizeMode.header:
+        return _clampWidth(
+          measureHeaderWidth(
+            column.title,
+            sortable: column.sortable,
+            groupable: groupingEnabled && column.groupable,
+          ),
+          column,
+          autoCaps: true,
+        );
+      case PlexDataGridColumnSizeMode.cells:
+        return _clampWidth(
+          _maxCellWidth(column, pageRows, rowStyle),
+          column,
+          autoCaps: true,
+        );
+      case PlexDataGridColumnSizeMode.auto:
+        return _clampWidth(
+          math.max(
+            measureHeaderWidth(
+              column.title,
+              sortable: column.sortable,
+              groupable: groupingEnabled && column.groupable,
+            ),
+            _maxCellWidth(column, pageRows, rowStyle),
+          ),
+          column,
+          autoCaps: true,
+        );
+    }
+  }
+
+  /// Body slot widths (optional leading checkbox + each data column).
+  ///
+  /// [viewportWidth] is the grid body width. Selection checkbox uses
+  /// [selectColumnWidth] (44) and is subtracted before fill / lastFill.
+  /// If non-fill columns exceed the viewport, fill / lastFill stay at their
+  /// minimum and the grid scrolls horizontally.
+  List<double> resolveColumnWidths<T>({
+    required List<PlexDataGridColumn<T>> columns,
+    required List<T> pageRows,
+    required PlexDataGridColumnSizeMode gridColumnSizeMode,
+    required double viewportWidth,
+    bool selectable = false,
+    bool groupingEnabled = false,
+    PlexDataGridCellStyle? Function(T row)? rowStyle,
+  }) {
+    final List<double> colWidths = <double>[
+      for (final PlexDataGridColumn<T> column in columns)
+        columnIntrinsicWidth(
+          column: column,
+          pageRows: pageRows,
+          gridColumnSizeMode: gridColumnSizeMode,
+          rowStyle: rowStyle,
+          groupingEnabled: groupingEnabled,
+        ),
+    ];
+    final List<double> maxes = <double>[
+      for (final PlexDataGridColumn<T> column in columns)
+        column.maxWidth ?? double.infinity,
+    ];
+    final List<double> flexes = <double>[
+      for (final PlexDataGridColumn<T> column in columns)
+        column.flex < 0 ? 0.0 : column.flex,
+    ];
+    final List<int> fillIdx = <int>[];
+    final List<int> lastFillIdx = <int>[];
+    for (int i = 0; i < columns.length; i++) {
+      final PlexDataGridColumnSizeMode mode =
+          columns[i].sizeMode ?? gridColumnSizeMode;
+      if (mode == PlexDataGridColumnSizeMode.fill) {
+        fillIdx.add(i);
+      } else if (mode == PlexDataGridColumnSizeMode.lastFill) {
+        lastFillIdx.add(i);
+      }
+    }
+
+    double used = (selectable ? selectColumnWidth : 0) +
+        colWidths.fold<double>(0, (double s, double w) => s + w);
+    double leftover =
+        viewportWidth.isFinite ? math.max(0.0, viewportWidth - used) : 0.0;
+    if (leftover > 0) {
+      _distribute(fillIdx, colWidths, maxes, flexes, leftover);
+      used = (selectable ? selectColumnWidth : 0) +
+          colWidths.fold<double>(0, (double s, double w) => s + w);
+      leftover =
+          viewportWidth.isFinite ? math.max(0.0, viewportWidth - used) : 0.0;
+      if (leftover > 0 && lastFillIdx.isNotEmpty) {
+        _distribute(
+          <int>[lastFillIdx.last],
+          colWidths,
+          maxes,
+          flexes,
+          leftover,
+        );
+      }
+    }
+    return <double>[
+      if (selectable) selectColumnWidth,
+      ...colWidths,
+    ];
+  }
+
+  /// Data-row height: density when every column is [PlexDataGridRowSizeMode.fixed],
+  /// otherwise max(density, wrapped default-text heights) for auto columns.
+  double resolveRowHeight<T>({
+    required T row,
+    required List<PlexDataGridColumn<T>> columns,
+    required List<double> columnWidths,
+    required PlexDensity density,
+    required PlexDataGridRowSizeMode gridRowSizeMode,
+    PlexDataGridCellStyle? Function(T row)? rowStyle,
+    bool selectable = false,
+  }) {
+    final double minH = densityRowHeight(density);
+    int widthIndex = selectable ? 1 : 0;
+    double height = minH;
+    bool anyAuto = false;
+    for (final PlexDataGridColumn<T> column in columns) {
+      final double colW = columnWidths[widthIndex++];
+      if ((column.rowSizeMode ?? gridRowSizeMode) !=
+          PlexDataGridRowSizeMode.auto) {
+        continue;
+      }
+      anyAuto = true;
+      final PlexDataGridCellStyle? merged =
+          _mergedStyle(column, row, rowStyle);
+      final String text = column.value(row)?.toString() ?? '';
+      final double maxW = math.max(0.0, colW - horizontalPadding);
+      height = math.max(
+        height,
+        measureCellHeight(
+          text,
+          maxWidth: maxW,
+          numeric: column.numeric,
+          fontSize: merged?.fontSize,
+          fontWeight: merged?.fontWeight,
+        ),
+      );
+    }
+    return anyAuto ? height : minH;
+  }
+
+  /// Header row height. [PlexDataGridRowSizeMode.auto] wraps the uppercase
+  /// title and grows from the density header height.
+  double resolveHeaderHeight<T>({
+    required List<PlexDataGridColumn<T>> columns,
+    required List<double> columnWidths,
+    required PlexDensity density,
+    required PlexDataGridRowSizeMode headerRowSizeMode,
+    bool selectable = false,
+  }) {
+    final double minH = densityHeaderHeight(density);
+    if (headerRowSizeMode != PlexDataGridRowSizeMode.auto) return minH;
+    double height = minH;
+    int widthIndex = selectable ? 1 : 0;
+    for (final PlexDataGridColumn<T> column in columns) {
+      final double colW = columnWidths[widthIndex++];
+      final double extra = (column.sortable ? sortIconExtra : 0) +
+          (column.groupable ? groupIconExtra : 0);
+      final double maxW = math.max(0.0, colW - horizontalPadding - extra);
+      height = math.max(
+        height,
+        _measure(
+          text: column.title.toUpperCase(),
+          fontSize: PlexFontSize.small,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 0.05 * PlexFontSize.small,
+          maxWidth: maxW,
+        ).height,
+      );
+    }
+    return height;
+  }
+
+  bool columnsUseFixedRowHeight<T>(
+    List<PlexDataGridColumn<T>> columns,
+    PlexDataGridRowSizeMode gridRowSizeMode,
+  ) {
+    for (final PlexDataGridColumn<T> column in columns) {
+      if ((column.rowSizeMode ?? gridRowSizeMode) ==
+          PlexDataGridRowSizeMode.auto) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  double _maxCellWidth<T>(
+    PlexDataGridColumn<T> column,
+    List<T> pageRows,
+    PlexDataGridCellStyle? Function(T row)? rowStyle,
+  ) {
+    double maxW = 0;
+    for (final T row in pageRows) {
+      final PlexDataGridCellStyle? merged =
+          _mergedStyle(column, row, rowStyle);
+      final String text = column.value(row)?.toString() ?? '';
+      maxW = math.max(
+        maxW,
+        measureCellWidth(
+          text,
+          numeric: column.numeric,
+          fontSize: merged?.fontSize,
+          fontWeight: merged?.fontWeight,
+        ),
+      );
+    }
+    return maxW;
+  }
+
+  PlexDataGridCellStyle? _mergedStyle<T>(
+    PlexDataGridColumn<T> column,
+    T row,
+    PlexDataGridCellStyle? Function(T row)? rowStyle,
+  ) {
+    final PlexDataGridCellStyle? base = rowStyle?.call(row);
+    final PlexDataGridCellStyle? cell = column.cellStyle?.call(row);
+    if (base == null) return cell;
+    return base.merge(cell);
+  }
+
+  double _clampWidth<T>(
+    double width,
+    PlexDataGridColumn<T> column, {
+    required bool autoCaps,
+  }) {
+    final double minW =
+        column.minWidth ?? (autoCaps ? defaultMinWidth : 0);
+    final double maxW =
+        column.maxWidth ?? (autoCaps ? defaultMaxWidth : double.infinity);
+    if (maxW < minW) return minW;
+    return width.clamp(minW, maxW);
+  }
+
+  void _distribute(
+    List<int> indices,
+    List<double> widths,
+    List<double> maxes,
+    List<double> flexes,
+    double leftover,
+  ) {
+    if (indices.isEmpty || leftover <= 0) return;
+    final List<int> growing = List<int>.from(indices);
+    double remaining = leftover;
+    while (remaining > 0.01 && growing.isNotEmpty) {
+      final double flexSum =
+          growing.fold<double>(0, (double s, int i) => s + flexes[i]);
+      if (flexSum <= 0) break;
+      final double perFlex = remaining / flexSum;
+      double used = 0;
+      final List<int> saturated = <int>[];
+      for (final int i in growing) {
+        final double add = perFlex * flexes[i];
+        final double room = maxes[i] - widths[i];
+        if (room <= 0) {
+          saturated.add(i);
+          continue;
+        }
+        final double take = math.min(add, room);
+        widths[i] += take;
+        used += take;
+        if (take >= room - 0.01) saturated.add(i);
+      }
+      remaining -= used;
+      growing.removeWhere(saturated.contains);
+      if (used < 0.01) break;
+    }
+  }
+
+  Size _measure({
+    required String text,
+    required double fontSize,
+    FontWeight? fontWeight,
+    double letterSpacing = 0,
+    bool tabular = false,
+    double maxWidth = double.infinity,
+    String? fontFamily,
+  }) {
+    final String family = fontFamily ?? this.fontFamily;
+    final Object key = Object.hash(
+      text,
+      fontSize,
+      fontWeight?.index,
+      letterSpacing,
+      tabular,
+      maxWidth,
+      family,
+    );
+    final Size? cached = _cache[key];
+    if (cached != null) return cached;
+    final TextPainter painter = TextPainter(
+      text: TextSpan(
+        text: text,
+        style: TextStyle(
+          fontFamily: family,
+          fontSize: fontSize,
+          fontWeight: fontWeight,
+          letterSpacing: letterSpacing == 0 ? null : letterSpacing,
+          fontFeatures: tabular
+              ? const <FontFeature>[FontFeature.tabularFigures()]
+              : null,
+        ),
+      ),
+      textDirection: TextDirection.ltr,
+    );
+    painter.layout(maxWidth: maxWidth);
+    final Size size = Size(painter.width, painter.height);
+    painter.dispose();
+    _cache[key] = size;
+    return size;
+  }
 }
 
 /// How a per-column filter compares the typed query to cell text.
@@ -568,11 +1054,11 @@ class PlexDataGrid<T> extends StatefulWidget {
     this.showDensityToggle = true,
     this.showFooter = true,
     this.height,
-    this.enableCsvExport = false,
-    this.enableExcelExport = false,
-    this.enablePdfExport = false,
+    this.enableCsvExport = true,
+    this.enableExcelExport = true,
+    this.enablePdfExport = true,
     this.showColumnFilters = false,
-    this.enableGrouping = false,
+    this.enableGrouping = true,
     this.groupByColumnId,
     this.groupByColumnIds,
     this.autoExpandGroups = true,
@@ -584,6 +1070,9 @@ class PlexDataGrid<T> extends StatefulWidget {
     this.rowStyle,
     this.frozenColumnCount = 0,
     this.frozenRowCount = 0,
+    this.columnSizeMode = PlexDataGridColumnSizeMode.fixed,
+    this.rowSizeMode = PlexDataGridRowSizeMode.fixed,
+    this.headerRowSizeMode = PlexDataGridRowSizeMode.fixed,
     this.onCellEdited,
     this.applyCellEdit,
     this.onRowsChanged,
@@ -619,20 +1108,21 @@ class PlexDataGrid<T> extends StatefulWidget {
   final bool showFooter;
   final double? height;
 
-  /// Toolbar CSV button. Default `false` (opt-in on [PlexDataGrid]).
+  /// Toolbar CSV button. Default `true`.
   final bool enableCsvExport;
 
-  /// Toolbar Excel button. Default `false`; [PlexAdvanceDataTable] defaults this to `true`.
+  /// Toolbar Excel button. Default `true`.
   final bool enableExcelExport;
 
-  /// Toolbar PDF button. Default `false`; [PlexAdvanceDataTable] defaults this to `true`.
+  /// Toolbar PDF button. Default `true`.
   final bool enablePdfExport;
 
   /// Shows a filter row under the header (contains / equals per [PlexDataGridColumn.filterable] column).
   final bool showColumnFilters;
 
-  /// Shows a group-by control in the toolbar. Users can add/remove grouping
-  /// columns (header action and toolbar chips). Order of ids is nest order.
+  /// Shows a group-by control in the toolbar. Default `true`. Users can
+  /// add/remove grouping columns (header action and toolbar chips). Order of
+  /// ids is nest order.
   final bool enableGrouping;
 
   /// Convenience for a single grouping column. Maps to a one-item
@@ -644,7 +1134,7 @@ class PlexDataGrid<T> extends StatefulWidget {
   /// group.
   final List<String>? groupByColumnIds;
 
-  /// When true, groups start expanded.
+  /// When true, groups start expanded. Default `true`.
   final bool autoExpandGroups;
 
   /// Caption for a group header. Defaults to `"key (count)"`.
@@ -682,6 +1172,17 @@ class PlexDataGrid<T> extends StatefulWidget {
   /// top-right scroll-x, bottom-left scroll-y, bottom-right both).
   final int frozenRowCount;
 
+  /// Default column width mode. Columns may override with
+  /// [PlexDataGridColumn.sizeMode].
+  final PlexDataGridColumnSizeMode columnSizeMode;
+
+  /// Default data-row height mode. Columns may override with
+  /// [PlexDataGridColumn.rowSizeMode].
+  final PlexDataGridRowSizeMode rowSizeMode;
+
+  /// Header label wrap / height. Independent of [rowSizeMode].
+  final PlexDataGridRowSizeMode headerRowSizeMode;
+
   /// Fired after an editable default text cell is submitted.
   /// Does not rewrite [rows] unless [applyCellEdit] is also set.
   final void Function(T row, String columnId, String newValue)? onCellEdited;
@@ -704,9 +1205,6 @@ class PlexDataGrid<T> extends StatefulWidget {
 }
 
 class _PlexDataGridState<T> extends State<PlexDataGrid<T>> {
-  static const double _selectColWidth = 44;
-  static const double _defaultColWidth = 160;
-
   static const double _filterRowHeight = 36;
 
   final TextEditingController _searchController = TextEditingController();
@@ -797,21 +1295,8 @@ class _PlexDataGridState<T> extends State<PlexDataGrid<T>> {
     return density == PlexDensity.compact ? 34 : 44;
   }
 
-  double _headerHeight(PlexDensity density) {
-    return density == PlexDensity.compact ? 38 : 44;
-  }
-
-  double _columnWidth(PlexDataGridColumn<T> column) {
-    return column.width ?? _defaultColWidth;
-  }
-
-  List<double> _bodyColumnWidths() {
-    return <double>[
-      if (widget.selectionMode != PlexDataGridSelectionMode.none)
-        _selectColWidth,
-      ...widget.columns.map(_columnWidth),
-    ];
-  }
+  bool get _selectable =>
+      widget.selectionMode != PlexDataGridSelectionMode.none;
 
   List<T> _filteredRows() {
     return PlexDataGridEngine.filter(
@@ -1251,18 +1736,29 @@ class _PlexDataGridState<T> extends State<PlexDataGrid<T>> {
     ];
     final int total = lines.length;
     final int pageCount = _pageCount(total);
-    final List<double> widths = _bodyColumnWidths();
-    final double minWidth =
-        widths.fold<double>(0, (double s, double w) => s + w);
+    final PlexDataGridSizer sizer =
+        PlexDataGridSizer(fontFamily: theme.fontFamily);
 
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         final double height = widget.height ??
             (constraints.maxHeight.isFinite ? constraints.maxHeight : 520);
+        final double width = constraints.maxWidth.isFinite
+            ? constraints.maxWidth
+            : sizer
+                .resolveColumnWidths(
+                  columns: widget.columns,
+                  pageRows: pageRows,
+                  gridColumnSizeMode: widget.columnSizeMode,
+                  viewportWidth: 0,
+                  selectable: _selectable,
+                  groupingEnabled: widget.enableGrouping,
+                  rowStyle: widget.rowStyle,
+                )
+                .fold<double>(0, (double s, double w) => s + w);
         return SizedBox(
           height: height,
-          width:
-              constraints.maxWidth.isFinite ? constraints.maxWidth : minWidth,
+          width: width,
           child: DecoratedBox(
             decoration: BoxDecoration(
               color: colors.surfaceCard,
@@ -1291,8 +1787,7 @@ class _PlexDataGridState<T> extends State<PlexDataGrid<T>> {
                           density: density,
                           pageLines: pageLines,
                           pageRows: pageRows,
-                          widths: widths,
-                          minWidth: minWidth,
+                          sizer: sizer,
                         ),
                         if (widget.loading && pageRows.isNotEmpty)
                           Positioned.fill(
@@ -1346,7 +1841,7 @@ class _PlexDataGridState<T> extends State<PlexDataGrid<T>> {
           children: [
             if (widget.title != null || widget.subtitle != null)
               ConstrainedBox(
-                constraints: const BoxConstraints(minWidth: 120, maxWidth: 280),
+                constraints: const BoxConstraints(minWidth: 120),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -1556,6 +2051,7 @@ class _PlexDataGridState<T> extends State<PlexDataGrid<T>> {
     bool? includeSelection,
     String keyPrefix = '',
     bool leading = true,
+    double? rowHeight,
   }) {
     if (line.isGroup) {
       return _buildGroupRow(
@@ -1589,6 +2085,7 @@ class _PlexDataGridState<T> extends State<PlexDataGrid<T>> {
       keyPrefix: keyPrefix,
       columns: columns,
       includeSelection: includeSelection,
+      height: rowHeight,
     );
   }
 
@@ -1602,6 +2099,7 @@ class _PlexDataGridState<T> extends State<PlexDataGrid<T>> {
     bool? includeSelection,
     String keyPrefix = '',
     bool leading = true,
+    List<double>? lineHeights,
   }) {
     if (lines.isEmpty) return const SizedBox.shrink();
     return DecoratedBox(
@@ -1611,17 +2109,18 @@ class _PlexDataGridState<T> extends State<PlexDataGrid<T>> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          for (final PlexDataGridLine<T> line in lines)
+          for (int i = 0; i < lines.length; i++)
             _buildPageLine(
               theme: theme,
               colors: colors,
               density: density,
-              line: line,
+              line: lines[i],
               widths: widths,
               columns: columns,
               includeSelection: includeSelection,
               keyPrefix: keyPrefix,
               leading: leading,
+              rowHeight: lineHeights?[i],
             ),
         ],
       ),
@@ -1640,13 +2139,14 @@ class _PlexDataGridState<T> extends State<PlexDataGrid<T>> {
     bool? includeSelection,
     String keyPrefix = '',
     bool leading = true,
+    List<double>? lineHeights,
   }) {
     if (pageLines.isEmpty) return _buildEmpty(theme, colors);
     return ListView.builder(
       controller: controller,
       primary: controller == null ? null : false,
       itemCount: scrollingLines.length,
-      itemExtent: _rowHeight(density),
+      itemExtent: lineHeights == null ? _rowHeight(density) : null,
       itemBuilder: (BuildContext context, int index) {
         return _buildPageLine(
           theme: theme,
@@ -1658,6 +2158,7 @@ class _PlexDataGridState<T> extends State<PlexDataGrid<T>> {
           includeSelection: includeSelection,
           keyPrefix: keyPrefix,
           leading: leading,
+          rowHeight: lineHeights?[index],
         );
       },
     );
@@ -1669,29 +2170,80 @@ class _PlexDataGridState<T> extends State<PlexDataGrid<T>> {
     required PlexDensity density,
     required List<PlexDataGridLine<T>> pageLines,
     required List<T> pageRows,
-    required List<double> widths,
-    required double minWidth,
+    required PlexDataGridSizer sizer,
   }) {
-    final int frozen = widget.frozenColumnCount.clamp(0, widget.columns.length);
-    final List<PlexDataGridLine<T>> frozenLines = _frozenPageLines(pageLines);
-    final List<PlexDataGridLine<T>> scrollingLines =
-        frozenLines.isEmpty ? pageLines : pageLines.sublist(frozenLines.length);
-    if (frozen > 0) {
-      return _buildFrozenBody(
-        theme: theme,
-        colors: colors,
-        density: density,
-        pageLines: pageLines,
-        pageRows: pageRows,
-        frozenLines: frozenLines,
-        scrollingLines: scrollingLines,
-        widths: widths,
-        frozen: frozen,
-      );
-    }
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
-        final double gridWidth = math.max(minWidth, constraints.maxWidth);
+        final double viewport =
+            constraints.maxWidth.isFinite ? constraints.maxWidth : 0;
+        final List<double> widths = sizer.resolveColumnWidths(
+          columns: widget.columns,
+          pageRows: pageRows,
+          gridColumnSizeMode: widget.columnSizeMode,
+          viewportWidth: viewport,
+          selectable: _selectable,
+          groupingEnabled: widget.enableGrouping,
+          rowStyle: widget.rowStyle,
+        );
+        final double minWidth =
+            widths.fold<double>(0, (double s, double w) => s + w);
+        final bool fixedRows = sizer.columnsUseFixedRowHeight(
+          widget.columns,
+          widget.rowSizeMode,
+        );
+        final List<double>? lineHeights = fixedRows
+            ? null
+            : <double>[
+                for (final PlexDataGridLine<T> line in pageLines)
+                  line.row == null
+                      ? sizer.densityRowHeight(density)
+                      : sizer.resolveRowHeight(
+                          row: line.row as T,
+                          columns: widget.columns,
+                          columnWidths: widths,
+                          density: density,
+                          gridRowSizeMode: widget.rowSizeMode,
+                          rowStyle: widget.rowStyle,
+                          selectable: _selectable,
+                        ),
+              ];
+        final double headerHeight = sizer.resolveHeaderHeight(
+          columns: widget.columns,
+          columnWidths: widths,
+          density: density,
+          headerRowSizeMode: widget.headerRowSizeMode,
+          selectable: _selectable,
+        );
+        final int frozen =
+            widget.frozenColumnCount.clamp(0, widget.columns.length);
+        final List<PlexDataGridLine<T>> frozenLines =
+            _frozenPageLines(pageLines);
+        final List<PlexDataGridLine<T>> scrollingLines = frozenLines.isEmpty
+            ? pageLines
+            : pageLines.sublist(frozenLines.length);
+        final List<double>? frozenHeights =
+            lineHeights?.sublist(0, frozenLines.length);
+        final List<double>? scrollHeights =
+            lineHeights?.sublist(frozenLines.length);
+        if (frozen > 0) {
+          return _buildFrozenBody(
+            theme: theme,
+            colors: colors,
+            density: density,
+            pageLines: pageLines,
+            pageRows: pageRows,
+            frozenLines: frozenLines,
+            scrollingLines: scrollingLines,
+            widths: widths,
+            frozen: frozen,
+            headerHeight: headerHeight,
+            frozenHeights: frozenHeights,
+            scrollHeights: scrollHeights,
+          );
+        }
+        final double gridWidth = constraints.maxWidth.isFinite
+            ? math.max(minWidth, constraints.maxWidth)
+            : minWidth;
         return Scrollbar(
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
@@ -1699,7 +2251,14 @@ class _PlexDataGridState<T> extends State<PlexDataGrid<T>> {
               width: gridWidth,
               child: Column(
                 children: [
-                  _buildHeader(theme, colors, density, pageRows, widths),
+                  _buildHeader(
+                    theme,
+                    colors,
+                    density,
+                    pageRows,
+                    widths,
+                    headerHeight: headerHeight,
+                  ),
                   if (frozenLines.isNotEmpty)
                     _buildFrozenRowBand(
                       theme: theme,
@@ -1707,6 +2266,7 @@ class _PlexDataGridState<T> extends State<PlexDataGrid<T>> {
                       density: density,
                       lines: frozenLines,
                       widths: widths,
+                      lineHeights: frozenHeights,
                     ),
                   Expanded(
                     child: _buildScrollingLines(
@@ -1716,6 +2276,7 @@ class _PlexDataGridState<T> extends State<PlexDataGrid<T>> {
                       pageLines: pageLines,
                       scrollingLines: scrollingLines,
                       widths: widths,
+                      lineHeights: scrollHeights,
                     ),
                   ),
                 ],
@@ -1737,6 +2298,9 @@ class _PlexDataGridState<T> extends State<PlexDataGrid<T>> {
     required List<PlexDataGridLine<T>> scrollingLines,
     required List<double> widths,
     required int frozen,
+    required double headerHeight,
+    List<double>? frozenHeights,
+    List<double>? scrollHeights,
   }) {
     final bool selectable =
         widget.selectionMode != PlexDataGridSelectionMode.none;
@@ -1773,6 +2337,7 @@ class _PlexDataGridState<T> extends State<PlexDataGrid<T>> {
             paneWidths,
             columns: columns,
             includeSelection: includeSelection,
+            headerHeight: headerHeight,
           ),
           if (frozenLines.isNotEmpty)
             _buildFrozenRowBand(
@@ -1785,6 +2350,7 @@ class _PlexDataGridState<T> extends State<PlexDataGrid<T>> {
               includeSelection: includeSelection,
               keyPrefix: keyPrefix,
               leading: leading,
+              lineHeights: frozenHeights,
             ),
           Expanded(
             child: _buildScrollingLines(
@@ -1799,6 +2365,7 @@ class _PlexDataGridState<T> extends State<PlexDataGrid<T>> {
               includeSelection: includeSelection,
               keyPrefix: keyPrefix,
               leading: leading,
+              lineHeights: scrollHeights,
             ),
           ),
         ],
@@ -1853,6 +2420,7 @@ class _PlexDataGridState<T> extends State<PlexDataGrid<T>> {
     List<double> widths, {
     List<PlexDataGridColumn<T>>? columns,
     bool? includeSelection,
+    required double headerHeight,
   }) {
     final List<PlexDataGridColumn<T>> headerColumns = columns ?? widget.columns;
     final bool selectable = includeSelection ??
@@ -1865,8 +2433,10 @@ class _PlexDataGridState<T> extends State<PlexDataGrid<T>> {
         pageRows.any((T row) => _selectedIds.contains(_idFor(row)));
 
     int widthIndex = 0;
+    final bool wrapHeader =
+        widget.headerRowSizeMode == PlexDataGridRowSizeMode.auto;
     final Widget headerRow = SizedBox(
-      height: _headerHeight(density),
+      height: headerHeight,
       child: Row(
         children: [
           if (selectable)
@@ -1914,6 +2484,7 @@ class _PlexDataGridState<T> extends State<PlexDataGrid<T>> {
                 onToggleGroup: widget.enableGrouping && column.groupable
                     ? () => _toggleGroupColumn(column.id)
                     : null,
+                wrap: wrapHeader,
               ),
             ),
         ],
@@ -2253,6 +2824,7 @@ class _PlexDataGridState<T> extends State<PlexDataGrid<T>> {
     String keyPrefix = '',
     List<PlexDataGridColumn<T>>? columns,
     bool? includeSelection,
+    double? height,
   }) {
     final Object id = _idFor(row);
     final bool selected = _selectedIds.contains(id);
@@ -2276,7 +2848,7 @@ class _PlexDataGridState<T> extends State<PlexDataGrid<T>> {
           ),
           child: SizedBox(
             key: ValueKey<Object>('plex-data-grid-row-$keyPrefix$id'),
-            height: _rowHeight(density),
+            height: height ?? _rowHeight(density),
             child: Row(
               children: [
                 if (selectable)
@@ -2310,6 +2882,8 @@ class _PlexDataGridState<T> extends State<PlexDataGrid<T>> {
                     width: widths[widthIndex++],
                     rowStyle: rowStyle,
                     selected: selected,
+                    wrap: (column.rowSizeMode ?? widget.rowSizeMode) ==
+                        PlexDataGridRowSizeMode.auto,
                   ),
               ],
             ),
@@ -2327,6 +2901,7 @@ class _PlexDataGridState<T> extends State<PlexDataGrid<T>> {
     required double width,
     required PlexDataGridCellStyle? rowStyle,
     required bool selected,
+    bool wrap = false,
   }) {
     final PlexDataGridCellStyle? cellStyle = column.cellStyle?.call(row);
     final PlexDataGridCellStyle? merged =
@@ -2379,8 +2954,9 @@ class _PlexDataGridState<T> extends State<PlexDataGrid<T>> {
     } else {
       content = Text(
         column.value(row)?.toString() ?? '',
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
+        maxLines: wrap ? null : 1,
+        overflow: wrap ? TextOverflow.clip : TextOverflow.ellipsis,
+        softWrap: wrap,
         textAlign: textAlign,
         style: textStyle,
       );
@@ -2607,6 +3183,7 @@ class _HeaderCell extends StatelessWidget {
     this.groupable = false,
     this.grouped = false,
     this.onToggleGroup,
+    this.wrap = false,
   });
 
   final PlexThemeData theme;
@@ -2620,57 +3197,61 @@ class _HeaderCell extends StatelessWidget {
   final bool groupable;
   final bool grouped;
   final VoidCallback? onToggleGroup;
+  final bool wrap;
 
   @override
   Widget build(BuildContext context) {
     final bool sorted = sort != null;
     final Color textColor = sorted ? colors.textBrand : colors.textMuted;
-    final Widget label = Row(
-      children: [
-        Expanded(
-          child: Text(
-            columnTitle.toUpperCase(),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            textAlign: numeric ? TextAlign.right : TextAlign.left,
-            style: TextStyle(
-              fontFamily: theme.fontFamily,
-              fontSize: PlexFontSize.small,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 0.05 * PlexFontSize.small,
+    final Widget label = ClipRect(
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              columnTitle.toUpperCase(),
+              maxLines: wrap ? null : 1,
+              overflow: wrap ? TextOverflow.clip : TextOverflow.ellipsis,
+              softWrap: wrap,
+              textAlign: numeric ? TextAlign.right : TextAlign.left,
+              style: TextStyle(
+                fontFamily: theme.fontFamily,
+                fontSize: PlexFontSize.small,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.05 * PlexFontSize.small,
+                color: textColor,
+              ),
+            ),
+          ),
+          if (sortable) ...[
+            const SizedBox(width: PlexDim.mini),
+            Icon(
+              sort?.direction == PlexDataGridSortDirection.descending
+                  ? Icons.arrow_downward
+                  : Icons.arrow_upward,
+              size: 12,
               color: textColor,
             ),
-          ),
-        ),
-        if (sortable) ...[
-          const SizedBox(width: PlexDim.mini),
-          Icon(
-            sort?.direction == PlexDataGridSortDirection.descending
-                ? Icons.arrow_downward
-                : Icons.arrow_upward,
-            size: 12,
-            color: textColor,
-          ),
-        ],
-        if (onToggleGroup != null) ...[
-          const SizedBox(width: 2),
-          IconButton(
-            key: Key('plex-data-grid-header-group-$columnId'),
-            tooltip: grouped
-                ? 'Remove group: $columnTitle'
-                : 'Group by $columnTitle',
-            visualDensity: VisualDensity.compact,
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
-            icon: Icon(
-              grouped ? Icons.account_tree : Icons.account_tree_outlined,
-              size: 14,
-              color: grouped ? colors.textBrand : colors.textMuted,
+          ],
+          if (onToggleGroup != null) ...[
+            const SizedBox(width: 2),
+            IconButton(
+              key: Key('plex-data-grid-header-group-$columnId'),
+              tooltip: grouped
+                  ? 'Remove group: $columnTitle'
+                  : 'Group by $columnTitle',
+              visualDensity: VisualDensity.compact,
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
+              icon: Icon(
+                grouped ? Icons.account_tree : Icons.account_tree_outlined,
+                size: 14,
+                color: grouped ? colors.textBrand : colors.textMuted,
+              ),
+              onPressed: onToggleGroup,
             ),
-            onPressed: onToggleGroup,
-          ),
+          ],
         ],
-      ],
+      ),
     );
 
     return Semantics(
